@@ -23,6 +23,24 @@ const otherRouter = [
     }]
   },
   {
+    path: '/userInfo',
+    name: 'userInfo',
+    component: Main,
+    meta: {
+      hideInBread: true,
+      hideInMenu: true
+    },
+    children: [{
+      path: 'user-info',
+      name: 'user-info',
+      meta: {
+        icon: 'iconfont icon-person',
+        title: '个人档案'
+      },
+      component: () => import( /* webpackChunkName: "user-info" */ '@/views/other-page/userInfo/user-info.vue')
+    }]
+  },
+  {
     path: '/locking',
     name: 'locking',
     meta: {
