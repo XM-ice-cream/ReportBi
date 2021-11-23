@@ -1,0 +1,216 @@
+{
+    "Print-B,Print-T": [
+        {
+            "id": "388A6C73-2033-4464-82BE-59C09BB11C2A",
+            "itemName": "barCodes",
+            "type": "arrString"
+        },
+        {
+            "id": "67578669-6C4D-4650-B836-81779972C7E1",
+            "itemName": "toolingFixtureEncodes",
+            "type": "arrString"
+        },
+        {
+            "id": "2BFBCA53-16D8-497C-95DC-594B656EFB25",
+            "itemName": "collectDataValues",
+            "_showChildren": true,
+            "children": [
+                {
+                    "id": "F310929E-34D0-4E91-A237-F02BDD71378F",
+                    "itemName": "Stencil",
+                    "itemValue": ""
+                },
+                {
+                    "id": "5493EF63-BF29-446A-809A-83AE4F96BDFB",
+                    "itemName": "ItemPnRid",
+                    "itemValue": ""
+                },
+                {
+                    "id": "C1F83A07-724C-4609-A6FD-93637ED40ED8",
+                    "itemName": "Squeegee",
+                    "itemValue": ""
+                }
+            ]
+        },
+        {
+            "id": "EC76704D-57E3-4759-8DE2-C16F60255DC1",
+            "itemName": "defects",
+            "type": "arrObj",
+            "isAdd": true,
+            "_showChildren": true,
+            "children": [
+                {
+                    "id": "B89B56BB-8C99-4604-8DDF-BF77786B9794",
+                    "isShowRemove": true,
+                    "itemName": "",
+                    "_showChildren": true,
+                    "children": [
+                        {
+                            "id": "A3613630-3953-488E-8B90-B8D93F1F66E6",
+                            "itemName": "unitIdLocation",
+                            "itemValue": null,
+                            "type":"number"
+                        },
+                        {
+                            "id": "621CED4D-A5E4-4192-848D-BD9F2B2459B3",
+                            "itemName": "objectId",
+                            "itemValue": ""
+                        },
+                        {
+                            "id": "01585EBD-B1A8-4C8D-940E-C276B645B562",
+                            "itemName": "type",
+                            "itemValue": null,
+                            "type":"number"
+                        },
+                        {
+                            "id": "EA5F31AD-604E-4EE4-9B6C-008EFF38F6D7",
+                            "itemName": "keyParts",
+                            "type": "arrString"
+                        },
+                        {
+                            "id": "6FD709EF-5F8D-4A6B-A250-3200F8DF0665",
+                            "itemName": "details",
+                            "type": "arrObj",
+                            "isAdd": true,
+                            "addNodeName": "defects",
+                            "_showChildren": true,
+                            "children": [
+                                {
+                                    "id": "DBD047ED-2119-4326-A593-0A64CEEA0F32",
+                                    "isShowRemove": true,
+                                    "itemName": "",
+                                    "_showChildren": true,
+                                    "children": [
+                                        {
+                                            "id": "12DCAF54-5547-41AB-B635-BE0CD63B9C31",
+                                            "itemName": "location",
+                                            "itemValue": ""
+                                        },
+                                        {
+                                            "id": "F05F040B-EB9C-4C95-9937-10A27C011395",
+                                            "itemName": "code",
+                                            "itemValue": ""
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "SPI-B": [
+        {
+            "id": "7C86F059-41D4-45E5-9FF8-F665A6CDDF2C",
+            "itemName": "barCodes",
+            "type": "arrString"
+        },
+        {
+            "id": "67578669-6C4D-4650-B836-81779972C7E1",
+            "itemName": "toolingFixtureEncodes",
+            "type": "arrString"
+        },
+        {
+            "id": "C5412256-41CF-41DF-B5D1-AF13409AB41F",
+            "itemName": "collectDataValues",
+            "_showChildren": true,
+            "children": [
+                {
+                    "id": "3BB90FC7-74FF-4BEE-8330-A0A1FFC2CA3D",
+                    "itemName": "unitId",
+                    "type": "arrObj",
+                    "isAdd": true,
+                    "_showChildren": true,
+                    "children": [
+                        {
+                            "id": "5E512492-6E03-49D4-88B1-58F1DD2CB823",
+                            "isShowRemove": true,
+                            "itemName": "",
+                            "_showChildren": true,
+                            "children": [
+                                {
+                                    "id": "CBA9D96F-52F4-4A1B-925F-1B7A351DF928",
+                                    "itemName": "unitId",
+                                    "itemValue": ""
+                                },
+                                {
+                                    "id": "CDBD6B90-2FB4-429C-8ABC-FC45FFB25170",
+                                    "itemName": "boardNo",
+                                    "itemValue": ""
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "4B06CDD4-0AD3-4347-ACF3-C09146DD47FA",
+            "itemName": "defects",
+            "type": "arrObj",
+            "isAdd": true,
+            "_showChildren": true,
+            "children": [
+                {
+                    "id": "6815E0C7-DD4A-42AE-923F-F4CE1AE36E18",
+                    "isShowRemove": true,
+                    "itemName": "",
+                    "_showChildren": true,
+                    "children": [
+                        {
+                            "id": "FB9611C5-4298-452B-A698-E520921B2C2A",
+                            "itemName": "unitIdLocation",
+                            "itemValue": null,
+                            "type":"number"
+                        },
+                        {
+                            "id": "F2C3E98C-30BE-4E8A-9CC4-9533AB206DC1",
+                            "itemName": "objectId",
+                            "itemValue": ""
+                        },
+                        {
+                            "id": "F3874D83-61E5-4F79-A31B-5989AFD4F882",
+                            "itemName": "type",
+                            "itemValue": null,
+                            "type":"number"
+                        },
+                        {
+                            "id": "9A024CDA-3916-484A-BC17-D11E340769E4",
+                            "itemName": "keyParts",
+                            "type": "arrString"
+                        },
+                        {
+                            "id": "A38B2292-6287-44C0-A518-0B19B2A49344",
+                            "itemName": "details",
+                            "type": "arrObj",
+                            "isAdd": true,
+                            "addNodeName": "defects",
+                            "_showChildren": true,
+                            "children": [
+                                {
+                                    "id": "32A4CC1C-EF02-4F75-AA1D-5B7515DD5FF9",
+                                    "isShowRemove": true,
+                                    "itemName": "",
+                                    "_showChildren": true,
+                                    "children": [
+                                        {
+                                            "id": "06C2CA13-B4AF-4360-8577-E5E951E224CB",
+                                            "itemName": "location",
+                                            "itemValue": ""
+                                        },
+                                        {
+                                            "id": "95754CFD-D2DE-4E93-BFDC-8DCD141B334A",
+                                            "itemName": "code",
+                                            "itemValue": ""
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

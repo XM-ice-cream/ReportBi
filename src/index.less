@@ -1,0 +1,680 @@
+@import '~view-design/src/styles/index.less';
+@import "./assets/common.less";
+@import "./assets/scrollBar.less";
+@import "./assets/iviewCommon.less";
+
+.page-style, .comment {
+  height: @baseSize;
+}
+
+.overflowY {
+  overflow-y: auto;
+}
+
+// 图片去掉间隙
+.img-style {
+  display: inline-block;
+  font-size: 0;
+  width: 100%;
+}
+
+// 主体颜色
+.primary_font_color {
+  color: @primary-color;
+}
+
+.primary_border_color {
+  border: 1px solid @primary-color;
+}
+
+.primary_bg_color {
+  background-color: @primary-color;
+}
+
+// 调整图标基线
+.ivu-icon-iconfont {
+  vertical-align: 0;
+}
+
+// 网格鼠标经过样式
+.row_hover {
+  padding: 2px 5px;
+
+  &:hover {
+    background-color: @primary-color;
+    color: @baseColorWhite;
+    cursor: pointer;
+  }
+}
+
+// split右侧card边距
+.right-pane {
+  padding-left: 6px;
+}
+
+.split-pane {
+  height: @baseSize;
+}
+
+// 卡片样式
+.card-style {
+  height: calc(@baseSize);
+
+  .ivu-card-head, .ivu-card-body {
+    padding: @basePadding;
+  }
+
+  .ivu-card-body {
+    height: calc(@baseSize - 40px);
+  }
+}
+
+.card-style-form {
+  .ivu-form-item {
+    margin: 0 5px 0 0;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &-content {
+      display: inline-block;
+    }
+  }
+
+  .ivu-input-group {
+    top: 0;
+  }
+}
+
+.ivu-form {
+  &-item {
+    margin-bottom: 16px;
+
+    &-content {
+      line-height: @baseLineHeight;
+    }
+
+    &-error-tip {
+      padding-top: 2px;
+    }
+  }
+
+  &-item-label {
+    padding: 5px 12px 5px 0 !important;
+  }
+}
+
+//自定义弹窗样式
+.page-style-modal {
+  .ivu-modal-body {
+    padding: 5px 10px;
+  }
+}
+
+//自定义列表样式
+.page-style-list.ivu-list {
+  .ivu-list-item {
+    padding: 5px;
+  }
+}
+
+//自定义警告提示样式
+.page-style-alert {
+  &.ivu-alert {
+    margin-bottom: 0;
+  }
+}
+
+.flow-style-modal .ivu-modal-content {
+  //background-color: unset;
+
+  .ivu-modal-body {
+    padding: 0;
+  }
+}
+
+//自定义组件样式
+.page-style-drawer {
+  .ivu-drawer-mask, .ivu-drawer-wrap {
+    z-index: 3000;
+  }
+}
+
+// 树型组件样式
+.ivu-tree-title {
+  &.ivu-tree-title-selected, &:hover {
+    background-color: @primary-color;
+
+    span, i {
+      color: @baseColorWhite;
+    }
+  }
+}
+
+// 全局size默认为small的时候，调整关闭图标位置
+.ivu-message-notice-close {
+  top: 5px;
+
+  span {
+    font-size: 32px;
+  }
+
+  i.ivu-icon {
+    top: 0;
+  }
+}
+
+//全局提示 message 样式
+.ivu-message {
+  .ivu-message-custom-content span {
+    font-size: 14px;
+  }
+
+  .ivu-icon-ios-close-circle {
+    font-size: 16px;
+  }
+
+  .ivu-message-notice-close i.ivu-icon {
+    font-size: 26px;
+  }
+}
+
+// 表格样式
+.ivu-table {
+  .ivu-table-header, .ivu-table-body, .ivu-table-fixed-header, .ivu-table-fixed-body {
+    th, td {
+      height: 10px !important; // 全局表单头高度
+      padding: 0;
+    }
+  }
+
+  .ivu-table-fixed {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  // 表格高亮行颜色改变
+  .ivu-table-row-highlight, .ivu-table-row-hover, .ivu-table-row-highlight.ivu-table-row-hover {
+    td, .table_cell_font_color {
+      //background-color: @primary-color;
+      color: @baseColorWhite;
+    }
+
+  }
+
+  .ivu-table-cell {
+    padding: 3px !important;
+  }
+
+}
+
+// 多级表格 expand 样式
+.ivu-table-small .ivu-table-cell-with-expand {
+  height: 24px;
+  line-height: 18px;
+}
+
+// 折叠面板组件自定义样式
+.page-style-collapse.ivu-collapse {
+  & > .ivu-collapse-item {
+    .ivu-collapse-header {
+      height: 23px;
+      line-height: 23px;
+    }
+
+    .ivu-collapse-content {
+      padding: 0 5px;
+
+      &-box {
+        padding: 5px 0;
+      }
+    }
+  }
+}
+
+// 分页样式
+.custom-page { //  修改分页面显示
+  margin-top: 10px;
+
+  .ivu-page-total {
+    float: right; //  修改分页面显示
+  }
+}
+
+// 分页下拉组件page组件自定义样式
+.select_page_style.ivu-page-simple .ivu-page-simple-pager input {
+  border: 0;
+}
+
+// 第三方插件vue-treeselect样式修改
+.vue-treeselect {
+  height: @baseLineHeight;
+
+  .paddingTop {
+    padding-top: 3px;
+  }
+
+  .vue-treeselect__control {
+    height: @baseLineHeight;
+
+    .vue-treeselect__multi-value {
+      margin-bottom: 0;
+      line-height: 14px;
+
+      .vue-treeselect__limit-tip {
+        .paddingTop;
+        padding-right: 2px;
+
+        &-text {
+          margin: 0;
+        }
+      }
+
+      .vue-treeselect__input-container {
+        .paddingTop !important;
+      }
+
+      .vue-treeselect__multi-value-item-container {
+        padding-top: 3px;
+
+        .vue-treeselect__multi-value-item {
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  .vue-treeselect__placeholder, .vue-treeselect__single-value {
+    line-height: @baseLineHeight;
+  }
+}
+
+// 第三方插件v-selectpage样式修改
+.selectPageFontSize() {
+  font-size: @font-size-base !important;
+}
+
+div.v-dropdown-container {
+  z-index: 99999 !important;
+}
+
+.select-page-style {
+  &.v-dropdown-caller.v-dropdown-caller--full-width {
+    display: inline-block;
+    width: 100%;
+  }
+
+  &.v-selectpage div.sp-input-container {
+    div.sp-clear {
+      padding: unset;
+      display: flex;
+      align-items: center;
+    }
+
+    div.sp-base {
+      .selectPageFontSize();
+      padding: 1px 7px;
+      min-height: @baseLineHeight;
+      height: auto;
+      max-height: 85px;
+      overflow-y: auto;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+
+      span.sp-placeholder {
+        margin: unset;
+        color: #c5c8ce;
+      }
+
+      span.sp-selected-tag {
+        line-height: @line-height-base;
+
+        i {
+          .selectPageFontSize();
+        }
+      }
+    }
+  }
+}
+
+div.sp-header h3, div.sp-search .sp-search-input, div.sp-result-area ul.sp-results li, div.sp-pagination {
+  .selectPageFontSize();
+}
+
+div.sp-header {
+  h3 {
+    font-weight: bold;
+  }
+}
+
+
+//钢网表格样式
+.steel_table .ivu-table {
+  .ivu-table-body {
+    background: #282C37;
+  }
+
+  .ivu-table-header, .ivu-table-body, .ivu-table-fixed-header, .ivu-table-fixed-body {
+    th, td {
+      height: 40px !important; // 全局表单头高度
+      padding: 0;
+      background: #282C37;
+      color: #5fb878;
+    }
+  }
+
+  .table_cell_bg_color_red td {
+    color: #fb6868;
+  }
+
+  .table_cell_bg_color_yellow td {
+    color: #cccc00;
+  }
+
+  .table_cell_bg_color_green td {
+    color: #ffff00;
+  }
+
+  .ivu-table-tip table td {
+    background: #282C37;
+    color: #999;
+  }
+
+
+}
+
+// 嵌套table 表格底部样式
+.tableChild .ivu-table-footer {
+  height: 100%;
+  line-height: 34px;
+}
+
+.steel_con .ivu-card-body {
+  background: #5a5c61;
+}
+
+//自定义表格行样式
+.table_cell_bg_color_red td {
+  color: #000;
+  background: #fb6868;
+}
+
+.table_cell_bg_color_yellow td {
+  color: #000;
+  background: #eaec5c;
+}
+
+.table_cell_bg_color_yellow_1 td {
+  color: #000;
+  background: #ffff00;
+}
+
+.table_cell_bg_color_ffcc66 td {
+  color: #000;
+  background: #ffcc66;
+}
+
+.table_cell_bg_color_d9534f td {
+  color: #000;
+  background: #d9534f;
+}
+
+.table_cell_bg_color_green td {
+  color: #000;
+  background: #A0DE86;
+}
+
+.ivu-table .bg_red {
+  background: red;
+  color: #fff;
+}
+
+.ivu-table .bg_5fb878 {
+  background: #5fb878;
+  color: #fff;
+}
+
+.ivu-table .bg_cccc00 {
+  background: #cccc00;
+  color: #fff;
+}
+
+//列颜色
+.ivu-table {
+  th {
+    &.table-info-column-yellow {
+      background-color: #ffd77a;
+      color: #fff;
+    }
+
+    &.table-info-column-blue {
+      background-color: #abdcff;
+      color: #fff;
+    }
+
+    &.table-info-column-ccc {
+      background-color: #ccc;
+      color: #fff;
+    }
+
+    &.table-info-column-ccccff {
+      background-color: #ccccff;
+      color: #fff;
+    }
+
+    &.table-info-column-dedede {
+      background-color: #DEDEDE;
+      color: #fff;
+    }
+  }
+
+  .table-info-cell-colorRed {
+    color: red;
+  }
+}
+
+//oee card 样式
+.oee-charts {
+  .ivu-card-head {
+    padding: 2px 8px;
+  }
+}
+
+// 气泡提示组件样式
+.poptip-style {
+  .ivu-poptip-body-content {
+    overflow: inherit;
+  }
+}
+
+// 气泡提示组件样式
+.poptip-style-button {
+  text-align: right;
+
+  button {
+    margin-right: 5px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+//导入模块公共样式
+.import_con {
+  .upload-con {
+    width: 100%;
+    text-align: center;
+  }
+
+  .download {
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+
+    span {
+      color: #409eef;
+      cursor: pointer;
+    }
+  }
+}
+
+//穿梭框公共样式
+.transfer_con {
+  display: flex;
+  justify-content: center;
+}
+
+//质量核料表格样式
+.quality-check {
+  .ivu-page, .ivu-page-prev a, .ivu-page-next a {
+    color: #000;
+  }
+
+  .ivu-modal-content {
+    .ivu-modal-header p, i, i:hover {
+      color: #000;
+    }
+  }
+
+  .ivu-page-prev,
+  .ivu-page-next {
+    background-color: unset;
+  }
+
+  .ivu-modal-content {
+    background-image: url('./assets/images/bg1.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .ivu-table {
+    background: unset;
+
+    .ivu-table-body {
+      background: unset;
+    }
+
+    .ivu-table-header, .ivu-table-body, .ivu-table-fixed-header, .ivu-table-fixed-body {
+      th, td {
+        height: 40px !important; // 全局表单头高度
+        padding: 0;
+        background-color: unset;
+        color: #000;
+      }
+    }
+
+    .table_cell_bg_color_red td {
+      color: #000;
+      background-color: unset
+    }
+
+    .table_cell_bg_color_yellow td {
+      color: #FF6600;
+      background-color: unset;
+    }
+
+    .ivu-table-tip table td {
+      background-color: unset;
+      // color: #fff;
+      font-size: 15px;
+      color: #000;
+    }
+
+    .ivu-table-header thead tr th {
+      font-size: 14px;
+    }
+
+  }
+}
+
+//上传文件加载动画
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
+}
+
+@keyframes ani-demo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+//产品温度日志-温度曲线页面样式
+.temperature-curve {
+  .ivu-drawer-header {
+    border-bottom: 1px solid #e8eaec;
+    padding: 0 16px;
+    line-height: 1;
+  }
+
+  .ivu-drawer-body {
+    height: calc(100% - 35px);
+    padding: 5px;
+  }
+}
+
+// 流程组件公共样式
+#flow-tool-bar .g6-component-toolbar {
+  padding: 2px;
+  border: none;
+}
+
+.tooltip-style {
+  border: 1px solid #e2e2e2;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #545454;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px 8px;
+  box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+  top: 0;
+}
+
+.dynamicForm .ivu-table-cell {
+  display: flex;
+  align-items: center;
+
+  .ivu-table-cell-slot {
+    width: 100%;
+  }
+}
+
+// 框架组件UI调整
+.input-number-style {
+  width: 100%;
+}
+
+//数字输入框宽度100%
+.ivu-input-number {
+  width: 100%;
+}
+
+.ivu-date-picker {
+  width: 100%;
+}
+
+// 加高输入框高度
+.custom-input-height input {
+  height: 50px;
+}
+
+//Popper 料号维护解析规则样式
+.resolverRulePopper {
+  width: 100%;
+
+  .ivu-poptip, .ivu-poptip-rel {
+    width: 100%;
+  }
+
+  .ivu-poptip-body-content {
+    overflow: unset;
+  }
+}

@@ -1,0 +1,63 @@
+[
+    {
+        "name": "昆山window系统正式地址",
+        "value": "http://10.32.44.33:8000",
+        "reportip": "http://10.32.42.30:5700",
+        "logo": "http://ksbaize.luxshare.com.cn:8000/api/systemcenter/anonymous/v1/assets/show?fileId=Logo"
+    },
+    {
+        "name": "昆山window系统测试地址",
+        "value": "http://10.32.42.30:9000",
+        "reportip": "http://10.32.42.30:5700"
+    },
+    {
+        "name": "越南Linux系统正式地址",
+        "value": "http://10.171.11.89:8000",
+        "logo": "http://10.171.11.89/img/logo.jpg"
+    },
+    {
+        "name": "纬创地址",
+        "value": "http://10.32.44.61:8000",
+        "reportip": "http://10.32.42.30:5700"
+    },
+    {
+        "name": "纬创地址1",
+        "value": "http://172.30.170.115:8000",
+        "reportip": "http://10.32.42.30:5700"
+    },
+    {
+        "name": "立臻地址",
+        "value": "http://172.30.50.13:8000",
+        "reportip": "http://10.32.23.13:8000"
+    },
+    {
+        "name": "立臻正式地址",
+        "value": "http://10.42.23.13:8000",
+        "reportip": "http://172.30.50.19:5700"
+    },
+    {
+        "name": "立臻炉子地址",
+        "value": "http://10.42.24.157:8000",
+        "reportip": "http://10.42.24.157:8000"
+    },
+    {
+        "name": "立臻新登录地址",
+        "value": "http://10.42.23.13:8080",
+        "reportip": "http://10.42.23.13:8080"
+    },
+    {
+        "name": "巴城正式地址",
+        "value": "http://10.191.19.51:8000",
+        "reportip": "http://10.191.19.55:5700"
+    },
+    {
+        "name": "巴城测试地址",
+        "value": "http://10.191.21.51:8000",
+        "reportip": "http://10.191.19.55:5700"
+    },
+    {
+        "name": "淀山湖正式",
+        "value": "http://10.32.44.76:8000",
+        "reportip": "http://10.191.19.55:5700"
+    }
+]
