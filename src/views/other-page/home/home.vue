@@ -4,9 +4,9 @@
       <div class="container-detail">
         <div class="avatar">
           <span class="avatar-image">
-          <avatar-custom :imgUrl="headIcon" v-if="headIcon"></avatar-custom>
-          <img class="head-portrait" src="../../../assets/images/default-head.png" v-else>
-        </span>
+            <avatar-custom :imgUrl="headIcon" v-if="headIcon"></avatar-custom>
+            <img class="head-portrait" src="../../../assets/images/default-head.png" v-else>
+          </span>
           <div class="avatar-bg" :class="changeVipLevel(vipLevel)"></div>
         </div>
         <div class="avatar-content">
