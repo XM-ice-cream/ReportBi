@@ -844,12 +844,12 @@ export default {
     flatnessCheck: '平整度检查',
     onLineType: '上线类型',
     checkStart: '点检',
-    planeness:'平整度',
-    fixSteelSheet:'固定钢片',
-    locationPING:'定位PING',
-    locationHole:'定位孔',
-    magnetgule:'磁铁胶',
-    cleanliness:'清洁度',
+    planeness: '平整度',
+    fixSteelSheet: '固定钢片',
+    locationPING: '定位PING',
+    locationHole: '定位孔',
+    magnetgule: '磁铁胶',
+    cleanliness: '清洁度',
     // 载治具变更记录
     lineAccount: '上下线工号',
     fixturePn: 'PCB料号/成品料号',
@@ -1533,6 +1533,8 @@ export default {
     OP45_AOI_ID: 'OP45设备编号',
     OP_AOI_ID: 'OP70设备编号',
     carrierID: '载具编号',
+    // Receive Data
+    dataType: '数据类型',
     // <!--------------------------------Menu Name----------------------------------------->
     'error-404': '找不到页面',
     'authorize-manager': '权限管理',
