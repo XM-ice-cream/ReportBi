@@ -1854,6 +1854,7 @@ export default {
     'expandpitch-query': '扩晶Pitch值查询',
     'encap-op50': 'EnCapOP50报表',
     'encap-op70': 'EnCapOP70报表',
+    'be-report': 'BE报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
