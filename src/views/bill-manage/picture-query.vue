@@ -102,6 +102,7 @@ export default {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
       btnData: [],
+      AOIRreviewFileData: [],
       req: {
         workOrder: "",
         unitID: "",
