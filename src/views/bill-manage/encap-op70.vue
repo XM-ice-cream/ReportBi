@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/encap-op50";
+import {getpagelistReq, exportReq} from "@/api/bill-manage/encap-op70";
 import {getButtonBoolean, formatDate, exportFile, renderDate} from "@/libs/tools";
 import {getlistReq as getDataItemReq} from '@/api/system-manager/data-item'
 
@@ -104,9 +104,9 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: this.$t("workOrder"), key: "workOrder", align: "center", width: 140, tooltip: true, fixed: 'left'},
-        {title: this.$t("panelNo"), key: "panelNo", align: "center", width: 140, tooltip: true},
-        {title: this.$t("smallBoardCode"), key: "unitId", align: "center", width: 140, tooltip: true},
+        {title: this.$t("workOrder"), key: "workorder", align: "center", width: 140, tooltip: true, fixed: 'left'},
+        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 140, tooltip: true},
+        {title: this.$t("smallBoardCode"), key: "unitid", align: "center", width: 140, tooltip: true},
         {title: this.$t("status"), key: "status", align: "center", width: 90, tooltip: true},
         {title: this.$t("pn"), key: "pn", align: "center", width: 90, tooltip: true},
         {title: 'BUILDCONFIG', key: "buildconfig", align: "center", width: 120, tooltip: true},
@@ -118,7 +118,7 @@ export default {
         {title: "FailZone", key: "failZone", align: "center", width: 120, tooltip: true},
         {title: "FailValue", key: "failValue", align: "center", width: 120, tooltip: true},
         {title: this.$t("dispensingEqpCode"), key: "eqp", align: "center", width: 120, tooltip: true},
-        {title: this.$t("dispensingTime"), key: "dispensingTime ", align: "center", width: 125, render: renderDate,},
+        {title: this.$t("dispensingTime"), key: "dispensingTime", align: "center", width: 125, render: renderDate,},
         {title: this.$t("OP_AOI_ID"), key: "oP_AOI_ID", align: "center", width: 120, tooltip: true},
         {title: 'MagazineID', key: "magazineID", align: "center", width: 120, tooltip: true},
         {title: this.$t("carrierID"), key: "carrierID", align: "center", width: 120, tooltip: true},

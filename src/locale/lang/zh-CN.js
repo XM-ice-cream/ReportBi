@@ -1101,6 +1101,7 @@ export default {
     virtualLabel: '虚拟条码',
     panelNo: '大板码号',
     smallBoardCode: "小板码号",
+    smallBoardCode56: "56位小板码号",
     //绑定真实条码
     formulaName: '配方名称',
     unitQty: 'unit扣数',
@@ -1528,11 +1529,16 @@ export default {
     kdmat: '客户物料',
     // EnCapOP50报表
     dispensingEqpCode: '点胶机设备编号',
-    dispensingTime: '点胶机设备编号',
+    dispensingTime: '点胶时间',
     OP50_AOI_ID: 'OP50设备编号',
     OP45_AOI_ID: 'OP45设备编号',
     OP_AOI_ID: 'OP70设备编号',
     carrierID: '载具编号',
+    // OQCShipping报表
+    shipDate: '出货日期',
+    shipmentNo: '出货单号',
+    shipAddress: '出货地',
+    shippingGrade: '出货等级',
     // Receive Data
     dataType: '数据类型',
     // <!--------------------------------Menu Name----------------------------------------->
@@ -1855,6 +1861,7 @@ export default {
     'encap-op50': 'EnCapOP50报表',
     'encap-op70': 'EnCapOP70报表',
     'be-report': 'BE报表',
+    'oqc-shipping': 'OQCShipping报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
@@ -2491,6 +2498,7 @@ export default {
     clickUpload: '点击上传',
     pleaseSpecifyTheExcelFormatInTheSpecifiedFormat: '请按照规定格式上传',
     downloadTemplate: '下载模板',
+    download: '下载',
     onlyStateChangesAreRecorded: '只有状态变更才会记录',
     jobNumberOrName: '工号或姓名',
     ebomAvlLocation: '位号和用量不一致',
