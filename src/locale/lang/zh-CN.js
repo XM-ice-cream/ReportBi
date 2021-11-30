@@ -1539,6 +1539,7 @@ export default {
     shipmentNo: '出货单号',
     shipAddress: '出货地',
     shippingGrade: '出货等级',
+    apn: '料号',
     // Receive Data
     dataType: '数据类型',
     // <!--------------------------------Menu Name----------------------------------------->

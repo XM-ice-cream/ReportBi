@@ -51,7 +51,7 @@
                     </FormItem>
                     <!-- 56位小条码 -->
                     <FormItem :label="$t('smallBoardCode56')" prop="unitId56">
-                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode56')"
+                      <Input v-model.trim="req.unitId56" :placeholder="$t('pleaseEnter') + $t('smallBoardCode56')"
                              @on-search="searchClick"/>
                     </FormItem>
                     <!-- config -->
@@ -119,23 +119,22 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: this.$t("shipDate"), key: "shipdate", align: "center", width: 140, tooltip: true, fixed: 'left'},
-        {title: this.$t("shipmentNo"), key: "shipmentno", align: "center", width: 140, tooltip: true},
+        {title: this.$t("shipDate"), key: "shipdate", align: "center", width: 140, tooltip: true},
+        {title: this.$t("shipmentNo"), key: "shipmentno", align: "center", width: 120, tooltip: true},
         {title: this.$t("shipAddress"), key: "shipaddress", align: "center", width: 140, tooltip: true},
-        {title: 'APN', key: "pn", align: "center", width: 90, tooltip: true},
-        {title: this.$t("partName"), key: "partname", align: "center", width: 120, tooltip: true},
+        {title: this.$t("apn"), key: "apn", align: "center", width: 120, tooltip: true},
         {title: this.$t("config"), key: "config", align: "center", width: 90, tooltip: true},
-        {title: this.$t("boxNo"), key: "boxno", align: "center", width: 90, tooltip: true},
-        {title: this.$t("cartonNo"), key: "cartonno", align: "center", width: 120, tooltip: true},
-        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 140, tooltip: true},
-        {title: this.$t("smallBoardCode56"), key: "unitid56", align: "center", width: 120, tooltip: true},
-        {title: this.$t("shippingGrade"), key: "shippinggrade", align: "center", width: 120, tooltip: true},
-        {title: 'OP60', key: "oP60", align: "center", width: 120, tooltip: true},
-        {title: 'ON/OFF', key: "onoff", align: "center", width: 120, tooltip: true},
-        {title: 'OP60', key: "fos", align: "center", width: 120, tooltip: true},
-        {title: 'MURA', key: "mura", align: "center", width: 120, tooltip: true},
-        {title: 'I16', key: "i16", align: "center", width: 120, tooltip: true},
-        {title: 'FVI', key: "fvi", align: "center", width: 120, tooltip: true},
+        {title: this.$t("boxNo"), key: "boxno", align: "center", width: 160, tooltip: true},
+        {title: this.$t("cartonNo"), key: "cartonno", align: "center", width: 160, tooltip: true},
+        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 120, tooltip: true},
+        {title: this.$t("smallBoardCode56"), key: "unitiD56", align: "center", width: 150, tooltip: true},
+        {title: this.$t("shippingGrade"), key: "shippinggrade", align: "center", width: 100, tooltip: true},
+        {title: 'OP60', key: "oP60", align: "center", width: 100, tooltip: true},
+        {title: 'ON/OFF', key: "onoff", align: "center", width: 100, tooltip: true},
+        {title: 'OP60', key: "fos", align: "center", width: 100, tooltip: true},
+        {title: 'MURA', key: "mura", align: "center", width: 100, tooltip: true},
+        {title: 'I16', key: "i16", align: "center", width: 100, tooltip: true},
+        {title: 'FVI', key: "fvi", align: "center", width: 100, tooltip: true},
       ], // 表格数据
     };
   },
