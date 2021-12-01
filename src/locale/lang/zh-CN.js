@@ -1540,6 +1540,14 @@ export default {
     shipAddress: '出货地',
     shippingGrade: '出货等级',
     apn: '料号',
+    // WIP报表
+    customerModel: '客户机种',
+    workOrderInfo: '工单信息',
+    scheduleEndDate: '预计结案日期',
+    workOrderQTY: '工单总数',
+    finishQTY: '完工数量',
+    //processName: '制程名称',
+    curProcessNameQTY: '完当前在该制程产品的数量工数量',
     // Receive Data
     dataType: '数据类型',
     // <!--------------------------------Menu Name----------------------------------------->
@@ -1863,6 +1871,8 @@ export default {
     'encap-op70': 'EnCapOP70报表',
     'be-report': 'BE报表',
     'oqc-shipping': 'OQCShipping报表',
+    'wip-report': 'WIP报表',
+    'onwipsn-query': 'OnWipSN查询',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

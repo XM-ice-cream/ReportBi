@@ -84,7 +84,7 @@
 
 <script>
 import {getpagelistReq, exportReq} from "@/api/bill-manage/be-report";
-import {getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
+import {getButtonBoolean, formatDate, exportFile, renderDate} from "@/libs/tools";
 import {getlistReq as getDataItemReq} from '@/api/system-manager/data-item'
 
 export default {
@@ -123,7 +123,7 @@ export default {
         {title: this.$t("stepName"), key: "stepname", align: "center", width: 90, tooltip: true},
         {title: this.$t("status"), key: "status", align: "center", width: 90, tooltip: true},
         {title: this.$t("defectCode"), key: "defectcode", align: "center", width: 120, tooltip: true},
-        {title: this.$t("defectDate"), key: "defectdate", align: "center", width: 120, tooltip: true},
+        {title: this.$t("defectDate"), key: "defectdate", align: "center", render: renderDate, width: 120, tooltip: true},
         {title: this.$t("badDescription"), key: "description", align: "center", width: 120, tooltip: true},
         {title: 'BUILDCONFIG', key: "buildconfig", align: "center", width: 120, tooltip: true},
         {title: this.$t("eqpCode"), key: "eqP_ID", align: "center", width: 120, tooltip: true},

@@ -1,4 +1,4 @@
-/* OQCShipping报表 */
+/* WIP报表 */
 <template>
   <div class="page-style">
     <!-- 页面表格 -->
@@ -39,30 +39,22 @@
                       ">
                       </v-selectpage>
                     </FormItem>
-                    <!-- 大条码 -->
-                    <FormItem :label="$t('panelNo')" prop="panelNo">
-                      <Input v-model.trim="req.panelNo" :placeholder="$t('pleaseEnter') + $t('panelNo')"
+                    <!-- 料号 -->
+                    <FormItem :label="$t('pn')" prop="pn">
+                      <Input v-model.trim="req.pn" placeholder="请输入料号,多个以英文逗号分隔"
                              @on-search="searchClick"/>
                     </FormItem>
-                    <!-- 小条码 -->
-                    <FormItem :label="$t('smallBoardCode')" prop="unitId">
-                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode')"
+                    <!-- 产品代码 -->
+                    <FormItem :label="$t('modelName')" prop="modelname">
+                      <Input v-model.trim="req.modelname" :placeholder="$t('pleaseEnter') + $t('modelName')"
                              @on-search="searchClick"/>
                     </FormItem>
-                    <!-- 56位小条码 -->
-                    <FormItem :label="$t('smallBoardCode56')" prop="unitId56">
-                      <Input v-model.trim="req.unitId56" :placeholder="$t('pleaseEnter') + $t('smallBoardCode56')"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- config -->
-                    <FormItem :label="$t('config')" prop="config">
-                      <Input v-model.trim="req.config" placeholder="请输入config"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- 彩盒数 -->
-                    <FormItem :label="$t('cartonNo')" prop="cartonno">
-                      <Input v-model.trim="req.cartonno" :placeholder="$t('pleaseEnter') + $t('cartonNo')"
-                             @on-search="searchClick"/>
+                    <!-- 制程类型 -->
+                    <FormItem :label="$t('modelType')" prop="modelType">
+                      <RadioGroup v-model="req.modelType">
+                        <Radio label="SMT">SMT</Radio>
+                        <Radio label="BE">BE</Radio>
+                      </RadioGroup>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -87,12 +79,12 @@
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/oqc-shipping";
+import {getpagelistReq, exportReq} from "@/api/bill-manage/wip-report";
 import {getButtonBoolean, formatDate, exportFile, renderDate} from "@/libs/tools";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
 
 export default {
-  name: "oqc-shipping",
+  name: "wip-report",
   data() {
     return {
       workerPageListUrl: workerPageListUrl(),
@@ -105,11 +97,9 @@ export default {
         startTime: "",
         endTime: "",
         workOrder: "", //工单
-        panelNo: "",
-        unitId: "",
-        unitId56: "",
-        config: "",
-        cartonno: "",
+        pn: "",
+        modelname: "",
+        modelType: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -119,22 +109,18 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: this.$t("shipDate"), key: "shipdate", align: "center", render: renderDate, width: 140, tooltip: true},
-        {title: this.$t("shipmentNo"), key: "shipmentno", align: "center", width: 120, tooltip: true},
-        {title: this.$t("shipAddress"), key: "shipaddress", align: "center", width: 140, tooltip: true},
-        {title: this.$t("apn"), key: "apn", align: "center", width: 120, tooltip: true},
-        {title: this.$t("config"), key: "config", align: "center", width: 90, tooltip: true},
-        {title: this.$t("boxNo"), key: "boxno", align: "center", width: 160, tooltip: true},
-        {title: this.$t("cartonNo"), key: "cartonno", align: "center", width: 160, tooltip: true},
-        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 120, tooltip: true},
-        {title: this.$t("smallBoardCode56"), key: "unitiD56", align: "center", width: 150, tooltip: true},
-        {title: this.$t("shippingGrade"), key: "shippinggrade", align: "center", width: 100, tooltip: true},
-        {title: 'OP60', key: "oP60", align: "center", width: 100, tooltip: true},
-        {title: 'ON/OFF', key: "onoff", align: "center", width: 100, tooltip: true},
-        {title: 'OP60', key: "fos", align: "center", width: 100, tooltip: true},
-        {title: 'MURA', key: "mura", align: "center", width: 100, tooltip: true},
-        {title: 'I16', key: "i16", align: "center", width: 100, tooltip: true},
-        {title: 'FVI', key: "fvi", align: "center", width: 100, tooltip: true},
+        {title: this.$t("workOrder"), key: "workorder", align: "center", width: 140, tooltip: true},
+        {title: this.$t("pn"), key: "pn", align: "center", width: 120, tooltip: true},
+        {title: this.$t("modelName"), key: "modelname", align: "center", width: 140, tooltip: true},
+        {title: this.$t("customerModel"), key: "customerno", align: "center", width: 90, tooltip: true},
+        {title: this.$t("workOrderInfo"), key: "workordeR_INFO", align: "center", width: 140, tooltip: true},
+        {title: this.$t("createDate"), key: "createdate", align: "center", render: renderDate, width: 140, tooltip: true},
+        {title: this.$t("scheduleEndDate"), key: "scheduleenddate", align: "center", render: renderDate, width: 140, tooltip: true},
+        {title: this.$t("workOrderQTY"), key: "qty", align: "center", width: 80, tooltip: true},
+        {title: this.$t("inputQTY"), key: "inputqty", align: "center", width: 80, tooltip: true},
+        {title: this.$t("finishQTY"), key: "finishqty", align: "center", width: 80, tooltip: true},
+        {title: this.$t("processName"), key: "curprocessname", align: "center", width: 100, tooltip: true},
+        {title: this.$t("curProcessNameQTY"), key: "curprocessnameqty", align: "center", width: 120, tooltip: true},
       ], // 表格数据
     };
   },
@@ -159,60 +145,60 @@ export default {
     pageLoad() {
       this.data = [];
       this.tableConfig.loading = false;
-      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno} = this.req;
+      let {startTime, endTime, workOrder, pn, modelname, modelType} = this.req;
       if (startTime && endTime) {
-        this.$refs.searchReq.validate((validate) => {
-          if (validate) {
-            this.tableConfig.loading = true;
-            let obj = {
-              orderField: "PN", // 排序字段
-              ascending: true, // 是否升序
-              pageSize: this.req.pageSize, // 分页大小
-              pageIndex: this.req.pageIndex, // 当前页码
-              data: {
-                startTime: formatDate(startTime),
-                endTime: formatDate(endTime),
-                workOrder,
-                panelNo,
-                unitId,
-                unitId56,
-                config,
-                cartonno,
-              },
-            };
-            getpagelistReq(obj).then((res) => {
-              this.tableConfig.loading = false;
-              if (res.code === 200) {
-                let {data, pageSize, pageIndex, total, totalPage} = res.result;
-                this.data = data || [];
-                this.req = {...this.req, pageSize, pageIndex, total, totalPage};
-              }
-            })
-              .catch(() => (this.tableConfig.loading = false));
-            this.searchPoptipModal = false;
-          }
-        });
+        if(workOrder || pn || modelname || modelType) {
+            this.$refs.searchReq.validate((validate) => {
+            if (validate) {
+                this.tableConfig.loading = true;
+                let obj = {
+                orderField: "PN", // 排序字段
+                ascending: true, // 是否升序
+                pageSize: this.req.pageSize, // 分页大小
+                pageIndex: this.req.pageIndex, // 当前页码
+                data: {
+                    startTime: formatDate(startTime),
+                    endTime: formatDate(endTime),
+                    workOrder, //工单
+                    pn,
+                    modelname,
+                    modelType,
+                },
+                };
+                getpagelistReq(obj).then((res) => {
+                this.tableConfig.loading = false;
+                if (res.code === 200) {
+                    let {data, pageSize, pageIndex, total, totalPage} = res.result;
+                    this.data = data || [];
+                    this.req = {...this.req, pageSize, pageIndex, total, totalPage};
+                }
+                })
+                .catch(() => (this.tableConfig.loading = false));
+                this.searchPoptipModal = false;
+            }
+            });
+        }else {
+            this.$Message.warning('除时间以外，其它条件不能全为空');
+        }
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
       }
     },
     // 导出
     exportClick() {
-      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno} = this.req;
+      let {startTime, endTime, workOrder, pn, modelname, modelType} = this.req;
       if (startTime && endTime) {
         let obj = {
-          startTime: formatDate(startTime),
-          endTime: formatDate(endTime),
-          workOrder,
-          panelNo,
-          unitId,
-          unitId56,
-          config,
-          cartonno,
+            startTime: formatDate(startTime),
+            endTime: formatDate(endTime),
+            workOrder, //工单
+            pn,
+            modelname,
+            modelType,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], {type: "application/vnd.ms-excel"});
-          const fileName = `${this.$t("oqc-shipping")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+          const fileName = `${this.$t("wip-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
           exportFile(blob, fileName);
         });
       } else {
