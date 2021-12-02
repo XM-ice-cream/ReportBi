@@ -252,7 +252,7 @@ export default {
           slot: "outputs",
         },
         {
-          title: "一次通过率",
+          title: "一次良率",
           slot: "firstrate",
           minWidth: 80,
           align: "center",
@@ -264,21 +264,13 @@ export default {
           align: "center",
         },
         {
-          title: this.$t("yield_Rate"),
+          title: '最终良率',
           slot: "yieldrate",
           minWidth: 80,
           align: "center",
           ellipsis: true,
           tooltip: true,
-        },
-        {
-          title: "不良率",
-          slot: "ngrate",
-          minWidth: 80,
-          align: "center",
-          ellipsis: true,
-          tooltip: true,
-        },
+        }
       ],
     };
   },
