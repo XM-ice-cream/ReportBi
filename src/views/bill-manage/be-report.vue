@@ -1,4 +1,4 @@
-/* EnCapOP70报表 */
+/* BE报表 */
 <template>
   <div class="page-style">
     <!-- 页面表格 -->
@@ -51,6 +51,15 @@
                         </Option>
                       </Select>
                     </FormItem>
+                    <!-- 类别 -->
+                    <FormItem :label="$t('stepName')" prop="stepName">
+                      <Select v-model="req.stepName" :placeholder="$t('pleaseSelect') + $t('stepName')"
+                              transfer>
+                        <Option v-for="(item, i) in stepList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -74,12 +83,12 @@
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/encap-op70";
+import {getpagelistReq, exportReq} from "@/api/bill-manage/be-report";
 import {getButtonBoolean, formatDate, exportFile, renderDate} from "@/libs/tools";
 import {getlistReq as getDataItemReq} from '@/api/system-manager/data-item'
 
 export default {
-  name: "encap-op70",
+  name: "be-report",
   data() {
     return {
       searchPoptipModal: false,
@@ -88,6 +97,7 @@ export default {
       data: [], // 表格数据
       btnData: [],
       categoryList: [],// 类别下拉框
+      stepList: [],// 类别下拉框
       req: {
         startTime: "",
         endTime: "",
@@ -95,6 +105,7 @@ export default {
         panelNo: "",
         unitId: "",
         status: "",
+        stepName: "OP80",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -105,34 +116,17 @@ export default {
           },
         },
         {title: this.$t("workOrder"), key: "workorder", align: "center", width: 140, tooltip: true, fixed: 'left'},
-        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 140, tooltip: true},
         {title: this.$t("smallBoardCode"), key: "unitid", align: "center", width: 140, tooltip: true},
-        {title: this.$t("status"), key: "status", align: "center", width: 90, tooltip: true},
+        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 140, tooltip: true},
         {title: this.$t("pn"), key: "pn", align: "center", width: 90, tooltip: true},
-        {title: 'BUILDCONFIG', key: "buildconfig", align: "center", width: 120, tooltip: true},
         {title: this.$t("lineName"), key: "linename", align: "center", width: 120, tooltip: true},
-        {title: this.$t("stepName"), key: "stepname", align: "center", width: 120, tooltip: true},
+        {title: this.$t("stepName"), key: "stepname", align: "center", width: 90, tooltip: true},
+        {title: this.$t("status"), key: "status", align: "center", width: 90, tooltip: true},
         {title: this.$t("defectCode"), key: "defectcode", align: "center", width: 120, tooltip: true},
-        {title: this.$t("defectDate"), key: "defectdate", align: "center", width: 120, tooltip: true},
+        {title: this.$t("defectDate"), key: "defectdate", align: "center", render: renderDate, width: 120, tooltip: true},
         {title: this.$t("badDescription"), key: "description", align: "center", width: 120, tooltip: true},
-        {title: "FailZone", key: "failZone", align: "center", width: 120, tooltip: true},
-        {title: "FailValue", key: "failValue", align: "center", width: 120, tooltip: true},
-        {title: this.$t("dispensingEqpCode"), key: "eqp", align: "center", width: 120, tooltip: true},
-        {title: this.$t("dispensingTime"), key: "dispensingTime", align: "center", width: 125, render: renderDate,},
-        {title: this.$t("OP_AOI_ID"), key: "oP_AOI_ID", align: "center", width: 120, tooltip: true},
-        {title: 'MagazineID', key: "magazineID", align: "center", width: 120, tooltip: true},
-        {title: this.$t("carrierID"), key: "carrierID", align: "center", width: 120, tooltip: true},
-        {title: 'LayerNo', key: "layerNo", align: "center", width: 120, tooltip: true},
-        {title: 'FillChamberID', key: "fillChamberID", align: "center", width: 120, tooltip: true},
-        {title: 'CuringInTime', key: "curingInTime", align: "center", width: 125, render: renderDate,},
-        {title: 'CuringOutTime', key: "curingOutTime", align: "center", width: 125, render: renderDate,},
-        {title: 'DwellPreCureID', key: "dwellPreCureID", align: "center", width: 125, tooltip: true,},
-        {title: 'Dwell', key: "dwell", align: "center", width: 125, tooltip: true,},
-        {title: 'DwellPlatFromVaccum', key: "dwellPlatFromVaccum", align: "center", width: 140, tooltip: true,},
-        {title: 'DwellCarrierVaccum', key: "dwellCarrierVaccum", align: "center", width: 125, tooltip: true,},
-        {title: 'PreCure', key: "preCure", align: "center", width: 125, tooltip: true,},
-        {title: 'PreCurePlatFromVaccum', key: "preCurePlatFromVaccum", align: "center", width: 160, tooltip: true,},
-        {title: 'PreCureTempreture', key: "preCureTempreture", align: "center", width: 125, tooltip: true,},
+        {title: 'BUILDCONFIG', key: "buildconfig", align: "center", width: 120, tooltip: true},
+        {title: this.$t("eqpCode"), key: "eqP_ID", align: "center", width: 120, tooltip: true},
       ], // 表格数据
     };
   },
@@ -158,7 +152,7 @@ export default {
     pageLoad() {
       this.data = [];
       this.tableConfig.loading = false;
-      let {startTime, endTime, workOrder, panelNo, unitId, status} = this.req;
+      let {startTime, endTime, workOrder, panelNo, unitId, status, stepName} = this.req;
       if (startTime && endTime) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -175,6 +169,7 @@ export default {
                 panelNo,
                 unitId,
                 status,
+                stepName,
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -195,7 +190,7 @@ export default {
     },
     // 导出
     exportClick() {
-      let {startTime, endTime, workOrder, panelNo, unitId, status} = this.req;
+      let {startTime, endTime, workOrder, panelNo, unitId, status, stepName} = this.req;
       if (startTime && endTime) {
         let obj = {
           startTime: formatDate(startTime),
@@ -204,24 +199,31 @@ export default {
           panelNo,
           unitId,
           status,
+          stepName,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], {type: "application/vnd.ms-excel"});
-          const fileName = `${this.$t("encap-op70")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+          const fileName = `${this.$t("be-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
           exportFile(blob, fileName);
         });
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
       }
     },
+    // 获取业务数据
+    async getDataItemData () {
+      this.categoryList = await this.getDataItemDetailList("EncapReport"); // 获取状态数据
+      this.stepList = await this.getDataItemDetailList("BEReportStepName"); // 获取站点数据
+    },
     // 获取数据字典数据
-    getDataItemData() {
-      const obj = {itemCode: 'EncapReport', enabled: 1}
-      getDataItemReq(obj).then((res) => {
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
         if (res.code === 200) {
-          this.categoryList = res.result || [];
+          arr = res.result || [];
         }
-      })
+      });
+      return arr;
     },
     // 点击重置按钮触发
     resetClick() {
