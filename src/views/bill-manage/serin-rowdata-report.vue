@@ -9,6 +9,13 @@
             <FormItem :label='$t("stationType")' prop="stationType">
               <Input type="text" v-model="req.stationType" clearable size="default"></Input>
             </FormItem>
+            <!-- 上传状态 -->
+            <FormItem :label="$t('status')" prop="status">
+              <Select v-model="req.status" transfer :placeholder="$t('pleaseSelect') + $t('status')">
+                <Option :value=0>全部</Option>
+                <Option :value=1>已上传</Option>
+              </Select>
+            </FormItem>
             <FormItem :label='$t("barCode")' prop="barcode">
               <Input type="textarea" v-model="req.barcode" size="default" :autosize="{minRows:15,maxRows: 15}" placeholder="请以逗号或回车分隔" clearable></Input>
             </FormItem>
@@ -34,6 +41,7 @@ export default {
     return {
       req: {
         stationType: "",
+        status:0,
         barcode: ""
       }, //查询数据
       // 验证实体
@@ -60,11 +68,12 @@ export default {
     exportClick () {
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
-          let { stationType, barcode } = this.req;
+          let { stationType, barcode, status } = this.req;
           // 回车转逗号分割
           if (barcode.indexOf('\n')) barcode = barcode.replace(/\n/g, ',')
           const obj = {
             barcode,
+            status,
             stationType: stationType.toUpperCase()
           }
           exportReq(obj).then((res) => {
