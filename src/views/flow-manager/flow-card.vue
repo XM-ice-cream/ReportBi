@@ -103,7 +103,7 @@
               </Poptip>
             </i-col>
             <i-col span="12">
-              <button-custom :btnData="btnData" 
+              <button-custom :btnData="btnData" @on-jumpStation-click="jumpStationClick" @on-unlock-click="unlockClick"
                              @on-export-click="exportClick"></button-custom>
             </i-col>
           </Row>
@@ -115,7 +115,8 @@
                      @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
       </Card>
     </div>
-   
+    <JumpStation ref="refJumpStation"/>
+    <Unlock ref="refUnlock"/>
   </div>
 </template>
 
@@ -123,11 +124,14 @@
 import {getpagelistReq, exportReq} from "@/api/bill-manage/flow-card";
 import {formatDate, getButtonBoolean, exportFile, renderDate, renderState, renderColorSpan,} from "@/libs/tools";
 import {workerPageListUrl} from "@/api/material-manager/order-info";
+import JumpStation from "./flow-work/jump-station.vue";
+import Unlock from "./flow-work/unlock.vue";
 import {getallprocessReq} from "@/api/basis-info/wf-route";
 import {getfloorlistReq} from "@/api/basis-info/area-floor";
 
 export default {
   name: "flow-card",
+  components: {JumpStation, Unlock},
   data() {
     return {
       tableConfig: {...this.$config.tableConfig}, // table配置
@@ -240,6 +244,10 @@ export default {
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
     this.getLineList();
+    if (this.$route.params.unitId) {
+      this.req.unitId = this.$route.params.unitId
+      this.pageLoad()
+    }
   },
   // 导航离开该组件的对应路由时调用
   deactivated() {
@@ -298,6 +306,14 @@ export default {
           this.lineList = res.result || [];
         }
       })
+    },
+    // 点击跳站按钮触发
+    jumpStationClick() {
+      this.$refs.refJumpStation.drawerFlag = true;
+    },
+    // 点击解锁按钮触发
+    unlockClick() {
+      this.$refs.refUnlock.drawerFlag = true;
     },
     // 导出
     exportClick() {

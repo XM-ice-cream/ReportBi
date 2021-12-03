@@ -72,7 +72,16 @@
         </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
           <template slot-scope="{ row }" slot="image">
-            <Button style="height:16px" v-if="row.fileFullName" type="primary" size="small" @click="previewImage(row.fileFullName)">{{ $t("preview") }}</Button>
+            <!-- <Button style="height:16px" v-if="row.fileFullName" type="primary" size="small" @click="previewImage(row.fileFullName)">{{ $t("preview") }}</Button> -->
+            <Button
+              style="height:16px;margin-left:5px"
+              v-if="row.fileFullName"
+              type="primary"
+              size="small"
+              @click="downloadImage(row.fileFullName)"
+              >{{ $t("download") }}
+            </Button
+            >
           </template>
         </Table>
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
@@ -90,6 +99,8 @@ import { getpagelistReq, exportReq } from "@/api/bill-manage/picture-query";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
 import { formatDate, getButtonBoolean, exportFile } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
+import { Spin } from "view-design";
+import axios from "axios";
 export default {
   name: "picture-query",
   data () {
@@ -102,6 +113,7 @@ export default {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
       btnData: [],
+      AOIRreviewFileData: [],
       req: {
         workOrder: "",
         unitID: "",
@@ -152,6 +164,27 @@ export default {
       if (this.req.AOIRreviewFile) {
         let imgUrl = this.req.AOIRreviewFile + "/download?filefullname=" + fileFullName;
         window.open(imgUrl, "_blank");
+      } else {
+        this.$Message.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
+      }
+    },  
+    downloadImage(fileFullName) {
+      if (this.req.AOIRreviewFile) {
+        let imgurl = this.req.AOIRreviewFile + "/download?filefullname=" + fileFullName; // 获取图片地址
+        Spin.show();
+        axios
+          .get(imgurl, { responseType: "blob" })
+          .then((res) => {
+            let url = window.URL.createObjectURL(res.request.response);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = fileFullName;
+            a.click();
+            Spin.hide();
+          })
+          .catch(() => {
+            Spin.hide();
+          });
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
       }
