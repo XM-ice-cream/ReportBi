@@ -1839,6 +1839,7 @@ export default {
     'oee-manage': 'OEE管理',
     'serin-query': 'Serin查询',
     'line-report': '产线报表',
+    'line-half-report-classes': '产线报表(半点-班次)',
     'line-report-classes': '产线报表(班次)',
     'oee-alarm': 'OEE智能报警',
     'trackout-capacity': '机台収值查询',
@@ -1873,6 +1874,7 @@ export default {
     'oqc-shipping': 'OQCShipping报表',
     'wip-report': 'WIP报表',
     'onwipsn-query': 'OnWipSN查询',
+    'key-part-query': '料件码报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

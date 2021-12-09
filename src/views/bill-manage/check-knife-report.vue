@@ -99,6 +99,7 @@ export default {
         {title: this.$t("itemCode"), key: "itemValue", align: "center", width: 120,},
         {title: this.$t("barCoding"), key: "code", align: "center", width: 150, tooltip: true,},
         {title: this.$t("category"), key: "category", align: "center", width: 120, tooltip: true},
+        {title: this.$t("model"), key: "model", align: "center", width: 80, tooltip: true},
         {title: this.$t("status"), key: "status", align: "center", width: 120, tooltip: true},
         {title: 'BatchID', key: "batchID", width: 120, align: "center", tooltip: true},
         {title: this.$t("createUser"), key: "createUserName", width: 80, align: "center"},

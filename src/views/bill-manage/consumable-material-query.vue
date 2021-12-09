@@ -91,10 +91,12 @@ export default {
         { title: this.$t("partNo"), key: "partNo", width: 140 },
         { title: this.$t("dateCode"), key: "dateCode", width: 80 },
         { title: this.$t("lotCode"), key: "lotCode", width: 130 },
-        { title: this.$t("vendorName"), key: "vendorName", minwidth: 150, tooltip: true },
+        { title: this.$t("vendorName"), key: "vendorName", minWidth: 150, tooltip: true },
         { title: this.$t("expdate"), key: "expdate", width: 130 },
         { title: this.$t("dataValue"), key: "dataValue", width: 130 },
         { title: this.$t("trackTime"), key: "trackTime", width: 125 },
+        { title: 'RID', key: "rid", width: 100 },
+        { title: 'UnitID', key: "unitid", width: 100 },
       ],
     };
   },
