@@ -1875,6 +1875,7 @@ export default {
     'wip-report': 'WIP报表',
     'onwipsn-query': 'OnWipSN查询',
     'key-part-query': '料件码报表',
+    'key-part-k01-query': 'k01料件码报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
