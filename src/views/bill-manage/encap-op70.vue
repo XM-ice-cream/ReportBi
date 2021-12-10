@@ -130,9 +130,15 @@ export default {
         {title: 'Dwell', key: "dwell", align: "center", width: 125, tooltip: true,},
         {title: 'DwellPlatFromVaccum', key: "dwellPlatFromVaccum", align: "center", width: 140, tooltip: true,},
         {title: 'DwellCarrierVaccum', key: "dwellCarrierVaccum", align: "center", width: 125, tooltip: true,},
+        {title: 'DwellStartTime', key: "dwellStartTime", align: "center", width: 125, tooltip: true, render: renderDate,},
+        {title: 'DwellEndTime', key: "dwellEndTime", align: "center", width: 125, tooltip: true, render: renderDate,},
+        {title: 'DwellTime', key: "dwellTime", align: "center", width: 125, tooltip: true,},
         {title: 'PreCure', key: "preCure", align: "center", width: 125, tooltip: true,},
         {title: 'PreCurePlatFromVaccum', key: "preCurePlatFromVaccum", align: "center", width: 160, tooltip: true,},
         {title: 'PreCureTempreture', key: "preCureTempreture", align: "center", width: 125, tooltip: true,},
+        {title: 'PreCureStartTime', key: "preCureStartTime", align: "center", width: 125, tooltip: true, render: renderDate,},
+        {title: 'PreCureEndTime', key: "preCureEndTime", align: "center", width: 125, tooltip: true, render: renderDate,},
+        {title: 'PreCureTime', key: "preCureTime", align: "center", width: 125, tooltip: true,},
       ], // 表格数据
     };
   },
