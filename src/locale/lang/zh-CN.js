@@ -1265,6 +1265,7 @@ export default {
     config: 'Config',
     //辅耗材查询
     auxiliaryMaterialNo: '辅耗材编号',
+    tfencode: '治具编码',
     //物料追溯
     boardSerialNumber: '大板序号',
     smallBoardSerialNumber: '小板序号',
