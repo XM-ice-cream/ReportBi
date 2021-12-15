@@ -104,6 +104,12 @@
                         :placeholder="$t('pleaseEnter') + 'BuildConfig'"
                       />
                     </FormItem>
+                    <FormItem :label="$t('stepName')" prop="curprocessname">
+                      <Input
+                        v-model.trim="req.curprocessname"
+                        :placeholder="$t('pleaseEnter') + $t('stepName')"
+                      />
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -161,6 +167,7 @@ export default {
         wo: "",
         unitId56: "",
         buildConfig: "",
+        curprocessname: "",
         isHistory: false,
         ...this.$config.pageConfig,
       }, //查询数据
@@ -257,6 +264,7 @@ export default {
         panelNo,
         unitId56,
         buildConfig,
+        curprocessname,
         isHistory,
       } = this.req;
       if (
@@ -267,7 +275,8 @@ export default {
         wo ||
         panelNo ||
         unitId56 ||
-        buildConfig
+        buildConfig ||
+        curprocessname
       ) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -287,6 +296,7 @@ export default {
                 wo,
                 unitId56,
                 buildConfig,
+                curprocessname,
                 isHistory,
               },
             };
@@ -319,6 +329,7 @@ export default {
         panelNo,
         unitId56,
         buildConfig,
+        curprocessname,
         isHistory,
       } = this.req;
       if (
@@ -329,7 +340,8 @@ export default {
         wo ||
         panelNo ||
         unitId56 ||
-        buildConfig
+        buildConfig ||
+        curprocessname
       ) {
         let obj = {
           startTime: formatDate(startTime),
@@ -341,6 +353,7 @@ export default {
           wo,
           unitId56,
           buildConfig,
+          curprocessname,
           isHistory,
         };
         exportReq(obj).then((res) => {

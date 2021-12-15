@@ -155,7 +155,7 @@ export default {
       this.data = [];
       this.tableConfig.loading = false;
       let {startTime, endTime, workOrder, panelNo, unitId, status} = this.req;
-      if (startTime && endTime) {
+      if ((startTime && endTime) || workOrder || panelNo || unitId || status) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
             this.tableConfig.loading = true;
@@ -192,7 +192,7 @@ export default {
     // 导出
     exportClick() {
       let {startTime, endTime, workOrder, panelNo, unitId, status} = this.req;
-      if (startTime && endTime) {
+      if ((startTime && endTime) || workOrder || panelNo || unitId || status) {
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),

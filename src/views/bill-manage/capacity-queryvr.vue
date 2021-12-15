@@ -27,7 +27,6 @@
                     :label-colon="true"
                     @submit.native.prevent
                     ref="searchReq"
-                    :rules="ruleValidate"
                     :model="req"
                     @keyup.native.enter="searchClick"
                   >
@@ -671,8 +670,6 @@ export default {
     },
     // SN导出
     exportClick() {
-      if (!this.req.startTime || !this.req.endTime)
-        return this.$Message.warning(`${this.$t("pleaseSelect")}${this.$t("timeHorizon")}`);
       const { workOrder, startTime, startTime1, endTime, endTime1, pn, name } = this.req;
       const obj = {
         workOrder,

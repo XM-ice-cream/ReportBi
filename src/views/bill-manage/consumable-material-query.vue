@@ -33,6 +33,18 @@
                         ">
                       </v-selectpage>
                     </FormItem>
+                    <!-- rid -->
+                    <FormItem :label="$t('rId')">
+                      <Input type="text" v-model="req.rid" :placeholder="$t('pleaseEnter') + $t('rId') + $t('multiple,separated')"></Input>
+                    </FormItem>
+                    <!-- lotCode -->
+                    <FormItem :label="$t('lotCode')">
+                      <Input type="text" v-model="req.lotCode" :placeholder="$t('pleaseEnter') + $t('lotCode') + $t('multiple,separated')"></Input>
+                    </FormItem>
+                    <!-- tfencode -->
+                    <FormItem :label="$t('tfencode')">
+                      <Input type="text" v-model="req.tfencode" :placeholder="$t('pleaseEnter') + $t('tfencode') + $t('multiple,separated')"></Input>
+                    </FormItem>
                     <div class="poptip-style-button">
                       <Button @click="resetClick">{{ $t("reset") }}</Button>
                       <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
@@ -76,6 +88,9 @@ export default {
         panel: "", //大板序号
         unitId: "", // 小板序号
         workOrder: "", //工单
+        rid: "", 
+        lotCode: "", 
+        tfencode: "", 
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -91,10 +106,12 @@ export default {
         { title: this.$t("partNo"), key: "partNo", width: 140 },
         { title: this.$t("dateCode"), key: "dateCode", width: 80 },
         { title: this.$t("lotCode"), key: "lotCode", width: 130 },
-        { title: this.$t("vendorName"), key: "vendorName", minwidth: 150, tooltip: true },
+        { title: this.$t("vendorName"), key: "vendorName", minWidth: 150, tooltip: true },
         { title: this.$t("expdate"), key: "expdate", width: 130 },
         { title: this.$t("dataValue"), key: "dataValue", width: 130 },
         { title: this.$t("trackTime"), key: "trackTime", width: 125 },
+        { title: 'RID', key: "rid", width: 100 },
+        { title: 'UnitID', key: "unitid", width: 100 },
       ],
     };
   },
@@ -113,8 +130,8 @@ export default {
   methods: {
     // 获取分页列表数据
     pageLoad () {
-      let { pageSize, pageIndex, panel, unitId, workOrder } = this.req;
-      if (!panel && !unitId && !workOrder) return this.$Msg.error('请输入查询条件')
+      let { pageSize, pageIndex, panel, unitId, workOrder, rid, lotCode, tfencode } = this.req;
+      if (!panel && !unitId && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
       this.tableConfig.loading = true;
       const obj = {
         orderField: "panel", // 排序字段
@@ -125,6 +142,9 @@ export default {
           panel: commaSplitString(panel).join(),
           unitId: commaSplitString(unitId).join(),
           workOrder,
+          rid, 
+          lotCode, 
+          tfencode, 
         },
       };
       getpagelistReq(obj).then((res) => {
@@ -149,15 +169,21 @@ export default {
       this.req.panel = "";
       this.req.unitId = "";
       this.$refs.workOrder.remove()
+      this.req.rid = "";
+      this.req.lotCode = "";
+      this.req.tfencode = "";
     },
     // 导出
     exportClick () {
-      let { panel, unitId, workOrder } = this.req;
-      if (!panel && !unitId && !workOrder) return this.$Msg.error('请输入查询条件')
+      let { panel, unitId, workOrder, rid, lotCode, tfencode } = this.req;
+      if (!panel && !unitId && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
       const obj = {
         panel: commaSplitString(panel).join(),
         unitId: commaSplitString(unitId).join(),
         workOrder,
+        rid, 
+        lotCode, 
+        tfencode, 
       };
       exportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });

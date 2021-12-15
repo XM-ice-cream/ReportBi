@@ -260,7 +260,7 @@ export default {
       let {inProcessTime, outProcessTime, workOrder, lineName, panelNo, unitId, unitId56, processId, boxNo, cartonNo, palletNo, carrier, enabled,} = this.req;
       this.tableConfig.loading = true;
       const obj = {
-        orderField: "id", // 排序字段
+        orderField: "CreateDate", // 排序字段
         ascending: false, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
