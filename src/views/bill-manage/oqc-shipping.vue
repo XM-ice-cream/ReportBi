@@ -64,6 +64,11 @@
                       <Input v-model.trim="req.cartonno" :placeholder="$t('pleaseEnter') + $t('cartonNo')"
                              @on-search="searchClick"/>
                     </FormItem>
+                    <!-- 出货单号 -->
+                    <FormItem :label="$t('shipmentNo')" prop="shipmentNO">
+                      <Input v-model.trim="req.shipmentNO" :placeholder="$t('pleaseEnter') + $t('shipmentNo')"
+                             @on-search="searchClick"/>
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -110,6 +115,7 @@ export default {
         unitId56: "",
         config: "",
         cartonno: "",
+        shipmentNO: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -159,13 +165,13 @@ export default {
     pageLoad() {
       this.data = [];
       this.tableConfig.loading = false;
-      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno} = this.req;
+      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno, shipmentNO} = this.req;
       if (startTime && endTime) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
             this.tableConfig.loading = true;
             let obj = {
-              orderField: "PN", // 排序字段
+              orderField: "panelno", // 排序字段
               ascending: true, // 是否升序
               pageSize: this.req.pageSize, // 分页大小
               pageIndex: this.req.pageIndex, // 当前页码
@@ -178,6 +184,7 @@ export default {
                 unitId56,
                 config,
                 cartonno,
+                shipmentNO,
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -198,7 +205,7 @@ export default {
     },
     // 导出
     exportClick() {
-      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno} = this.req;
+      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno, shipmentNO} = this.req;
       if (startTime && endTime) {
         let obj = {
           startTime: formatDate(startTime),
@@ -209,6 +216,7 @@ export default {
           unitId56,
           config,
           cartonno,
+          shipmentNO,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], {type: "application/vnd.ms-excel"});

@@ -55,7 +55,15 @@
                         </FormItem>
                         <!-- 线体 -->
                         <FormItem :label="$t('line')" prop="linename">
-                          <Input type="text" v-model="req.linename" @on-keyup.enter="searchClick" :placeholder="$t('pleaseEnter') + $t('line')" />
+                          <v-selectpage class="select-page-style" ref="config" v-if="searchPoptipModal" key-field="name" show-field="name" :data="linePageListUrl" v-model="req.linename" :placeholder="$t('pleaseEnter') + $t('line')" :result-format="
+                        (res) => {
+                        return {                            
+                            totalRow: res.total,
+                            list: res.data || [],
+                        };
+                        }
+                    ">
+                          </v-selectpage>
                         </FormItem>
                         <!-- 小线体 -->
                         <FormItem label="小线体" prop="subline">
@@ -154,7 +162,7 @@
 </template>
 
 <script>
-import { getlistReq, trackOutExportReq, configPageListUrl } from "@/api/bill-manage/quality-yield-query-report";
+import { getlistReq, trackOutExportReq, configPageListUrl, linePageListUrl } from "@/api/bill-manage/quality-yield-query-report";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
 import { formatDate, getButtonBoolean, commaSplitString } from "@/libs/tools";
 import TabTable from "./quality-yield-query-report/tabTable.vue";
@@ -166,6 +174,7 @@ export default {
   data () {
     return {
       configPageListUrl: configPageListUrl(),
+      linePageListUrl: linePageListUrl(),
       tabName: "tab1",
       tab1: true,
       tab2: false,
