@@ -55,7 +55,7 @@
                         </FormItem>
                         <!-- 线体 -->
                         <FormItem :label="$t('line')" prop="linename">
-                          <v-selectpage class="select-page-style" ref="config" v-if="searchPoptipModal" key-field="name" show-field="name" :data="linePageListUrl" v-model="req.linename" :placeholder="$t('pleaseEnter') + $t('line')" :result-format="
+                          <v-selectpage class="select-page-style" multiple v-if="searchPoptipModal" key-field="name" show-field="name" :data="linePageListUrl" v-model="req.linename" :placeholder="$t('pleaseEnter') + $t('line')" :result-format="
                         (res) => {
                         return {                            
                             totalRow: res.total,
@@ -306,7 +306,7 @@ export default {
           endtime: formatDate(endTime),
           workorder: commaSplitString(workOrder).join(),
           pn,
-          linename,
+          linename:linename?linename.split(','):[],
           subline,
           buildtype,
           config,
@@ -334,7 +334,7 @@ export default {
           endtime: formatDate(endTime),
           workorder: commaSplitString(workOrder).join(),
           pn,
-          linename,
+          linename:linename?linename.split(','):[],
           subline,
           buildtype,
           config,

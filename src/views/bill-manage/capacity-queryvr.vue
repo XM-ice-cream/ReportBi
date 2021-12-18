@@ -179,7 +179,7 @@ export default {
       req: {
         totalPage: 5,
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: 30,
         total: 50,
         startTime: "",
         startTime1: "",
@@ -602,7 +602,7 @@ export default {
           const obj = {
             orderField: "WorkOrder",
             ascending: true,
-            pageSize: 30,
+            pageSize: this.req.pageSize,
             pageIndex: this.req.pageIndex,
             data: {
               startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
