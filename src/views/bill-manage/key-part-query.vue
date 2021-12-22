@@ -64,7 +64,7 @@
 
 <script>
 import {getpagelistReq, exportReq} from "@/api/bill-manage/key-part-query";
-import {getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
+import {getButtonBoolean, formatDate, exportFile, commaSplitString} from "@/libs/tools";
 
 export default {
   name: "key-part-query",
@@ -129,11 +129,11 @@ export default {
               pageSize: this.req.pageSize, // 分页大小
               pageIndex: this.req.pageIndex, // 当前页码
               data: {
-                unitId,
-                s_FLEX,
-                d_HINGE_FLEX,
-                t_HINGE_FLEX,
-                sip,
+                unitId: commaSplitString(unitId).join(),
+                s_FLEX: commaSplitString(s_FLEX).join(),
+                d_HINGE_FLEX: commaSplitString(d_HINGE_FLEX).join(),
+                t_HINGE_FLEX: commaSplitString(t_HINGE_FLEX).join(),
+                sip: commaSplitString(sip).join(),
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -153,11 +153,11 @@ export default {
     exportClick() {
         let {unitId, s_FLEX, d_HINGE_FLEX, t_HINGE_FLEX, sip} = this.req;
         let obj = {
-            unitId,
-            s_FLEX,
-            d_HINGE_FLEX,
-            t_HINGE_FLEX,
-            sip,
+            unitId: commaSplitString(unitId).join(),
+            s_FLEX: commaSplitString(s_FLEX).join(),
+            d_HINGE_FLEX: commaSplitString(d_HINGE_FLEX).join(),
+            t_HINGE_FLEX: commaSplitString(t_HINGE_FLEX).join(),
+            sip: commaSplitString(sip).join(),
         };
         exportReq(obj).then((res) => {
             let blob = new Blob([res], {type: "application/vnd.ms-excel"});

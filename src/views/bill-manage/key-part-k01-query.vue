@@ -59,7 +59,7 @@
 
 <script>
 import {getpagelistReq, exportReq} from "@/api/bill-manage/key-part-k01-query";
-import {getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
+import {getButtonBoolean, formatDate, exportFile, commaSplitString} from "@/libs/tools";
 
 export default {
   name: "key-part-k01-query",
@@ -123,10 +123,10 @@ export default {
               pageSize: this.req.pageSize, // 分页大小
               pageIndex: this.req.pageIndex, // 当前页码
               data: {
-                unitId,
-                s_FLEX,
-                fcm,
-                sip,
+                unitId: commaSplitString(unitId).join(),
+                s_FLEX: commaSplitString(s_FLEX).join(),
+                fcm: commaSplitString(fcm).join(),
+                sip: commaSplitString(sip).join(),
               },
             };
             getpagelistReq(obj).then((res) => {
