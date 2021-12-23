@@ -48,7 +48,7 @@
 
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/expandpitch-query";
-import { getButtonBoolean, formatDate, exportFile, commaSplitString } from "@/libs/tools";
+import { getButtonBoolean, formatDate, exportFile, commaSplitString, renderDate } from "@/libs/tools";
 export default {
   name: "expandpitch-query",
   data () {
@@ -75,6 +75,7 @@ export default {
           },
         },
         { title: "WarferID", key: "barcode", align: "center" },
+        { title: "CreateDate", key: "createdate", align: "center", width: 125, render: renderDate, },
         { title: "D1", key: "d1", align: "center" },
         { title: "D2", key: "d2", align: "center" },
         { title: "D3", key: "d3", align: "center" },
