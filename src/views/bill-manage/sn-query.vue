@@ -70,7 +70,7 @@
                     <FormItem label="UnitId" prop="unitId">
                       <Input
                         v-model.trim="req.unitId"
-                        :placeholder="$t('pleaseEnter') + 'UnitId'"
+                        :placeholder="$t('pleaseEnter') + 'UnitId' + $t('multiple,separated')"
                       />
                     </FormItem>
                     <!-- 线别 -->
