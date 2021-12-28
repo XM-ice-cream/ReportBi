@@ -7,7 +7,7 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400"
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="800"
                       trigger="manual" transfer>
                 <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
@@ -18,7 +18,7 @@
                     <!-- 箱号 -->
                     <FormItem :label="$t('cartonCode')" prop="boxCode">
                       <Input v-model="req.boxCode" :placeholder="$t('pleaseEnter') + $t('cartonCode')"
-                             @on-search="searchClick"/>
+                             type="textarea" :autosize="{minRows: 1,maxRows: 20}" @on-search="searchClick"/>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
