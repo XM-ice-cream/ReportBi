@@ -212,6 +212,14 @@ export default {
           align: "center",
         },
         {
+          title: this.$t("modelName"),
+          key: "modelname",
+          minWidth: 100,
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
+        },
+        {
           title: this.$t("stationId"),
           key: "processName",
           minWidth: 140,
@@ -586,6 +594,7 @@ export default {
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    this.tableConfig.loading = false;//打开页面后不会有加载动画
   },
   deactivated() {
     this.searchPoptipModal = false;
@@ -725,7 +734,7 @@ export default {
     },
   },
   mounted() {
-    this.pageLoad();
+    //this.pageLoad();
   },
 };
 </script>
