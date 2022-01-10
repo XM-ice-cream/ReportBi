@@ -78,7 +78,7 @@
                   </Poptip>
                 </i-col>
                 <i-col span="12">
-                  <button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
+                  <button-custom :btnData="btnData" @on-removeCirc-click="removeCircClick" @on-retainCirc-click="retainCircClick" @on-export-click="exportClick" ></button-custom>
                 </i-col>
               </Row>
             </div>
@@ -201,6 +201,7 @@ export default {
         buildtype: "", //段别
         unitid: "", //unidId
         config: "",
+        removeCirc: "N",//去除/保留维修回流产品
         ...this.$config.pageConfig,
       }, //查询数据
       searchObj: {},
@@ -298,7 +299,7 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      const { workOrder, pn, linename, subline, buildtype, config, startTime, endTime, unitid } = this.req;
+      const { workOrder, pn, linename, subline, buildtype, config, startTime, endTime, unitid, removeCirc } = this.req;
       if (workOrder || pn || linename || subline || buildtype || config || startTime || endTime || unitid) {
         this.tableConfig.loading = true;
         this.searchObj = {
@@ -311,6 +312,7 @@ export default {
           buildtype,
           config,
           unitid,
+          removeCirc,
         };
         getlistReq(this.searchObj)
           .then((res) => {
@@ -327,7 +329,7 @@ export default {
     },
     // 导出
     exportClick () {
-      const { workOrder, pn, linename, subline, buildtype, config, startTime, endTime, unitid } = this.req;
+      const { workOrder, pn, linename, subline, buildtype, config, startTime, endTime, unitid, removeCirc } = this.req;
       if (workOrder || pn || linename || subline || buildtype || config || startTime || endTime || unitid) {
         const obj = {
           starttime: formatDate(startTime),
@@ -339,6 +341,7 @@ export default {
           buildtype,
           config,
           unitid,
+          removeCirc,
         };
         trackOutExportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
@@ -360,6 +363,26 @@ export default {
         this.$refs["tab" + index].queryObj = obj;
         this.$refs["tab" + index].pageLoad(obj);
       });
+    },
+    // 点击切换:去除维修回流产品
+    removeCircClick () {
+      // if(this.req.removeCirc == "N" || this.req.removeCirc == "")
+      // {
+      //   this.req.removeCirc = "Y";
+      // }
+      // else
+      // {
+      //   this.req.removeCirc = "N";
+      // }
+      this.req.removeCirc = "Y";
+      this.req.pageIndex = 1;
+      this.pageLoad();
+    },
+    // 点击切换:保留维修回流产品
+    retainCircClick () {
+      this.req.removeCirc = "N";
+      this.req.pageIndex = 1;
+      this.pageLoad();
     },
     // 自动改变表格高度
     autoSize () {
