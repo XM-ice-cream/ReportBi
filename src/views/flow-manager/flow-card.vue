@@ -269,7 +269,7 @@ export default {
           outProcessTime: outProcessTime ? formatDate(outProcessTime): '',
           workOrder, lineName, panelNo, unitId, unitId56, processId, boxNo, cartonNo, palletNo, carrier, enabled,
         },
-        isFuzzyKey: ["panelNo", "unitId", "unitId56", "carrier", "boxNo", "cartonNo", "palletNo",],
+        isFuzzyKey: [],
       };
       getpagelistReq(obj).then((res) => {
         this.tableConfig.loading = false;
@@ -324,7 +324,7 @@ export default {
         inProcessTime: inProcessTime ? formatDate(inProcessTime): '',
         outProcessTime: outProcessTime ? formatDate(outProcessTime): '',
         workOrder, lineName, panelNo, unitId, unitId56, processId, boxNo, cartonNo, palletNo, carrier, enabled,
-        isFuzzyKey: ["panelNo", "unitId", "unitId56", "carrier", "boxNo", "cartonNo", "palletNo",],
+        isFuzzyKey: [],
       };
       exportReq(obj).then((res) => {
         let blob = new Blob([res], {type: "application/vnd.ms-excel"});
