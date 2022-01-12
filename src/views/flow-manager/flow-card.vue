@@ -236,9 +236,6 @@ export default {
       }, //查询数据
     };
   },
-  mounted () {
-    this.pageLoad();
-  },
   activated() {
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
