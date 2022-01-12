@@ -1,4 +1,4 @@
-/* OQCShipping报表 */
+/* 上料记录查询报表 */
 <template>
   <div class="page-style">
     <!-- 页面表格 -->
@@ -27,46 +27,19 @@
                                   format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"
                                   v-model="req.endTime"></DatePicker>
                     </FormItem>
-                    <!-- 工单 -->
-                    <FormItem :label="$t('workOrder')" prop="workOrder">
-                      <v-selectpage ref="workOrder" class="select-page-style" v-if="searchPoptipModal" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
-                        (res) => {
-                          return {
-                            totalRow: res.total,
-                            list: res.data || [],
-                          };
-                        }
-                      ">
-                      </v-selectpage>
-                    </FormItem>
-                    <!-- 大条码 -->
-                    <FormItem :label="$t('panelNo')" prop="panelNo">
-                      <Input v-model.trim="req.panelNo" :placeholder="$t('pleaseEnter') + $t('panelNo')"
+                    <!-- 设备编码 -->
+                    <FormItem :label="$t('eqpCode')" prop="eqpCode">
+                      <Input v-model="req.eqpCode" :placeholder="$t('pleaseEnter') + $t('eqpCode')"
                              @on-search="searchClick"/>
                     </FormItem>
-                    <!-- 小条码 -->
-                    <FormItem :label="$t('smallBoardCode')" prop="unitId">
-                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode')"
+                    <!-- RID -->
+                    <FormItem :label="$t('rId')" prop="rid">
+                      <Input v-model.trim="req.rid" :placeholder="$t('pleaseEnter') + $t('rId')"
                              @on-search="searchClick"/>
                     </FormItem>
-                    <!-- 56位小条码 -->
-                    <FormItem :label="$t('smallBoardCode56')" prop="unitId56">
-                      <Input v-model.trim="req.unitId56" :placeholder="$t('pleaseEnter') + $t('smallBoardCode56')"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- config -->
-                    <FormItem :label="$t('config')" prop="config">
-                      <Input v-model.trim="req.config" placeholder="请输入config"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- 彩盒数 -->
-                    <FormItem :label="$t('cartonNo')" prop="cartonno">
-                      <Input v-model.trim="req.cartonno" :placeholder="$t('pleaseEnter') + $t('cartonNo')"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- 出货单号 -->
-                    <FormItem :label="$t('shipmentNo')" prop="shipmentNO">
-                      <Input v-model.trim="req.shipmentNO" :placeholder="$t('pleaseEnter') + $t('shipmentNo')"
+                    <!-- 制程名称 -->
+                    <FormItem :label="$t('processName')" prop="processNAME">
+                      <Input v-model.trim="req.processNAME" :placeholder="$t('pleaseEnter') + $t('processName')"
                              @on-search="searchClick"/>
                     </FormItem>
                   </Form>
@@ -92,15 +65,13 @@
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/oqc-shipping";
-import {getButtonBoolean, formatDate, exportFile, renderDate} from "@/libs/tools";
-import { workerPageListUrl } from "@/api/material-manager/order-info";
+import {getpagelistReq, exportReq} from "@/api/bill-manage/feeding-record-query";
+import {getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
 
 export default {
-  name: "oqc-shipping",
+  name: "feeding-record-query",
   data() {
     return {
-      workerPageListUrl: workerPageListUrl(),
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: {...this.$config.tableConfig}, // table配置
@@ -109,13 +80,9 @@ export default {
       req: {
         startTime: "",
         endTime: "",
-        workOrder: "", //工单
-        panelNo: "",
-        unitId: "",
-        unitId56: "",
-        config: "",
-        cartonno: "",
-        shipmentNO: "",
+        eqpCode: "",
+        rid: "",
+        processNAME: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -125,22 +92,15 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: this.$t("shipDate"), key: "shipdate", align: "center", render: renderDate, width: 140, tooltip: true},
-        {title: this.$t("shipmentNo"), key: "shipmentno", align: "center", width: 120, tooltip: true},
-        {title: this.$t("shipAddress"), key: "shipaddress", align: "center", width: 140, tooltip: true},
-        {title: this.$t("apn"), key: "apn", align: "center", width: 120, tooltip: true},
-        {title: this.$t("config"), key: "config", align: "center", width: 90, tooltip: true},
-        {title: this.$t("boxNo"), key: "boxno", align: "center", width: 160, tooltip: true},
-        {title: this.$t("cartonNo"), key: "cartonno", align: "center", width: 160, tooltip: true},
-        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 120, tooltip: true},
-        {title: this.$t("smallBoardCode56"), key: "unitiD56", align: "center", width: 150, tooltip: true},
-        {title: this.$t("shippingGrade"), key: "shippinggrade", align: "center", width: 100, tooltip: true},
-        {title: 'OP60', key: "oP60", align: "center", width: 100, tooltip: true},
-        {title: 'ON/OFF', key: "onoff", align: "center", width: 100, tooltip: true},
-        {title: 'OP60', key: "fos", align: "center", width: 100, tooltip: true},
-        {title: 'MURA', key: "mura", align: "center", width: 100, tooltip: true},
-        {title: 'I16', key: "i16", align: "center", width: 100, tooltip: true},
-        {title: 'FVI', key: "fvi", align: "center", width: 100, tooltip: true},
+        {title: this.$t("workOrder"), key: "workorder", align: "center", width: 120, tooltip: true, fixed: 'left'},
+        {title: this.$t("processName"), key: "processname", align: "center", width: 140, tooltip: true},
+        {title: this.$t("rId"), key: "rid", align: "center", width: 200, tooltip: true},
+        {title: this.$t("eqpCode"), key: "eqpcode", align: "center", width: 120, tooltip: true},
+        {title: this.$t("pn"), key: "pn", align: "center", width: 120, tooltip: true},
+        {title: this.$t("dateCode"), key: "datecode", align: "center", width: 100, tooltip: true,},
+        {title: this.$t("lotCode"), key: "lotcode", align: "center", width: 100, tooltip: true},
+        {title: this.$t("name"), key: "name", align: "center", width: 180, tooltip: true},
+        {title: this.$t("createUserId"), key: "createuserid", align: "center", width: 100, tooltip: true},
       ], // 表格数据
     };
   },
@@ -149,6 +109,7 @@ export default {
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    this.getDataItemData();
   },
   // 导航离开该组件的对应路由时调用
   beforeRouteLeave(to, from, next) {
@@ -165,26 +126,22 @@ export default {
     pageLoad() {
       this.data = [];
       this.tableConfig.loading = false;
-      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno, shipmentNO} = this.req;
-      if (startTime && endTime) {
+      let {startTime, endTime, eqpCode, rid, processNAME} = this.req;
+      if ((startTime && endTime) || eqpCode || rid || processNAME) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
             this.tableConfig.loading = true;
             let obj = {
-              orderField: "panelno", // 排序字段
+              orderField: "PN", // 排序字段
               ascending: true, // 是否升序
               pageSize: this.req.pageSize, // 分页大小
               pageIndex: this.req.pageIndex, // 当前页码
               data: {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
-                workOrder,
-                panelNo,
-                unitId,
-                unitId56,
-                config,
-                cartonno,
-                shipmentNO,
+                eqpCode,
+                rid,
+                processNAME,
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -205,22 +162,18 @@ export default {
     },
     // 导出
     exportClick() {
-      let {startTime, endTime, workOrder, panelNo, unitId, unitId56, config, cartonno, shipmentNO} = this.req;
-      if (startTime && endTime) {
+      let {startTime, endTime, eqpCode, rid, processNAME} = this.req;
+      if ((startTime && endTime) || eqpCode || rid || processNAME) {
         let obj = {
-          startTime: formatDate(startTime),
-          endTime: formatDate(endTime),
-          workOrder,
-          panelNo,
-          unitId,
-          unitId56,
-          config,
-          cartonno,
-          shipmentNO,
+            startTime: formatDate(startTime),
+            endTime: formatDate(endTime),
+            eqpCode,
+            rid,
+            processNAME,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], {type: "application/vnd.ms-excel"});
-          const fileName = `${this.$t("oqc-shipping")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+          const fileName = `${this.$t("feeding-record-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名
           exportFile(blob, fileName);
         });
       } else {

@@ -139,6 +139,7 @@ export default {
         {title: 'PreCureStartTime', key: "preCureStartTime", align: "center", width: 125, tooltip: true, render: renderDate,},
         {title: 'PreCureEndTime', key: "preCureEndTime", align: "center", width: 125, tooltip: true, render: renderDate,},
         {title: 'PreCureTime', key: "preCureTime", align: "center", width: 125, tooltip: true,},
+        {title: 'Dwell&PreCure Time', key: "dwell_PreCure_Time", align: "center", width: 130, tooltip: true,},
       ], // 表格数据
     };
   },

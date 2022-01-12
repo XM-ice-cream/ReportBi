@@ -1877,6 +1877,8 @@ export default {
     'onwipsn-query': 'OnWipSN查询',
     'key-part-query': '料件码报表',
     'key-part-k01-query': 'k01料件码报表',
+    'feeding-record-query': '上料记录查询报表',
+    'boxcode-query': '箱号查询',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

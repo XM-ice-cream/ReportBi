@@ -179,7 +179,7 @@ export default {
       req: {
         totalPage: 5,
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: 30,
         total: 50,
         startTime: "",
         startTime1: "",
@@ -207,6 +207,14 @@ export default {
           title: this.$t("workOrder"),
           key: "workOrder",
           minWidth: 150,
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
+        },
+        {
+          title: this.$t("modelName"),
+          key: "modelname",
+          minWidth: 100,
           ellipsis: true,
           tooltip: true,
           align: "center",
@@ -586,6 +594,7 @@ export default {
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    this.tableConfig.loading = false;//打开页面后不会有加载动画
   },
   deactivated() {
     this.searchPoptipModal = false;
@@ -602,7 +611,7 @@ export default {
           const obj = {
             orderField: "WorkOrder",
             ascending: true,
-            pageSize: 30,
+            pageSize: this.req.pageSize,
             pageIndex: this.req.pageIndex,
             data: {
               startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
@@ -725,7 +734,7 @@ export default {
     },
   },
   mounted() {
-    this.pageLoad();
+    //this.pageLoad();
   },
 };
 </script>

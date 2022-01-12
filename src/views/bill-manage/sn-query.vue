@@ -70,7 +70,7 @@
                     <FormItem label="UnitId" prop="unitId">
                       <Input
                         v-model.trim="req.unitId"
-                        :placeholder="$t('pleaseEnter') + 'UnitId'"
+                        :placeholder="$t('pleaseEnter') + 'UnitId' + $t('multiple,separated')"
                       />
                     </FormItem>
                     <!-- 线别 -->
@@ -290,11 +290,11 @@ export default {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
                 panelNo: commaSplitString(panelNo).join(),
-                unitId,
+                unitId: commaSplitString(unitId).join(),
                 lineName,
                 pn,
                 wo,
-                unitId56,
+                unitId56: commaSplitString(unitId56).join(),
                 buildConfig,
                 curprocessname,
                 isHistory,
@@ -347,11 +347,11 @@ export default {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
           panelNo: commaSplitString(panelNo).join(),
-          unitId,
+          unitId: commaSplitString(unitId).join(),
           lineName,
           pn,
           wo,
-          unitId56,
+          unitId56: commaSplitString(unitId56).join(),
           buildConfig,
           curprocessname,
           isHistory,

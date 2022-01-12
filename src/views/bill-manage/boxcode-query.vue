@@ -1,4 +1,4 @@
-/* k01料件码报表 */
+/* 箱号查询报表 */
 <template>
   <div class="page-style">
     <!-- 页面表格 -->
@@ -7,33 +7,18 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="450"
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="800"
                       trigger="manual" transfer>
                 <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form ref="searchReq" :model="req" :label-width="100" :label-colon="true" @submit.native.prevent
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent
                         @keyup.native.enter="searchClick">
-                    <!-- UnitID -->
-                    <FormItem label='UnitID' prop="unitId">
-                      <Input v-model="req.unitId" placeholder="请输入UnitID"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- S_FLEX -->
-                    <FormItem label='S_FLEX' prop="s_FLEX">
-                      <Input v-model.trim="req.s_FLEX" placeholder="请输入S_FLEX"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- FCM -->
-                    <FormItem label='FCM' prop="fcm">
-                      <Input v-model.trim="req.fcm" placeholder="请输入FCM"
-                             @on-search="searchClick"/>
-                    </FormItem>
-                    <!-- SIP -->
-                    <FormItem label='SIP' prop="sip">
-                      <Input v-model.trim="req.sip" placeholder="请输入SIP"
-                             @on-search="searchClick"/>
+                    <!-- 箱号 -->
+                    <FormItem :label="$t('cartonCode')" prop="boxCode">
+                      <Input v-model="req.boxCode" :placeholder="$t('pleaseEnter') + $t('cartonCode')"
+                             type="textarea" :autosize="{minRows: 1,maxRows: 20}" @on-search="searchClick"/>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -58,11 +43,11 @@
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/key-part-k01-query";
-import {getButtonBoolean, formatDate, exportFile, commaSplitString} from "@/libs/tools";
+import {getpagelistReq, exportReq} from "@/api/bill-manage/boxcode-query";
+import {getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
 
 export default {
-  name: "key-part-k01-query",
+  name: "boxcode-query",
   data() {
     return {
       searchPoptipModal: false,
@@ -71,10 +56,7 @@ export default {
       data: [], // 表格数据
       btnData: [],
       req: {
-        unitId:"",
-        s_FLEX:"",
-        fcm:"",
-        sip:"",
+        boxCode: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -84,11 +66,9 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: 'UnitID', key: "unitId", align: "center", width: 140, tooltip: true, fixed: 'left'},
-        {title: 'PanelNo', key: "panelno", align: "center", width: 140, tooltip: true},
-        {title: 'S_FLEX', key: "s_FLEX", align: "center", width: 140, tooltip: true},
-        {title: 'FCM', key: "fcm", align: "center", width: 140, tooltip: true},
-        {title: 'SIP', key: "sip", align: "center", width: 140, tooltip: true},
+        {title: 'PW', key: "pw", align: "center", width: 120, tooltip: true, fixed: 'left'},
+        {title: this.$t("cartonCode"), key: "boxNo", align: "center", width: 140, tooltip: true},
+        {title: 'SubUnitId', key: "subUnitid", align: "center", width: 200, tooltip: true},
       ], // 表格数据
     };
   },
@@ -97,6 +77,7 @@ export default {
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    this.getDataItemData();
   },
   // 导航离开该组件的对应路由时调用
   beforeRouteLeave(to, from, next) {
@@ -111,22 +92,20 @@ export default {
     },
     // 获取分页列表数据
     pageLoad() {
-        this.data = [];
-        this.tableConfig.loading = false;
-        let {unitId, s_FLEX, fcm, sip} = this.req;
+      this.data = [];
+      this.tableConfig.loading = false;
+      let {boxCode} = this.req;
+      if (boxCode) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
             this.tableConfig.loading = true;
             let obj = {
-              orderField: "UnitId", // 排序字段
+              orderField: "BOXNO", // 排序字段
               ascending: true, // 是否升序
               pageSize: this.req.pageSize, // 分页大小
               pageIndex: this.req.pageIndex, // 当前页码
               data: {
-                unitId: commaSplitString(unitId).join(),
-                s_FLEX: commaSplitString(s_FLEX).join(),
-                fcm: commaSplitString(fcm).join(),
-                sip: commaSplitString(sip).join(),
+                boxCode,
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -141,21 +120,25 @@ export default {
             this.searchPoptipModal = false;
           }
         });
+      } else {
+        this.$Message.warning(this.$t("pleaseEnter") + this.$t("cartonCode"));
+      }
     },
     // 导出
     exportClick() {
-        let {unitId, s_FLEX, fcm, sip} = this.req;
+      let {boxCode} = this.req;
+      if (boxCode) {
         let obj = {
-            unitId,
-            s_FLEX,
-            fcm,
-            sip,
+            boxCode,
         };
         exportReq(obj).then((res) => {
-            let blob = new Blob([res], {type: "application/vnd.ms-excel"});
-            const fileName = `${this.$t("key-part-k01-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名
-            exportFile(blob, fileName);
+          let blob = new Blob([res], {type: "application/vnd.ms-excel"});
+          const fileName = `${this.$t("boxcode-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+          exportFile(blob, fileName);
         });
+      } else {
+        this.$Message.warning(this.$t("pleaseEnter") + this.$t("cartonCode"));
+      }
     },
     // 点击重置按钮触发
     resetClick() {

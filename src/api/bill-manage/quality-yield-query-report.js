@@ -50,3 +50,5 @@ export const trackOutExportReq = data => {
 }
 // 获取config 信息
 export const configPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/reportanalysis/v1/reportanalysis/getconfiglist`
+// 获取线体 信息
+export const linePageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/v1/dropdownlist/getlinelist`
