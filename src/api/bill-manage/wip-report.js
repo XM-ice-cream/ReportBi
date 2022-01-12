@@ -1,4 +1,6 @@
-import {requestCenter} from '@/libs/request'
+import {
+    requestCenter
+} from '@/libs/request'
 /* WIP报表查询 接口 */
 
 // 查询
@@ -7,6 +9,16 @@ export const getpagelistReq = data => {
         timeout: 0,
         baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/anonymous/v1/wipreport/getwipdata',
+        method: 'post',
+        data
+    })
+}
+// 明细查询
+export const getpagelistDetailReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/anonymous/v1/wipreport/getwipdetaildata',
         method: 'post',
         data
     })
