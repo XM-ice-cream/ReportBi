@@ -5,6 +5,7 @@ import {requestCenter} from '@/libs/request'
 export const addReq = data => {
   return requestCenter({
     loading: true,
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/generalconfig/addommconfig',
     method: 'post',
     data
@@ -15,6 +16,7 @@ export const addReq = data => {
 export const modifyReq = data => {
   return requestCenter({
     loading: true,
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/generalconfig/modifyommconfig',
     method: 'put',
     data
@@ -24,6 +26,7 @@ export const modifyReq = data => {
 // 分页查询
 export const getpagelistReq = data => {
   return requestCenter({
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/generalconfig/getommconfigpagelist',
     method: 'post',
     data

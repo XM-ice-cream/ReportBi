@@ -123,15 +123,17 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: "CreateDate", key: "createdate", align: "center", width: 125, render: renderDate },
-        { title: "站点", key: "station" },
-        { title: "编号名称", key: "name" },
-        { title: "通道名称", key: "channelType" },
-        { title: "通道参数", key: "channelParamter" },
-        { title: "下限值", key: "specLimitLower" },
-        { title: "目标值", key: "specLimitTarget" },
-        { title: "上限值", key: "specLimitUpper" },
-        { title: this.$t("remark"), key: "remark" },
+        { title: "站点", key: "station", align: "center", tooltip: true },
+        { title: "设备ID", key: "eqpid", align: "center", tooltip: true },
+        { title: "Barcode", key: "barcode", align: "center", width: 150, tooltip: true },
+        { title: "编号", key: "faicode", align: "center", tooltip: true },
+        { title: "测量值", key: "measuredvalue", align: "center", tooltip: true },
+        { title: "标准值", key: "standardvalue", align: "center" , tooltip: true},
+        { title: "上公差", key: "tolerancE_UPPER", align: "center", tooltip: true },
+        { title: "下公差", key: "tolerancE_LOWER", align: "center", tooltip: true },
+        { title: "超标值", key: "exceedstandardvalue", align: "center", tooltip: true },
+        { title: "超出公差值", key: "exceedtolerancevalue", align: "center", tooltip: true },
+        { title: "解析时间", key: "filecretetime", align: "center", width: 125, render: renderDate, tooltip: true },
       ], // 表格数据
     };
   },
@@ -156,34 +158,38 @@ export default {
     pageLoad() {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, stationType, orderField } = this.req;
-      this.$refs.searchReq.validate((validate) => {
-        if (validate) {
-          this.tableConfig.loading = true;
-          let obj = {
-            orderField, // 排序字段
-            ascending: true, // 是否升序
-            pageSize: this.req.pageSize, // 分页大小
-            pageIndex: this.req.pageIndex, // 当前页码
-            data: {
-              startTime: formatDate(startTime),
-              endTime: formatDate(endTime),
-              stationType,
-            },
-          };
-          getpagelistReq(obj)
-            .then((res) => {
-              this.tableConfig.loading = false;
-              if (res.code === 200) {
-                let { data, pageSize, pageIndex, total, totalPage } = res.result;
-                this.data = data || [];
-                this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
-                this.searchPoptipModal = false;
-              }
-            })
-            .catch(() => (this.tableConfig.loading = false));
-        }
-      });
+      let { startTime, endTime, stationType } = this.req;
+      if (stationType) {
+        this.$refs.searchReq.validate((validate) => {
+          if (validate) {
+            this.tableConfig.loading = true;
+            let obj = {
+              orderField: 'FILECRETETIME', // 排序字段
+              ascending: true, // 是否升序
+              pageSize: this.req.pageSize, // 分页大小
+              pageIndex: this.req.pageIndex, // 当前页码
+              data: {
+                startTime: formatDate(startTime),
+                endTime: formatDate(endTime),
+                stationType,
+              },
+            };
+            getpagelistReq(obj)
+              .then((res) => {
+                this.tableConfig.loading = false;
+                if (res.code === 200) {
+                  let { data, pageSize, pageIndex, total, totalPage } = res.result;
+                  this.data = data || [];
+                  this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+                  this.searchPoptipModal = false;
+                }
+              })
+              .catch(() => (this.tableConfig.loading = false));
+          }
+        });
+      } else {
+        this.$Message.warning(this.$t("pleaseEnter") + "站点");
+      }
     },
     // 导出
     exportClick() {
