@@ -55,10 +55,11 @@
                     </FormItem>
                     <!-- 站点 -->
                     <FormItem label="站点" prop="stationType">
-                      <Input
-                        v-model.trim="req.stationType"
-                        :placeholder="$t('pleaseEnter') + '站点'"
-                      ></Input>
+                      <Select v-model="req.stationType" clearable transfer :placeholder="$t('pleaseEnter') + '站点'">
+                        <Option v-for="(item, i) in stationList" :value="item.detailCode" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -98,6 +99,7 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/omm-data";
 import { getButtonBoolean, formatDate, exportFile, renderDate } from "@/libs/tools";
+import {getlistReq as getdataitemlistReq} from "@/api/system-manager/data-item";
 export default {
   name: "omm-data",
   data() {
@@ -113,6 +115,7 @@ export default {
         stationType: "",
         ...this.$config.pageConfig,
       }, //查询数据
+      stationList: [],
       columns: [
         {
           type: "index",
@@ -142,6 +145,7 @@ export default {
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    this.getDataItemData()
   },
   // 导航离开该组件的对应路由时调用
   beforeRouteLeave(to, from, next) {
@@ -208,6 +212,18 @@ export default {
       } else {
         this.$Message.warning(this.$t("pleaseEnter") + "站点");
       }
+    },
+    // 点击编码规则中的加号按钮触发
+    async getDataItemData() {
+      this.stationList = await this.getDataItemDetailList("OMMStation");
+    },
+    async getDataItemDetailList(itemCode) {
+      const obj = {itemCode, enabled: 1, oderType: 0,};
+      let arr = [];
+      await getdataitemlistReq(obj).then((res) => {
+        if (res.code === 200) arr = res.result || [];
+      });
+      return arr;
     },
     // 点击重置按钮触发
     resetClick() {

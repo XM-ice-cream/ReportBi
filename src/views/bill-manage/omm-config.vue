@@ -19,7 +19,11 @@
       >
         <!-- 站点 -->
         <FormItem label="站点" prop="station">
-          <Input v-model="submitData.station" :placeholder="$t('pleaseEnter') + '站点'" />
+          <Select v-model="submitData.station" clearable transfer :placeholder="$t('pleaseEnter') + '站点'">
+            <Option v-for="(item, i) in stationList" :value="item.detailCode" :key="i">
+              {{ item.detailName }}
+            </Option>
+          </Select>
         </FormItem>
         <!-- 编号名称 -->
         <FormItem label="编号名称" prop="name">
@@ -98,11 +102,11 @@
                   >
                     <!-- 站点 -->
                     <FormItem label="站点" prop="station">
-                      <Input
-                        v-model.trim="req.station"
-                        :placeholder="$t('pleaseEnter') + '站点'"
-                        @keyup.native.enter="searchClick"
-                      />
+                      <Select v-model="req.station" clearable transfer :placeholder="$t('pleaseEnter') + '站点'">
+                        <Option v-for="(item, i) in stationList" :value="item.detailCode" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                     <!-- 编号名称 -->
                     <FormItem label="编号名称" prop="name">
@@ -157,6 +161,7 @@
 <script>
 import { getpagelistReq, addReq, modifyReq } from "@/api/bill-manage/omm-config";
 import { getButtonBoolean, errorType, renderIsEnabled, renderDate } from "@/libs/tools";
+import {getlistReq as getdataitemlistReq} from "@/api/system-manager/data-item";
 export default {
   name: "omm-config",
   data() {
@@ -167,6 +172,7 @@ export default {
       drawerTitle: this.$t("add"),
       tableConfig: { ...this.$config.tableConfig }, // table配置
       // 表格表头
+      stationList: [],
       columns: [
         {
           type: "index",
@@ -177,19 +183,19 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: "站点", key: "station" },
-        { title: "编号名称", key: "name" },
-        { title: "通道名称", key: "channelType" },
-        { title: "通道参数", key: "channelParamter" },
-        { title: "下限值", key: "specLimitLower" },
-        { title: "目标值", key: "specLimitTarget" },
-        { title: "上限值", key: "specLimitUpper" },
-        { title: this.$t("remark"), key: "remark" },
-        { title: this.$t("enabled"), key: "enabled", width: 70, render: renderIsEnabled },
-        { title: this.$t("createUser"), key: "createUserName", width: 80 },
-        { title: this.$t("createDate"), key: "createDate", width: 125, render: renderDate },
-        { title: this.$t("modifyUser"), key: "modifyUserName", width: 80 },
-        { title: this.$t("modifyDate"), key: "modifyDate", width: 125, render: renderDate },
+        { title: "站点", key: "station", align: "center", width: 140, tooltip: true  },
+        { title: "编号名称", key: "name", align: "center", width: 120, tooltip: true  },
+        { title: "通道名称", key: "channelType", align: "center", width: 350, tooltip: true  },
+        { title: "通道参数", key: "channelParamter", align: "center", width: 300, tooltip: true  },
+        { title: "下限值", key: "specLimitLower", align: "center", width: 100, tooltip: true  },
+        { title: "目标值", key: "specLimitTarget", align: "center", width: 100, tooltip: true  },
+        { title: "上限值", key: "specLimitUpper", align: "center", width: 100, tooltip: true  },
+        { title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true  },
+        { title: this.$t("enabled"), key: "enabled", align: "center", width: 70, render: renderIsEnabled },
+        { title: this.$t("createUser"), key: "createUserName", align: "center", width: 80 },
+        { title: this.$t("createDate"), key: "createDate", align: "center", width: 125, render: renderDate },
+        { title: this.$t("modifyUser"), key: "modifyUserName", align: "center", width: 80 },
+        { title: this.$t("modifyDate"), key: "modifyDate", align: "center", width: 125, render: renderDate },
       ], // 表格数据
       data: [], // 表格数据
       selectObj: null, // 表格选中数据
@@ -270,6 +276,7 @@ export default {
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    this.getDataItemData()
   },
 
   methods: {
@@ -298,6 +305,18 @@ export default {
           }
         })
         .catch(() => (this.tableConfig.loading = false));
+    },
+    // 点击编码规则中的加号按钮触发
+    async getDataItemData() {
+      this.stationList = await this.getDataItemDetailList("OMMStation");
+    },
+    async getDataItemDetailList(itemCode) {
+      const obj = {itemCode, enabled: 1, oderType: 0,};
+      let arr = [];
+      await getdataitemlistReq(obj).then((res) => {
+        if (res.code === 200) arr = res.result || [];
+      });
+      return arr;
     },
     // 点击重置按钮触发
     resetClick() {
