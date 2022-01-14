@@ -33,24 +33,40 @@
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
                       <DatePicker
+                        style="width: 50%"
                         transfer
                         type="datetime"
                         :placeholder="$t('pleaseSelect') + $t('startTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
+                        format="yyyy-MM-dd"
                         :options="$config.datetimeOptions"
                         v-model="req.startTime"
                       ></DatePicker>
+                      <TimePicker
+                        transfer
+                        type="time"
+                        placeholder="Select time"
+                        style="width: 50%"
+                        v-model="req.startTime1"
+                      ></TimePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
                       <DatePicker
                         transfer
+                        style="width: 50%"
                         type="datetime"
                         :placeholder="$t('pleaseSelect') + $t('endTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
+                        format="yyyy-MM-dd"
                         :options="$config.datetimeOptions"
                         v-model="req.endTime"
                       ></DatePicker>
+                      <TimePicker
+                        transfer
+                        type="time"
+                        placeholder="Select time"
+                        style="width: 50%"
+                        v-model="req.endTime1"
+                      ></TimePicker>
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
@@ -166,7 +182,9 @@ export default {
         pageSize: 30,
         total: 50,
         startTime: "",
+        startTime1: "",
         endTime: "",
+        endTime1: "",
         workOrder: "", //工单
         pn: "", // 料号,
         name: "", // 线体
@@ -588,7 +606,7 @@ export default {
       this.$refs.searchReq.validate((validate) => {
         if (validate) {
           this.tableConfig.loading = true;
-          const { workOrder, pn, name, startTime, endTime } = this.req;
+          const { workOrder, pn, name, startTime, startTime1, endTime, endTime1 } = this.req;
 
           const obj = {
             orderField: "WorkOrder",
@@ -596,8 +614,8 @@ export default {
             pageSize: this.req.pageSize,
             pageIndex: this.req.pageIndex,
             data: {
-              startTime: formatDate(startTime),
-              endTime: formatDate(endTime),
+              startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
+              endTime: formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59"),
               workOrder,
               pn,
               name,
@@ -661,11 +679,11 @@ export default {
     },
     // SN导出
     exportClick() {
-      const { workOrder, startTime, endTime, pn, name } = this.req;
+      const { workOrder, startTime, startTime1, endTime, endTime1, pn, name } = this.req;
       const obj = {
         workOrder,
-        startTime: formatDate(startTime),
-        endTime: formatDate(endTime),
+        startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
+        endTime: formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59"),
         pn,
         name,
       };
