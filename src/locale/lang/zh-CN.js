@@ -1820,6 +1820,7 @@ export default {
     'KNSReferenceInfo': 'KNS坐标信息维护',
     'route-check-method': '流程勾选查询',
     'bom-report': 'Bom报表',
+    'bom-report-lz': 'Bom报表',
     'fa-report': 'FA报表',
     'led-barcode-preview': 'LED条码预览',
     'rework-manage': '重工管理',
