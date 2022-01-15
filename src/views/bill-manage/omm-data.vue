@@ -61,6 +61,10 @@
                         </Option>
                       </Select>
                     </FormItem>
+                    <!-- 类别 -->
+                    <FormItem :label="$t('category')" prop="category">
+                      <Input v-model.trim="req.category" :placeholder="$t('pleaseEnter') + $t('category')" />
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -113,6 +117,7 @@ export default {
         startTime: "",
         endTime: "",
         stationType: "",
+        category: "",
         ...this.$config.pageConfig,
       }, //查询数据
       stationList: [],
@@ -127,6 +132,7 @@ export default {
           },
         },
         { title: "站点", key: "station", align: "center", tooltip: true },
+        { title: "类别", key: "category", align: "center", tooltip: true },
         { title: "设备ID", key: "eqpid", align: "center", tooltip: true },
         { title: "Barcode", key: "barcode", align: "center", width: 150, tooltip: true },
         { title: "编号", key: "faicode", align: "center", tooltip: true },
@@ -162,7 +168,7 @@ export default {
     pageLoad() {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, stationType } = this.req;
+      let { startTime, endTime, stationType,category } = this.req;
       if (stationType) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -176,6 +182,7 @@ export default {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
                 stationType,
+                category,
               },
             };
             getpagelistReq(obj)
@@ -197,12 +204,13 @@ export default {
     },
     // 导出
     exportClick() {
-      let { startTime, endTime, stationType } = this.req;
+      let { startTime, endTime, stationType,category } = this.req;
       if (stationType) {
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
           stationType,
+          category,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
