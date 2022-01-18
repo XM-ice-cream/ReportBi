@@ -740,6 +740,7 @@ export default {
     lotCode: '生产批次',
     cavityNumber: '模穴号',
     x_Out: '叉板类型',
+    forkType: '叉板类型',
     grade: '湿敏度等级',
     po: '采购订单号',
     partsCount: '零件(卷/包)',

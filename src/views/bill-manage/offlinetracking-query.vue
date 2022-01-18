@@ -287,8 +287,8 @@ export default {
           panelNo,
           eqpId,
           type,
-          startTime: formatDate(startTime, "yyyy-MM-dd hh:mm:ss"),
-          endTime: formatDate(endTime, "yyyy-MM-dd hh:mm:ss"),
+          startTime: formatDate(startTime, "yyyy-MM-dd HH:mm:ss"),
+          endTime: formatDate(endTime, "yyyy-MM-dd HH:mm:ss"),
         },
       };
       getpagelistReq(obj)
@@ -345,8 +345,8 @@ export default {
         sn,
         eqpId,
         type,
-        startTime: formatDate(startTime, "yyyy-MM-dd"), // 报废时间
-        endTime: formatDate(endTime, "yyyy-MM-dd"), // 报废时间
+        startTime: formatDate(startTime, "yyyy-MM-dd HH:mm:ss"), // 报废时间
+        endTime: formatDate(endTime, "yyyy-MM-dd HH:mm:ss"), // 报废时间
       };
       exportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
