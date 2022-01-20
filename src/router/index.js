@@ -7,30 +7,30 @@ import {localRead, localSave, sessionSave, setTitle, userLocalInfo} from '@/libs
 import {watermarkFn} from '@/libs/tools' //, getNowToDate
 
 //引入安装的signalr包
-import * as signalR from '@aspnet/signalr'
+// import * as signalR from '@aspnet/signalr'
 
 Vue.use(VueRouter)
 
 // 消息提示判断
-const signalrTips = (vm, data) => {
-  let state = {1: 'info', 2: 'success', 3: 'warning', 4: 'error'}
-  let dialogState = state[data.dialogState]
-  if (data.dialogType === 0) {
-    const obj = {content: data.content, duration: data.duration, closable: true}
-    vm.$Message[dialogState](obj)
-  } else if (data.dialogType === 1) {
-    const obj = {title: data.title, content: data.content, duration: data.duration}
-    vm.$Message[dialogState](obj)
-  } else if (data.dialogType === 2) vm.$router.go(0)
-  else {
-    vm.$Modal.confirm({
-      title: data.title, content: data.content, duration: data.duration,
-      onOk: () => {
-        vm.$router.go(0)
-      }
-    })
-  }
-}
+// const signalrTips = (vm, data) => {
+//   let state = {1: 'info', 2: 'success', 3: 'warning', 4: 'error'}
+//   let dialogState = state[data.dialogState]
+//   if (data.dialogType === 0) {
+//     const obj = {content: data.content, duration: data.duration, closable: true}
+//     vm.$Message[dialogState](obj)
+//   } else if (data.dialogType === 1) {
+//     const obj = {title: data.title, content: data.content, duration: data.duration}
+//     vm.$Message[dialogState](obj)
+//   } else if (data.dialogType === 2) vm.$router.go(0)
+//   else {
+//     vm.$Modal.confirm({
+//       title: data.title, content: data.content, duration: data.duration,
+//       onOk: () => {
+//         vm.$router.go(0)
+//       }
+//     })
+//   }
+// }
 
 // 导入路由数据
 const routes = [
@@ -90,27 +90,27 @@ router.beforeEach((to, form, next) => {
       // 菜单导航是否获取
       if (store.state.hasGetMenuInfo) {
         // 是否注册实时通讯
-        if (!vm.$signalr) {
-          let signal = new signalR.HubConnectionBuilder()
-            //服务器地址
-            .withUrl(`${window.localStorage.getItem("configip")}/BaizeHub/Notify`, {
-              accessTokenFactory: () => userLocalInfo().token,
-            })
-            .build()
-          Vue.prototype.$signalr = signal
-        }
-        // 启动实时通讯
-        if (vm.$signalr.state === 0) {
-          vm.$signalr.start().then(() => {
-            vm.$Message.success(`${i18n.t('linkServerSuccess')}`)
-          }).catch(() => {
-            vm.$Message.warning(`${i18n.t('linkServerError')}`)
-          })
-          // 解绑事件
-          vm.$signalr.off('public')
-          // 接受所有消息
-          vm.$signalr.on('public', data => signalrTips(vm, data))
-        }
+        // if (!vm.$signalr) {
+        //   let signal = new signalR.HubConnectionBuilder()
+        //     //服务器地址
+        //     .withUrl(`${window.localStorage.getItem("configip")}/BaizeHub/Notify`, {
+        //       accessTokenFactory: () => userLocalInfo().token,
+        //     })
+        //     .build()
+        //   Vue.prototype.$signalr = signal
+        // }
+        // // 启动实时通讯
+        // if (vm.$signalr.state === 0) {
+        //   vm.$signalr.start().then(() => {
+        //     vm.$Message.success(`${i18n.t('linkServerSuccess')}`)
+        //   }).catch(() => {
+        //     vm.$Message.warning(`${i18n.t('linkServerError')}`)
+        //   })
+        //   // 解绑事件
+        //   vm.$signalr.off('public')
+        //   // 接受所有消息
+        //   vm.$signalr.on('public', data => signalrTips(vm, data))
+        // }
         // 判断是否有权限跳转该页面
         const menu = store.getters.allRouteList.find(x => x.name === to.name)
         if (menu) next()
