@@ -35,6 +35,10 @@
                     <FormItem :label="$t('sn')" prop="unitId">
                       <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('sn') + $t('multiple,separated')" />
                     </FormItem>
+                    <!-- REELID -->
+                    <FormItem :label="$t('REELId')" prop="ReelId">
+                      <Input v-model.trim="req.ReelId" :placeholder="$t('pleaseEnter') + $t('REELId') + $t('multiple,separated')" />
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -79,6 +83,7 @@ export default {
         panel: "",
         unitId: "",
         workOrder: "",
+        ReelId: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -124,8 +129,8 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      let { panel, unitId, workOrder } = this.req;
-      if (panel || unitId || workOrder) {
+      let { panel, unitId, workOrder,ReelId } = this.req;
+      if (panel || unitId || workOrder || ReelId) {
         this.tableConfig.loading = true;
         let obj = {
           orderField: "PCBID", // 排序字段
@@ -136,6 +141,7 @@ export default {
             panel: commaSplitString(panel).join(),
             unitId: commaSplitString(unitId).join(),
             workOrder,
+            ReelId: commaSplitString(ReelId).join(),
           },
         };
         getpagelistReq(obj)
@@ -154,12 +160,13 @@ export default {
     },
     // 导出
     exportClick () {
-      let { panel, unitId, workOrder } = this.req;
-      if (panel || unitId || workOrder) {
+      let { panel, unitId, workOrder,ReelId } = this.req;
+      if (panel || unitId || workOrder || ReelId) {
         const obj = {
           panel: commaSplitString(this.req.panel).join(),
           unitId: commaSplitString(this.req.unitId).join(),
           workOrder: this.req.workOrder,
+          ReelId: commaSplitString(this.req.ReelId).join(),
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });

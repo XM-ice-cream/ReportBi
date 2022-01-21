@@ -3,6 +3,7 @@ import "viewerjs/dist/viewer.css";
 import video from "./video";
 // import signalr from './singnalr'
 import ButtonCustom from "@/components/button-custom";
+import DrawerButton from "@/components/drawer-button";
 import PageCustom from "@/components/page-custom";
 import ModalCustom from "@/components/modal-custom";
 import Treeselect from "@riophae/vue-treeselect";
@@ -16,8 +17,8 @@ import "xe-utils";
 import VXETable from "vxe-table";
 import "vxe-table/lib/style.css";
 // highlight.js代码高亮插件
-import VueHighlightJS from 'vue-highlightjs'
-import 'highlight.js/styles/atom-one-dark.css'
+import VueHighlightJS from "vue-highlightjs";
+import "highlight.js/styles/atom-one-dark.css";
 // Vue-cli生成的工程文件的src/main.js
 
 const importPlugins = (Vue) => {
@@ -40,6 +41,8 @@ const importPlugins = (Vue) => {
   Vue.component("page-custom", PageCustom);
   // 注册业务弹框组件
   Vue.component("modal-custom", ModalCustom);
+  // 注册业务抽屉按钮组件
+  Vue.component("drawer-button", DrawerButton);
   // 注册下拉分页组件
   Vue.use(vSelectPage, {
     title: "",

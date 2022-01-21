@@ -53,6 +53,7 @@ export default {
   },
   mounted() {
     this.getImbBase64();
+
   },
   methods: {
     getImbBase64() {
