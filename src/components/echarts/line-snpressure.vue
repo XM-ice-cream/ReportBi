@@ -20,7 +20,7 @@ export default {
       let option = {
         color: ['#73d2ba', '#ffa811d6', '#fae2ba'],
         title: {
-          text: data.sn + ' 压力测试曲线',
+          text: data.sn + ' 压力曲线',
           left: 'center',
           subtext: data.title + '(' + data.subTitle + ')'
         },
