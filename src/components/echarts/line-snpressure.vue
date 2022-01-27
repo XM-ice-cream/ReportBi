@@ -50,6 +50,10 @@ export default {
           },
         },
         yAxis: {
+          name: 'Pa',
+          nameTextStyle: {
+            color: "#484848"
+          },
           type: 'value',
           axisTick: {
             show: false
