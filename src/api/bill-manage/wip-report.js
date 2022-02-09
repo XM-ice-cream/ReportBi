@@ -36,3 +36,16 @@ export const exportReq = data => {
         data
     })
 }
+
+// 明细导出
+export const exportDetailReq = data => {
+    return requestCenter({
+        loading: true,
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/anonymous/v1/wipreport/exportsndetail',
+        method: 'post',
+        responseType: 'arraybuffer',
+        data
+    })
+}

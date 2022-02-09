@@ -29,17 +29,6 @@
                     <FormItem :label="$t('pn')" prop="pn">
                       <Input v-model.trim="req.pn" placeholder="请输入料号,多个以英文逗号分隔" @on-search="searchClick" />
                     </FormItem>
-                    <!-- 产品代码 -->
-                    <FormItem :label="$t('modelName')" prop="modelname">
-                      <Input v-model.trim="req.modelname" :placeholder="$t('pleaseEnter') + $t('modelName')" @on-search="searchClick" />
-                    </FormItem>
-                    <!-- 制程类型 -->
-                    <FormItem :label="$t('modelType')" prop="modelType">
-                      <RadioGroup v-model="req.modelType">
-                        <Radio label="SMT">SMT</Radio>
-                        <Radio label="BE">BE</Radio>
-                      </RadioGroup>
-                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -82,8 +71,6 @@ export default {
       req: {
         workOrder: "", //工单
         pn: "",
-        modelname: "",
-        modelType: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [], // 表格数据
@@ -126,15 +113,15 @@ export default {
         { title: this.$t("workOrderInfo"), key: "workordeR_INFO", align: "center", width: 140, tooltip: true },
         { title: this.$t("createDate"), key: "createdate", align: "center", render: renderDate, width: 140, tooltip: true },
         { title: this.$t("scheduleEndDate"), key: "scheduleenddate", align: "center", render: renderDate, width: 140, tooltip: true },
+        { title: this.$t("moday"), key: "moday", align: "center", width: 80, tooltip: true },
         { title: this.$t("workOrderQTY"), key: "qty", align: "center", width: 80, tooltip: true },
         { title: this.$t("inputQTY"), key: "inputqty", align: "center", width: 80, tooltip: true },
         { title: this.$t("finishQTY"), key: "finishqty", align: "center", width: 80, tooltip: true },
-        { title: this.$t("processName"), key: "curprocessname", align: "center", width: 100, tooltip: true },
-        { title: this.$t("curProcessNameQTY"), key: "curprocessnameqty", align: "center", minWidth: 120, tooltip: true },
+        { title: this.$t("wipQTY"), key: "wipQTY", align: "center", width: 80, tooltip: true },
       ];
       this.tableConfig.loading = false;
-      let { workOrder, pn, modelname, modelType } = this.req;
-      if (workOrder || pn || modelname || modelType) {
+      let { workOrder, pn } = this.req;
+      if (workOrder || pn) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
             this.tableConfig.loading = true;
@@ -146,8 +133,6 @@ export default {
               data: {
                 workOrder, //工单
                 pn,
-                modelname,
-                modelType,
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -214,13 +199,11 @@ export default {
     },
     // 导出
     exportClick () {
-      let { workOrder, pn, modelname, modelType } = this.req;
-      if (workOrder || pn || modelname || modelType) {
+      let { workOrder, pn } = this.req;
+      if (workOrder || pn) {
         let obj = {
           workOrder, //工单
           pn,
-          modelname,
-          modelType,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });

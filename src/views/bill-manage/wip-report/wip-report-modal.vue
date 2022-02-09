@@ -5,13 +5,14 @@
     <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
     <div slot="footer">
       <Button @click="modalCancel">{{ $t("cancel") }}</Button>
+      <Button @click="exportClick">{{ $t("export") }}</Button>
     </div>
   </Modal>
 </template>
 
 <script>
-import { getpagelistDetailReq } from "@/api/bill-manage/wip-report";
-import { renderDate } from "@/libs/tools";
+import { getpagelistDetailReq, exportDetailReq } from "@/api/bill-manage/wip-report";
+import { formatDate, exportFile, renderDate } from "@/libs/tools";
 export default {
   name: "wip-report-modal",
   data () {
@@ -87,6 +88,23 @@ export default {
       this.searchPoptipModal = false;
 
 
+    },
+    // 导出
+    exportClick () {
+      const { workorder, processname } = this.paramData
+      if (workorder && processname) {
+        let obj = {
+          workorder, //工单
+          currentProcess:processname,
+        };
+        exportDetailReq(obj).then((res) => {
+          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+          const fileName = `${this.$t("wip-report-modal")}_${workorder}_${processname}_${formatDate(new Date())}.xlsx`; // 自定义文件名
+          exportFile(blob, fileName);
+        });
+      } else {
+        this.$Message.warning('工单和当前站点不能为空!');
+      }
     },
     modalCancel () {
       this.modalFlag = false;

@@ -146,10 +146,10 @@ export default {
     exportClick() {
         let {unitId, s_FLEX, fcm, sip} = this.req;
         let obj = {
-            unitId,
-            s_FLEX,
-            fcm,
-            sip,
+            unitId: commaSplitString(unitId).join(),
+            s_FLEX: commaSplitString(s_FLEX).join(),
+            fcm: commaSplitString(fcm).join(),
+            sip: commaSplitString(sip).join(),
         };
         exportReq(obj).then((res) => {
             let blob = new Blob([res], {type: "application/vnd.ms-excel"});
