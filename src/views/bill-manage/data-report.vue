@@ -67,6 +67,10 @@
                     <FormItem :label="$t('unitId')" prop="unitId">
                       <Input v-model="req.unitId" :placeholder="$t('pleaseEnter') + $t('unitId')" @keyup.native.enter="searchClick" />
                     </FormItem>
+                    <!-- panelNo -->
+                    <FormItem :label="$t('panelNo')" prop="panelno">
+                      <Input v-model="req.panelno" :placeholder="$t('pleaseEnter') + $t('panelNo')" @keyup.native.enter="searchClick" />
+                    </FormItem>
                     <!-- 站点 -->
                     <FormItem :label="$t('stepName')" prop="stepId">
                       <treeselect v-model="req.stepId" :options="processList" :show-count="true" :disable-branch-nodes="true" trans @input="processInput" @select="value => req.stepName = value.label" :placeholder="$t('pleaseSelect') + $t('stepName')" />
@@ -138,6 +142,7 @@ export default {
         workOrder: '', // 工单
         pn: '', // 料号
         unitId: '', // unitId
+        panelno: '', // panelno
         lineName: '', // 线体
         stepName: '', // 站点
         stepId: null, // 站点
@@ -194,7 +199,7 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      const { workOrder, pn, unitId, lineName, stepName, model, eqpId, pcbBin, ledBin, startTime, endTime } = this.req
+      const { workOrder, pn, unitId, panelno, lineName, stepName, model, eqpId, pcbBin, ledBin, startTime, endTime } = this.req
       this.$refs.searchReq.validate((validate) => {
         if (validate) {
           this.tableConfig.loading = true;
@@ -204,7 +209,7 @@ export default {
             pageSize: this.req.pageSize, // 分页大小
             pageIndex: this.req.pageIndex, // 当前页码
             data: {
-              workOrder, pn, unitId, lineName, stepName, model, eqpId, pcbBin, ledBin,
+              workOrder, pn, unitId, panelno, lineName, stepName, model, eqpId, pcbBin, ledBin,
               startTime: formatDate(startTime),
               endTime: formatDate(endTime),
             },
@@ -222,9 +227,9 @@ export default {
     },
     // 导出
     exportClick () {
-      const { workOrder, pn, unitId, lineName, stepName, model, eqpId, pcbBin, ledBin, startTime, endTime } = this.req
+      const { workOrder, pn, unitId, panelno, lineName, stepName, model, eqpId, pcbBin, ledBin, startTime, endTime } = this.req
       const obj = {
-        workOrder, pn, unitId, lineName, stepName, model, eqpId, pcbBin, ledBin,
+        workOrder, pn, unitId, panelno, lineName, stepName, model, eqpId, pcbBin, ledBin,
         startTime: formatDate(startTime),
         endTime: formatDate(endTime),
       }

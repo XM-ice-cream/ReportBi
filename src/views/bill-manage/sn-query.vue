@@ -194,6 +194,13 @@ export default {
           width: 140,
           tooltip: true,
         },
+        {
+          title: "操作",
+          key: "ruleName",
+          align: "center",
+          width: 100,
+          tooltip: true,
+        },
          {
           title: "UnitId56",
           key: "unitId56",
