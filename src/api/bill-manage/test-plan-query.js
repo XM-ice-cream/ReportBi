@@ -24,3 +24,14 @@ export const exportReq = data => {
       data
   })
 }
+
+// 查询TestPlanOMM数据
+export const getpagelistDetailReq = data => {
+  return requestCenter({
+      timeout: 0,
+      baseUrl: window.localStorage.getItem("reportip"),
+      url: '/api/reportcenter/anonymous/v1/testplan/gettestplanommdata',
+      method: 'post',
+      data
+  })
+}

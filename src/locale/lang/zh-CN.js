@@ -1560,6 +1560,12 @@ export default {
     abnormal: '异常',
     treatment: '对策',
     spotDataType: '抽取类型',
+    measuredValue: '测量值',
+    toleranceUpper: '上公差上限',
+    toleranceLower: '公差下限',
+    exceedStandardValue: '超出标准值',
+    exceedToleranceValue: '超出公差值',
+    createTime: '创建时间',
     // <!--------------------------------Menu Name----------------------------------------->
     'error-404': '找不到页面',
     'authorize-manager': '权限管理',
@@ -1890,6 +1896,7 @@ export default {
     'key-part-k01-query': 'k01料件码报表',
     'feeding-record-query': '上料记录查询报表',
     'boxcode-query': '箱号查询',
+    'test-plan-omm': 'TestPlanOMM明细',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
