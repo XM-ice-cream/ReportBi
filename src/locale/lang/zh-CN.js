@@ -1890,6 +1890,7 @@ export default {
     'key-part-k01-query': 'k01料件码报表',
     'feeding-record-query': '上料记录查询报表',
     'boxcode-query': '箱号查询',
+    'encap-fill-report': 'EncapFill报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
