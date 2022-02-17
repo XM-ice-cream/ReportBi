@@ -56,14 +56,17 @@
                      @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
       </Card>
     </div>
+    <testPlanOMM :isShow.sync="isShow" :paramData="wipJson" />
   </div>
 </template>
 
 <script>
 import {getpagelistReq, exportReq} from "@/api/bill-manage/test-plan-query";
 import {getButtonBoolean, formatDate, exportFile, renderDate, commaSplitString} from "@/libs/tools";
+import testPlanOMM from './test-plan-query/test-plan-omm.vue';
 
 export default {
+  components: { testPlanOMM },
   name: "test-plan-query",
   data() {
     return {
@@ -72,6 +75,8 @@ export default {
       tableConfig: {...this.$config.tableConfig}, // table配置
       data: [], // 表格数据
       btnData: [],
+      isShow: false,
+      wipJson: {},
       req: {
         startTime: "",
         endTime: "",
@@ -87,6 +92,46 @@ export default {
           },
         },
         {title: this.$t("workOrder"), key: "workorder", align: "center", width: 140, tooltip: true},
+        {
+          title: this.$t("panelNo"),
+          key: "panelno",
+          width: 140,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
+          render: (h, params) => {
+            return h("div", [
+              h(
+                "a",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    color: "blue",
+                    fontSize: "13px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    display: "block", //设置样式，超过文字省略号显示
+                    cursor: "pointer", //设置鼠标样式
+                  },
+                  domProps: {
+                    title: params.row.panelno, //添加title属性
+                  },
+                  on: {
+                    click: () => {
+                      this.show(params.row); //点击事件
+                    },
+                  },
+                },
+                params.row.panelno
+              ),
+            ]);
+          },
+        },
         {title: this.$t("panelNo"), key: "panelno", align: "center", width: 140, tooltip: true},
         {title: this.$t("lineName"), key: "linename", align: "center", width: 140, tooltip: true},
         {title: this.$t("processName"), key: "processname", align: "center", width: 120, tooltip: true},
@@ -176,6 +221,10 @@ export default {
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
       }
+    },
+    show (row) {
+      this.isShow = true;
+      this.wipJson = { panelno: row.panelno }
     },
     // 点击重置按钮触发
     resetClick() {

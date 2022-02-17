@@ -76,6 +76,7 @@ export default {
         },
         { title: "WarferID", key: "barcode", align: "center" },
         { title: "CreateDate", key: "createdate", align: "center", width: 125, render: renderDate, },
+        { title: "Polarity", key: "polarity", align: "center" },
         { title: "D1", key: "d1", align: "center" },
         { title: "D2", key: "d2", align: "center" },
         { title: "D3", key: "d3", align: "center" },
@@ -141,20 +142,16 @@ export default {
     // 导出
     exportClick () {
       let { startTime, endTime, barcode } = this.req;
-      if (barcode) {
-        let obj = {
-          startTime: formatDate(startTime),
-          endTime: formatDate(endTime),
-          barcode: commaSplitString(barcode).join(),
-        };
-        exportReq(obj).then((res) => {
-          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-          const fileName = `${this.$t("expandpitch-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名
-          exportFile(blob, fileName);
-        });
-      } else {
-        this.$Message.warning(this.$t("pleaseEnter") + 'WarferID');
-      }
+      let obj = {
+        startTime: formatDate(startTime),
+        endTime: formatDate(endTime),
+        barcode: commaSplitString(barcode).join(),
+      };
+      exportReq(obj).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `${this.$t("expandpitch-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     // 点击重置按钮触发
     resetClick () {
