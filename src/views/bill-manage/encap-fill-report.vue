@@ -97,6 +97,13 @@
                       >
                       </v-selectpage>
                     </FormItem>
+                    <!-- 站点 -->
+                    <FormItem :label="$t('stepName')" prop="stepName">
+                      <Select v-model="req.stepName" transfer filterable :placeholder="$t('pleaseSelect') + $t('stepName')">
+                        <Option value="OP50">OP50</Option>
+                        <Option value="OP70">OP70</Option>
+                      </Select>
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick">{{ $t("reset") }}</Button>
@@ -170,6 +177,7 @@ export default {
       req: {
         startTime: "",
         endTime: "",
+        stepName: "OP50",
         line: "", // 线体
         eqpId: "", //设备id
         ...this.$config.pageConfig,
@@ -198,12 +206,13 @@ export default {
     // 获取分页列表数据
     pageLoad() {
       this.$Spin.hide();
-      const { startTime, endTime, line, eqpId } = this.req;
-      if (startTime || endTime || line || eqpId) {
+      const { startTime, endTime, stepName, line, eqpId } = this.req;
+      if (startTime || endTime || stepName || line || eqpId) {
         this.$Spin.show();
         this.searchObj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
+          stepName,
           line: line ? line.split(",") : [],
           eqpId: eqpId ? eqpId.split(",") : [],
         };
