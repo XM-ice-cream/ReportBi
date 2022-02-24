@@ -5,7 +5,8 @@ import {requestCenter} from '@/libs/request'
 export const getpagelistReq = data => {
   return requestCenter({
     timeout: 0,
-    url: '/api/workflowcenter/v1/unitinfo/getpagescraplist',
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/unitinforeport/getpagescraplist',
     method: 'post',
     data
   })
@@ -16,7 +17,8 @@ export const exportReq = data => {
   return requestCenter({
     loading: true,
     timeout: 0,
-    url: '/api/workflowcenter/v1/unitinfo/exportscrap',
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/unitinforeport/exportscrap',
     method: 'post',
     responseType: 'arraybuffer',
     data

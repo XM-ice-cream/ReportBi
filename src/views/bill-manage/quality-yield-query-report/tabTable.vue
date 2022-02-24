@@ -116,6 +116,22 @@ export default {
           align: "center",
         },
         {
+          title: this.$t("defectLocation"),
+          key: "location",
+          ellipsis: true,
+          tooltip: true,
+          minWidth: 100,
+          align: "center",
+        },
+        {
+          title: this.$t("FailureReason"),
+          key: "failureReason",
+          ellipsis: true,
+          tooltip: true,
+          minWidth: 150,
+          align: "center",
+        },
+        {
           title: this.$t("defectDate"),
           key: "defectdate",
           ellipsis: true,

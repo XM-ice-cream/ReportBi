@@ -118,6 +118,46 @@ export default {
         { title: this.$t("inputQTY"), key: "inputqty", align: "center", width: 80, tooltip: true },
         { title: this.$t("finishQTY"), key: "finishqty", align: "center", width: 80, tooltip: true },
         { title: this.$t("wipQTY"), key: "wipQTY", align: "center", width: 80, tooltip: true },
+        {
+          title: "其他工站Wip数",
+          key: "otherStation",
+          width: 80,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
+          render: (h, params) => {
+            return h("div", [
+              h(
+                "a",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    color: "blue",
+                    fontSize: "13px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    display: "block", //设置样式，超过文字省略号显示
+                    cursor: "pointer", //设置鼠标样式
+                  },
+                  domProps: {
+                    title: params.row.otherStation, //添加title属性
+                  },
+                  on: {
+                    click: () => {
+                      this.show(params.row, "OtherStation"); //点击事件
+                    },
+                  },
+                },
+                params.row.otherStation
+              ),
+            ]);
+          },
+        },
       ];
       this.tableConfig.loading = false;
       let { workOrder, pn } = this.req;
