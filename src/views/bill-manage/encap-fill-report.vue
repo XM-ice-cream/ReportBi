@@ -75,28 +75,6 @@
                       >
                       </v-selectpage>
                     </FormItem>
-                    <!-- 设备 -->
-                    <FormItem :label="$t('equipment')" prop="eqpId">
-                      <v-selectpage
-                        class="select-page-style"
-                        multiple
-                        v-if="searchPoptipModal"
-                        key-field="enCode"
-                        show-field="enCode"
-                        :data="eqpPageListUrl"
-                        v-model="req.eqpId"
-                        :placeholder="$t('pleaseSelect') + $t('equipment')"
-                        :result-format="
-                          (res) => {
-                            return {
-                              totalRow: res.total,
-                              list: res.data || [],
-                            };
-                          }
-                        "
-                      >
-                      </v-selectpage>
-                    </FormItem>
                     <!-- 站点 -->
                     <FormItem :label="$t('stepName')" prop="stepName">
                       <Select v-model="req.stepName" transfer filterable :placeholder="$t('pleaseSelect') + $t('stepName')">
@@ -123,14 +101,6 @@
               :btnData="btnData"
             />
           </TabPane>
-          <TabPane label="设备查询" name="tab2">
-            <TabTable2
-              ref="tab2"
-              :query-obj="searchObj"
-              :table-data="eqpTableData"
-              :btnData="btnData"
-            />
-          </TabPane>
           <TabPane label="良率查询" name="tab3">
             <TabTable3
               ref="tab3"
@@ -150,12 +120,11 @@ import { getpagelistReq } from "@/api/bill-manage/encap-fill-report";
 import { linePageListUrl } from "@/api/bill-manage/quality-yield-query-report";
 import { formatDate, getButtonBoolean } from "@/libs/tools";
 import TabTable from "./encap-fill-report/tabTable.vue";
-import TabTable2 from "./encap-fill-report/tabTable2.vue";
 import TabTable3 from "./encap-fill-report/tabTable3.vue";
 import { eqpPageListUrl } from "@/api/eqp-manage/eqp-info";
 
 export default {
-  components: { TabTable, TabTable2, TabTable3 },
+  components: { TabTable, TabTable3 },
   name: "encap-fill-report",
   data() {
     return {
@@ -163,11 +132,9 @@ export default {
       linePageListUrl: linePageListUrl(),
       tabName: "tab1",
       tab1: true,
-      tab2: false,
       tab3: false,
       tableConfig: { ...this.$config.tableConfig }, // table配置
       lineTableData: [], // 线体表格数据
-      eqpTableData: [], // 设备表格数据
       defectTableData: [], // 良率表格数据
       dataModal: [], // 模态框表格数据
       currentRow: {}, // 当前点击表格行数据
@@ -179,7 +146,6 @@ export default {
         endTime: "",
         stepName: "OP50",
         line: "", // 线体
-        eqpId: "", //设备id
         ...this.$config.pageConfig,
       }, //查询数据
       searchObj: {},
@@ -206,26 +172,23 @@ export default {
     // 获取分页列表数据
     pageLoad() {
       this.$Spin.hide();
-      const { startTime, endTime, stepName, line, eqpId } = this.req;
-      if (startTime || endTime || stepName || line || eqpId) {
+      const { startTime, endTime, stepName, line } = this.req;
+      if (startTime || endTime || stepName || line ) {
         this.$Spin.show();
         this.searchObj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
           stepName,
           line: line ? line.split(",") : [],
-          eqpId: eqpId ? eqpId.split(",") : [],
         };
         getpagelistReq(this.searchObj)
           .then((res) => {
             this.$Spin.hide();
             const {
               encapFILLByLineResponses,
-              encapFILLByEqpIdResponses,
               encapFILLByDefectResponses,
             } = res || {};
             this.lineTableData = encapFILLByLineResponses;
-            this.eqpTableData = encapFILLByEqpIdResponses;
             this.defectTableData = encapFILLByDefectResponses;
             this.searchPoptipModal = false;
           })

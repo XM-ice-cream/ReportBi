@@ -12,6 +12,17 @@ export const getpagelistReq = data => {
   })
 }
 
+// Scrap明细查询
+export const getpagelistScrapDetailReq = data => {
+  return requestCenter({
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/encapop50report/getencapfillscrapdetail',
+    method: 'post',
+    data
+  })
+}
+
 // 线体导出
 export const byLineExportReq = data => {
   return requestCenter({

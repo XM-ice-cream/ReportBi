@@ -1,37 +1,44 @@
 <template>
-  <Card :bordered="false" dis-hover class="card-style">
-    <div slot="title">
-      <Row>
-        <i-col span="24">
-          <button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
-        </i-col>
-      </Row>
+  <div class="page-style">
+    <!-- 页面表格 -->
+    <div class="comment">
+      <Card :bordered="false" dis-hover class="card-style">
+        <div slot="title">
+          <Row>
+            <i-col span="24">
+              <button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
+            </i-col>
+          </Row>
+        </div>
+        <Table
+          :border="tableConfig.border"
+          :highlight-row="tableConfig.highlightRow"
+          :max-height="tableConfig.height"
+          :columns="columns"
+          :data="data"
+        >
+        </Table>
+        <BarEncapFill
+          ref="barEncapFill"
+          style="width: 900px; height: 420px"
+          :data="barData"
+          index="lineEncapFill"
+        />
+      </Card>
     </div>
-    <Table
-      :border="tableConfig.border"
-      :highlight-row="tableConfig.highlightRow"
-      :max-height="tableConfig.height"
-      :columns="columns"
-      :data="data"
-    >
-    </Table>
-    <BarEncapFill
-      ref="barEncapFill"
-      style="width: 900px; height: 420px"
-      :data="barData"
-      index="lineEncapFill"
-    />
-  </Card>
+    <encapFillScrapDetail :isShow.sync="isShow" :paramData="wipJson" />
+  </div>
 </template>
 
 <script>
 import { byLineExportReq } from "@/api/bill-manage/encap-fill-report";
 import { exportFile, formatDate } from "@/libs/tools";
 import BarEncapFill from "@/components/echarts/bar-encap-fill.vue";
+import encapFillScrapDetail from './encap-fill-scrap-detail.vue';
 
 export default {
   name: "tabTable",
-  components: { BarEncapFill },
+  components: { BarEncapFill,encapFillScrapDetail },
   props: {
     btnData: {
       type: Array,
@@ -50,6 +57,8 @@ export default {
     return {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
+      wipJson: {},
+      isShow: false,
       barData: {
         legendData: ["Input", "Yield rate"],
         xAxisData: [],
@@ -77,7 +86,47 @@ export default {
         { title: "Line ID", key: "lineName", minWidth: 120, tooltip: true, align: "center" },
         { title: "Input", key: "inputQty", minWidth: 120, tooltip: true, align: "center" },
         { title: "Out put", key: "outputQty", minWidth: 120, tooltip: true, align: "center" },
-        { title: "Fail", key: "failQty", minWidth: 120, tooltip: true, align: "center" },
+        // { title: "Fail", key: "failQty", minWidth: 120, tooltip: true, align: "center" },
+        {
+          title: "Fail",
+          key: "failQty",
+          width: 120,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
+          render: (h, params) => {
+            return h("div", [
+              h(
+                "a",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    color: "blue",
+                    fontSize: "13px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    display: "block", //设置样式，超过文字省略号显示
+                    cursor: "pointer", //设置鼠标样式
+                  },
+                  domProps: {
+                    title: params.row.failQty, //添加title属性
+                  },
+                  on: {
+                    click: () => {
+                      this.show(params.row); //点击事件
+                    },
+                  },
+                },
+                params.row.failQty
+              ),
+            ]);
+          },
+        },
         { title: "Yield rate", key: "yieldRate", minWidth: 120, tooltip: true, align: "center" },
       ], // 表格数据
     };
@@ -107,6 +156,14 @@ export default {
         const fileName = `${this.$t("encap-fill-report")}-线体查询${formatDate(new Date())}.xlsx`; // 自定义文件名
         exportFile(blob, fileName);
       });
+    },
+    show (row) {
+      let obj = this.queryObj;
+      this.isShow = true;
+      this.wipJson = { lineName: row.lineName, stepName: obj.stepName }
+      // console.log(row, processname, this.$refs.wipmodal);
+      //   this.$refs.wipmodal.pageLoad(row.workorder, processname);
+
     },
     // 自动改变表格高度
     autoSize() {
