@@ -1898,6 +1898,7 @@ export default {
     'boxcode-query': '箱号查询',
     'test-plan-omm': 'TestPlanOMM明细',
     'encap-fill-report': 'EncapFill报表',
+    'encap-fill-dam-detail': 'EncapFillDam明细',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

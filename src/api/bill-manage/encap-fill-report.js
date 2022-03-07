@@ -23,6 +23,17 @@ export const getpagelistScrapDetailReq = data => {
   })
 }
 
+// Dam明细查询
+export const getpagelistDamDetailReq = data => {
+  return requestCenter({
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/encapop50report/getencapfilldamdetail',
+    method: 'post',
+    data
+  })
+}
+
 // 线体导出
 export const byLineExportReq = data => {
   return requestCenter({

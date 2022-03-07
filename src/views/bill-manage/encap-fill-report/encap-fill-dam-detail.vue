@@ -1,6 +1,6 @@
-/* EncapFillScrap明细数据 */
+/* EncapFillDam明细数据 */
 <template>
-  <Modal draggable v-model="modalFlag" width="1250" title="EncapFillScrap明细" :styles="{ top: '20px' }" :closable="true">
+  <Modal draggable v-model="modalFlag" width="1250" title="EncapFillDam明细" :styles="{ top: '20px' }" :closable="false">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
     <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
     <div slot="footer">
@@ -10,10 +10,10 @@
 </template>
 
 <script>
-import { getpagelistScrapDetailReq } from "@/api/bill-manage/encap-fill-report";
-import { formatDate,renderDate } from "@/libs/tools";
+import { getpagelistDamDetailReq } from "@/api/bill-manage/encap-fill-report";
+import { formatDate } from "@/libs/tools";
 export default {
-  name: "encap-fill-scrap-detail",
+  name: "encap-fill-dam-detail",
   data () {
     return {
       tableConfig: { ...this.$config.tableConfig }, // table配置
@@ -25,11 +25,13 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: this.$t("unitId"), key: "unitId", align: "center", width: 150, tooltip: true },
-        { title: this.$t("lineName"), key: "lineName", align: "center", width: 150, tooltip: true },
-        { title: this.$t("eqpId"), key: "eqpId", align: "center", width: 150, tooltip: true },
-        { title: this.$t("stepName"), key: "stepName", align: "center", width: 150, tooltip: true },
-        { title: this.$t("trackTime"), key: "trackTime", align: "center", width: 150, tooltip: true, render: renderDate, },
+        
+        { title: "Line ID", key: "lineName", minWidth: 120, tooltip: true, align: "center" },
+        { title: "Step Name", key: "stepName", minWidth: 120, tooltip: true, align: "center" },
+        { title: "EQP ID", key: "eqpId", minWidth: 120, tooltip: true, align: "center" },
+        { title: "Input", key: "inputQty", minWidth: 120, tooltip: true, align: "center" },
+        { title: "Output", key: "outputQty", minWidth: 120, tooltip: true, align: "center" },
+        { title: "Yield rate", key: "yieldRate", minWidth: 120, tooltip: true, align: "center" },
       ],
       req: {
         ...this.$config.pageConfig,
@@ -38,16 +40,16 @@ export default {
     };
   },
   props: {
-    isShow: {
+    isShowDam: {
       typeof: Boolean,
       default: false
     },
     paramData: Object
   },
   watch: {
-    isShow () {
-      if (this.isShow) {
-        this.modalFlag = this.isShow;
+    isShowDam () {
+      if (this.isShowDam) {
+        this.modalFlag = this.isShowDam;
         const { startTime, endTime, lineName, eqpId, stepName } = this.paramData
         this.pageLoad(startTime, endTime, lineName, eqpId, stepName)
       }
@@ -65,7 +67,7 @@ export default {
       console.log('pageLoad3', stepName);
       this.data = [];
       let obj = {
-        orderField: "TrackTime", // 排序字段
+        orderField: "EQPID", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
@@ -77,7 +79,7 @@ export default {
           eqpId,
         },
       };
-      getpagelistScrapDetailReq(obj).then((res) => {
+      getpagelistDamDetailReq(obj).then((res) => {
         // this.tableConfig.loading = false;
         if (res.code === 200) {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
@@ -92,7 +94,7 @@ export default {
     },
     modalCancel () {
       this.modalFlag = false;
-      this.$emit('update:isShow', false)
+      this.$emit('update:isShowDam', false)
     },
 
     // 自动改变表格高度

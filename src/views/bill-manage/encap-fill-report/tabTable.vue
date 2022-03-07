@@ -27,6 +27,7 @@
       </Card>
     </div>
     <encapFillScrapDetail :isShow.sync="isShow" :paramData="wipJson" />
+    <encapFillDamDetail :isShowDam.sync="isShowDam" :paramData="wipJson" />
   </div>
 </template>
 
@@ -35,10 +36,11 @@ import { byLineExportReq } from "@/api/bill-manage/encap-fill-report";
 import { exportFile, formatDate } from "@/libs/tools";
 import BarEncapFill from "@/components/echarts/bar-encap-fill.vue";
 import encapFillScrapDetail from './encap-fill-scrap-detail.vue';
+import encapFillDamDetail from './encap-fill-dam-detail.vue';
 
 export default {
   name: "tabTable",
-  components: { BarEncapFill,encapFillScrapDetail },
+  components: { BarEncapFill,encapFillScrapDetail,encapFillDamDetail },
   props: {
     btnData: {
       type: Array,
@@ -59,6 +61,7 @@ export default {
       data: [], // 表格数据
       wipJson: {},
       isShow: false,
+      isShowDam: false,
       barData: {
         legendData: ["Input", "Yield rate"],
         xAxisData: [],
@@ -84,6 +87,8 @@ export default {
           },
         },
         { title: "Line ID", key: "lineName", minWidth: 120, tooltip: true, align: "center" },
+        { title: "Step Name", key: "stepName", minWidth: 120, tooltip: true, align: "center" },
+        { title: "EQP ID", key: "eqpId", minWidth: 120, tooltip: true, align: "center" },
         { title: "Input", key: "inputQty", minWidth: 120, tooltip: true, align: "center" },
         { title: "Out put", key: "outputQty", minWidth: 120, tooltip: true, align: "center" },
         // { title: "Fail", key: "failQty", minWidth: 120, tooltip: true, align: "center" },
@@ -159,8 +164,21 @@ export default {
     },
     show (row) {
       let obj = this.queryObj;
-      this.isShow = true;
-      this.wipJson = { lineName: row.lineName, stepName: obj.stepName }
+      console.log('======queryObj====',this.queryObj)
+      console.log('======1====',row.failQty)
+      console.log('======2====',row.failQty==0)
+      if(row.failQty == 0)
+      {
+        this.isShow = false;
+        this.isShowDam = true;
+      }
+      else
+      {
+        this.isShow = true;
+        this.isShowDam = false;
+      }
+      //this.isShow = true;
+      this.wipJson = { startTime: obj.startTime, endTime: obj.endTime, lineName: row.lineName, eqpId: row.eqpId, stepName: obj.stepName }
       // console.log(row, processname, this.$refs.wipmodal);
       //   this.$refs.wipmodal.pageLoad(row.workorder, processname);
 

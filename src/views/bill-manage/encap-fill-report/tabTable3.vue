@@ -58,6 +58,7 @@ export default {
         },
         { title: "Line ID", key: "lineName", minWidth: 120, tooltip: true, align: "center" },
         { title: "EQP", key: "eqpId", minWidth: 120, tooltip: true, align: "center" },
+        { title: "Step Name", key: "stepName", minWidth: 120, tooltip: true, align: "center" },
         { title: "不良现象", key: "defectDes", minWidth: 120, tooltip: true, align: "center" },
         { title: "不良数", key: "defectQty", minWidth: 120, tooltip: true, align: "center" },
       ], // 表格数据
