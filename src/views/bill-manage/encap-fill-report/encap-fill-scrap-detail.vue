@@ -3,6 +3,12 @@
   <Modal draggable v-model="modalFlag" width="1250" title="EncapFillScrap明细" :styles="{ top: '20px' }" :closable="true">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
     <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+    <BarEncapFill
+      ref="barEncapFill"
+      style="width: 900px; height: 420px"
+      :data="barData"
+      index="eqpEncapFill"
+    />
     <div slot="footer">
       <Button @click="modalCancel">{{ $t("cancel") }}</Button>
     </div>
@@ -10,14 +16,27 @@
 </template>
 
 <script>
-import { getpagelistScrapDetailReq } from "@/api/bill-manage/encap-fill-report";
+import { getpagelistScrapDetailReq, getpagelistDamRateReq } from "@/api/bill-manage/encap-fill-report";
 import { formatDate,renderDate } from "@/libs/tools";
+import BarEncapFill from "@/components/echarts/bar-encap-fill.vue";
 export default {
   name: "encap-fill-scrap-detail",
+  components: { BarEncapFill },
   data () {
     return {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [],
+      barData: {
+        legendData: ["EQP(Dam机台)", "Fail"],
+        xAxisData: [],
+        xAxisLabel: {
+          rotate: 20,
+          interval: 0,
+        },
+        xBarMax: 200,
+        barData: [],
+        lineData: [],
+      }, // 柱状图数据
       columns: [
         {
           type: "index", fixed: "left", width: 50, align: "center",
@@ -51,7 +70,7 @@ export default {
         const { startTime, endTime, lineName, eqpId, stepName } = this.paramData
         this.pageLoad(startTime, endTime, lineName, eqpId, stepName)
       }
-    }
+    },
   },
   activated () {
     this.autoSize();
@@ -83,6 +102,17 @@ export default {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
           this.data = data || []
           this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+        }
+      })
+      getpagelistDamRateReq(obj.data).then((res) => {
+        if (res.code === 200) {
+          // this.barData = res || []
+          let result = res.result;
+          this.tableConfig.loading = result.length === 0;
+          this.barData.xAxisData = result.map((o) => o.eqpId);
+          this.barData.barData = result.map((o) => Number(o.inputQty));
+          this.barData.lineData = result.map((o) => Number(o.yieldRate.replace("%", "")));
+          this.$nextTick(() => this.$refs.barEncapFill.initChart());
         }
       })
       //   .catch(() => (this.tableConfig.loading = false));

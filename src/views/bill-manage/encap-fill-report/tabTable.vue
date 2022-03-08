@@ -139,6 +139,7 @@ export default {
   watch: {
     tableData: {
       handler(newVal) {
+        console.log('=============newVal============',newVal)
         this.data = newVal;
         this.tableConfig.loading = newVal.length === 0;
         this.barData.xAxisData = this.data.map((o) => o.lineName);

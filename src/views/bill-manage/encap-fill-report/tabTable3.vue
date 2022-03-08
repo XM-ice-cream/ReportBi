@@ -15,15 +15,19 @@
       :data="tableData"
     >
     </Table>
+    <!-- 饼图 -->
+    <PieEncap ref="pieEncap" :data="pieData" index="PieEncap" />
   </Card>
 </template>
 
 <script>
 import { byDefectExportReq } from "@/api/bill-manage/encap-fill-report";
 import { exportFile, formatDate } from "@/libs/tools";
+import PieEncap from '@/components/echarts/pie-encap'
 
 export default {
-  name: "tabTable",
+  name: "tabTable3",
+  components: { PieEncap },
   props: {
     btnData: {
       type: Array,
@@ -45,6 +49,11 @@ export default {
       req: {
         ...this.$config.pageConfig,
       }, //查询数据
+      pieData: {
+        series: [],
+        legend: [],
+        title: '',
+      }, // 饼图数据
       // 模态框表格数据
       columns: [
         {
@@ -67,8 +76,20 @@ export default {
   watch: {
     tableData: {
       handler(newVal) {
+      console.log('=====newVal=====',newVal)
         this.data = newVal;
         this.tableConfig.loading = newVal.length === 0;
+        this.pieData = {
+          series: [],
+          legend: [],
+          title: '',
+        }, // 饼图数据
+        this.data.map(o => {
+          this.pieData.series.push({ name: o.defectDes, value: o.defectQty });
+          this.pieData.legend.push(o.eqpId);
+        })
+        this.pieData.title = this.data.eqpId;
+        this.$nextTick(() => this.$refs.pieEncap.initChart())
       },
       deep: true,
     },
