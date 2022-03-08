@@ -1566,6 +1566,17 @@ export default {
     exceedStandardValue: '超出标准值',
     exceedToleranceValue: '超出公差值',
     createTime: '创建时间',
+    //数据源
+    dataSourceCode: '数据源编码',
+    dataSourceName: '数据源名称',
+    dataSourceType: '数据源类型',
+    dataSourceDesc: '数据源描述',
+    requestUrl: '请求路径',
+    requestWay: '请求方式',
+    requestHead: '请求头',
+    requestContent: '请求体',
+
+
     // <!--------------------------------Menu Name----------------------------------------->
     'error-404': '找不到页面',
     'authorize-manager': '权限管理',
@@ -1898,6 +1909,9 @@ export default {
     'boxcode-query': '箱号查询',
     'test-plan-omm': 'TestPlanOMM明细',
     'encap-fill-report': 'EncapFill报表',
+    // <!--------------------------------报表设计----------------------------------------->
+    'datasource': '数据源',
+
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

@@ -1,41 +1,38 @@
 <template>
   <Layout class="main" @click.native="clickMain">
-    <Sider hide-trigger collapsible :width="200" :collapsed-width="64" v-model="collapsed" class="left-sider"
-           :style="{ overflow: 'hidden' }">
+    <Sider hide-trigger collapsible :width="200" :collapsed-width="64" v-model="collapsed" class="left-sider" :style="{ overflow: 'hidden' }">
       <!--  关闭手风琴模式  -->
       <!--      <side-menu accordion ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage"-->
       <!--                 :menu-list="menuList">-->
-      <side-menu ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage"
-                 :menu-list="menuList">
+      <side-menu ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage" :menu-list="menuList">
         <!-- 需要放在菜单上面的内容，如Logo，写在side-menu标签内部，如下 -->
         <div class="logo-con">
-          <img v-show="!collapsed" :src="maxLogo" key="max-logo"/>
-          <img v-show="collapsed" :src="minLogo" key="min-logo"/>
+          <img v-show="!collapsed" :src="maxLogo" key="max-logo" />
+          <img v-show="collapsed" :src="minLogo" key="min-logo" />
         </div>
       </side-menu>
     </Sider>
     <Layout class="main-layout-con">
       <Header class="header-con">
         <header-bar :collapsed="collapsed" @on-coll-change="handleCollapsedChange">
-          <user :message-unread-count="unreadCount" :user-avatar="userAvatar" :user-name="userName"/>
-          <language v-if="$config.useI18n" @on-lang-change="setLocal" style="margin-right: 10px;" :lang="local"/>
-          <error-store v-if="$config.plugin['error-store'] && $config.plugin['error-store'].showInHeader"
-                       :has-read="hasReadErrorPage" :count="errorCount" style="margin-right: 10px;"></error-store>
+          <user :message-unread-count="unreadCount" :user-avatar="userAvatar" :user-name="userName" />
+          <language v-if="$config.useI18n" @on-lang-change="setLocal" style="margin-right: 10px;" :lang="local" />
+          <error-store v-if="$config.plugin['error-store'] && $config.plugin['error-store'].showInHeader" :has-read="hasReadErrorPage" :count="errorCount" style="margin-right: 10px;"></error-store>
           <message style="margin-right: 10px;" :size="18"></message>
           <lock-screen style="margin-right: 10px;" :size="18"></lock-screen>
-          <fullscreen v-model="isFullscreen" :size="18" style="margin-right: 10px;"/>
+          <fullscreen v-model="isFullscreen" :size="18" style="margin-right: 10px;" />
           <div style="margin-right: 10px;cursor: pointer;">
-            <Icon custom="iconfont icon-update" :size="18" title="刷新数据" @click="refreshView"/>
+            <Icon custom="iconfont icon-update" :size="18" title="刷新数据" @click="refreshView" />
           </div>
         </header-bar>
       </Header>
       <div class="tag-nav-wrapper">
-        <tags-nav :value="$route" @input="handleClick" :list="tagNavList" @on-close="handleCloseTag"/>
+        <tags-nav :value="$route" @input="handleClick" :list="tagNavList" @on-close="handleCloseTag" />
       </div>
       <Content class="content-wrapper">
         <div class="content-wrapper-div">
           <keep-alive :include="cacheList">
-            <router-view v-if="isRefreshView" ref="refreshView"/>
+            <router-view v-if="isRefreshView" ref="refreshView" />
           </keep-alive>
           <ABackTop :height="100" :bottom="80" :right="50" container=".content-wrapper"></ABackTop>
         </div>
@@ -53,9 +50,9 @@ import Fullscreen from "./components/fullscreen";
 import Language from "./components/language";
 import Message from "./components/message";
 import ErrorStore from "./components/error-store";
-import {mapMutations, mapGetters} from "vuex";
-import {getNewTagList, routeEqual, initMenuList,} from "@/libs/utils";
-import {objEqual} from "@/libs/tools";
+import { mapMutations, mapGetters } from "vuex";
+import { getNewTagList, routeEqual, initMenuList, } from "@/libs/utils";
+import { objEqual } from "@/libs/tools";
 import routers from "@/router/routers";
 import minLogo from "@/assets/images/logo-min.png";
 import maxLogo from "@/assets/images/logo.png";
@@ -75,7 +72,7 @@ export default {
     User,
     ABackTop,
   },
-  data() {
+  data () {
     return {
       collapsed: false,
       minLogo,
@@ -86,16 +83,16 @@ export default {
   },
   computed: {
     ...mapGetters(["errorCount"]),
-    tagNavList() {
+    tagNavList () {
       return this.$store.state.tagNavList;
     },
-    userAvatar() {
+    userAvatar () {
       return this.$store.state.avatarImgPath;
     },
-    userName() {
+    userName () {
       return this.$store.state.userName;
     },
-    cacheList() {
+    cacheList () {
       let list = [
         "ParentView",
         ...(this.tagNavList.length
@@ -108,16 +105,17 @@ export default {
       if (list.length === 1) list = [];
       return list;
     },
-    menuList() {
+    menuList () {
+      console.log(this.$store.getters.menuList);
       return this.$store.getters.menuList;
     },
-    local() {
+    local () {
       return this.$store.state.local;
     },
-    hasReadErrorPage() {
+    hasReadErrorPage () {
       return this.$store.state.hasReadErrorPage;
     },
-    unreadCount() {
+    unreadCount () {
       return this.$store.state.unreadCount;
     },
   },
@@ -130,8 +128,8 @@ export default {
       "setHomeRoute",
       "closeTag",
     ]),
-    turnToPage(route) {
-      let {name, params, query} = {};
+    turnToPage (route) {
+      let { name, params, query } = {};
       if (typeof route === "string") name = route;
       else {
         name = route.name;
@@ -151,10 +149,10 @@ export default {
         query,
       });
     },
-    handleCollapsedChange(state) {
+    handleCollapsedChange (state) {
       this.collapsed = state;
     },
-    handleCloseTag(res, type, route) {
+    handleCloseTag (res, type, route) {
       if (type !== "others") {
         if (type === "all") {
           this.turnToPage(this.$config.homeName);
@@ -166,14 +164,14 @@ export default {
       }
       this.setTagNavList(res);
     },
-    handleClick(item) {
+    handleClick (item) {
       let list = [];
       initMenuList(list, this.menuList);
       let menu = list.find((x) => x.name === item.name);
       if (menu) this.$store.commit("updateMenuId", menu.id);
       this.turnToPage(item);
     },
-    refreshView() {
+    refreshView () {
       this.isRefreshView = false;
       this.$nextTick(() => {
         this.isRefreshView = true;
@@ -190,7 +188,7 @@ export default {
         }, 200);
       });
     },
-    clickMain() {
+    clickMain () {
       let refreshView = this.$refs.refreshView;
       if (refreshView?.searchPoptipModal) {
         refreshView.searchPoptipModal = false;
@@ -200,15 +198,15 @@ export default {
     },
   },
   watch: {
-    $route(newRoute) {
+    $route (newRoute) {
       let list = [];
       initMenuList(list, this.menuList);
       let menu = list.find((x) => x.name === newRoute.name);
       if (menu) this.$store.commit("updateMenuId", menu.id);
 
-      const {name, query, params, meta} = newRoute;
+      const { name, query, params, meta } = newRoute;
       this.addTag({
-        route: {name, query, params, meta},
+        route: { name, query, params, meta },
         type: "push",
       });
       this.setBreadCrumb(newRoute);
@@ -216,15 +214,15 @@ export default {
       this.$refs.sideMenu.updateOpenName(name);
     },
   },
-  mounted() {
+  mounted () {
     /**
      * @description 初始化设置面包屑导航和标签导航
      */
     this.setTagNavList();
     this.setHomeRoute(routers);
-    const {name, params, query, meta} = this.$route;
+    const { name, params, query, meta } = this.$route;
     this.addTag({
-      route: {name, params, query, meta},
+      route: { name, params, query, meta },
     });
     this.setBreadCrumb(this.$route);
     // 设置初始语言
