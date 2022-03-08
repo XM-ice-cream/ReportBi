@@ -1,29 +1,29 @@
-/* 数据源 */
+/* 数据集 */
 <template>
   <div class="page-style">
     <!-- 左侧抽屉 -->
     <!-- <Modal v-model="modal2" width="360"> -->
     <Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="false">
       <Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
-        <!-- 数据源类型 -->
-        <FormItem :label="$t('dataSourceType')" prop="sourceType" inline>
-          <Select v-model="submitData.sourceType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
-            <Option v-for="(item, i) in dataSourceTypeList" :value="item.detailName" :key="i">
+        <!-- 数据集类型 -->
+        <FormItem :label="$t('dataSetType')" prop="SetType" inline>
+          <Select v-model="submitData.SetType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
+            <Option v-for="(item, i) in dataSetTypeList" :value="item.detailName" :key="i">
               {{ item.detailName }}
             </Option>
           </Select>
         </FormItem>
-        <!-- 数据源编码 -->
-        <FormItem :label="$t('dataSourceCode')" prop="sourceCode" inline>
-          <Input v-model.trim="submitData.sourceCode" :placeholder="$t('pleaseEnter') + $t('dataSourceCode')" />
+        <!-- 数据集编码 -->
+        <FormItem :label="$t('dataSetCode')" prop="SetCode" inline>
+          <Input v-model.trim="submitData.SetCode" :placeholder="$t('pleaseEnter') + $t('dataSetCode')" />
         </FormItem>
-        <!-- 数据源名称 -->
-        <FormItem :label="$t('dataSourceName')" prop="sourceName" inline>
-          <Input v-model.trim="submitData.sourceName" :placeholder="$t('pleaseEnter') + $t('dataSourceName')" />
+        <!-- 数据集名称 -->
+        <FormItem :label="$t('dataSetName')" prop="SetName" inline>
+          <Input v-model.trim="submitData.SetName" :placeholder="$t('pleaseEnter') + $t('dataSetName')" />
         </FormItem>
-        <!-- 数据源描述 -->
-        <FormItem :label="$t('dataSourceDesc')" prop="dataSourceDesc">
-          <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="submitData.dataSourceDesc" :placeholder="$t('pleaseEnter') + $t('dataSourceDesc')" />
+        <!-- 数据集描述 -->
+        <FormItem :label="$t('dataSetDesc')" prop="dataSetDesc">
+          <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="submitData.dataSetDesc" :placeholder="$t('pleaseEnter') + $t('dataSetDesc')" />
         </FormItem>
         <!-- 请求路径 -->
         <FormItem :label="$t('requestUrl')" prop="requestUrl">
@@ -62,18 +62,26 @@
                 </Button>
                 <div class="poptip-style-content" slot="content">
                   <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
-                    <!-- 数据源编码 -->
-                    <FormItem :label="$t('dataSourceCode')" prop="dataSourceCode">
-                      <Input v-model="req.dataSourceCode" :placeholder="$t('pleaseEnter') + $t('dataSourceCode')" @on-search="searchClick" />
+                    <!-- 数据集编码 -->
+                    <FormItem :label="$t('dataSetCode')" prop="dataSetCode">
+                      <Input v-model="req.dataSetCode" :placeholder="$t('pleaseEnter') + $t('dataSetCode')" @on-search="searchClick" />
                     </FormItem>
-                    <!-- 数据源名称 -->
-                    <FormItem :label="$t('dataSourceName')" prop="dataSourceName">
-                      <Input v-model="req.dataSourceName" :placeholder="$t('pleaseEnter') + $t('dataSourceName')" @on-search="searchClick" />
+                    <!-- 数据集名称 -->
+                    <FormItem :label="$t('dataSetName')" prop="dataSetName">
+                      <Input v-model="req.dataSetName" :placeholder="$t('pleaseEnter') + $t('dataSetName')" @on-search="searchClick" />
                     </FormItem>
-                    <!-- 数据源类型 -->
-                    <FormItem :label="$t('dataSourceType')" prop="dataSourceType">
-                      <Select v-model="req.dataSourceType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
-                        <Option v-for="(item, i) in dataSourceTypeList" :value="item.detailName" :key="i">
+                    <!-- 数据源 -->
+                    <FormItem :label="$t('dataSource')" prop="dataSource">
+                      <Select v-model="req.dataSetType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
+                        <Option v-for="(item, i) in dataSetTypeList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
+                    </FormItem>
+                    <!-- 数据集类型 -->
+                    <FormItem :label="$t('dataSetType')" prop="dataSetType">
+                      <Select v-model="req.dataSetType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
+                        <Option v-for="(item, i) in dataSetTypeList" :value="item.detailName" :key="i">
                           {{ item.detailName }}
                         </Option>
                       </Select>
@@ -91,7 +99,11 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-select="selectClick"></Table>
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-select="selectClick">
+          <template slot="operation">
+            <p>数据预览</p>
+          </template>
+        </Table>
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
@@ -103,7 +115,7 @@ import { getpagelistReq } from "@/api/bill-manage/encap-op70";
 import { getButtonBoolean, formatDate, renderIsEnabled } from "@/libs/tools";
 
 export default {
-  name: "datasource",
+  name: "dataset",
   data () {
     return {
       searchPoptipModal: false,
@@ -115,15 +127,15 @@ export default {
       categoryList: [],// 类别下拉框
       selectObj: null,//表格选中
       selectArr: [],//表格多选
-      dataSourceTypeList: [],
+      dataSetTypeList: [],
       submitData: {
 
       },
       drawerFlag: false,
       req: {
-        dataSourceCode: "",
-        dataSourceName: "",
-        dataSourceType: "",
+        dataSetCode: "",
+        dataSetName: "",
+        dataSetType: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -138,18 +150,19 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: this.$t("dataSourceCode"), key: "sourceCode", align: "center", tooltip: true },
-        { title: this.$t("dataSourceName"), key: "sourceName", align: "center", tooltip: true, },
-        { title: this.$t("dataSourceDesc"), key: "sourceDesc", align: "center", tooltip: true, },
-        { title: this.$t("dataSourceType"), key: "sourceType", align: "center", tooltip: true, },
+        { title: this.$t("dataSetCode"), key: "SetCode", align: "center", tooltip: true },
+        { title: this.$t("dataSetName"), key: "SetName", align: "center", tooltip: true, },
+        { title: this.$t("dataSetDesc"), key: "SetDesc", align: "center", tooltip: true, },
+        { title: this.$t("dataSetType"), key: "SetType", align: "center", tooltip: true, },
         { title: this.$t("enabled"), key: "enableFlag", align: "center", tooltip: true, render: renderIsEnabled, },
+        { title: '操作', slot: "operation", align: "center", width: '80' },
       ], // 表格数据
       // 验证实体
       ruleValidate: {
-        dataSourceType: [
+        dataSetType: [
           {
             required: true,
-            message: this.$t("pleaseEnter") + this.$t("dataSourceType"),
+            message: this.$t("pleaseEnter") + this.$t("dataSetType"),
             trigger: "change",
           },
         ],
@@ -183,11 +196,11 @@ export default {
           "updateBy": null,
           "updateTime": null,
           "version": null,
-          "sourceCode": "mysql_ajreport",
-          "sourceName": "mysql数据源",
-          "sourceDesc": null,
-          "sourceType": null,
-          "sourceConfig": null,
+          "SetCode": "mysql_ajreport",
+          "SetName": "mysql数据集",
+          "SetDesc": null,
+          "SetType": null,
+          "SetConfig": null,
           "enableFlag": 1,
           "deleteFlag": null
         }, {
@@ -197,11 +210,11 @@ export default {
           "updateBy": null,
           "updateTime": null,
           "version": null,
-          "sourceCode": "mysql_ajreport",
-          "sourceName": "mysql数据源",
-          "sourceDesc": null,
-          "sourceType": null,
-          "sourceConfig": null,
+          "SetCode": "mysql_ajreport",
+          "SetName": "mysql数据集",
+          "SetDesc": null,
+          "SetType": null,
+          "SetConfig": null,
           "enableFlag": 1,
           "deleteFlag": null
         }];

@@ -1575,6 +1575,12 @@ export default {
     requestWay: '请求方式',
     requestHead: '请求头',
     requestContent: '请求体',
+    // 数据集
+    dataSetCode: '数据集编码',
+    dataSetName: '数据集名称',
+    dataSetType: '数据集类型',
+    dataSource: '数据源',
+    dataSetDesc: '描述',
 
 
     // <!--------------------------------Menu Name----------------------------------------->
