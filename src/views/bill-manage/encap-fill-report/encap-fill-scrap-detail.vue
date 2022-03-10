@@ -106,6 +106,7 @@ export default {
       })
       getpagelistDamRateReq(obj.data).then((res) => {
         if (res.code === 200) {
+      console.log('getpagelistDamRateReq', res.result);
           // this.barData = res || []
           let result = res.result;
           this.tableConfig.loading = result.length === 0;
