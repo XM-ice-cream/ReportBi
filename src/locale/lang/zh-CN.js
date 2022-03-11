@@ -1581,7 +1581,14 @@ export default {
     dataSetType: '数据集类型',
     dataSource: '数据源',
     dataSetDesc: '描述',
-
+    sourceType: '数据集类型',
+    //报表管理
+    reportType: '报表类型',
+    reportName: '报表名称',
+    reportCode: '报表编码',
+    reportAuthor: '制作人',
+    reportDesc: '描述',
+    operator: '操作',
 
     // <!--------------------------------Menu Name----------------------------------------->
     'error-404': '找不到页面',
@@ -1915,8 +1922,14 @@ export default {
     'boxcode-query': '箱号查询',
     'test-plan-omm': 'TestPlanOMM明细',
     'encap-fill-report': 'EncapFill报表',
-    // <!--------------------------------报表设计----------------------------------------->
     'datasource': '数据源',
+    'encap-fill-dam-detail': 'EncapFillDam明细',
+    'omm-config': 'omm配置',
+    'omm-data': 'OMM数据',
+    'sn-pressure': 'SN 压力测试 看板',
+    'bill-design-manage': '报表设计',
+    'dataset': '数据集',
+    'report-manage': '报表管理',
 
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',

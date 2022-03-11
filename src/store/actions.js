@@ -43,10 +43,8 @@ export default {
     }) {
         return new Promise((resolve => {
             getlisttreecurrentuserReq().then(res => {
-                console.log(res);
                 let menuList = initNode(res.result.filter(o => o.name === 'bill-manage' || o.name === 'bill-design-manage'))
                 menuList.push(...errorRouter);
-                console.log(menuList);
                 commit('updateAppRouter', menuList)
                 commit('updateHasGetMenuInfo', true)
                 resolve()

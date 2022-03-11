@@ -75,6 +75,28 @@
                       >
                       </v-selectpage>
                     </FormItem>
+                    <!-- 设备 -->
+                    <FormItem :label="$t('equipment')" prop="eqpId">
+                      <v-selectpage
+                        class="select-page-style"
+                        multiple
+                        v-if="searchPoptipModal"
+                        key-field="enCode"
+                        show-field="enCode"
+                        :data="eqpPageListUrl"
+                        v-model="req.eqpId"
+                        :placeholder="$t('pleaseSelect') + $t('equipment')"
+                        :result-format="
+                          (res) => {
+                            return {
+                              totalRow: res.total,
+                              list: res.data || [],
+                            };
+                          }
+                        "
+                      >
+                      </v-selectpage>
+                    </FormItem>
                     <!-- 站点 -->
                     <FormItem :label="$t('stepName')" prop="stepName">
                       <Select v-model="req.stepName" transfer filterable :placeholder="$t('pleaseSelect') + $t('stepName')">
@@ -146,6 +168,7 @@ export default {
         endTime: "",
         stepName: "OP50",
         line: "", // 线体
+        eqpId: "", //设备id
         ...this.$config.pageConfig,
       }, //查询数据
       searchObj: {},
@@ -172,14 +195,15 @@ export default {
     // 获取分页列表数据
     pageLoad() {
       this.$Spin.hide();
-      const { startTime, endTime, stepName, line } = this.req;
-      if (startTime || endTime || stepName || line ) {
+      const { startTime, endTime, stepName, line, eqpId } = this.req;
+      if (startTime || endTime || line || eqpId ) {
         this.$Spin.show();
         this.searchObj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
           stepName,
           line: line ? line.split(",") : [],
+          eqpId: eqpId ? eqpId.split(",") : [],
         };
         getpagelistReq(this.searchObj)
           .then((res) => {

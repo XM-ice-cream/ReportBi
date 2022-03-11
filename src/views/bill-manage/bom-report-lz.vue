@@ -52,6 +52,10 @@
                         </Option>
                       </Select>
                     </FormItem>
+                    <!-- 脚位 -->
+                    <FormItem :label="$t('footPosition')" prop="electricalreference">
+                      <Input v-model.trim="req.electricalreference" :placeholder="$t('pleaseEnter') + $t('footPosition')" />
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -97,6 +101,7 @@ export default {
         lotCode: "",
         reelId: "",
         category: "",
+        electricalreference: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -144,7 +149,7 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category } = this.req;
+      let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category, electricalreference } = this.req;
       if (startTime && endTime) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -164,6 +169,7 @@ export default {
                 lotCode,
                 reelId,
                 category,
+                electricalreference,
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -184,7 +190,7 @@ export default {
     },
     // 导出
     exportClick () {
-      let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category } = this.req;
+      let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category, electricalreference } = this.req;
       if (startTime && endTime) {
         let obj = {
           startTime: formatDate(startTime),
@@ -196,6 +202,7 @@ export default {
           lotCode,
           reelId,
           category,
+          electricalreference,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
