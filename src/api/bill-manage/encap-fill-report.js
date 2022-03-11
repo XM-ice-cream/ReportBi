@@ -83,3 +83,22 @@ export const byDefectExportReq = data => {
     data
   })
 }
+
+// 获取FILL和DAM设备ID
+export const getEncapFillDamEqpId = data => {
+  return requestCenter({
+    loading: true,
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/encapop50report/getencapfilldameqpid',
+    method: 'post',
+    //responseType: 'arraybuffer',
+    data
+  })
+}
+
+// 获取FILL和DAM设备ID
+//export const getEncapFillDamEqpId = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/encapop50report/getencapfilldameqpid`
+
+// 获取EQP 信息
+export const eqpPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/v1/dropdownlist/getfilldameqplist`

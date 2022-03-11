@@ -1,6 +1,11 @@
 /* EncapDam良率 饼图 */
 <template>
-  <div :id="'pieChart' + index" class="pieChart"></div>
+<div>
+  <template v-for="item in data">
+    <div :id="item.title" class="pieChart" :key="item.title"></div>
+  </template>
+   </div>
+ 
 </template>
 <script>
 import echarts from "echarts";
@@ -14,28 +19,32 @@ export default {
     },
     data: {},
   },
-
+  watch:{
+    data(){
+      this.data.forEach(item=>{
+this.$nextTick(()=>{
+        this.initChart (item)
+      })
+      })
+      
+    },
+  },
   data () {
     return {
-      pieChart: {},
     };
   },
   methods: {
-    initChart () {
+    initChart (data) {
       // 基于准备好的dom，初始化echarts实例
-      this.pieChart = echarts.init(document.getElementById("pieChart" + this.index));
+      const pieChart = echarts.init(document.getElementById(data.title));
       let option = {
         color: ['#9eeab0', '#b4c6e7', '#ffd966', '#d0cece', '#fbac93', '#acb9ca', '#f0904e', '#fbfc93', '#fcb9ca', '#f0c04e'],
         title: {
-          text: this.data.title,
+          text: data.title,
+          left:'center'
         },
         tooltip: {
           trigger: 'item',
-          formatter: function (datas) {
-            let res = datas.marker + datas.name + '：'
-              + datas.value + '<br/>'
-            return res
-          }
         },
         grid: {
           top: '10%'
@@ -43,14 +52,15 @@ export default {
         legend: {
           orient: 'vertial',
           type: "scroll",
-          height: '100%',
+          width:'80%',
+          height: '10',
           itemWidth: 12,
           itemHeight: 12,
           icon: 'rect',
-          right: '10%',
-          top: '0%',
+          left:'center',
+          top: '10%',
           itemGap: 10,
-          data: this.data.legend,
+          data: data.legend,
           textStyle: {
             color: '#333333',
             padding: [2, 0, 0, 0,],
@@ -64,11 +74,11 @@ export default {
         },
         series: [
           {
-            name: 'Defect Rate',
+            name: '不良现象',
             type: 'pie',
             radius: '50%',
-            center: ['40%', '50%'],
-            data: this.data.series,
+            center: ['50%', '50%'],
+            data:data.series,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -89,23 +99,25 @@ export default {
         ]
       };
       // 绘制图表
-      this.pieChart.setOption(option, true);
-      window.addEventListener('resize', () => {
-        if (this.pieChart) {
-          this.pieChart.resize()   // 不报错
-        }
-      })
+      pieChart.setOption(option, true);
+      // window.addEventListener('resize', () => {
+      //   if (this.pieChart) {
+      //     this.pieChart.resize()   // 不报错
+      //   }
+      // })
 
     }
   },
   mounted () {
-    this.initChart();
+    
   },
 };
 </script>
 <style lang="less" scoped>
 .pieChart {
-  width: 98% !important;
-  height: 100% !important;
+  width: 20% !important;
+  height: 300px !important;
+      display: inline-block;
+      margin-top:20px;
 }
 </style>

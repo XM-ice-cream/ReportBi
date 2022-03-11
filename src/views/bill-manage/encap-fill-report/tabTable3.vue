@@ -76,20 +76,34 @@ export default {
   watch: {
     tableData: {
       handler(newVal) {
-      console.log('=====newVal=====',newVal)
         this.data = newVal;
         this.tableConfig.loading = newVal.length === 0;
-        this.pieData = {
-          series: [],
-          legend: [],
-          title: '',
-        }, // 饼图数据
+        this.pieData =[];
+        // this.pieData = {
+        //   series: [],
+        //   legend: [],
+        //   title: '',
+        // }; // 饼图数据
+        let eqpList =[];
         this.data.map(o => {
-          this.pieData.series.push({ name: o.defectDes, value: o.defectQty });
-          this.pieData.legend.push(o.eqpId);
+          if(eqpList.includes(o.eqpId)){
+            let currentPieData =this.pieData[this.pieData.length-1];
+            currentPieData.series.push({ name: o.defectDes, value: o.defectQty });
+            if(!currentPieData.legend.includes(o.legend)){currentPieData.legend.push(o.defectDes)}
+          }else{
+            this.pieData.push({
+              series: [{ name: o.defectDes, value: o.defectQty }],  
+              legend: [o.defectDes],          
+              title: o.eqpId,
+            }                   
+            )
+             eqpList.push(o.eqpId)      
+          }
         })
-        this.pieData.title = this.data.eqpId;
-        this.$nextTick(() => this.$refs.pieEncap.initChart())
+        console.log(this.pieData);
+       
+       
+          
       },
       deep: true,
     },

@@ -76,13 +76,19 @@
                       </v-selectpage>
                     </FormItem>
                     <!-- 设备 -->
+                    <!-- <FormItem :label="$t('equipment')" prop="eqpId">
+                      <Select v-model="req.eqpId" filterable clearable transfer multiple :placeholder="$t('pleaseSelect') + $t('equipment')">
+                        <Option v-for="(item, index) in eqpIdList" :value="item.id" :key="index">{{ item.name }}</Option>
+                      </Select>
+                    </FormItem> -->
+                    <!-- 设备 -->
                     <FormItem :label="$t('equipment')" prop="eqpId">
                       <v-selectpage
                         class="select-page-style"
                         multiple
                         v-if="searchPoptipModal"
-                        key-field="enCode"
-                        show-field="enCode"
+                        key-field="name"
+                        show-field="name"
                         :data="eqpPageListUrl"
                         v-model="req.eqpId"
                         :placeholder="$t('pleaseSelect') + $t('equipment')"
@@ -138,12 +144,12 @@
 </template>
 
 <script>
-import { getpagelistReq } from "@/api/bill-manage/encap-fill-report";
+import { getpagelistReq, getEncapFillDamEqpId, eqpPageListUrl } from "@/api/bill-manage/encap-fill-report";
 import { linePageListUrl } from "@/api/bill-manage/quality-yield-query-report";
 import { formatDate, getButtonBoolean } from "@/libs/tools";
 import TabTable from "./encap-fill-report/tabTable.vue";
 import TabTable3 from "./encap-fill-report/tabTable3.vue";
-import { eqpPageListUrl } from "@/api/eqp-manage/eqp-info";
+//import { eqpPageListUrl } from "@/api/eqp-manage/eqp-info";
 
 export default {
   components: { TabTable, TabTable3 },
@@ -156,6 +162,7 @@ export default {
       tab1: true,
       tab3: false,
       tableConfig: { ...this.$config.tableConfig }, // table配置
+      eqpIdList: [],
       lineTableData: [], // 线体表格数据
       defectTableData: [], // 良率表格数据
       dataModal: [], // 模态框表格数据
@@ -182,6 +189,7 @@ export default {
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    //this.getEqpIdList();
     this.pageLoad();
   },
   deactivated() {
@@ -220,6 +228,14 @@ export default {
       } else {
         this.$Msg.warning("请完善查询条件");
       }
+    },
+    // 获取设备数据
+    getEqpIdList () {
+      getEncapFillDamEqpId().then(res => {
+        if (res.code === 200) {
+          this.eqpIdList = res.result || {}
+        }
+      })
     },
     // 点击重置按钮触发
     resetClick() {
