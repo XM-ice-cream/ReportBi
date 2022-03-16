@@ -27,7 +27,7 @@ export const deleteReportReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
-        url: '/api/autoreportcenter/anonymous/v1/report/delete',
+        url: '/api/autoreportcenter/anonymous/v1/report/batchdelete',
         method: 'post',
         data
     })

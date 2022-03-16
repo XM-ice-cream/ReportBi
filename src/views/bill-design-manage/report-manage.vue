@@ -280,12 +280,14 @@ export default {
       this.$Modal.confirm({
         title: "确认要删除该数据吗?",
         onOk: () => {
-          const deleteArr = this.selectArr.length > 0 ? this.selectArr : [{ ...this.selectObj }];
-          deleteArr.forEach(o => {
-            deleteReportReq({ reportCode: o.reportCode })
+          const deleteArr = this.selectArr.map(o => o.reportCode);
+          deleteReportReq(deleteArr).then(res => {
+            if (res.code === 200) {
+              this.$Message.success("删除成功");
+              this.pageLoad();
+            }
           })
-          this.$Message.success("删除成功");
-          this.pageLoad();
+
         },
         //   onCancel: () => this.clearGraphData(),
       });
