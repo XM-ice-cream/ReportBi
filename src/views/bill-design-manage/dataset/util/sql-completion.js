@@ -35,11 +35,13 @@ const hints = [
     "EXECUTE",
     "DESCRIBE",
     "FROM",
-    "ORDER BY"]
+    "ORDER BY"
+]
+
 function createCompleter(getExtraHints) {
     const createSuggestions = function (model, textUntilPosition) {
         let text = model.getValue();
-        textUntilPosition = textUntilPosition.replace(/[\*\[\]@\$\(\)]/g, "").replace(/(\s+|\.)/g, " ");
+        textUntilPosition = textUntilPosition.replace(/[*[\]@$()]/g, "").replace(/(\s+|\.)/g, " ");
         let arr = textUntilPosition.split(/[\s;]/);
         let activeStr = arr[arr.length - 1];
         let len = activeStr.length;
@@ -61,8 +63,7 @@ function createCompleter(getExtraHints) {
         return mergeHints.map(ele => ({
             label: ele,
             kind: hints.indexOf(ele) > -1 ?
-                monaco.languages.CompletionItemKind.Keyword :
-                monaco.languages.CompletionItemKind.Text,
+                monaco.languages.CompletionItemKind.Keyword : monaco.languages.CompletionItemKind.Text,
             documentation: ele,
             insertText: ele
         }));
@@ -75,7 +76,9 @@ function createCompleter(getExtraHints) {
                 endLineNumber: position.lineNumber,
                 endColumn: position.column
             });
-            return { suggestions: createSuggestions(model, textUntilPosition) };
+            return {
+                suggestions: createSuggestions(model, textUntilPosition)
+            };
         }
     }
 }

@@ -6,6 +6,7 @@ const padLeft = num => String(num).padStart(2, '0') // 左侧补零
 // const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 
 module.exports = {
+    lintOnSave: false,
     // 打包时是否开启hash组合名称
     filenameHashing: false,
     // 设为false打包时不生成.map文件

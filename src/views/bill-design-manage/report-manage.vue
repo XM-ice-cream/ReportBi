@@ -1,4 +1,4 @@
-/* 数据源 */
+/* 报表管理 */
 <template>
   <div class="page-style">
     <!-- 左侧抽屉 -->
@@ -22,11 +22,11 @@
           <!-- 报表类型 -->
           <FormItem :label="$t('reportType')" prop="reportType">
             <Select v-model="submitData.reportType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer v-if="this.isAdd">
-              <Option v-for="(item, i) in reportTypeList" :value="item.detailName" :key="i">
+              <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
                 {{ item.detailName }}
               </Option>
             </Select>
-            <span v-else>{{submitData.reportType}} 123</span>
+            <span v-else>{{submitData.reportType}}</span>
           </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -48,12 +48,6 @@
               <span slot="open">有效</span>
               <span slot="close">失效</span>
             </i-switch>
-          </FormItem>
-          </Col>
-          <!-- 报表缩略图 -->
-          <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-          <FormItem label="报表缩略图" prop='img'>
-            <upload-img @fileUpload="fileUpload" :uploadFormat="['png', 'jpg']" ref="uploadImg" />
           </FormItem>
           </Col>
         </Row>
@@ -79,7 +73,7 @@
                     <!-- 报表类型 -->
                     <FormItem :label="$t('reportType')" prop="reportType">
                       <Select v-model="req.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')" transfer>
-                        <Option v-for="(item, i) in reportTypeList" :value="item.detailCode" :key="i">
+                        <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
                           {{ item.detailName }}
                         </Option>
                       </Select>
@@ -110,24 +104,25 @@
           </Row>
         </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-select="selectClick">
-          <template slot='operator'>
-            <Button type="primary" class="tableBtn">设计</Button>&nbsp;
-            <Button type="primary" class="tableBtn">分享</Button>
+          <template slot='operator' slot-scope="{row}">
+            <Button type="primary" class="tableBtn" @click="design(row)">设计</Button>&nbsp;
+            <Button type="primary" class="tableBtn" @click="preview(row)">预览</Button>
           </template>
         </Table>
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
+
+    <excelreport-design :visib.sync="excelVisib" :reportData="{}" />
   </div>
 </template>
 
 <script>
-import { getpagelistReq, insertDataSourceReq, deleteDataSourceReq, modifyDataSourceReq } from "@/api/bill-design-manage/datasource.js";
-import { getlistReq } from "@/api/system-manager/data-item";
-import uploadImg from '../../components/upload-img/upload-img.vue';//showFileUrl
-import { getButtonBoolean, errorType, renderIsEnabled, getUploadImageUrl, compress, base64ToFile } from "@/libs/tools";
+import { getpagelistReq, insertReportReq, deleteReportReq, modifyReportReq } from "@/api/bill-design-manage/report-manage.js";
+import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
+import excelreportDesign from './report-manage/excelreport-design.vue';
 export default {
-  components: { uploadImg },
+  components: { excelreportDesign },
   name: "report-manage",
   data () {
     return {
@@ -140,12 +135,15 @@ export default {
       isAdd: true,
       selectObj: null,//表格选中
       selectArr: [],//表格多选
-      reportTypeList: [],
+      reportTypeList: [{ detailValue: 'excel', detailName: 'excel报表' }, { detailValue: 'largescreen', detailName: '大屏报表' }],
       submitData: {
-        reportType: "",
-        reportName: "",
+        enabled: 1,
+        remark: "",
         reportCode: "",
+        reportDesc: "",
+        reportType: "",
         reportAuthor: "",
+        reportName: ""
       },
       drawerFlag: false,
       req: {
@@ -153,6 +151,7 @@ export default {
         reportName: "",
         reportCode: "",
         reportAuthor: "",
+        reportDesc: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -177,10 +176,10 @@ export default {
       ], // 表格数据
       // 验证实体
       ruleValidate: {
-        reportAuthor: [
+        reportCode: [
           {
             required: true,
-            message: this.$t("pleaseEnter") + this.$t("reportAuthor"),
+            message: this.$t("pleaseEnter") + this.$t("reportCode"),
             trigger: "change",
           },
         ], reportType: [
@@ -194,14 +193,13 @@ export default {
             message: this.$t("pleaseEnter") + this.$t("reportName"),
           },
         ],
-      }
+      },
+      excelVisib: false,
     };
   },
   activated () {
     this.pageLoad();
-    this.showImage();
     this.autoSize();
-    this.getDataItemData();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
   },
@@ -220,180 +218,17 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = true;
-      const { reportType, reportName, reportAuthor } = this.req
+      const { reportType, reportName, reportAuthor, reportCode } = this.req
       let obj = {
         orderField: "reportType", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
         data: {
-          reportType, reportName, reportAuthor
+          reportType, reportName, reportAuthor, reportCode
         },
       };
       getpagelistReq(obj).then((res) => {
-        res = {
-          "code": 200,
-          "message": "操作成功",
-          "args": null,
-          "result": {
-            "data": [
-              {
-                "id": 194,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2022-03-09 16:12:46",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2022-03-09 16:12:46",
-                "version": 1,
-                "reportName": "wdsas",
-                "reportCode": "asd",
-                "setCodes": null,
-                "reportGroup": "default",
-                "reportDesc": "Ad",
-                "setParam": null,
-                "jsonStr": null,
-                "reportType": "report_excel",
-                "total": 0,
-                "reportImage": null,
-                "enabled": 1,
-                "deleteFlag": 0,
-                "reportAuthor": "ADS",
-                "downloadCount": null,
-                "accessKey": "00390b51db0c7a966425e5142c8e6377"
-              },
-              {
-                "id": 193,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2022-03-07 19:33:00",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2022-03-07 19:33:00",
-                "version": 2,
-                "reportName": "物流大屏1",
-                "reportCode": "logistics_one",
-                "setCodes": null,
-                "reportGroup": null,
-                "reportDesc": "",
-                "setParam": null,
-                "jsonStr": null,
-                "reportType": "report_screen",
-                "total": 0,
-                "reportImage": "",
-                "enabled": 1,
-                "deleteFlag": 0,
-                "reportAuthor": null,
-                "downloadCount": null,
-                "accessKey": "6f8e8618bb86ff9fef43b4a8e1e67ce3"
-              },
-              {
-                "id": 190,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-06-30 16:34:40",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-01 15:19:56",
-                "version": 3,
-                "reportName": "空白大屏",
-                "reportCode": "blank",
-                "setCodes": null,
-                "reportGroup": null,
-                "reportDesc": "",
-                "setParam": null,
-                "jsonStr": null,
-                "reportType": "report_screen",
-                "total": 0,
-                "reportImage": "",
-                "enabled": 1,
-                "deleteFlag": 0,
-                "reportAuthor": null,
-                "downloadCount": null,
-                "accessKey": "8497cab7a819dc337088a1f764d7dc80"
-              },
-              {
-                "id": 189,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-06-30 15:19:59",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-06-30 15:19:59",
-                "version": 1,
-                "reportName": "访问大屏",
-                "reportCode": "acc_ajreport",
-                "setCodes": null,
-                "reportGroup": null,
-                "reportDesc": "",
-                "setParam": null,
-                "jsonStr": null,
-                "reportType": "report_screen",
-                "total": 0,
-                "reportImage": null,
-                "enabled": 1,
-                "deleteFlag": 0,
-                "reportAuthor": null,
-                "downloadCount": null,
-                "accessKey": "80300fbfe774fe712c60c80f946617be"
-              },
-              {
-                "id": 188,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-06-30 14:32:53",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-06-30 14:32:53",
-                "version": 1,
-                "reportName": "汽车生产销售大屏",
-                "reportCode": "car_ajreport",
-                "setCodes": null,
-                "reportGroup": null,
-                "reportDesc": "",
-                "setParam": null,
-                "jsonStr": null,
-                "reportType": "report_screen",
-                "total": 0,
-                "reportImage": null,
-                "enabled": 1,
-                "deleteFlag": 0,
-                "reportAuthor": null,
-                "downloadCount": null,
-                "accessKey": "a853e134a82aff14e66887c0abba3831"
-              },
-              {
-                "id": 187,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-06-30 10:06:31",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-06-30 10:06:31",
-                "version": 1,
-                "reportName": "日志大屏",
-                "reportCode": "log_ajreport",
-                "setCodes": null,
-                "reportGroup": null,
-                "reportDesc": "",
-                "setParam": null,
-                "jsonStr": null,
-                "reportType": "report_screen",
-                "total": 0,
-                "reportImage": null,
-                "enabled": 1,
-                "deleteFlag": 0,
-                "reportAuthor": null,
-                "downloadCount": null,
-                "accessKey": "4903f2fc0e1981d72cd0c448636ac10b"
-              }
-            ],
-            "total": 6,
-            "pageSize": 10,
-            "pageIndex": 1,
-            "totalPage": 1
-          }
-        }
         this.tableConfig.loading = false;
         if (res.code === 200) {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
@@ -412,8 +247,8 @@ export default {
     // 点击编辑按钮触发
     editClick () {
       if (this.selectObj) {
-        let { reportType, sourceConnect, reportCode, reportName, reportAuthor } = this.selectObj;
-        this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor };
+        let { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled } = this.selectObj;
+        this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled };
         this.drawerFlag = true;
         this.isAdd = false;
         this.drawerTitle = this.$t("edit");
@@ -421,18 +256,17 @@ export default {
     },
     //提交
     submitClick () {
-      console.log('submitClick');
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
           let obj = { ...this.submitData };
-          let request = this.isAdd ? insertDataSourceReq(obj) : modifyDataSourceReq(obj);
+          let request = this.isAdd ? insertReportReq(obj) : modifyReportReq(obj);
           request.then((res) => {
             if (res.code === 200) {
               this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
               this.pageLoad();//刷新表格
               this.cancelClick();
             } else
-              this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}`);
+              this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + '报表编码不可重复!');
           });
         }
       });
@@ -441,49 +275,14 @@ export default {
       this.drawerFlag = false;
       this.$refs.submitReq.resetFields(); //清除表单红色提示
     },
-    showImage () {
-      //   let pictures = this.selectObj.pictures.split(',')
-      //   pictures.forEach((item) => {
-      //     this.$refs.uploadImg.uploadList.push({ name: item, url: showFileUrl(item) })
-      //   })
-      this.$refs.uploadImg.$refs.upload.fileList = this.$refs.uploadImg.uploadList
-      this.$refs.uploadImg.drawerFlag = true
-    },
-    //上传图片
-    fileUpload (file) {
-      //获取图片地址
-      getUploadImageUrl(file).then((imageUrl) => {
-        //将图片进行压缩
-        compress(imageUrl).then((res) => {
-          let formData = new FormData();
-          formData.append("fileData", base64ToFile(res));
-          formData.append("fileName", file.name);
-          for (let item in this.extraData) {
-            formData.append(item, this.extraData[item]);
-          }
-          console.log(formData);
-          //   uploadImageReq(formData).then((res) => {
-          //     if (res.code === 200) {
-          //       this.$refs.uploadImg.uploadList.push({ name: res.result, url: showFileUrl(res.result) })
-          //       this.$Message.success(this.$t('uploadSuccess'));
-          //     } else {
-          let content = `${errorType(this, res)}<br> ${res.message}`;
-          this.$Modal.error({
-            title: this.$t("uploadAttachment") + this.$t("fail"),
-            content: content,
-          });
-          //     }
-          //   });
-        });
-      });
-    },
     //删除
     deleteClick () {
       this.$Modal.confirm({
         title: "确认要删除该数据吗?",
         onOk: () => {
-          this.selectArr.forEach(o => {
-            deleteDataSourceReq({ reportType: o.reportType })
+          const deleteArr = this.selectArr.length > 0 ? this.selectArr : [{ ...this.selectObj }];
+          deleteArr.forEach(o => {
+            deleteReportReq({ reportCode: o.reportCode })
           })
           this.$Message.success("删除成功");
           this.pageLoad();
@@ -491,17 +290,6 @@ export default {
         //   onCancel: () => this.clearGraphData(),
       });
 
-    },
-    // 获取数据字典数据
-    async getDataItemData () {
-      this.reportTypeList = await this.getDataItemDetailList("dataSource");
-    },
-    async getDataItemDetailList (itemCode) {
-      let arr = [];
-      await getlistReq({ itemCode, enabled: 1 }).then((res) => {
-        if (res.code === 200) arr = res.result || [];
-      });
-      return arr;
     },
 
     // 某一行高亮时触发
@@ -515,6 +303,14 @@ export default {
     // 点击重置按钮触发
     resetClick () {
       this.$refs.searchReq.resetFields();
+    },
+    //设计
+    design (data) {
+      if (data.reportType === 'excel') this.excelVisib = true;
+    },
+    // 预览
+    preview () {
+
     },
     // 自动改变表格高度
     autoSize () {

@@ -17,7 +17,7 @@ export const insertDataSourceReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
-        url: '/api/autoreportcenter/anonymous/v1/datasource/insertdatasource',
+        url: '/api/autoreportcenter/anonymous/v1/datasource/insert',
         method: 'post',
         data
     })

@@ -38,26 +38,26 @@
         <Row :gutter="10" v-if="submitData.sourceType==='http'">
           <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
           <!-- 请求路径 -->
-          <FormItem :label="$t('requestUrl')" prop="requestUrl">
-            <Input v-model.trim="submitData.requestUrl" :placeholder="$t('pleaseEnter') + $t('requestUrl')" />
+          <FormItem :label="$t('httpAddress')" prop="httpAddress">
+            <Input v-model.trim="submitData.httpAddress" :placeholder="$t('pleaseEnter') + $t('httpAddress')" />
           </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
           <!-- 请求方式 -->
-          <FormItem :label="$t('requestWay')" prop="requestWay">
-            <Input v-model.trim="submitData.requestWay" :placeholder="$t('pleaseEnter') + $t('requestWay')" />
+          <FormItem :label="$t('httpWay')" prop="httpWay">
+            <Input v-model.trim="submitData.httpWay" :placeholder="$t('pleaseEnter') + $t('httpWay')" />
           </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
           <!-- 请求头 -->
-          <FormItem :label="$t('requestHead')" prop="requestHead">
-            <Input v-model.trim="submitData.requestHead" :placeholder="$t('pleaseEnter') + $t('requestHead')" />
+          <FormItem :label="$t('httpHeader')" prop="httpHeader">
+            <Input v-model.trim="submitData.httpHeader" :placeholder="$t('pleaseEnter') + $t('httpHeader')" />
           </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
           <!-- 请求体 -->
-          <FormItem :label="$t('requestContent')" prop="requestContent">
-            <Input v-model.trim="submitData.requestContent" :placeholder="$t('pleaseEnter') + $t('requestContent')" />
+          <FormItem :label="$t('httpBody')" prop="httpBody">
+            <Input v-model.trim="submitData.httpBody" :placeholder="$t('pleaseEnter') + $t('httpBody')" />
           </FormItem>
           </Col>
         </Row>
@@ -150,6 +150,10 @@ export default {
         sourceDesc: "",
         sourceType: "",
         sourceConnect: "",
+        httpAddress: "",
+        httpWay: "POST",
+        httpHeader: '{"Content-Type":"application/json;charset=UTF-8"}',
+        httpBody: ""
       },
       drawerFlag: false,
       req: {
@@ -251,8 +255,8 @@ export default {
     // 点击编辑按钮触发
     editClick () {
       if (this.selectObj) {
-        let { sourceCode, sourceConnect, sourceDesc, sourceName, sourceType } = this.selectObj;
-        this.submitData = { sourceCode, sourceConnect, sourceDesc, sourceName, sourceType };
+        // let { sourceCode, sourceConnect, sourceDesc, sourceName, sourceType } = this.selectObj;
+        this.submitData = { ... this.selectObj };
         this.drawerFlag = true;
         this.isAdd = false;
         this.drawerTitle = this.$t("edit");
@@ -260,7 +264,6 @@ export default {
     },
     //提交
     submitClick () {
-      console.log('submitClick');
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
           let obj = { ...this.submitData };
@@ -271,7 +274,7 @@ export default {
               this.pageLoad();//刷新表格
               this.cancelClick();
             } else
-              this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}`);
+              this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + res.message);
           });
         }
       });
@@ -285,7 +288,8 @@ export default {
       this.$Modal.confirm({
         title: "确认要删除该数据吗?",
         onOk: () => {
-          this.selectArr.forEach(o => {
+          const deleteArr = this.selectArr.length > 0 ? this.selectArr : [{ ...this.selectObj }];
+          deleteArr.forEach(o => {
             deleteDataSourceReq({ sourceCode: o.sourceCode })
           })
           this.$Message.success("删除成功");
@@ -297,9 +301,9 @@ export default {
     },
     //测试连接
     testClick () {
-      const { sourceCode, sourceName, sourceDesc, sourceType, sourceConnect } = this.submitData;
-      console.log(sourceCode, sourceName, sourceDesc, sourceType, sourceConnect);
-      const obj = { sourceCode, sourceName, sourceDesc, sourceType, sourceConnect }
+      //   const { sourceCode, sourceName, sourceDesc, sourceType, sourceConnect } = this.submitData;
+      //   console.log(sourceCode, sourceName, sourceDesc, sourceType, sourceConnect);
+      const obj = { ...this.submitData }
       testConnection(obj).then(res => {
         if (res.code === 200) {
           this.$Message.success("连接成功");
