@@ -20,12 +20,12 @@
       </div>
       <div class="wip-table">
         <span class="title">WIP 不良</span>
-        <Table :border="tableConfig.border" :highlight-cell="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columnsYield" :data="dataYield" @on-cell-click='yieldClick'>
+        <Table :border="tableConfig.border" :highlight-cell="tableConfig.highlightRow" :height="tableConfig.height" :loading="Yieldloading" :columns="columnsYield" :data="dataYield" @on-cell-click='yieldClick' :span-method="handleSpanYield">
         </Table>
       </div>
       <div class="wip-table">
         <span class="title">不良工站</span>
-        <Table :border="tableConfig.border" ref="qty" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columnsQty" :data="dataQty" @on-cell-click='qtyClick'>
+        <Table :border="tableConfig.border" ref="qty" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columnsQty" :data="dataQty" @on-cell-click='qtyClick' :span-method="handleSpanQty">
         </Table>
       </div>
     </Card>
@@ -49,6 +49,7 @@ export default {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       btnData: [],
       queryObj: {},
+      Yieldloading: false,
       req: {
         startTime: '',
         endTime: ''
@@ -56,74 +57,68 @@ export default {
       dataYield: [],
       columnsYield: [
         {
-          title: 'Station/Lines',
-          key: "station",
+          title: 'Section',
+          key: "section",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
           title: 'Yield',
-          key: "yield",
+          key: "yieldtype",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'Overall Yield',
-          key: "workorder",
+          title: 'L01',
+          key: "L01",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L1',
-          key: "workorder",
+          title: 'L02',
+          key: "L02",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L2',
-          key: "workorder",
+          title: 'L03',
+          key: "L03",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L3',
-          key: "workorder",
+          title: 'L04',
+          key: "L04",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L4',
-          key: "workorder",
+          title: 'L05',
+          key: "L05",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L5',
-          key: "workorder",
+          title: 'L06',
+          key: "L06",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L6',
-          key: "workorder",
+          title: 'L07',
+          key: "L07",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L7',
-          key: "workorder",
+          title: 'L08',
+          key: "L08",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L8',
-          key: "workorder",
-          ellipsis: true,
-          tooltip: true,
-          align: "center",
-        }, {
-          title: 'L9',
-          key: "workorder",
+          title: 'L09',
+          key: "L09",
           ellipsis: true,
           tooltip: true,
           align: "center",
@@ -132,68 +127,68 @@ export default {
       dataQty: [],
       columnsQty: [
         {
-          title: 'Station/Lines',
+          title: 'Section',
+          key: "section",
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
+        }, {
+          title: 'Station',
           key: "station",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'Yield',
-          key: "yield",
+          title: 'L01',
+          key: "L01",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L1',
-          key: "workorder",
+          title: 'L02',
+          key: "L02",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L2',
-          key: "workorder",
+          title: 'L03',
+          key: "L03",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L3',
-          key: "workorder",
+          title: 'L04',
+          key: "L04",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L4',
-          key: "workorder",
+          title: 'L05',
+          key: "L05",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L5',
-          key: "workorder",
+          title: 'L06',
+          key: "L06",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L6',
-          key: "workorder",
+          title: 'L07',
+          key: "L07",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L7',
-          key: "workorder",
+          title: 'L08',
+          key: "L08",
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
-          title: 'L8',
-          key: "workorder",
-          ellipsis: true,
-          tooltip: true,
-          align: "center",
-        }, {
-          title: 'L9',
-          key: "workorder",
+          title: 'L09',
+          key: "L09",
           ellipsis: true,
           tooltip: true,
           align: "center",
@@ -210,6 +205,7 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = true;
+      this.Yieldloading = true;
       const { startTime, endTime } = this.req;
       let obj = {
         startTime: formatDate(startTime),
@@ -226,275 +222,120 @@ export default {
 
     },
     //获取LPA良率
-    getLpaYeild (obj) {
-      //   getLpaYieldReq(obj).then((res) => {
-      const res = {
-        "code": 200,
-        "errorCode": -1,
-        "hasPage": false,
-        "message": null,
-        "elapsedMilliseconds": 158786,
-        "result": [
-          {
-            "lineName": "L02",
-            "smt_Input_Qty": "6845",
-            "smt_Output_Qty": "6436",
-            "smt_Defect_Qty": "400",
-            "smt_Fyp_Rate": "6.02%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "6243",
-            "encap_Output_Qty": "6521",
-            "encap_Defect_Qty": "12",
-            "encap_Rate": "0.00%",
-            "be_Input_Qty": "6399",
-            "be_Output_Qty": "6439",
-            "be_Defect_Qty": "27",
-            "be_Rate": "99.59%"
-          },
-          {
-            "lineName": "L03",
-            "smt_Input_Qty": "7935",
-            "smt_Output_Qty": "7735",
-            "smt_Defect_Qty": "238",
-            "smt_Fyp_Rate": "3.05%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "7390",
-            "encap_Output_Qty": "7449",
-            "encap_Defect_Qty": "11",
-            "encap_Rate": "99.97%",
-            "be_Input_Qty": "7246",
-            "be_Output_Qty": "7153",
-            "be_Defect_Qty": "21",
-            "be_Rate": "99.71%"
-          },
-          {
-            "lineName": "L04",
-            "smt_Input_Qty": "4126",
-            "smt_Output_Qty": "3940",
-            "smt_Defect_Qty": "178",
-            "smt_Fyp_Rate": "4.41%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "3255",
-            "encap_Output_Qty": "1479",
-            "encap_Defect_Qty": "6",
-            "encap_Rate": "99.93%",
-            "be_Input_Qty": "1385",
-            "be_Output_Qty": "1438",
-            "be_Defect_Qty": "44",
-            "be_Rate": "97.00%"
-          },
-          {
-            "lineName": "L05",
-            "smt_Input_Qty": "6933",
-            "smt_Output_Qty": "6778",
-            "smt_Defect_Qty": "147",
-            "smt_Fyp_Rate": "2.15%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "7148",
-            "encap_Output_Qty": "6428",
-            "encap_Defect_Qty": "6",
-            "encap_Rate": "0.00%",
-            "be_Input_Qty": "6280",
-            "be_Output_Qty": "6283",
-            "be_Defect_Qty": "71",
-            "be_Rate": "98.87%"
-          },
-          {
-            "lineName": "L06",
-            "smt_Input_Qty": "1001",
-            "smt_Output_Qty": "902",
-            "smt_Defect_Qty": "99",
-            "smt_Fyp_Rate": "10.70%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "979",
-            "encap_Output_Qty": "600",
-            "encap_Defect_Qty": "21",
-            "encap_Rate": "99.68%",
-            "be_Input_Qty": "489",
-            "be_Output_Qty": "285",
-            "be_Defect_Qty": "5",
-            "be_Rate": "98.48%"
-          },
-          {
-            "lineName": "L07",
-            "smt_Input_Qty": "128",
-            "smt_Output_Qty": "95",
-            "smt_Defect_Qty": "20",
-            "smt_Fyp_Rate": "19.05%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "185",
-            "encap_Output_Qty": "0",
-            "encap_Defect_Qty": "1",
-            "encap_Rate": "0.00%",
-            "be_Input_Qty": "0",
-            "be_Output_Qty": "0",
-            "be_Defect_Qty": "0",
-            "be_Rate": "0.00%"
-          },
-          {
-            "lineName": "L08",
-            "smt_Input_Qty": "0",
-            "smt_Output_Qty": "21",
-            "smt_Defect_Qty": "0",
-            "smt_Fyp_Rate": "0.00%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "20",
-            "encap_Output_Qty": "0",
-            "encap_Defect_Qty": "0",
-            "encap_Rate": "0.00%",
-            "be_Input_Qty": "0",
-            "be_Output_Qty": "0",
-            "be_Defect_Qty": "0",
-            "be_Rate": "0.00%"
-          },
-          {
-            "lineName": "L09",
-            "smt_Input_Qty": "0",
-            "smt_Output_Qty": "0",
-            "smt_Defect_Qty": "0",
-            "smt_Fyp_Rate": "0.00%",
-            "smt_After_Rework_Rate": "0.00%",
-            "encap_Input_Qty": "0",
-            "encap_Output_Qty": "0",
-            "encap_Defect_Qty": "0",
-            "encap_Rate": "0.00%",
-            "be_Input_Qty": "0",
-            "be_Output_Qty": "0",
-            "be_Defect_Qty": "0",
-            "be_Rate": "0.00%"
+    async getLpaYeild (obj) {
+      await getLpaYieldReq(obj).then((res) => {
+        this.Yieldloading = false;
+        if (res.code === 200) {
+          let result = [];
+          if (this.dataYield) {
+            //站点与段别的对应关系
+            const title = [
+              { section: 'Overall', yieldtype: 'Overall' }, { section: 'SMT', yieldtype: 'Input' },
+              { section: 'SMT', yieldtype: 'Output' }, { section: 'SMT', yieldtype: 'Defect' },
+              { section: 'SMT', yieldtype: 'Fyp' }, { section: 'SMT', yieldtype: 'After_Rework' },
+              { section: 'ENCAPE', yieldtype: 'Input' }, { section: 'ENCAPE', yieldtype: 'Output' },
+              { section: 'ENCAPE', yieldtype: 'Defect' }, { section: 'ENCAPE', yieldtype: 'Rate' },
+              { section: 'BE', yieldtype: 'Input' }, { section: 'BE', yieldtype: 'Output' },
+              { section: 'BE', yieldtype: 'Defect' }, { section: 'BE', yieldtype: 'Rate' }];
+            //创建空的表格信息
+            result = title.map(item => {
+              const { section, yieldtype } = item;
+              return { section, yieldtype, 'L01': '', 'L02': '', 'L03': '', 'L04': '', 'L05': '', 'L06': '', 'L07': '', 'L08': '', 'L09': '' }
+            });
+            res.result.forEach((o, index) => {
+              const lineName = res.result[index].lineName;
+              Object.keys(o).forEach((key, keyIndex) => {
+                if (key !== 'lineName') {
+                  // const keySplit = key.split('-');
+                  // const station = keySplit[1];
+                  result[keyIndex - 1][lineName] = res.result[index][key];
+                }
+              })
+            })
           }
-        ]
-      }
-      this.tableConfig.loading = false;
-      if (res.code === 200) {
-        this.dataQty = res.result || [];
-      }
-      //   }).catch(() => (this.tableConfig.loading = false));
+          this.dataYield = result;
+          console.log(this.dataYield);
+        }
+      }).catch(() => (this.Yieldloading = false));
     },
     //获取LPA不良率
-    getLpaDefectYeild (obj) {
-      //   getLpaDefeactYieldReq(obj).then((res) => {
-      const res = {
-        "code": 200,
-        "errorCode": -1,
-        "hasPage": false,
-        "message": null,
-        "elapsedMilliseconds": 138817,
-        "result": [
-          {
-            "lineName": "L02",
-            "smt_Op40_Rate": "0.00%",
-            "smt_AutoOnoff_smt_Rate": "2.98%",
-            "encap_Op45Op50_Rate": "0.00%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.00%",
-            "bE_Function_Rate": "0.06%",
-            "bE_I16_Rate": "0.11%",
-            "bE_Fvi_Rate": "0.01%"
-          },
-          {
-            "lineName": "L03",
-            "smt_Op40_Rate": "0.03%",
-            "smt_AutoOnoff_smt_Rate": "1.27%",
-            "encap_Op45Op50_Rate": "0.00%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.03%",
-            "bE_Function_Rate": "0.04%",
-            "bE_I16_Rate": "0.18%",
-            "bE_Fvi_Rate": "0.00%"
-          },
-          {
-            "lineName": "L04",
-            "smt_Op40_Rate": "0.00%",
-            "smt_AutoOnoff_smt_Rate": "1.83%",
-            "encap_Op45Op50_Rate": "0.04%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.07%",
-            "bE_Function_Rate": "0.76%",
-            "bE_I16_Rate": "1.36%",
-            "bE_Fvi_Rate": "0.00%"
-          },
-          {
-            "lineName": "L05",
-            "smt_Op40_Rate": "0.00%",
-            "smt_AutoOnoff_smt_Rate": "0.89%",
-            "encap_Op45Op50_Rate": "0.00%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.00%",
-            "bE_Function_Rate": "0.19%",
-            "bE_I16_Rate": "0.13%",
-            "bE_Fvi_Rate": "0.24%"
-          },
-          {
-            "lineName": "L06",
-            "smt_Op40_Rate": "0.00%",
-            "smt_AutoOnoff_smt_Rate": "2.49%",
-            "encap_Op45Op50_Rate": "0.27%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.32%",
-            "bE_Function_Rate": "0.00%",
-            "bE_I16_Rate": "0.66%",
-            "bE_Fvi_Rate": "0.00%"
-          },
-          {
-            "lineName": "L07",
-            "smt_Op40_Rate": "0.00%",
-            "smt_AutoOnoff_smt_Rate": "6.67%",
-            "encap_Op45Op50_Rate": "0.00%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.00%",
-            "bE_Function_Rate": "0.00%",
-            "bE_I16_Rate": "0.00%",
-            "bE_Fvi_Rate": "0.00%"
-          },
-          {
-            "lineName": "L08",
-            "smt_Op40_Rate": "0.00%",
-            "smt_AutoOnoff_smt_Rate": "0.00%",
-            "encap_Op45Op50_Rate": "0.00%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.00%",
-            "bE_Function_Rate": "0.00%",
-            "bE_I16_Rate": "0.00%",
-            "bE_Fvi_Rate": "0.00%"
-          },
-          {
-            "lineName": "L09",
-            "smt_Op40_Rate": "0.00%",
-            "smt_AutoOnoff_smt_Rate": "0.00%",
-            "encap_Op45Op50_Rate": "0.00%",
-            "encap_Autoonoff2_Rate": "0.00%",
-            "encap_Autoonoff3_Rate": "0.00%",
-            "encap_Op60_Rate": "0.00%",
-            "encap_Op70_Rate": "0.00%",
-            "bE_Function_Rate": "0.00%",
-            "bE_I16_Rate": "0.00%",
-            "bE_Fvi_Rate": "0.00%"
+    async getLpaDefectYeild (obj) {
+      await getLpaDefeactYieldReq(obj).then((res) => {
+        this.tableConfig.loading = false;
+        if (res.code === 200) {
+          let result = [];
+          if (this.dataYield) {
+            //站点与段别的对应关系
+            const title = [
+              { section: 'SMT', station: 'Op40' }, { section: 'SMT', station: 'AutoOnoff' },
+              { section: 'ENCAPE', station: 'Op45Op50' }, { section: 'ENCAPE', station: 'Autoonoff2' },
+              { section: 'ENCAPE', station: 'Autoonoff3' }, { section: 'ENCAPE', station: 'Op60' },
+              { section: 'ENCAPE', station: 'Op70' }, { section: 'BACK END', station: 'Function' },
+              { section: 'BACK END', station: 'I16' }, { section: 'BACK END', station: 'Fvi' }];
+            //创建空的表格信息
+            result = title.map(item => {
+              const { section, station } = item;
+              return { section, station, 'L01': '', 'L02': '', 'L03': '', 'L04': '', 'L05': '', 'L06': '', 'L07': '', 'L08': '', 'L09': '' }
+            });
+            res.result.forEach((o, index) => {
+              const lineName = res.result[index].lineName;
+              Object.keys(o).forEach((key, keyIndex) => {
+                if (key !== 'lineName') {
+                  // const keySplit = key.split('-');
+                  // const station = keySplit[1];
+                  result[keyIndex - 1][lineName] = res.result[index][key];
+                }
+              })
+            })
           }
-        ]
-      }
-      this.tableConfig.loading = false;
-      if (res.code === 200) {
-        this.dataYield = res.result || [];
-        if (this.dataYield) {
-          const title = []
+          this.dataQty = result;
+
+        }
+      }).catch(() => (this.tableConfig.loading = false));
+    },
+    //合并单元格
+    handleSpanYield ({ row, column, rowIndex, columnIndex }) {
+      const cc = [
+        { r: 0, c: 0, rspan: 1, cspan: 2 },
+        { r: 1, c: 0, rspan: 5, cspan: 1 },
+        { r: 6, c: 0, rspan: 4, cspan: 1 },
+        { r: 10, c: 0, rspan: 4, cspan: 1 },
+      ]
+      for (let i = 0; i < cc.length; i++) {
+        const o = cc[i];
+        if (rowIndex === o.r && columnIndex === o.c) {
+          return {
+            rowspan: o.rspan,
+            colspan: o.cspan
+          }
+        } else if ((!([0, 1, 6, 10].includes(rowIndex)) && columnIndex === 0) || (rowIndex === 0 && columnIndex === 1)) {
+          return {
+            rowspan: 0,
+            colspan: 0
+          }
         }
       }
-      //   }).catch(() => (this.tableConfig.loading = false));
+    },
+    //合并单元格
+    handleSpanQty ({ row, column, rowIndex, columnIndex }) {
+      const cc = [
+        { rowIndex: 0, rowspan: 2, colspan: 1 },
+        { rowIndex: 2, rowspan: 5, colspan: 1 },
+        { rowIndex: 7, rowspan: 3, colspan: 1 },
+      ];
+      for (let i = 0; i < cc.length; i++) {
+        if (rowIndex === cc[i].rowIndex && columnIndex === 0) {
+          return {
+            rowspan: cc[i].rowspan,
+            colspan: cc[i].colspan
+          };
+        } else if (!([0, 2, 7].includes(rowIndex)) && columnIndex === 0) {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+      }
     },
 
     yieldClick (row, column, data, event) {
@@ -525,7 +366,7 @@ export default {
     },
     // 自动改变表格高度
     autoSize () {
-      this.tableConfig.height = document.body.clientHeight / 2 - 150;
+      this.tableConfig.height = document.body.clientHeight / 2 - 130;
     },
   },
 };
