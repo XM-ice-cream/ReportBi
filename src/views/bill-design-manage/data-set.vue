@@ -14,27 +14,17 @@
                 <div class="poptip-style-content" slot="content">
                   <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 数据集编码 -->
-                    <FormItem :label="$t('dataSetCode')" prop="dataSetCode">
-                      <Input v-model="req.dataSetCode" :placeholder="$t('pleaseEnter') + $t('dataSetCode')" @on-search="searchClick" />
+                    <FormItem :label="$t('setCode')" prop="setCode">
+                      <Input v-model="req.setCode" :placeholder="$t('pleaseEnter') + $t('setCode')" @on-search="searchClick" />
                     </FormItem>
                     <!-- 数据集名称 -->
-                    <FormItem :label="$t('dataSetName')" prop="dataSetName">
-                      <Input v-model="req.dataSetName" :placeholder="$t('pleaseEnter') + $t('dataSetName')" @on-search="searchClick" />
+                    <FormItem :label="$t('setName')" prop="setName">
+                      <Input v-model="req.setName" :placeholder="$t('pleaseEnter') + $t('setName')" @on-search="searchClick" />
                     </FormItem>
                     <!-- 数据源 -->
-                    <FormItem :label="$t('dataSource')" prop="dataSource">
-                      <Select v-model="req.dataSetType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
-                        <Option v-for="(item, i) in dataSetTypeList" :value="item.detailName" :key="i">
-                          {{ item.detailName }}
-                        </Option>
-                      </Select>
-                    </FormItem>
-                    <!-- 数据集类型 -->
-                    <FormItem :label="$t('dataSetType')" prop="dataSetType">
-                      <Select v-model="req.dataSetType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
-                        <Option v-for="(item, i) in dataSetTypeList" :value="item.detailName" :key="i">
-                          {{ item.detailName }}
-                        </Option>
+                    <FormItem :label="$t('dataSource')" prop="sourceCode">
+                      <Select v-model="req.sourceCode" clearable :placeholder="$t('pleaseSelect') + $t('dataSource')" transfer>
+                        <Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
                       </Select>
                     </FormItem>
                   </Form>
@@ -59,7 +49,7 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-select="selectClick">
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick">
           <template slot="operation" slot-scope="{ row }">
             <Button @click="dataview(row)" class="tableBtn">数据预览</Button>
           </template>
@@ -75,7 +65,7 @@
 </template>
 
 <script>
-import { getpagelistReq } from "@/api/bill-design-manage/datasource.js";
+import { getpagelistReq, getAllDatasourceReq, deleteDatacollectReq } from "@/api/bill-design-manage/data-set.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import dataView from './dataset/data-view.vue';
 import EditViewSet from './dataset/edit-view-set.vue';
@@ -95,16 +85,16 @@ export default {
       categoryList: [],// 类别下拉框
       selectObj: null,//表格选中
       selectArr: [],//表格多选
-      dataSetTypeList: [],
+      sourceList: [],
       dataSet: {},
       isAdd: true,//新增编辑
       submitData: {
 
       },
       req: {
-        dataSetCode: "",
-        dataSetName: "",
-        dataSetType: "",
+        setCode: "",
+        setName: "",
+        sourceCode: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -119,20 +109,20 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: this.$t("dataSetCode"), key: "setCode", align: "center", tooltip: true },
-        { title: this.$t("dataSetName"), key: "setName", align: "center", tooltip: true, },
+        { title: this.$t("setCode"), key: "setCode", align: "center", tooltip: true },
+        { title: this.$t("setName"), key: "setName", align: "center", tooltip: true, },
         { title: this.$t("dataSetDesc"), key: "setDesc", align: "center", tooltip: true, },
-        { title: this.$t("dataSourceCode"), key: "sourceCode", align: "center", tooltip: true, },
-        { title: this.$t("dataSetType"), key: "setType", align: "center", tooltip: true, },
-        { title: this.$t("enabled"), key: "enableFlag", align: "center", tooltip: true, render: renderIsEnabled, },
+        { title: this.$t("dataSource"), key: "sourceName", align: "center", tooltip: true, },
+        { title: this.$t("sourceType"), key: "setType", align: "center", tooltip: true, },
+        { title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, },
         { title: '操作', slot: "operation", align: "center", width: '80' },
       ], // 表格数据
       // 验证实体
       ruleValidate: {
-        dataSetType: [
+        sourceCode: [
           {
             required: true,
-            message: this.$t("pleaseEnter") + this.$t("dataSetType"),
+            message: this.$t("pleaseEnter") + this.$t("sourceCode"),
             trigger: "change",
           },
         ],
@@ -142,6 +132,7 @@ export default {
   activated () {
     this.pageLoad();
     this.autoSize();
+    this.getDataSourceList();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
   },
@@ -158,267 +149,38 @@ export default {
     },
     // 获取分页列表数据
     pageLoad () {
-      console.log('获取分页列表数据');
       this.data = [];
       this.tableConfig.loading = true;
+      const { sourceCode, setCode, setName } = this.req;
       let obj = {
-        orderField: "PN", // 排序字段
+        orderField: "setCode", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
         data: {
-
+          sourceCode,
+          setCode,
+          setName
         },
       };
       getpagelistReq(obj).then((res) => {
-        res = {
-          "code": 200,
-          "message": "操作成功",
-          "args": null,
-          "result": {
-            "data": [
-              {
-                "id": 72,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-08-27 13:48:33",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-08-27 13:48:33",
-                "version": 1,
-                "setCode": "compare_ajreport",
-                "setName": "柱状对比图示例数据",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "SELECT time,type,nums from aj_report_comparestack",
-                "caseResult": "[{\"time\":\"2021-08-23\",\"type\":\"成功\",\"nums\":12},{\"time\":\"2021-08-23\",\"type\":\"失败\",\"nums\":1},{\"time\":\"2021-08-24\",\"type\":\"成功\",\"nums\":24},{\"time\":\"2021-08-24\",\"type\":\"失败\",\"nums\":5},{\"time\":\"2021-08-25\",\"type\":\"成功\",\"nums\":13},{\"time\":\"2021-08-25\",\"type\":\"失败\",\"nums\":8},{\"time\":\"2021-08-26\",\"type\":\"成功\",\"nums\":19},{\"time\":\"2021-08-26\",\"type\":\"失败\",\"nums\":3},{\"time\":\"2021-08-27\",\"type\":\"成功\",\"nums\":9},{\"time\":\"2021-08-27\",\"type\":\"失败\",\"nums\":15}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "bf7e108e0631a9353ca59794e3f82bf0"
-              },
-              {
-                "id": 71,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-07-27 19:50:52",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-08-16 14:08:51",
-                "version": 7,
-                "setCode": "barstack_ajreport",
-                "setName": "柱状堆叠数据",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "select time,type,nums from aj_report_barstack",
-                "caseResult": "[{\"time\":\"2021-07-27\",\"type\":\"A\",\"nums\":12},{\"time\":\"2021-07-27\",\"type\":\"B\",\"nums\":20},{\"time\":\"2021-07-27\",\"type\":\"C\",\"nums\":11},{\"time\":\"2021-07-26\",\"type\":\"A\",\"nums\":11},{\"time\":\"2021-07-26\",\"type\":\"B\",\"nums\":30},{\"time\":\"2021-07-25\",\"type\":\"B\",\"nums\":20},{\"time\":\"2021-07-25\",\"type\":\"C\",\"nums\":15}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "616029ab84c3d8da36f34a5b822040c6"
-              },
-              {
-                "id": 70,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-07-14 16:17:14",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-15 10:35:21",
-                "version": 2,
-                "setCode": "per",
-                "setName": "百分比",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "select doub from aj_report_nums where id =2;",
-                "caseResult": "[{\"doub\":55.33}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "1cf3c7125dd35ae693aa472a79377319"
-              },
-              {
-                "id": 69,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-07-06 17:56:23",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-07 10:59:34",
-                "version": 4,
-                "setCode": "logis_table",
-                "setName": "表格测试",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "select date,address,name from aj_report_table;",
-                "caseResult": "[{\"date\":\"2021-05-01\",\"address\":\"这是一条测试表格事件1\",\"name\":\"上汽安吉\"},{\"date\":\"2021-05-02\",\"address\":\"这是一条测试表格事件2\",\"name\":\"上汽大通\"},{\"date\":\"2021-05-03\",\"address\":\"这是一条测试表格事件3\",\"name\":\"上汽智行\"},{\"date\":\"2021-05-04\",\"address\":\"这是一条测试表格事件4\",\"name\":\"上汽国际\"},{\"date\":\"2021-05-05\",\"address\":\"这是一条测试表格事件5\",\"name\":\"上汽国内\"},{\"date\":\"2021-05-06\",\"address\":\"这是一条测试表格事件6\",\"name\":\"上汽运输\"},{\"date\":\"2021-05-07\",\"address\":\"这是一条测试表格事件7\",\"name\":\"上汽大众\"}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "c66842446f0095833c9d03a4749002a0"
-              },
-              {
-                "id": 68,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-07-06 17:24:16",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-06 17:30:15",
-                "version": 2,
-                "setCode": "logis_3",
-                "setName": "收发车情况",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "select time,collect,start from aj_report_common3;",
-                "caseResult": "[{\"start\":8,\"time\":\"1月\",\"collect\":10},{\"start\":12,\"time\":\"2月\",\"collect\":15},{\"start\":22,\"time\":\"3月\",\"collect\":20},{\"start\":28,\"time\":\"4月\",\"collect\":30},{\"start\":35,\"time\":\"5月\",\"collect\":28},{\"start\":38,\"time\":\"6月\",\"collect\":40},{\"start\":100,\"time\":\"7月\",\"collect\":80},{\"start\":120,\"time\":\"8月\",\"collect\":90},{\"start\":89,\"time\":\"9月\",\"collect\":65},{\"start\":50,\"time\":\"10月\",\"collect\":50},{\"start\":34,\"time\":\"11月\",\"collect\":35},{\"start\":23,\"time\":\"12月\",\"collect\":27}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "bf7db6cbf4aa7d064d8ead5ab9c641ac"
-              },
-              {
-                "id": 67,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-07-06 16:51:27",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-06 16:51:27",
-                "version": 1,
-                "setCode": "logis_2",
-                "setName": "收车量",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "select name,nums from aj_report_common2 order by nums;",
-                "caseResult": "[{\"name\":\"武汉\",\"nums\":20},{\"name\":\"河南\",\"nums\":50},{\"name\":\"西安\",\"nums\":70},{\"name\":\"北京\",\"nums\":100},{\"name\":\"上海\",\"nums\":200}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "898fbed3b59ccb7285981231e4862307"
-              },
-              {
-                "id": 66,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-07-06 15:44:41",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-06 15:54:16",
-                "version": 3,
-                "setCode": "logis_1",
-                "setName": "库存",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "select name,nums from aj_report_common1 order by nums",
-                "caseResult": "[{\"name\":\"上海\",\"nums\":500},{\"name\":\"北京\",\"nums\":600},{\"name\":\"西安\",\"nums\":1000},{\"name\":\"河南\",\"nums\":1200},{\"name\":\"武汉\",\"nums\":2000}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "34d01193f3348f302f205db4f39ae721"
-              },
-              {
-                "id": 65,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-07-05 15:00:18",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-05 15:00:18",
-                "version": 1,
-                "setCode": "amount_1",
-                "setName": "amount1",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "SELECT sum(success)as nums from aj_report_wifiamount;",
-                "caseResult": "[{\"nums\":1514}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "edb7b3558b27512d4c93d6b97651f2eb"
-              },
-              {
-                "id": 62,
-                "createBy": "admin",
-                "createByView": null,
-                "createTime": "2021-06-30 15:16:37",
-                "updateBy": "admin",
-                "updateByView": null,
-                "updateTime": "2021-07-01 16:06:00",
-                "version": 2,
-                "setCode": "acc_ajrt",
-                "setName": "访问-系统RT",
-                "setDesc": "",
-                "setType": "sql",
-                "sourceCode": "mysql_ajreport",
-                "dynSentence": "SELECT datetime,rt from aj_report_exper ORDER BY datetime;",
-                "caseResult": "[{\"datetime\":\"2021-06-18\",\"rt\":90.92},{\"datetime\":\"2021-06-19\",\"rt\":100.02},{\"datetime\":\"2021-06-20\",\"rt\":98.89},{\"datetime\":\"2021-06-21\",\"rt\":110.99},{\"datetime\":\"2021-06-22\",\"rt\":89.78}]",
-                "enableFlag": 1,
-                "deleteFlag": 0,
-                "dataSetParamDtoList": null,
-                "dataSetTransformDtoList": null,
-                "contextData": null,
-                "setParamList": null,
-                "fieldLabel": null,
-                "accessKey": "483667d92c6be545226a74df2bedc0fa"
-              }
-            ],
-            "total": 27,
-            "pageSize": 10,
-            "pageIndex": 1,
-            "totalPage": 3
-          },
-
-        }
         this.tableConfig.loading = false;
         if (res.code === 200) {
-          console.log('123');
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
           this.data = data || [];
           this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
         }
       }).catch(() => (this.tableConfig.loading = false));
       this.searchPoptipModal = false;
+    },
+    //获取数据源下拉框
+    getDataSourceList () {
+      const obj = { sourceType: "" };
+      getAllDatasourceReq(obj).then(res => {
+        const { code, result } = res;
+        if (code !== 200) return;
+        this.sourceList = result;
+      });
     },
     // 新增按钮
     addClick (type) {
@@ -482,17 +244,23 @@ export default {
     },
     //删除
     deleteClick () {
+      const deleteData = this.selectArr.length > 0 ? this.selectArr : (this.selectObj ? [{ ...this.selectObj }] : []);
+      if (deleteData.length == 0) {
+        this.$Message.error('无选中删除数据');
+        return;
+      }
       this.$Modal.confirm({
         title: "确认要删除该数据吗?",
         onOk: () => {
-          console.log(this.selectArr);
+          const deleteArr = deleteData.map(o => o.setCode);
+          deleteDatacollectReq({ setCode: deleteArr }).then(res => {
+            if (res.code === 200) {
+              this.$Message.success("删除成功");
+              this.pageLoad();
+            }
+          })
         },
-        //   onCancel: () => this.clearGraphData(),
       });
-
-    },
-    //测试连接
-    testClick () {
 
     },
 

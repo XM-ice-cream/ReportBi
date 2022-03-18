@@ -3,9 +3,9 @@
     <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="false" v-model="visib" fullscreen>
       <Form ref="form" :model="formData" :rules="ruleValidate" :label-width="130">
         <Row :gutter="10">
-          <Col v-if="this.setType == 'sql'" :xs="24" :sm="20" :md="8" :lg="8" :xl="8">
+          <Col :xs="24" :sm="20" :md="8" :lg="8" :xl="8">
           <FormItem label="数据源" prop="sourceCode">
-            <Select v-model.trim="formData.sourceCode" class="organisation" size="small" @change="changeSource">
+            <Select v-model.trim="formData.sourceCode" class="organisation" size="small">
               <Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
             </Select>
           </FormItem>
@@ -30,39 +30,34 @@
           <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
           <FormItem label="查询SQL">
             <div class="codemirror">
-              <monaco-editor v-model.trim="formData.dynSentence" language="sql" style="height: 500px" />
+              <monaco-editor v-model.trim="formData.dynSentence" language="sql" style="height:400px" />
             </div>
           </FormItem>
           </Col>
         </Row>
         <Row v-if="this.setType == 'http'">
-          <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
-          <FormItem label="请求路径">
-            <Input placeholder="请输入请求路径..." v-model="httpForm.apiUrl" class="input-with-select">
-            <Select v-model="httpForm.method" slot="prepend" placeholder="请选择" style="width: 80px">
-              <Option label="GET" value="GET"></Option>
-              <Option label="POST" value="POST"></Option>
-              <Option label="PUT" value="PUT"></Option>
-              <Option label="DELETE" value="DELETE"></Option>
-            </Select>
-            </Input>
-          </FormItem>
-          </Col>
-          <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
-          <FormItem label="请求头">
-            <Input v-model.trim="httpForm.header" size="small" placeholder="请输入请求头..." />
-          </FormItem>
-          </Col>
-          <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
+          <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22">
           <FormItem label="请求体">
-            <Input v-model.trim="httpForm.body" size="small" placeholder="请输入请求体..." />
+            <Input type='text' v-model.trim='formData.dynSentence' />
+          </FormItem>
+          </Col>
+        </Row>
+        <!-- 是否有效 -->
+        <Row>
+          <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+          <!-- 是否有效 -->
+          <FormItem :label="$t('enabled')" prop="enabled">
+            <i-switch size="large" v-model="formData.enabled" :true-value="1" :false-value="0">
+              <span slot="open">{{ $t("open") }}</span>
+              <span slot="close">{{ $t("close") }}</span>
+            </i-switch>
           </FormItem>
           </Col>
         </Row>
         <Row :gutter="10">
           <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22">
           <Form :label-width="100" class="demo-ruleForm">
-            <Tabs v-model.trim="tabsActiveName" type="card" @tab-click="handleClickTabs">
+            <Tabs v-model.trim="tabsActiveName" type="card" @on-click="handleClickTabs">
               <TabPane label="查询参数" name="first">
                 <Button type="primary" v-if="tableData.length == 0" size="small" @click="addRow()">添加
                 </Button>
@@ -74,72 +69,23 @@
                     <Input v-model.trim="tableData[index].paramDesc" />
                   </template>
                   <template slot-scope="{index}" slot="paramType">
-                    <Input v-model.trim="tableData[index].paramType" />
+                    <Select v-model.trim="tableData[index].paramType" clearable transfer>
+                      <Option v-for="item in paramTypeList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
+                    </Select>
                   </template>
                   <template slot-scope="{index}" slot="sampleItem">
-                    <Input v-model.trim="tableData[index].sampleItem" />
+                    <Input v-model.trim="tableData[index].sampleItem" v-if="tableData[index].paramType!=='DateTime'" />
+                    <DatePicker v-else v-model.trim="tableData[index].sampleItem" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
                   </template>
                   <template slot-scope="{row,index}" slot="mandatory">
                     <Checkbox v-model="tableData[index].mandatory" @change="Mandatory(index)">必选 </Checkbox>
-                    <Button type="primary" icon="el-icon-plus" @click="permissionClick(row, index)"> 高级规则</Button>
+                    <!-- <Button type="primary" icon="el-icon-plus" @click="permissionClick(row, index)"> 高级规则</Button> -->
                   </template>
                   <template slot-scope="{row,index}" slot="operator">
                     <Button type="text" size="small" @click.native.prevent="cutOutRow(index, tableData)">删除</Button>
                     <Button type="text" size="small" @click="addRow(row)">追加</Button>
                   </template>
                 </Table>
-              </TabPane>
-              <TabPane label="数据转换" name="second">
-                <template>
-                  <div class="filterWrapper">
-                    <div class="filterTable">
-                      <div v-for="(item, index) in itemFilterList" :key="index" class="filterBox">
-                        <div class="box">
-                          <Dictionary v-model="item.transformType" :updata-dict="item.transformType" :dict-key="'TRANSFORM_TYPE'" />
-                          <Button type="text" class="reduceFilter" icon="el-icon-close" @click="reduceFilter(item)" />
-                          <Button v-if=" item.transformType == 'js' || item.transformType == 'dict'" type="text" class="editor" icon="el-icon-edit" @click="filterScriptBtn(item)" />
-                        </div>
-                        <Button type="text" class="font-icon-right" icon="el-icon-right" />
-                      </div>
-                      <Modal :title="dialogTitle" v-model="dialogSwitchVisible" :close-on-click-modal="false" width="60%" min-height="400px" append-to-body>
-                        <div v-if="isItemFilterType.transformType == 'js'">
-                          <div class="codemirror">
-                            <!-- //自定义高级规则？ -->
-                            <monaco-editor v-model.trim="transformScript" language="javascript" style="height: 500px" />
-                          </div>
-                        </div>
-                        <div v-else>
-                          <div v-for="(item, index) in tableData2" :key="index">
-                            <label>字典项名称：</label>
-                            <Input v-model.trim="item.name" size="small" style="width: 25%" />
-                            <Button type="danger" size="small" plain icon="el-icon-delete" @click="delAllDict($index, tableData2)" />
-                            <Table :data="item.children" :columns='columnsChildren' border style="width: 80%">
-                              <template slot-scope="{row}" slot='name'>
-                                <Input v-model.trim="row.name" />
-                              </template>
-                              <template slot-scope="{row}" slot='value'>
-                                <Input v-model.trim="row.value " />
-                              </template>
-                              <template slot='operator'>
-                                <Button type="success" circle plain icon="el-icon-plus" @click=" addDict($index, item.children)" />
-                                <Button type="danger" circle plain icon="el-icon-delete" @click="delDict($index, item.children)" />
-                              </template>
-                            </Table>
-                          </div>
-                          <Button type="success" @click="addAllDict()">新增</Button>
-                        </div>
-                        <span slot="footer" class="dialog-footer">
-                          <Button @click="dialogSwitchVisible = false">取消</Button>
-                          <Button type="primary" @click="filterScriptConfirm">保存</Button>
-                        </span>
-                      </Modal>
-                      <!-- //添加数据转换 -->
-                      <div class="addFilter" disabled="true" @click="addFilter">
-                        <i class="el-icon-plus" /><span>新增</span>
-                      </div>
-                    </div>
-                  </div>
-                </template>
               </TabPane>
               <TabPane label="测试预览" name="third">
                 <div style="max-height: 400px; overflow: auto">
@@ -159,7 +105,7 @@
     <Modal :title="title" v-model="dialogPermissionVisible" :mask-closable="false" :closable="false" width="60%">
       <div class="codemirror">
         <!-- //自定义高级规则？ -->
-        <monaco-editor v-model.trim="validationRules" language="javascript" style="height: 500px" />
+        <monaco-editor v-model.trim="validationRules" language="javascript" style="height: 500px" v-if="dialogPermissionVisible" />
       </div>
       <span slot="footer" class="dialog-footer">
         <Button @click="testResultset">测试</Button>
@@ -171,11 +117,12 @@
 </template>
 <script>
 import {
-  verificationSet,
+  getAllDatasourceReq,
   testTransformSet,
-  addDataSet,
-  editDataSet
-} from "@/api/bill-design-manage/dataset.js";
+  insertDatacollectReq,
+  modifyDatacollectReq,
+  getDeatilByIdReq
+} from "@/api/bill-design-manage/data-set.js";
 import Dictionary from "@/components/dictionary/index";
 // import { codemirror } from "vue-codemirror"; // 引入codeMirror全局实例
 import "codemirror/mode/sql/sql.js";
@@ -204,68 +151,13 @@ export default {
   },
   data () {
     return {
-      data: [],
-      listLoading: true,
-      permission: {
-        add: ["admin", "alipayConfig:add"],
-        edit: ["admin", "alipayConfig:edit"],
-        del: ["admin", "datasource:del"]
-      },
-      // 内部真实的内容
-      code: "",
-      // 默认配置
-      optionsSql: {
-        mode: "text/x-sql",
-        tabSize: 2, // 缩进格式
-        // theme: 'cobalt', // monokai主题，对应主题库 JS 需要提前引入
-        lineNumbers: true, // 显示行号
-        line: true,
-        styleActiveLine: true, // 高亮选中行
-        hintOptions: {
-          completeSingle: true // 当匹配只有一项的时候是否自动补全
-        }
-      },
-      optionsJavascript: {
-        mode: "text/javascript",
-        tabSize: 2, // 缩进格式
-        // theme: 'cobalt', // monokai主题，对应主题库 JS 需要提前引入
-        lineNumbers: true, // 显示行号
-        line: true,
-        styleActiveLine: true, // 高亮选中行
-        hintOptions: {
-          completeSingle: true // 当匹配只有一项的时候是否自动补全
-        }
-      },
-      selectedList: [],
-      clickType: "",
       formData: {},
       // 弹框默认隐藏
       dialogFormVisible: false,
       dialogFormVisibleTitle: "",
       dialogPermissionVisible: false,
       dialogSwitchVisible: false,
-      permissionTextarea: "",
-      isItemFilterType: "", // 选中的转换类型id
-      itemFilterList: [
-        {
-          transformType: "js",
-          transformScript: ``
-        }
-      ],
-      transformScript: `function dataTransform(data){\n\t//自定义脚本内容\n\treturn data;\n}`,
-      itemFilterScriptId: "",
       title: "自定义高级规则",
-      totalCount: 0,
-      totalPage: 0,
-      params: {
-        pageNumber: 1,
-        pageSize: 10,
-        helpTitle: "",
-        enabled: null,
-        helpCategory: "",
-        order: "DESC",
-        sort: "update_time"
-      },
       ruleValidate: {
         setName: [
           { required: true, message: "数据集名称必填", trigger: "blur" }
@@ -322,68 +214,28 @@ export default {
           width: '80'
         },
       ],
-      columnsChildren: [
-        {
-          title: 'key',
-          width: 30,
-          slot: "name",
-        },
-        {
-          title: "值",
-          slot: "value",
-        },
-        {
-          title: "操作",
-          slot: "operator",
-          width: '80'
-        },
-      ],
       isRowData: {},
-      tableData2: [],
-      dialogTitle: "js脚本填写",
-      isShowPagination: false,
       updataDisabled: false,
-      dialogCaseResult: false,
-      caseResultTitle: "",
-      caseResultContent: null,
       testMassageCode: null,
-      query: {
-        setName: "",
-        setCode: ""
-      },
       setType: "", //数据集类型，主要用于区分http   addSql  addHttp  edit
-      httpForm: {
-        //http数据源相关数据
-        apiUrl: "",
-        method: "GET",
-        header: '{"Content-Type":"application/json;charset=UTF-8"}',
-        body: ""
-      },
       //待删除
       dictionaryOptions: [], // 数据源类型
-      list: null,
-      basicDialog: false,
-      dialogForm: {
-        sourceName: "",
-        sourceCode: "",
-        sourceType: "",
-        sourceDesc: "",
-        sourceConfig: ""
-      },
-      dataLink: [],
-      rules: {
-        sourceType: [
-          { required: true, message: "数据集名称必选", trigger: "change" }
-        ],
-        sourceCode: [
-          { required: true, message: "数据集编码必填", trigger: "blur" }
-        ],
-        sourceName: [
-          { required: true, message: "数据源名称必选", trigger: "blur" }
-        ]
-      },
-      value: "",
-      testReplyCode: null
+      paramTypeList: [{
+        sourceName: '字符串',
+        sourceCode: 'String'
+      }, {
+        sourceName: '时间类型',
+        sourceCode: 'DateTime'
+      }, {
+        sourceName: '整型',
+        sourceCode: 'Int'
+      }, {
+        sourceName: '浮点类型',
+        sourceCode: 'Double'
+      }, {
+        sourceName: '布尔',
+        sourceCode: 'Boolean'
+      }]
     };
   },
   methods: {
@@ -391,266 +243,93 @@ export default {
     addOrEditDataSet (row, type, isAdd) {
       console.log(row, type, isAdd);
       this.setType = type;
-      if (type == "http" && row.dynSentence) {
-        this.httpForm = JSON.parse(row.dynSentence);
-      }
+      //   if (type == "http" && row.dynSentence) {
+      //     this.httpForm = JSON.parse(row.dynSentence);
+      //   }
       //获取数据源下拉
-      //   const { code, data } = await queryAllDataSourceSet();
-      //   if (code != "200") return;
-      //   this.sourceList = data;
-
+      this.getDataSourceList(type);
       this.dialogFormVisible = true;
       this.tabsActiveName = "first";
       this.testMassageCode = null;
-      if (!isAdd) {
-        this.updataDisabled = true;
-        this.dialogFormVisibleTitle = "编辑数据集";
-        // dataSetPreview(row).then(data => {
-        const data = {
-          "code": "200",
-          "message": "操作成功",
-          "args": null,
-          "data": {
-            "id": 72,
-            "createBy": "admin",
-            "createByView": null,
-            "createTime": "2021-08-27 13:48:33",
-            "updateBy": "admin",
-            "updateByView": null,
-            "updateTime": "2021-08-27 13:48:33",
-            "version": 1,
-            "setCode": "compare_ajreport",
-            "setName": "柱状对比图示例数据",
-            "setDesc": "",
-            "setType": "sql",
-            "sourceCode": "mysql_ajreport",
-            "dynSentence": "SELECT time,type,nums from aj_report_comparestack",
-            "caseResult": "[{\"time\":\"2021-08-23\",\"type\":\"成功\",\"nums\":12},{\"time\":\"2021-08-23\",\"type\":\"失败\",\"nums\":1},{\"time\":\"2021-08-24\",\"type\":\"成功\",\"nums\":24},{\"time\":\"2021-08-24\",\"type\":\"失败\",\"nums\":5},{\"time\":\"2021-08-25\",\"type\":\"成功\",\"nums\":13},{\"time\":\"2021-08-25\",\"type\":\"失败\",\"nums\":8},{\"time\":\"2021-08-26\",\"type\":\"成功\",\"nums\":19},{\"time\":\"2021-08-26\",\"type\":\"失败\",\"nums\":3},{\"time\":\"2021-08-27\",\"type\":\"成功\",\"nums\":9},{\"time\":\"2021-08-27\",\"type\":\"失败\",\"nums\":15}]",
-            "enableFlag": 1,
-            "deleteFlag": 0,
-            "dataSetParamDtoList": [],
-            "dataSetTransformDtoList": [],
-            "contextData": null,
-            "setParamList": [
-              "time",
-              "type",
-              "nums"
-            ],
-            "fieldLabel": null,
-            "accessKey": "bf7e108e0631a9353ca59794e3f82bf0"
-          }
-        }
-        this.formData = data.data;
-
-        if (data.data.dataSetParamDtoList != null || data.data.dataSetParamDtoList.length > 0) {
-
-          this.tableData = data.data.dataSetParamDtoList;
-          let count = 0;
+      !isAdd ? this.refeshEdit(row) : this.refeshAdd()
+    },
+    //编辑
+    refeshEdit (row) {
+      this.updataDisabled = true;
+      this.dialogFormVisibleTitle = "编辑数据集";
+      this.tableData = [];
+      console.log(row);
+      const obj = { setCode: row.setCode };
+      getDeatilByIdReq(obj).then(res => {
+        this.formData = res.result;
+        if (res.result.dataSetParamDtoList != null || res.result.dataSetParamDtoList.length > 0) {
+          this.tableData = res.result.dataSetParamDtoList;
           this.tableData.find((value, i) => {
-
-            if (value.paramName === "pageNumber" || value.paramName === "pageSize") {
-              count++;
-            }
-            if (value.requiredFlag == 1) {
-              this.tableData[i].mandatory = true;
-            } else {
-              this.tableData[i].mandatory = false;
-            }
+            this.tableData[i].mandatory = value.requiredFlag == 1 ? true : false;
           });
-          if (count === 2) {
-            console.log('123');
-            this.isShowPagination = true;
-          } else {
-            console.log('123');
-            this.isShowPagination = false;
-            console.log(this.isShowPagination);
-          }
-
-        } else {
-          this.tableData = [];
-          this.isShowPagination = false;
-
         }
-        if (data.data.dataSetTransformDtoList !== null) {
-          this.itemFilterList = data.data.dataSetTransformDtoList;
-        } else {
-          this.itemFilterList = [];
-        }
-        this.itemFilterList.forEach((item) => {
-          if (item.transformType == "dict") {
-            const extendObj = JSON.parse(item.transformScript);
-            const extendArry = [];
-            for (const i in extendObj) {
-              const children = [];
-              for (const y in extendObj[i]) {
-                children.push({ name: y, value: extendObj[i][y] });
-              }
-              extendArry.push({ name: i, children: children });
-            }
-            this.tableData2 = extendArry;
-          }
-        });
-        // });
-      } else {
-        this.dialogFormVisibleTitle = "新增数据集";
-        this.updataDisabled = false;
-        this.formData = {
-          setName: "",
-          setCode: "",
-          setDesc: "",
-          sourceCode: "",
-          dynSentence: ""
-        };
-        this.tableData = [];
-        this.itemFilterList = [];
-        this.isShowPagination = false;
-      }
+      });
+    },
+
+    //新增
+    refeshAdd () {
+      this.dialogFormVisibleTitle = "新增数据集";
+      this.updataDisabled = false;
+      this.tableData = [];
+      this.formData = {
+        setName: "",
+        setCode: "",
+        setDesc: "",
+        sourceCode: "",
+        dynSentence: "",
+        enabled: 1
+      };
+
+    },
+    //获取数据源下拉框
+    getDataSourceList (type) {
+      const obj = { sourceType: type }
+      getAllDatasourceReq(obj).then(res => {
+        const { code, result } = res;
+        if (code !== 200) return;
+        this.sourceList = result;
+      });
     },
     // 关闭模态框
     closeDialog () {
       this.$emit("handleClose");
     },
-    handleClose () {
-      this.dialogFormVisible = false;
-    },
-    isShowCaseResult (item) {
-      this.dialogCaseResult = true;
-      this.caseResultTitle = item.setName;
-      this.caseResultContent = JSON.parse(item.caseResult);
-    },
 
     // 测试预览
     async handleClickTabs (tab) {
-      if (this.setType == "http") {
-        //针对http数据源
-        console.log("http数据集" + this.httpForm);
-        this.formData.dynSentence = JSON.stringify(this.httpForm);
-      }
-      if (tab.paneName == "third") {
-        const params = {
-          sourceCode: this.formData.sourceCode,
-          dynSentence: this.formData.dynSentence,
-          dataSetParamDtoList: this.tableData,
-          dataSetTransformDtoList: this.itemFilterList,
-          setType: this.setType
-        };
-        const { code, data } = await testTransformSet(params);
-        if (code != "200") return;
-        this.cols = data.data;
-        this.testMassageCode = code;
-      }
-    },
-    // 必选
-    Mandatory (val) {
-      if (!this.tableData[val].mandatory) {
-        this.tableData[val].requiredFlag = 0;
-      } else {
-        this.tableData[val].requiredFlag = 1;
-      }
-    },
-    // 分页参数增加列
-    changePagination () {
-      if (this.isShowPagination) {
-        this.tableData.push(
-          {
-            paramName: "pageNumber",
-            paramDesc: "当前页",
-            paramType: "int",
-            sampleItem: "1",
-            mandatory: true,
-            requiredFlag: 1,
-            validationRules: `function verification(data){\n\t//自定义脚本内容\n\treturn true;\n}`
-          },
-          {
-            paramName: "pageSize",
-            paramDesc: "条数",
-            paramType: "int",
-            sampleItem: "10",
-            mandatory: true,
-            requiredFlag: 1,
-            validationRules: `function verification(data){\n\t//自定义脚本内容\n\treturn true;\n}`
+      //   if (this.setType == "http") {
+      //     //针对http数据源
+      //     console.log("http数据集" + this.httpForm);
+      //     this.formData.dynSentence = JSON.stringify(this.httpForm);
+      //   }
+      if (tab == "third") {
+        this.$refs.form.validate(async (valid) => {
+          if (valid) {
+            const params = {
+              sourceCode: this.formData.sourceCode,
+              dynSentence: this.formData.dynSentence,
+              dataSetParamDtoList: this.tableData,
+              dataSetTransformDtoList: [],
+              setType: this.setType
+            };
+            const { code, message } = await testTransformSet(params);
+            console.log(code);
+            if (code != 200) {
+              this.$Message.error(message);
+              return;
+            };
+            this.cols = JSON.parse(message);
+            this.testMassageCode = code;
           }
-        );
-      } else {
-        this.tableData.forEach((item, i) => {
-          if (item.paramName == "pageSize" || item.paramName == "pageNumber") {
-            this.tableData.splice(i, 2);
-          }
-        });
+        })
       }
     },
-    // js 脚本编辑
-    async filterScriptBtn (item) {
-      console.log(item);
-      this.isItemFilterType = item;
-      this.dialogSwitchVisible = true;
-      if (item.transformType == "js") {
-        this.itemFilterScriptId = item.itemFilterSort;
-        const fnCont = `function dataTransform(data){\n\t//自定义脚本内容\n\treturn data;\n}`;
-        this.transformScript = item.transformScript
-          ? item.transformScript
-          : fnCont;
-      } else if (item.transformType == "dict") {
-        // this.dialogTitle = '字典翻译'
-        // this.itemFilterScriptId = item.itemFilterSort
-        // const { code, data } = await getDictList('TRANSFORM_TYPE')
-        // if (code != '200') return
-        // const extend = data.find(function (y) {
-        //   if (y.id == item.transformType) {
-        //     return y
-        //   }
-        // })
-        // const extendArry = []
-        // const extendObj = JSON.parse(extend.extend)
-        // for (const i in extendObj) {
-        //   const children = []
-        //   for (const y in extendObj[i]) {
-        //     children.push({ name: y, value: extendObj[i][y] })
-        //   }
-        //   extendArry.push({ name: i, children: children })
-        // }
-        // this.tableData2 = extendArry
-      }
-    },
-    // js 脚本编辑确定
-    filterScriptConfirm () {
-      const arr = this.toObject(this.tableData2);
-      this.itemFilterList.forEach((el) => {
-        if (el.transformType == "dict") {
-          el.transformScript = JSON.stringify(arr);
-        } else {
-          el.transformScript = this.transformScript;
-        }
-      });
-      this.dialogSwitchVisible = false;
-    },
-    addFilter () {
-      let obj = {};
-      this.tableData2 = [];
-      if (this.itemFilterList.length == 0) {
-        obj = {
-          transformType: "",
-          transformScript: "",
-          itemFilterSort: 1
-        };
-      } else {
-        obj = {
-          transformType: "",
-          transformScript: "",
-          itemFilterSort: this.itemFilterList.length + 1
-        };
-      }
-      this.itemFilterList.push(obj);
-    },
-    // 删除filter
-    reduceFilter (item) {
-      if (this.itemFilterList.length > 0) {
-        let index = this.itemFilterList.indexOf(item);
-        if (index > -1) {
-          this.itemFilterList.splice(index, 1);
-        }
-      }
-    },
+
     // --查询参数-----------------///////////////////////////////////////////////////////////////////////
     permissionClick (row) {
       this.title = "自定义高级规则";
@@ -661,52 +340,35 @@ export default {
           ? row.validationRules
           : fnCont;
       }
-      this.dialogPermissionVisible = true;
+      this.$nextTick(() => {
+        this.dialogPermissionVisible = true;
+      })
     },
     dialogValidationRules () {
       this.isRowData.validationRules = this.validationRules;
       this.dialogPermissionVisible = false;
     },
-    // 字典项 增删改
-    addAllDict () {
-      this.tableData2.push({
-        name: "",
-        children: [{ name: "", value: "" }]
-      });
-    },
-    addDict (index, item) {
-      item.push({ name: "", value: "" });
-    },
-    delAllDict (index, rows) {
-      rows.splice(index, 1);
-    },
-    delDict (index, rows) {
-      if (index == 0) {
-        this.$message.error("至少保留一条");
-        return;
-      }
-      rows.splice(index, 1);
-    },
-    // -------------------------------------------------------------------------------
-    // 数据源下拉切换
-    changeSource () { },
     // 自定义高级规则
     async testResultset () {
       this.isRowData.validationRules = this.validationRules;
-      const { code, message, data } = await verificationSet(this.isRowData);
-      if (code == "200") {
-        if (data) {
-          this.$message.success("返回结果：" + data);
-        } else {
-          this.$message.warning("当前示例值校验不通过");
-        }
-      } else {
-        this.$message.error(message);
-      }
+      //   const { code, message, data } = await verificationSet(this.isRowData);
+      //   if (code == "200") {
+      //     if (data) {
+      //       this.$message.success("返回结果：" + data);
+      //     } else {
+      //       this.$message.warning("当前示例值校验不通过");
+      //     }
+      //   } else {
+      //     this.$message.error(message);
+      //   }
     },
     // 删除
     cutOutRow (index, rows) {
       rows.splice(index, 1);
+    },
+    // 必选
+    Mandatory (val) {
+      this.tableData[val].requiredFlag = !this.tableData[val].mandatory ? 0 : 1;
     },
     // 追加
     addRow () {
@@ -722,11 +384,6 @@ export default {
       console.log(this.tableData);
     },
     async submit (formName) {
-      if (this.setType == "http") {
-        //针对http数据源
-        console.log("http数据集" + this.httpForm);
-        this.formData.dynSentence = JSON.stringify(this.httpForm);
-      }
       this.formData.setType = this.setType;
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
@@ -734,41 +391,19 @@ export default {
             this.formData.dataSetParamDtoList = this.tableData;
             this.formData.dataSetTransformDtoList = this.itemFilterList;
             this.formData.caseResult = JSON.stringify(this.cols);
-            if (this.dialogFormVisibleTitle === "新增数据集") {
-              const { code } = await addDataSet(this.formData);
-              if (code != "200") return;
-              this.$emit("refreshList");
-              this.closeDialog();
-            } else {
-              const { code } = await editDataSet(this.formData);
-              if (code != "200") return;
-              this.$emit("refreshList");
-              this.closeDialog();
-            }
+            const requestApi = this.isAdd ? insertDatacollectReq : modifyDatacollectReq;
+            const { code } = await requestApi(this.formData);
+            if (code != 200) return;
+            this.$Message.success("提交成功！");
+            this.$emit("refreshList");
+            this.closeDialog();
           } else {
-            this.$message.error("请先测试预览，操作成功后便可保存！");
+            this.$Message.error("请先测试预览，操作成功后便可保存！");
             return;
           }
-        } else {
-          return;
         }
       });
     },
-    toObject (val) {
-      const objfirst = {};
-      const objSecond = {};
-      val.forEach(el => {
-        el.name ? (objfirst[el.name] = el.children) : "";
-      });
-      for (const key in objfirst) {
-        const newObj = {};
-        objfirst[key].map(ev => {
-          Object.assign(newObj, { [ev.name]: ev.value });
-        });
-        objSecond[key] = newObj;
-      }
-      return objSecond;
-    }
   }
 };
 </script>

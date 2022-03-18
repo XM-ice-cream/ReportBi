@@ -69,6 +69,18 @@
           </FormItem>
           </Col>
         </Row>
+        <!-- 是否有效 -->
+        <Row>
+          <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+          <!-- 是否有效 -->
+          <FormItem :label="$t('enabled')" prop="enabled">
+            <i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+              <span slot="open">{{ $t("open") }}</span>
+              <span slot="close">{{ $t("close") }}</span>
+            </i-switch>
+          </FormItem>
+          </Col>
+        </Row>
       </Form>
       <!-- 按钮 -->
       <div slot="footer">
@@ -118,7 +130,7 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-select="selectClick"></Table>
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick"></Table>
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
@@ -126,7 +138,7 @@
 </template>
 
 <script>
-import { getpagelistReq, insertDataSourceReq, deleteDataSourceReq, modifyDataSourceReq, testConnection } from "@/api/bill-design-manage/datasource.js";
+import { getpagelistReq, insertDataSourceReq, deleteDataSourceReq, modifyDataSourceReq, testConnection } from "@/api/bill-design-manage/data-source.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
 
@@ -153,7 +165,8 @@ export default {
         httpAddress: "",
         httpWay: "POST",
         httpHeader: '{"Content-Type":"application/json;charset=UTF-8"}',
-        httpBody: ""
+        httpBody: "",
+        enabled: 1
       },
       drawerFlag: false,
       req: {
@@ -285,10 +298,15 @@ export default {
     },
     //删除
     deleteClick () {
+      const deleteData = this.selectArr.length > 0 ? this.selectArr : (this.selectObj ? [{ ...this.selectObj }] : []);
+      if (deleteData.length == 0) {
+        this.$Message.error('无选中删除数据');
+        return;
+      }
       this.$Modal.confirm({
         title: "确认要删除该数据吗?",
         onOk: () => {
-          const deleteArr = this.selectArr.map(o => o.sourceCode);
+          const deleteArr = deleteData.map(o => o.sourceCode);
           deleteDataSourceReq({ sourceCode: deleteArr }).then(res => {
             if (res.code === 200) {
               this.$Message.success("删除成功");

@@ -1576,9 +1576,8 @@ export default {
     httpHeader: '请求头',
     httpBody: '请求体',
     // 数据集
-    dataSetCode: '数据集编码',
-    dataSetName: '数据集名称',
-    dataSetType: '数据集类型',
+    setCode: '数据集编码',
+    setName: '数据集名称',
     dataSource: '数据源',
     dataSetDesc: '描述',
     sourceType: '数据集类型',

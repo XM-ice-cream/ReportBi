@@ -103,7 +103,7 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-select="selectClick">
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick">
           <template slot='operator' slot-scope="{row}">
             <Button type="primary" class="tableBtn" @click="design(row)">设计</Button>&nbsp;
             <Button type="primary" class="tableBtn" @click="preview(row)">预览</Button>
