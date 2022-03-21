@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="false" v-model="visib" fullscreen>
+    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :before-close="closeDialog">
       <Form ref="form" :model="formData" :rules="ruleValidate" :label-width="130">
         <Row :gutter="10">
           <Col :xs="24" :sm="20" :md="8" :lg="8" :xl="8">
@@ -102,7 +102,7 @@
         <Button type="primary" @click="submit('form')">保存</Button>
       </div>
     </Modal>
-    <Modal :title="title" v-model="dialogPermissionVisible" :mask-closable="false" :closable="false" width="60%">
+    <Modal :title="title" v-model="dialogPermissionVisible" :mask-closable="false" :closable="true" width="60%">
       <div class="codemirror">
         <!-- //自定义高级规则？ -->
         <monaco-editor v-model.trim="validationRules" language="javascript" style="height: 500px" v-if="dialogPermissionVisible" />
@@ -235,7 +235,8 @@ export default {
       }, {
         sourceName: '布尔',
         sourceCode: 'Boolean'
-      }]
+      }],
+      isAdd: true,
     };
   },
   methods: {
@@ -243,6 +244,7 @@ export default {
     addOrEditDataSet (row, type, isAdd) {
       console.log(row, type, isAdd);
       this.setType = type;
+      this.isAdd = isAdd;
       //   if (type == "http" && row.dynSentence) {
       //     this.httpForm = JSON.parse(row.dynSentence);
       //   }
@@ -297,7 +299,7 @@ export default {
     },
     // 关闭模态框
     closeDialog () {
-      this.$emit("handleClose");
+      this.$emit("update:visib", false);
     },
 
     // 测试预览

@@ -2,7 +2,7 @@
 <template>
   <div class="page-style">
     <!-- 左侧抽屉 -->
-    <Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="false">
+    <Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true" :before-close="cancelClick">
       <Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
         <Row :gutter="10">
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -113,7 +113,8 @@
       </Card>
     </div>
 
-    <excelreport-design :visib.sync="excelVisib" :reportData="{}" />
+    <excelreport-design :visib.sync="excelVisib" :reportCode.sync="selectObj.reportCode" />
+    <excelreport-preview :visib.sync="previewVisib" :reportCode.sync="selectObj.reportCode" />
   </div>
 </template>
 
@@ -121,8 +122,9 @@
 import { getpagelistReq, insertReportReq, deleteReportReq, modifyReportReq } from "@/api/bill-design-manage/report-manage.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import excelreportDesign from './report-manage/excelreport-design.vue';
+import ExcelreportPreview from './report-manage/excelreport-preview.vue';
 export default {
-  components: { excelreportDesign },
+  components: { excelreportDesign, ExcelreportPreview },
   name: "report-manage",
   data () {
     return {
@@ -133,7 +135,7 @@ export default {
       drawerTitle: this.$t("add"),
       btnData: [],
       isAdd: true,
-      selectObj: null,//表格选中
+      selectObj: {},//表格选中
       selectArr: [],//表格多选
       reportTypeList: [{ detailValue: 'excel', detailName: 'excel报表' }, { detailValue: 'largescreen', detailName: '大屏报表' }],
       submitData: {
@@ -195,6 +197,7 @@ export default {
         ],
       },
       excelVisib: false,
+      previewVisib: false
     };
   },
   activated () {
@@ -277,10 +280,15 @@ export default {
     },
     //删除
     deleteClick () {
+      const deleteData = this.selectArr.length > 0 ? this.selectArr : (this.selectObj ? [{ ...this.selectObj }] : []);
+      if (deleteData.length == 0) {
+        this.$Message.error('无选中删除数据');
+        return;
+      }
       this.$Modal.confirm({
         title: "确认要删除该数据吗?",
         onOk: () => {
-          const deleteArr = this.selectArr.map(o => o.reportCode);
+          const deleteArr = deleteData.map(o => o.reportCode);
           deleteReportReq(deleteArr).then(res => {
             if (res.code === 200) {
               this.$Message.success("删除成功");
@@ -308,11 +316,17 @@ export default {
     },
     //设计
     design (data) {
-      if (data.reportType === 'excel') this.excelVisib = true;
+      if (data.reportType === 'excel') {
+        this.excelVisib = true;
+        this.selectObj = { ...data };
+      };
     },
     // 预览
-    preview () {
-
+    preview (data) {
+      if (data.reportType === 'excel') {
+        this.previewVisib = true;
+        this.selectObj = { ...data };
+      }
     },
     // 自动改变表格高度
     autoSize () {
