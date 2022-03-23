@@ -3,13 +3,7 @@
   <div class="page-style">
     <div class="comment">
       <Card :bordered="false" dis-hover class="card-style">
-        <Form
-            ref="submitReq"
-            :model="req"
-            :label-width="150"
-            :label-colon="false"
-            :rules="ruleValidate"
-        >
+        <Form ref="submitReq" :model="req" :label-width="150" :label-colon="false" :rules="ruleValidate">
           <Row>
             <i-col span="24" style="margin-top:120px;text-align: center">
               <div class="state-content">
@@ -19,13 +13,7 @@
             </i-col>
             <i-col span="14" style="margin:50px auto 0 auto;">
               <FormItem :label="$t('bigBoardCode')" prop="barcode">
-                <Input
-                    ref="barcode"
-                    size="large"
-                    v-model.trim="req.barcode"
-                    @keyup.native.enter="searchClick"
-                    :placeholder="$t('pleaseEnter') + $t('bigBoardCode')"
-                />
+                <Input ref="barcode" size="large" v-model.trim="req.barcode" @keyup.native.enter="searchClick" :placeholder="$t('pleaseEnter') + $t('bigBoardCode')" />
               </FormItem>
             </i-col>
           </Row>
@@ -36,13 +24,13 @@
 </template>
 
 <script>
-import {getisfutureholdReq} from "@/api/bill-manage/future-hold-query";
-import {inputSelectContent} from "@/libs/tools";
-import {playSound} from "@/libs/tools";
+import { getisfutureholdReq } from "@/api/bill-manage/future-hold-query";
+import { inputSelectContent } from "@/libs/tools";
+import { playSound } from "@/libs/tools";
 
 export default {
   name: "future-hold-query",
-  data() {
+  data () {
     return {
       state: "",
       req: {
@@ -62,11 +50,11 @@ export default {
   },
   methods: {
     // 查询
-    searchClick() {
+    searchClick () {
       this.state = "";
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
-          getisfutureholdReq({panelno: this.req.barcode}).then((res) => {
+          getisfutureholdReq({ panelno: this.req.barcode }).then((res) => {
             if (res.code === 200) {
               if (res.message === "OK") {
                 this.state = "ng";
@@ -84,7 +72,7 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-/deep/ .ivu-form-item-label {
+/deep/ .ivu-FormItem-label {
   line-height: 32px;
   font-size: 24px;
 }

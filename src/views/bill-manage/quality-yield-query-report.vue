@@ -156,9 +156,7 @@
         <TabPane label="产出" name="tab7" :index="7" v-if="tab7">
           <TabTable ref="tab7" />
         </TabPane>
-        <!-- <TabPane label="质量良率看板" name="tab8" :index="8" :closable="false" v-if="tab8"> -->
-        <TabKanban />
-        <!-- </TabPane> -->
+        <!-- <TabKanban /> -->
       </Tabs>
     </div>
   </div>
@@ -170,10 +168,9 @@ import { workerPageListUrl } from "@/api/material-manager/order-info";
 import { formatDate, getButtonBoolean, commaSplitString } from "@/libs/tools";
 import TabTable from "./quality-yield-query-report/tabTable.vue";
 import { exportFile } from "@/libs/tools";
-import TabKanban from './quality-yield-query-report/tabKanban.vue';
 
 export default {
-  components: { TabTable, TabKanban },
+  components: { TabTable },
   name: "quality-yield-query-report",
   data () {
     return {

@@ -67,7 +67,7 @@ export const getDeatilByIdReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
-        url: '/api/autoreportcenter/anonymous/v1/datacollect/getdetailbysetid',
+        url: '/api/autoreportcenter/anonymous/v1/datacollect/getdetailbysetcode',
         method: 'post',
         data
     })

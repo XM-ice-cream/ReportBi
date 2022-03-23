@@ -58,9 +58,9 @@
       </Card>
     </div>
     <!-- 数据预览 -->
-    <data-view ref="DataView" :visib="dialogCaseResult" @handleClose="dialogCaseResult = false" />
+    <data-view ref="DataView" :visib.sync="dialogCaseResult" />
     <!-- 新增编辑组件 -->
-    <edit-view-set ref="EditDataSet" :dataSet="dataSet" :visib="dialogVisibleSetDataSet" @handleClose="dialogVisibleSetDataSet = false" @refreshList="pageLoad" />
+    <edit-view-set ref="EditDataSet" :dataSet="dataSet" :visib.sync="dialogVisibleSetDataSet" @refreshList="pageLoad" />
   </div>
 </template>
 

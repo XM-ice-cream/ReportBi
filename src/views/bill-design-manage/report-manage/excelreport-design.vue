@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="false" v-model="visib" fullscreen :z-index='800'>
+    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='900' :before-close="closeDialog">
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
@@ -14,8 +14,8 @@
             <!-- DBlist -->
             <div class="dblist">
               <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs" v-model="activeNames">
-                <Panel name="1">
-                  {{item.name}}
+                <Panel :name="item.setCode">
+                  {{item.setName}}
                   <div slot="content">
                     <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
                       <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
@@ -67,21 +67,24 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <Button @click="closeDialog">取消</Button>
-        <Button type="primary" @click="commit()">保存</Button>
+        <Button type="primary" @click="save()">保存</Button>
       </div>
     </Modal>
 
-    //数据集管理弹框--表格
-    <Modal title="数据集管理" v-model="outerVisible" style="width:800px" :z-index='801'>
-      <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='500' tooltip-effect="dark" @on-select="handleSelectionChange"></Table>
+    <!-- 数据集管理弹框--表格 -->
+    <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='901'>
+      <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='500' tooltip-effect="dark" @on-selection-change="handleSelectionChange"></Table>
+      <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       <div slot="footer" class="dialog-footer">
         <Button @click="outerVisible = false">取 消</Button>
-        <Button type="primary" @click="checkDataSet()">确定 </Button>
+        <Button type="primary" @click="checkDataSet">确定 </Button>
       </div>
     </Modal>
   </div>
 </template>
 <script>
+import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
+import { getExcelByReportcodeReq, insertExcelReportReq, modifyExcelReportReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
 export default {
   name: "excelreport-design",
@@ -92,20 +95,18 @@ export default {
       type: Boolean,
       default: false
     },
-    reportData: {
+    reportCode: {
       required: false,
-      type: Object,
-      default: () => {
-        return "";
-      }
+      type: String,
     }
   },
   watch: {
     visib () {
-      console.log(this.visib);
       if (this.visib) {
-        console.log(34);
-        this.design();
+        this.$nextTick(() => {
+          console.log(this.reportCode);
+          this.design();
+        })
       }
     }
   },
@@ -113,662 +114,19 @@ export default {
     return {
       dialogFormVisibleTitle: '报表EXCEL 设计',
       formData: {},
-      dataSet: [{ name: '123', setCode: '123', setParamList: ['startTime', 'endTime'] }],
+      dataSet: [],
       activeNames: ["1"],
       activeName: "first",
       outerVisible: false,
-      dataSetData: [
-        {
-          "id": 84,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "HTTP01",
-          "setName": "HTTP01",
-          "setDesc": "HTTP01",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 82,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "SADFSDAF",
-          "setName": "ASFSFD修改",
-          "setDesc": "SAFAFSDFS修改",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 83,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "QQQQQ",
-          "setName": "DB01",
-          "setDesc": "DB01",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 81,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "aasdf",
-          "setName": "sdfsaf",
-          "setDesc": "sdfasf",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 80,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "DB01Collect02",
-          "setName": "DB01Collect02",
-          "setDesc": "DB01Collect02",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 79,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "DB01Collect01",
-          "setName": "DB01Collect01",
-          "setDesc": "DB01Collect01",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 78,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "022802",
-          "setName": "022802",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 77,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "022801",
-          "setName": "022801",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 76,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "0228",
-          "setName": "0228",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 75,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "111",
-          "setName": "111",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 74,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "009",
-          "setName": "流程卡",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 73,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "003",
-          "setName": "bigdata_travel",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 72,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "compare_ajreport",
-          "setName": "柱状对比图示例数据",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 71,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "barstack_ajreport",
-          "setName": "柱状堆叠数据",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 70,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "per",
-          "setName": "百分比",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 69,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "logis_table",
-          "setName": "表格测试",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 68,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "logis_3",
-          "setName": "收发车情况",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 67,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "logis_2",
-          "setName": "收车量",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 66,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "logis_1",
-          "setName": "库存",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 65,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "amount_1",
-          "setName": "amount1",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 62,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "acc_ajrt",
-          "setName": "访问-系统RT",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 64,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "acc_ajerror",
-          "setName": "访问-系统ERROR",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 63,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "acc_ajqps",
-          "setName": "访问-系统QPS",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 60,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "acc_ajacc",
-          "setName": "访问-访问人数趋势",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 61,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "acc_ajregister",
-          "setName": "访问-注册人数趋势",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 59,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "car_ajreturn",
-          "setName": "汽车-退货",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 58,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "car_ajrework",
-          "setName": "汽车-返修",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 57,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "car_ajunsale",
-          "setName": "汽车-滞销",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 56,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "car_ajsaleTop5",
-          "setName": "汽车-销售TOP5",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 55,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "car_ajproTop5",
-          "setName": "汽车-生产TOP5",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 54,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "car_ajsale",
-          "setName": "汽车-销售趋势",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 53,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "car_ajpro",
-          "setName": "汽车-生产趋势",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 48,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "log_ajattack",
-          "setName": "日志-攻击占比",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 52,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "log_ajwifiamount",
-          "setName": "日志-wifi登陆趋势",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 51,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "log_ajmailfail",
-          "setName": "日志-邮件认证失败趋势",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 50,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "log_ajmailfailtop5",
-          "setName": "日志-邮件认证失败top5",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 47,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "log_ajfireacl",
-          "setName": "日志-防火墙ACL次数",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        },
-        {
-          "id": 46,
-          "createBy": null,
-          "createTime": null,
-          "updateBy": null,
-          "updateTime": null,
-          "version": null,
-          "setCode": "log_ajdevices",
-          "setName": "日志-资产统计",
-          "setDesc": "",
-          "setType": null,
-          "sourceCode": null,
-          "dynSentence": null,
-          "caseResult": null,
-          "enableFlag": null,
-          "deleteFlag": null
-        }
-      ],
+      dataSetData: [],
       setCode: '',
       selectArr: [],
       draggableFieldLabel: '',//拖拽的文本内容
       sheetData: '',
+      tableConfig: { ...this.$config.tableConfig }, // table配置
+      req: {
+        ...this.$config.pageConfig,
+      },
       rightForm: {
         coordinate: "",
         value: "",
@@ -789,64 +147,42 @@ export default {
         { title: '数据集名称', key: "setName", align: "center", tooltip: true, width: '120' },
         { title: '数据集描述', key: "setDesc", align: "center", tooltip: true, width: '180' },
         { title: '数据集编码', key: "setCode", align: "center", tooltip: true }
-      ]
+      ],
+      reportExcelDto: {
+        id: null,
+        jsonStr: "",
+        setCodes: "",
+        setParam: "",
+        reportCode: ""
+      },
 
     };
   },
   methods: {
-    commit () {
-
-    },
     //初始化显示第一条
     design () {
-      console.log('1233');
       // 根据reportCode获取单条报表
-      //   const { code, data } = await detailByReportCode(this.reportCode);
-      const result = {
-        "code": "200",
-        "message": "操作成功",
-        "args": null,
-        "data": {
-          "id": 231,
-          "createBy": "admin",
-          "createByView": null,
-          "createTime": "2022-02-28 10:17:51",
-          "updateBy": "admin",
-          "updateByView": null,
-          "updateTime": "2022-03-07 19:46:42",
-          "version": 13,
-          "reportName": null,
-          "reportCode": "022802",
-          "setCodes": "022802",
-          "reportGroup": null,
-          "setParam": "{\"022802\":{\"startTime\":\"2021-12-30\",\"endTime\":\"2021-12-31\"}}",
-          "jsonStr": "[{\"index\":\"Sheet_Wm05l77i4lKe_1646014654853\",\"status\":1,\"jfgird_select_save\":[],\"luckysheet_select_save\":[{\"left\":771,\"width\":73,\"top\":0,\"height\":19,\"left_move\":771,\"width_move\":73,\"top_move\":0,\"height_move\":19,\"row\":[0,0],\"column\":[6,6],\"row_focus\":0,\"column_focus\":6}],\"data\":[[{\"m\":\"partname\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"partname\",\"bg\":\"#6fa8dc\"},{\"m\":\"trackouttime\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"trackouttime\",\"bg\":\"#6fa8dc\"},{\"m\":\"stepnam\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"stepnam\",\"bg\":\"#6fa8dc\"},{\"m\":\"opid\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"opid\",\"bg\":\"#6fa8dc\"},{\"m\":\"rulenam\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"rulenam\",\"bg\":\"#6fa8dc\"},{\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"m\":\"linename\",\"v\":\"linename\",\"bg\":\"#3d85c6\"},{\"ct\":{\"fa\":\"@\",\"t\":\"s\"}},null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[{\"m\":\"#{022802.partname}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.partname}\"},{\"m\":\"#{022802.trackouttime}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.trackouttime}\"},{\"m\":\"#{022802.stepname}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.stepname}\"},{\"m\":\"#{022802.opid}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.opid}\"},{\"m\":\"#{022802.rulename}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.rulename}\"},{\"m\":\"#{022802.linename}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.linename}\"},{\"m\":\"#{022802.status}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.status}\"},null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]],\"config\":{\"columnlen\":{\"0\":120,\"1\":157,\"2\":141,\"3\":140,\"4\":134},\"customWidth\":{\"0\":1,\"1\":1,\"2\":1,\"3\":1,\"4\":1},\"merge\":{}},\"visibledatarow\":[20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,440,460,480,500,520,540,560,580,600,620,640,660,680,700,720,740,760,780,800,820,840,860,880,900,920,940,960,980,1000,1020,1040,1060,1080,1100,1120,1140,1160,1180,1200,1220,1240,1260,1280,1300,1320,1340,1360,1380,1400,1420,1440,1460,1480,1500,1520,1540,1560,1580,1600,1620,1640,1660,1680],\"visibledatacolumn\":[121,279,421,562,697,771,845,919,993,1067,1141,1215,1289,1363,1437,1511,1585,1659,1733,1807,1881,1955,2029,2103,2177,2251,2325,2399,2473,2547,2621,2695,2769,2843,2917,2991,3065,3139,3213,3287,3361,3435,3509,3583,3657,3731,3805,3879,3953,4027,4101,4175,4249,4323,4397,4471,4545,4619,4693,4767],\"ch_width\":4887,\"rh_height\":1760,\"luckysheet_selection_range\":[{\"row\":[0,0],\"column\":[4,4]}],\"zoomRatio\":1,\"celldata\":[{\"r\":0,\"c\":0,\"v\":{\"m\":\"partname\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"partname\",\"bg\":\"#6fa8dc\"}},{\"r\":0,\"c\":1,\"v\":{\"m\":\"trackouttime\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"trackouttime\",\"bg\":\"#6fa8dc\"}},{\"r\":0,\"c\":2,\"v\":{\"m\":\"stepnam\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"stepnam\",\"bg\":\"#6fa8dc\"}},{\"r\":0,\"c\":3,\"v\":{\"m\":\"opid\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"opid\",\"bg\":\"#6fa8dc\"}},{\"r\":0,\"c\":4,\"v\":{\"m\":\"rulenam\",\"ct\":{\"fa\":\"General\",\"t\":\"g\"},\"v\":\"rulenam\",\"bg\":\"#6fa8dc\"}},{\"r\":0,\"c\":5,\"v\":{\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"m\":\"linename\",\"v\":\"linename\",\"bg\":\"#3d85c6\"}},{\"r\":0,\"c\":6,\"v\":{\"ct\":{\"fa\":\"@\",\"t\":\"s\"}}},{\"r\":1,\"c\":0,\"v\":{\"m\":\"#{022802.partname}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.partname}\"}},{\"r\":1,\"c\":1,\"v\":{\"m\":\"#{022802.trackouttime}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.trackouttime}\"}},{\"r\":1,\"c\":2,\"v\":{\"m\":\"#{022802.stepname}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.stepname}\"}},{\"r\":1,\"c\":3,\"v\":{\"m\":\"#{022802.opid}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.opid}\"}},{\"r\":1,\"c\":4,\"v\":{\"m\":\"#{022802.rulename}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.rulename}\"}},{\"r\":1,\"c\":5,\"v\":{\"m\":\"#{022802.linename}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.linename}\"}},{\"r\":1,\"c\":6,\"v\":{\"m\":\"#{022802.status}\",\"ct\":{\"fa\":\"@\",\"t\":\"s\"},\"v\":\"#{022802.status}\"}}],\"images\":{},\"scrollLeft\":0,\"scrollTop\":0,\"luckysheet_conditionformat_save\":[],\"dataVerification\":{},\"frozen\":{\"type\":\"row\"},\"dynamicArray\":[]}]",
-          "reportType": null,
-          "total": 0,
-          "exportType": null,
-          "accessKey": "4b574eaccaf8041a0fc0c011138cd182"
+      getExcelByReportcodeReq({ reportCode: this.reportCode }).then(res => {
+        if (res.code === 200) {
+
+          const { result } = res;
+
+          if (result != null) {
+            this.reportId = result.reportCode;
+          }
+          this.sheetData = result == null ? [{}] : JSON.parse(result.jsonStr);
+          this.createSheet();
+          if (result != null) {
+            if (result.setCodes != null && result.setCodes !== "") {
+              let dataSetList = result.setCodes.split("|");
+              dataSetList.forEach(code => {
+                this.detail(code);
+              });
+            }
+          }
         }
-      }
-      const { code, data } = result;
-      console.log(code);
-      if (data != null) {
-        this.reportId = data.id;
-      }
-      this.sheetData = data == null ? [{}] : JSON.parse(data.jsonStr);
-      console.log(this.sheetData);
-      this.createSheet();
-      if (data != null) {
-        if (data.setCodes != null && data.setCodes !== "") {
-          //   let dataSetList = data.setCodes.split("|");
-          //   dataSetList.forEach(code => {
-          //     this.dataSetData.forEach(setData => {
-          //     //   if (code === setData.setCode) {
-          //     //     this.detail(setData.id);
-          //     //   }
-          //     });
-          //   });
-        }
-      }
+      });
+
     },
     //初始化表格
     createSheet () {
@@ -859,7 +195,6 @@ export default {
         plugins: ['chart'],
         hook: {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
-            console.log(cell, postion, sheetFile, ctx);
             window.luckysheet.setCellValue(
               postion.r,
               postion.c,
@@ -867,7 +202,6 @@ export default {
             );
           },
           cellMousedown: function (cell, postion, sheetFile, ctx) {
-            console.log(sheetFile, ctx);
             //单元格点击事件
             that.rightForm.coordinate = postion.r + "," + postion.c;
             that.rightForm.r = postion.r;
@@ -944,8 +278,6 @@ export default {
       this.setCode = setCode;
       let fieldLabel = evt.item.innerText; // 列名称
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
-      console.log("evt", evt);
-      console.log("draggableFieldLabel", this.draggableFieldLabel);
     },
     autoChangeFunc (auto) {
       if (auto) {
@@ -957,6 +289,20 @@ export default {
     //查看所有数据集
     queryAllDataSet () {
       this.outerVisible = true;
+      let obj = {
+        orderField: "setCode", // 排序字段
+        ascending: true, // 是否升序
+        pageSize: this.req.pageSize, // 分页大小
+        pageIndex: this.req.pageIndex, // 当前页码
+        data: { sourceCode: "", setCode: "", setName: "" },
+      };
+      getpagelistReq(obj).then(res => {
+        if (res.code === 200) {
+          let { data, pageSize, pageIndex, total, totalPage } = res.result;
+          this.dataSetData = data || [];
+          this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+        }
+      })
     },
     //选择选中的数据集
     checkDataSet () {
@@ -965,28 +311,64 @@ export default {
         this.$Message.warning("一次最多勾选一个数据集");
         this.outerVisible = true;
       } else {
-        this.detail(this.selectArr[0].id);
+        this.detail(this.selectArr[0].setCode);
       }
     },
-    detail (id) {
-      //   const { code, data } = await detail(id);
-      //   if (code != 200) return;
-      let flag = true;
-      this.dataSet.forEach(value => {
-        if (value.setCode === data.setCode) {
-          flag = false;
+    detail (setCode) {
+      const obj = { setCode: setCode };
+      getDeatilByIdReq(obj).then(res => {
+        if (res.code === 200) {
+          const data = res.result;
+          this.dataSet.push(data);
         }
       });
-      if (flag) {
-        this.dataSet.push(data);
-      }
+
     },
     //预览
     preview () {
+      this.closeDialog();
+      this.$parent.previewVisib = true;
     },
     //保存
-    save () {
+    async save () {
+      const jsonData = luckysheet.getAllSheets();
+      for (let i = 0; i < jsonData.length; i++) {
+        //清空data数据，以celldata数据为主
+        jsonData[i]["data"] = [];
+      }
 
+      this.reportExcelDto.jsonStr = JSON.stringify(luckysheet.getAllSheets());
+      let setCodeList = [];
+      let setParams = {};
+      this.dataSet.forEach(code => {
+        setCodeList.push(code.setCode);
+        if (
+          code.dataSetParamDtoList != null &&
+          code.dataSetParamDtoList.length > 0
+        ) {
+          let dataSetParam = {};
+          code.dataSetParamDtoList.forEach(value => {
+            dataSetParam[value.paramName] = value.sampleItem;
+          });
+          setParams[code.setCode] = dataSetParam;
+        }
+      });
+
+      this.reportExcelDto.setParam = JSON.stringify(setParams);
+      this.reportExcelDto.setCodes = setCodeList.join("|");
+      this.reportExcelDto.reportCode = this.reportCode;
+      if (this.reportId == null) {
+        const { code } = await insertExcelReportReq(this.reportExcelDto);
+        if (code != 200) return;
+        this.$Message.success("保存成功");
+        this.closeDialog();
+      } else {
+        this.reportExcelDto.id = this.reportId;
+        const { code } = await modifyExcelReportReq(this.reportExcelDto);
+        if (code != 200) return;
+        this.$Message.success("更新成功");
+        this.closeDialog();
+      }
     },
     //删除多选
     handleSelectionChange (val) {
@@ -994,8 +376,20 @@ export default {
     },
     //关闭弹框
     closeDialog () {
-      this.$emit('update:visib', false)
-    }
+      this.$emit('update:visib', false);
+      this.dataSet = [];
+    },
+    // 选择第几页
+    pageChange (index) {
+      this.req.pageIndex = index;
+      this.queryAllDataSet();
+    },
+    // 选择一页有条数据
+    pageSizeChange (index) {
+      this.req.pageIndex = 1;
+      this.req.pageSize = index;
+      this.queryAllDataSet();
+    },
   },
   mounted () {
 
@@ -1003,6 +397,11 @@ export default {
   }
 };
 </script>
+<style>
+.luckysheet-input-box {
+  z-index: 1000;
+}
+</style>
 <style lang="less" scoped>
 .sider {
   width: 180px !important;
@@ -1087,5 +486,16 @@ export default {
 }
 /deep/.luckysheet {
   border-top: none;
+}
+/deep/.luckysheet-share-logo {
+  display: none;
+}
+.tableModal {
+  /deep/ .ivu-modal {
+    width: 600px !important;
+  }
+}
+/deep/ #luckysheet-row-count-show {
+  width: 1.2rem !important;
 }
 </style>

@@ -2,7 +2,7 @@
 <template>
   <div class="page-style">
     <!-- 左侧抽屉 -->
-    <Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="false">
+    <Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true" :before-close="cancelClick">
       <Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
         <Row :gutter="10">
           <Col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">

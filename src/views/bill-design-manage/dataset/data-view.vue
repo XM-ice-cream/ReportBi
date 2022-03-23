@@ -1,5 +1,5 @@
 <template>
-  <Modal :title="caseResultTitle" :mask-closable="false" :closable="false" v-model="visib" width="70%" :before-close="closeDialog">
+  <Modal :title="caseResultTitle" :mask-closable="false" :closable="true" v-model="visib" width="70%" :before-close="closeDialog">
     <vue-json-editor v-model="caseResultContent" :show-btns="false" :mode="'code'" lang="zh" class="my-editor" />
     <span slot="footer">
       <Button type="primary" @click="closeDialog">关闭</Button>
