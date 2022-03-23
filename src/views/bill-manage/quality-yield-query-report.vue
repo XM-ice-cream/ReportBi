@@ -78,7 +78,7 @@
                   </Poptip>
                 </i-col>
                 <i-col span="12">
-                  <button-custom :btnData="btnData" @on-removeCirc-click="removeCircClick" @on-retainCirc-click="retainCircClick" @on-export-click="exportClick" ></button-custom>
+                  <button-custom :btnData="btnData" @on-removeCirc-click="removeCircClick" @on-retainCirc-click="retainCircClick" @on-export-click="exportClick"></button-custom>
                 </i-col>
               </Row>
             </div>
@@ -156,6 +156,9 @@
         <TabPane label="产出" name="tab7" :index="7" v-if="tab7">
           <TabTable ref="tab7" />
         </TabPane>
+        <!-- <TabPane label="质量良率看板" name="tab8" :index="8" :closable="false" v-if="tab8"> -->
+        <TabKanban />
+        <!-- </TabPane> -->
       </Tabs>
     </div>
   </div>
@@ -167,9 +170,10 @@ import { workerPageListUrl } from "@/api/material-manager/order-info";
 import { formatDate, getButtonBoolean, commaSplitString } from "@/libs/tools";
 import TabTable from "./quality-yield-query-report/tabTable.vue";
 import { exportFile } from "@/libs/tools";
+import TabKanban from './quality-yield-query-report/tabKanban.vue';
 
 export default {
-  components: { TabTable },
+  components: { TabTable, TabKanban },
   name: "quality-yield-query-report",
   data () {
     return {
@@ -183,6 +187,7 @@ export default {
       tab5: false,
       tab6: false,
       tab7: false,
+      tab8: true,
       workerPageListUrl: workerPageListUrl(),
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
@@ -307,7 +312,7 @@ export default {
           endtime: formatDate(endTime),
           workorder: commaSplitString(workOrder).join(),
           pn,
-          linename:linename?linename.split(','):[],
+          linename: linename ? linename.split(',') : [],
           subline,
           buildtype,
           config,
@@ -336,7 +341,7 @@ export default {
           endtime: formatDate(endTime),
           workorder: commaSplitString(workOrder).join(),
           pn,
-          linename:linename?linename.split(','):[],
+          linename: linename ? linename.split(',') : [],
           subline,
           buildtype,
           config,

@@ -1567,6 +1567,29 @@ export default {
     exceedToleranceValue: '超出公差值',
     createTime: '创建时间',
     scrapReason: '报废原因',
+    //数据源
+    dataSourceCode: '数据源编码',
+    dataSourceName: '数据源名称',
+    dataSourceType: '数据源类型',
+    dataSourceDesc: '数据源描述',
+    httpAddress: '请求路径',
+    httpWay: '请求方式',
+    httpHeader: '请求头',
+    httpBody: '请求体',
+    // 数据集
+    setCode: '数据集编码',
+    setName: '数据集名称',
+    dataSource: '数据源',
+    dataSetDesc: '描述',
+    sourceType: '数据集类型',
+    //报表管理
+    reportType: '报表类型',
+    reportName: '报表名称',
+    reportCode: '报表编码',
+    reportAuthor: '制作人',
+    reportDesc: '描述',
+    operator: '操作',
+
     // <!--------------------------------Menu Name----------------------------------------->
     'error-404': '找不到页面',
     'authorize-manager': '权限管理',
@@ -1899,8 +1922,16 @@ export default {
     'boxcode-query': '箱号查询',
     'test-plan-omm': 'TestPlanOMM明细',
     'encap-fill-report': 'EncapFill报表',
+    'datasource': '数据源',
     'encap-fill-dam-detail': 'EncapFillDam明细',
     'scrap-report': '报废报表',
+    'omm-config': 'omm配置',
+    'omm-data': 'OMM数据',
+    'sn-pressure': 'SN 压力测试 看板',
+    'bill-design-manage': '报表设计',
+    'dataset': '数据集',
+    'report-manage': '报表管理',
+
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

@@ -14,7 +14,6 @@ export default {
   },
   methods: {
     initChart (data) {
-      console.log(data);
       // 基于准备好的dom，初始化echarts实例
       const snPressureChart = echarts.init(document.getElementById("snPressureChart"));
       let option = {

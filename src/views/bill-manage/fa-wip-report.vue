@@ -239,7 +239,6 @@ export default {
             workOrder, stepName, modelName, pn
           }
           getfawipdistributionReq(this.searchObj).then((res) => {
-            console.log(res);
             this.tableConfig.loading = false;
             if (res.code === 200) {
               this.data = res.result;

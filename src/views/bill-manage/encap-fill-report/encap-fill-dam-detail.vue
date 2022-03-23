@@ -25,7 +25,7 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        
+
         { title: "Line ID", key: "lineName", minWidth: 120, tooltip: true, align: "center" },
         { title: "Step Name", key: "stepName", minWidth: 120, tooltip: true, align: "center" },
         { title: "EQP ID", key: "eqpId", minWidth: 120, tooltip: true, align: "center" },
@@ -62,8 +62,6 @@ export default {
   methods: {
     // 获取分页列表数据
     pageLoad (startTime, endTime, lineName, stepName) {
-      console.log('pageLoad1', lineName);
-      console.log('pageLoad3', stepName);
       this.data = [];
       let obj = {
         orderField: "EQPID", // 排序字段

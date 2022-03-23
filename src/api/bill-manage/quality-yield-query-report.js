@@ -24,6 +24,26 @@ export const getinputsReq = data => {
         data
     })
 }
+// 看板查询LPA良率数据
+export const getLpaYieldReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: 'http://10.191.19.72:8300/' || window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/lpayieldreport/v1/lpayieldreport/getlpayield',
+        method: 'post',
+        data
+    })
+}
+// 看板查询LPA不良率数据
+export const getLpaDefeactYieldReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: 'http://10.191.19.72:8300/' || window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/lpayieldreport/v1/lpayieldreport/getlpadefectyield',
+        method: 'post',
+        data
+    })
+}
 
 // 导出
 export const exportReq = data => {
