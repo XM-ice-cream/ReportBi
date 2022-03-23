@@ -60,8 +60,8 @@
                              @on-search="searchClick"/>
                     </FormItem>
                     <!-- 彩盒数 -->
-                    <FormItem :label="$t('cartonNo')" prop="cartonno">
-                      <Input v-model.trim="req.cartonno" :placeholder="$t('pleaseEnter') + $t('cartonNo')"
+                    <FormItem :label="$t('cartonCode')" prop="cartonno">
+                      <Input v-model.trim="req.cartonno" :placeholder="$t('pleaseEnter') + $t('cartonCode')"
                              @on-search="searchClick"/>
                     </FormItem>
                     <!-- 出货单号 -->
@@ -131,7 +131,7 @@ export default {
         {title: this.$t("apn"), key: "apn", align: "center", width: 120, tooltip: true},
         {title: this.$t("config"), key: "config", align: "center", width: 90, tooltip: true},
         {title: this.$t("boxNo"), key: "boxno", align: "center", width: 160, tooltip: true},
-        {title: this.$t("cartonNo"), key: "cartonno", align: "center", width: 160, tooltip: true},
+        {title: this.$t("cartonCode"), key: "cartonno", align: "center", width: 160, tooltip: true},
         {title: this.$t("panelNo"), key: "panelno", align: "center", width: 120, tooltip: true},
         {title: this.$t("smallBoardCode56"), key: "unitiD56", align: "center", width: 150, tooltip: true},
         {title: this.$t("shippingGrade"), key: "shippinggrade", align: "center", width: 100, tooltip: true},

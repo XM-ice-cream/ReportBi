@@ -1566,6 +1566,7 @@ export default {
     exceedStandardValue: '超出标准值',
     exceedToleranceValue: '超出公差值',
     createTime: '创建时间',
+    scrapReason: '报废原因',
     // <!--------------------------------Menu Name----------------------------------------->
     'error-404': '找不到页面',
     'authorize-manager': '权限管理',
@@ -1899,6 +1900,7 @@ export default {
     'test-plan-omm': 'TestPlanOMM明细',
     'encap-fill-report': 'EncapFill报表',
     'encap-fill-dam-detail': 'EncapFillDam明细',
+    'scrap-report': '报废报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

@@ -12,6 +12,17 @@ export const getpagelistReq = data => {
   })
 }
 
+// OP50/70设备分组查询
+export const getpagelistEqpReq = data => {
+  return requestCenter({
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/encapop50report/getencapfillbyeqp',
+    method: 'post',
+    data
+  })
+}
+
 // Scrap明细查询
 export const getpagelistScrapDetailReq = data => {
   return requestCenter({
