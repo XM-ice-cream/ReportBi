@@ -16,6 +16,7 @@
 		"@fullcalendar/vue": "^5.9.0",
 		"@riophae/vue-treeselect": "^0.4.0",
 		"@zxing/library": "^0.16.3",
+		"@smallwei/avue": "^2.8.23",
 		"animate.css": "^4.1.1",
 		"axios": "^0.19.2",
 		"core-js": "^3.6.4",
@@ -45,7 +46,11 @@
 		"codemirror": "^5.58.1",
 		"vue-codemirror": "^4.0.6",
 		"monaco-editor": "^0.20.0",
-		"vuedraggable": "^2.24.1"
+		"vuedraggable": "^2.24.1",
+		"vue-ruler-tool": "^1.2.4",
+		"v-chart": "^1.0.0",
+		"vue-echarts": "^5.0.0-beta.0",
+		"element-ui": "^2.9.2"
 	},
 	"devDependencies": {
 		"@vue/cli-plugin-babel": "~4.2.0",

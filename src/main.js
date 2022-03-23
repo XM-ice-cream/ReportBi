@@ -15,7 +15,18 @@ import {
 import * as publicApi from "@/api/public";
 import '@/index.less'
 import animate from 'animate.css'
+import Avue from '@smallwei/avue';
+import '@smallwei/avue/lib/index.css';
+import ECharts from 'vue-echarts'
+// 引入elementui 部分组件
+import {
+    Input
+} from 'element-ui';
+Vue.use(Input)
+
+Vue.use(Avue);
 Vue.use(animate);
+Vue.component('v-chart', ECharts)
 
 // 注册全局组件
 Vue.use(ViewUI, {

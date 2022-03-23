@@ -112,9 +112,12 @@
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
-
+    <!-- Excel 的设计与预览 -->
     <excelreport-design :visib.sync="excelVisib" :reportCode.sync="selectObj.reportCode" />
     <excelreport-preview :visib.sync="previewVisib" :reportCode.sync="selectObj.reportCode" />
+
+    <!-- 大屏的设计与预览 -->
+    <screenreport-design :visib.sync="screenVisib" :reportCode.sync="selectObj.reportCode" />
   </div>
 </template>
 
@@ -123,8 +126,9 @@ import { getpagelistReq, insertReportReq, deleteReportReq, modifyReportReq } fro
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import excelreportDesign from './report-manage/excelreport-design.vue';
 import ExcelreportPreview from './report-manage/excelreport-preview.vue';
+import ScreenreportDesign from './report-manage/screenreport-design.vue';
 export default {
-  components: { excelreportDesign, ExcelreportPreview },
+  components: { excelreportDesign, ExcelreportPreview, ScreenreportDesign },
   name: "report-manage",
   data () {
     return {
@@ -197,7 +201,9 @@ export default {
         ],
       },
       excelVisib: false,
-      previewVisib: false
+      previewVisib: false,
+      screenVisib: false,
+      previewScreenVisib: false,
     };
   },
   activated () {
@@ -316,17 +322,24 @@ export default {
     },
     //设计
     design (data) {
+      this.selectObj = { ...data };
       if (data.reportType === 'excel') {
         this.excelVisib = true;
-        this.selectObj = { ...data };
       };
+      if (data.reportType === 'largescreen') {
+        this.screenVisib = true;
+      }
     },
     // 预览
     preview (data) {
+      this.selectObj = { ...data };
       if (data.reportType === 'excel') {
         this.previewVisib = true;
-        this.selectObj = { ...data };
       }
+      if (data.reportType === 'largescreen') {
+        this.previewScreenVisib = true;
+      }
+
     },
     // 自动改变表格高度
     autoSize () {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal title="Excel 预览" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='950' :before-close="closeDialog">
+    <Modal title="Excel 预览" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='850' :before-close="closeDialog">
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
@@ -43,8 +43,7 @@
   </div>
 </template>
 <script>
-import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
-import { getExcelByReportcodeReq, insertExcelReportReq, modifyExcelReportReq } from '@/api/bill-design-manage/report-manage.js'
+import { getExcelPreviewReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
 export default {
   name: "excelreport-preview",
@@ -56,7 +55,7 @@ export default {
       default: false
     },
     reportCode: {
-      required: true,
+      required: false,
       type: String,
     }
   },
@@ -96,36 +95,13 @@ export default {
     async preview () {
       this.excelData = {};
       this.params.reportCode = this.reportCode;
-      //   const { code, data } = await preview(this.params);
-      const { code, data } = {
-        "code": "200",
-        "message": "操作成功",
-        "args": null,
-        "data": {
-          "id": 234,
-          "createBy": "admin",
-          "createByView": null,
-          "createTime": "2022-03-21 13:40:39",
-          "updateBy": "admin",
-          "updateByView": null,
-          "updateTime": "2022-03-21 13:40:39",
-          "version": 1,
-          "reportName": "DB01",
-          "reportCode": "SADFSDAF",
-          "setCodes": "QQQQQ",
-          "reportGroup": null,
-          "setParam": "{\"QQQQQ\":{\"sourcecode\":\"DB01\"}}",
-          "jsonStr": "[{\"luckysheet_select_save\":[{\"top_move\":0,\"top\":0,\"column_focus\":0,\"left\":0,\"column\":[0,0],\"width\":73,\"left_move\":0,\"width_move\":73,\"row\":[0,0],\"row_focus\":0,\"height_move\":19,\"height\":19}],\"index\":\"Sheet_ir7eMixzM1i8_1647841175697\",\"jfgird_select_save\":[],\"rh_height\":1760,\"visibledatacolumn\":[74,148,222,296,370,444,518,592,666,740,814,888,962,1036,1110,1184,1258,1332,1406,1480,1554,1628,1702,1776,1850,1924,1998,2072,2146,2220,2294,2368,2442,2516,2590,2664,2738,2812,2886,2960,3034,3108,3182,3256,3330,3404,3478,3552,3626,3700,3774,3848,3922,3996,4070,4144,4218,4292,4366,4440],\"visibledatarow\":[20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,440,460,480,500,520,540,560,580,600,620,640,660,680,700,720,740,760,780,800,820,840,860,880,900,920,940,960,980,1000,1020,1040,1060,1080,1100,1120,1140,1160,1180,1200,1220,1240,1260,1280,1300,1320,1340,1360,1380,1400,1420,1440,1460,1480,1500,1520,1540,1560,1580,1600,1620,1640,1660,1680],\"luckysheet_selection_range\":[],\"celldata\":[{\"r\":0,\"c\":0,\"v\":{\"ct\":{\"t\":\"s\",\"fa\":\"@\"},\"v\":\"测试mysql\",\"m\":\"测试mysql\"}},{\"r\":0,\"c\":1,\"v\":{\"ct\":{\"t\":\"s\",\"fa\":\"@\"},\"v\":\"MySql\",\"m\":\"MySql\"}},{\"r\":0,\"c\":2,\"v\":{\"ct\":{\"t\":\"s\",\"fa\":\"@\"},\"v\":\"这是描述\",\"m\":\"这是描述\"}},{\"r\":0,\"c\":3,\"v\":{\"ct\":{\"t\":\"s\",\"fa\":\"@\"},\"v\":\"DB01\",\"m\":\"DB01\"}}],\"ch_width\":4560,\"zoomRatio\":1,\"config\":{},\"status\":1}]",
-          "reportType": null,
-          "total": 0,
-          "exportType": null,
-          "accessKey": "285c3d3d98aae225f739172a344cccb1"
-        }
-      }
+      console.log(this.params);
+      const { code, result } = await getExcelPreviewReq(this.params);
+
       if (code != 200) return;
-      this.reportName = JSON.parse(data.jsonStr).name;
+      this.reportName = JSON.parse(result.jsonStr).name;
       // 渲染查询表单
-      this.params.setParam = JSON.parse(data.setParam);
+      this.params.setParam = JSON.parse(result.setParam);
       const extendArry = [];
       const extendObj = this.params.setParam;
       for (const i in extendObj) {
@@ -137,10 +113,10 @@ export default {
       }
       this.tableData2 = extendArry;
 
-      this.excelData = data.jsonStr;
-      this.sheetData = data == null ? [{}] : JSON.parse(data.jsonStr);
-      // console.log(this.excelData)
-      // console.log(this.sheetData)
+      this.excelData = result.jsonStr;
+      this.sheetData = result == null ? [{}] : JSON.parse(result.jsonStr);
+      console.log(this.excelData, result == null)
+      console.log(this.sheetData)
       this.createSheet();
     },
     async download (val) {

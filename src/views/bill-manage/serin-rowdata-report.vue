@@ -41,7 +41,7 @@ export default {
     return {
       req: {
         stationType: "",
-        status:0,
+        status: 0,
         barcode: ""
       }, //查询数据
       // 验证实体
@@ -98,7 +98,7 @@ export default {
     margin-top: 8%;
     text-align: center;
   }
-  /deep/.ivu-form .ivu-form-item-label {
+  /deep/.ivu-form .ivu-FormItem-label {
     font-size: 21px;
   }
   /deep/.ivu-btn-primary {
@@ -109,10 +109,10 @@ export default {
   .ivu-btn {
     font-size: 19px;
   }
-  /deep/.ivu-form-item-content {
+  /deep/.ivu-FormItem-content {
     font-size: 18px;
   }
-  /deep/.ivu-form-item {
+  /deep/.ivu-FormItem {
     margin-bottom: 25px;
   }
 }

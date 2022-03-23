@@ -96,7 +96,7 @@ export default {
       default: false
     },
     reportCode: {
-      required: true,
+      required: false,
       type: String,
     }
   },
@@ -166,11 +166,11 @@ export default {
         if (res.code === 200) {
 
           const { result } = res;
+
           if (result != null) {
-            this.reportId = result.id;
+            this.reportId = result.reportCode;
           }
           this.sheetData = result == null ? [{}] : JSON.parse(result.jsonStr);
-          console.log(this.sheetData, result == null);
           this.createSheet();
           if (result != null) {
             if (result.setCodes != null && result.setCodes !== "") {
@@ -195,7 +195,6 @@ export default {
         plugins: ['chart'],
         hook: {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
-            console.log(cell, postion, sheetFile, ctx);
             window.luckysheet.setCellValue(
               postion.r,
               postion.c,
@@ -203,7 +202,6 @@ export default {
             );
           },
           cellMousedown: function (cell, postion, sheetFile, ctx) {
-            console.log(sheetFile, ctx);
             //单元格点击事件
             that.rightForm.coordinate = postion.r + "," + postion.c;
             that.rightForm.r = postion.r;
@@ -280,8 +278,6 @@ export default {
       this.setCode = setCode;
       let fieldLabel = evt.item.innerText; // 列名称
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
-      console.log("evt", evt);
-      console.log("draggableFieldLabel", this.draggableFieldLabel);
     },
     autoChangeFunc (auto) {
       if (auto) {
@@ -331,7 +327,6 @@ export default {
     //预览
     preview () {
       this.closeDialog();
-      console.log(this.$parent);
       this.$parent.previewVisib = true;
     },
     //保存
@@ -362,14 +357,12 @@ export default {
       this.reportExcelDto.setParam = JSON.stringify(setParams);
       this.reportExcelDto.setCodes = setCodeList.join("|");
       this.reportExcelDto.reportCode = this.reportCode;
-      console.log(this.reportId);
       if (this.reportId == null) {
         const { code } = await insertExcelReportReq(this.reportExcelDto);
         if (code != 200) return;
         this.$Message.success("保存成功");
         this.closeDialog();
       } else {
-        console.log('124');
         this.reportExcelDto.id = this.reportId;
         const { code } = await modifyExcelReportReq(this.reportExcelDto);
         if (code != 200) return;
