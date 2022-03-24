@@ -1566,6 +1566,7 @@ export default {
     exceedStandardValue: '超出标准值',
     exceedToleranceValue: '超出公差值',
     createTime: '创建时间',
+    scrapReason: '报废原因',
     //数据源
     dataSourceCode: '数据源编码',
     dataSourceName: '数据源名称',
@@ -1923,6 +1924,7 @@ export default {
     'encap-fill-report': 'EncapFill报表',
     'datasource': '数据源',
     'encap-fill-dam-detail': 'EncapFillDam明细',
+    'scrap-report': '报废报表',
     'omm-config': 'omm配置',
     'omm-data': 'OMM数据',
     'sn-pressure': 'SN 压力测试 看板',

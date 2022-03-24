@@ -67,8 +67,8 @@ export default {
     isShow () {
       if (this.isShow) {
         this.modalFlag = this.isShow;
-        const { startTime, endTime, lineName, eqpId, stepName } = this.paramData
-        this.pageLoad(startTime, endTime, lineName, eqpId, stepName)
+        const { startTime, endTime, lineName, stepName } = this.paramData
+        this.pageLoad(startTime, endTime, lineName, stepName)
       }
     },
   },
@@ -78,13 +78,12 @@ export default {
   },
   methods: {
     // 获取分页列表数据
-    pageLoad (startTime, endTime, lineName, eqpId, stepName) {
+    pageLoad (startTime, endTime, lineName, stepName) {
       console.log('pageLoad1', lineName);
-      console.log('pageLoad2', eqpId);
       console.log('pageLoad3', stepName);
       this.data = [];
       let obj = {
-        orderField: "TrackTime", // 排序字段
+        orderField: "EQPID", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
@@ -93,7 +92,6 @@ export default {
           endTime: formatDate(endTime),
           lineName,
           stepName,
-          eqpId,
         },
       };
       getpagelistScrapDetailReq(obj).then((res) => {
@@ -128,18 +126,18 @@ export default {
 
     // 自动改变表格高度
     autoSize () {
-      this.tableConfig.height = document.body.clientHeight - 120 - 60;
+      this.tableConfig.height = document.body.clientHeight - 360 - 60;
     },
     // 选择第几页
     pageChange (index) {
       this.req.pageIndex = index;
-      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.eqpId,this.paramData.stepName)
+      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.stepName)
     },
     // 选择一页有条数据
     pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
-      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.eqpId,this.paramData.stepName)
+      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.stepName)
     },
   }
 };

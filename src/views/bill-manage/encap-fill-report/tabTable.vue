@@ -28,6 +28,7 @@
     </div>
     <encapFillScrapDetail :isShow.sync="isShow" :paramData="wipJson" />
     <encapFillDamDetail :isShowDam.sync="isShowDam" :paramData="wipJson" />
+    <encapFillEqp :isShowEqp.sync="isShowEqp" :paramData="wipJson" />
   </div>
 </template>
 
@@ -37,10 +38,11 @@ import { exportFile, formatDate } from "@/libs/tools";
 import BarEncapFill from "@/components/echarts/bar-encap-fill.vue";
 import encapFillScrapDetail from './encap-fill-scrap-detail.vue';
 import encapFillDamDetail from './encap-fill-dam-detail.vue';
+import encapFillEqp from './encap-fill-eqp.vue';
 
 export default {
   name: "tabTable",
-  components: { BarEncapFill,encapFillScrapDetail,encapFillDamDetail },
+  components: { BarEncapFill,encapFillScrapDetail,encapFillDamDetail,encapFillEqp },
   props: {
     btnData: {
       type: Array,
@@ -62,6 +64,7 @@ export default {
       wipJson: {},
       isShow: false,
       isShowDam: false,
+      isShowEqp: false,
       barData: {
         legendData: ["Input", "Yield rate"],
         xAxisData: [],
@@ -88,10 +91,49 @@ export default {
         },
         { title: "Line ID", key: "lineName", minWidth: 120, tooltip: true, align: "center" },
         { title: "Step Name", key: "stepName", minWidth: 120, tooltip: true, align: "center" },
-        { title: "EQP ID", key: "eqpId", minWidth: 120, tooltip: true, align: "center" },
-        { title: "Input", key: "inputQty", minWidth: 120, tooltip: true, align: "center" },
+        // { title: "EQP ID", key: "eqpId", minWidth: 120, tooltip: true, align: "center" },
+        // { title: "Input", key: "inputQty", minWidth: 120, tooltip: true, align: "center" },
+        {
+          title: "Input",
+          key: "inputQty",
+          width: 120,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
+          render: (h, params) => {
+            return h("div", [
+              h(
+                "a",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    color: "blue",
+                    fontSize: "13px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    display: "block", //设置样式，超过文字省略号显示
+                    cursor: "pointer", //设置鼠标样式
+                  },
+                  domProps: {
+                    title: params.row.inputQty, //添加title属性
+                  },
+                  on: {
+                    click: () => {
+                      this.show(params.row,'input'); //点击事件
+                    },
+                  },
+                },
+                params.row.inputQty
+              ),
+            ]);
+          },
+        },
         { title: "Out put", key: "outputQty", minWidth: 120, tooltip: true, align: "center" },
-        // { title: "Fail", key: "failQty", minWidth: 120, tooltip: true, align: "center" },
         {
           title: "Fail",
           key: "failQty",
@@ -123,7 +165,7 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.show(params.row); //点击事件
+                      this.show(params.row,'fail'); //点击事件
                     },
                   },
                 },
@@ -163,23 +205,32 @@ export default {
         exportFile(blob, fileName);
       });
     },
-    show (row) {
+    show (row,flag) {
       let obj = this.queryObj;
       console.log('======queryObj====',this.queryObj)
-      console.log('======1====',row.failQty)
-      console.log('======2====',row.failQty==0)
-      if(row.failQty == 0)
+      if(flag == 'fail')
       {
-        this.isShow = false;
-        this.isShowDam = true;
+        if(row.failQty == 0)
+        {
+          this.isShow = false;
+          this.isShowDam = true;
+          this.isShowEqp = false;
+        }
+        else
+        {
+          this.isShow = true;
+          this.isShowDam = false;
+          this.isShowEqp = false;
+        }
       }
       else
       {
-        this.isShow = true;
+        this.isShow = false;
         this.isShowDam = false;
+        this.isShowEqp = true;
       }
       //this.isShow = true;
-      this.wipJson = { startTime: obj.startTime, endTime: obj.endTime, lineName: row.lineName, eqpId: row.eqpId, stepName: obj.stepName }
+      this.wipJson = { startTime: obj.startTime, endTime: obj.endTime, lineName: row.lineName, stepName: obj.stepName }
       // console.log(row, processname, this.$refs.wipmodal);
       //   this.$refs.wipmodal.pageLoad(row.workorder, processname);
 
