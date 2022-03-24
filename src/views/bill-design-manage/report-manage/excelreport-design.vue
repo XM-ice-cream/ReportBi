@@ -17,10 +17,10 @@
                 <Panel :name="item.setCode">
                   {{item.setName}}
                   <div slot="content">
-                    <Poptip confirm :title="'确定删除' + item.setName + '吗？'" @on-ok="del(item)" class="deletePop" placement="bottom">
-                      <Icon type="md-trash" />
-                      <!-- <Button>Delete</Button> -->
-                    </Poptip>
+                    <div class="deletePop">
+                      <Icon type="md-trash" @click="del(item)" />
+                    </div>
+
                     <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
                       <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
                     </draggable>
@@ -380,11 +380,20 @@ export default {
     },
     //删除数据集数据
     del (val) {
-      for (let i = 0; i < this.dataSet.length; i++) {
-        if (this.dataSet[i].setCode === val.setCode) {
-          this.dataSet.splice(i, 1);
-        }
-      }
+      this.$Modal.confirm({
+        title: '确定删除' + val.setName + '吗？',
+        onOk: () => {
+          for (let i = 0; i < this.dataSet.length; i++) {
+            if (this.dataSet[i].setCode === val.setCode) {
+              this.dataSet.splice(i, 1);
+              this.$Message.success("删除成功");
+              break;
+            }
+          }
+
+        },
+      });
+
     },
     //关闭弹框
     closeDialog () {
