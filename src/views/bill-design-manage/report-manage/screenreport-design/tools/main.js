@@ -1,12 +1,3 @@
-/*
- * @Descripttion: json 入口文件
- * @version:
- * @Author: qianlishi
- * @Date: 2021-08-29 07:46:46
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-12-13 14:23:59
- */
-
 import {
     widgetText
 } from "./configure/widget-text"

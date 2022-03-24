@@ -67,7 +67,7 @@
           </Content>
           <!-- 右侧基础配置 -->
           <Sider hide-trigger class="layout-right" :style="{ width: widthLeftForOptions + 'px' }">
-            <Tabs v-model="activeName">
+            <!-- <Tabs v-model="activeName">
               <TabPane v-if="widgetOptions.setup || widgetOptions.collapse" name="first" label="配置">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
               </TabPane>
@@ -77,7 +77,7 @@
               <TabPane v-if="widgetOptions.position" name="third" label="坐标">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('position', val)" />
               </TabPane>
-            </Tabs>
+            </Tabs> -->
           </Sider>
         </Layout>
       </div>
@@ -446,7 +446,7 @@ export default {
 
     // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
     widgetOnDragged (evt, widgetCode) {
-      console.log('widgetOnDragged', evt);
+      console.log('widgetOnDragged', evt, widgetCode);
       let widgetType = widgetCode;
 
       // 获取结束坐标和列名
@@ -483,7 +483,7 @@ export default {
       // 将选中的复制组件，放到工作区中去
 
       this.widgets.push(deepClone(widgetJsonValue));
-      console.log(this.widgets);
+      console.log(this.widgets, widgetJsonValue);
       // 激活新组件的配置属性
       //   this.setOptionsOnClickWidget(this.widgets.length - 1);
     },
@@ -593,6 +593,7 @@ export default {
       this.grade = true;
     },
     widgetsMouseup (e) {
+      console.log(e);
       this.grade = false;
     },
     handleMouseDown () {
@@ -1014,5 +1015,14 @@ export default {
 }
 /deep/.ivu-tabs-bar {
   margin-bottom: 0px;
+}
+/deep/.ivu-tabs-nav .ivu-tabs-tab {
+  padding: 8px 16px;
+}
+/deep/.ivu-tabs-nav-scrollable {
+  padding: 0;
+}
+/deep/.ivu-tabs-nav {
+  background: #263445;
 }
 </style>

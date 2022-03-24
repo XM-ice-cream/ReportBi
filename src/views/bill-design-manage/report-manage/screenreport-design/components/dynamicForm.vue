@@ -9,25 +9,25 @@
                 item.type != 'dycustComponents' &&
                 item.type != 'dynamic-add-table'
             " :label="item.label" :prop="item.name" :required="item.required">
-            <InputNumber v-if="item.type == 'Input-number'" size="small" style="width:100%" v-model.trim="formData[item.name]" controls-position="right" @change="changed($event, item.name)" />
+            <InputNumber v-if="item.type == 'Input-number'" size="small" style="width:100%" v-model.trim="formData[item.name]" controls-position="right" @on-change="changed($event, item.name)" />
 
-            <Input v-if="item.type == 'Input-text'" v-model.trim="formData[item.name]" type="text" size="small" placeholder="请输入内容" clearable @change="changed($event, item.name)" />
+            <Input v-if="item.type == 'Input-text'" v-model.trim="formData[item.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, item.name)" />
 
-            <Input v-if="item.type == 'Input-textarea'" v-model.trim="formData[item.name]" type="textarea" size="small" rows="2" placeholder="请输入内容" @change="changed($event, item.name)" />
+            <Input v-if="item.type == 'Input-textarea'" v-model.trim="formData[item.name]" type="textarea" size="small" rows="2" placeholder="请输入内容" @on-change="changed($event, item.name)" />
 
-            <i-switch v-if="item.type == 'i-switch'" v-model="formData[item.name]" size="small" placeholder="请输入内容" @change="changed($event, item.name)" />
-            <ColorPicker v-if="item.type == 'vue-color'" v-model="formData[item.name]" @change="val => changed(val, item.name)" />
-            <customUpload v-if="item.type == 'custom-upload'" v-model="formData[item.name]" @change="changed($event, item.name)" />
+            <i-switch v-if="item.type == 'i-switch'" v-model="formData[item.name]" size="small" placeholder="请输入内容" @on-change="changed($event, item.name)" />
+            <ColorPicker v-if="item.type == 'vue-color'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)" />
+            <customUpload v-if="item.type == 'custom-upload'" v-model="formData[item.name]" @on-change="changed($event, item.name)" />
 
-            <RadioGroup v-if="item.type == 'RadioGroup'" v-model="formData[item.name]" @change="val => changed(val, item.name)">
+            <RadioGroup v-if="item.type == 'RadioGroup'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)">
               <Radio v-for="itemChild in item.selectOptions" :key="itemChild.code" :label="itemChild.code">{{ itemChild.name }}</Radio>
             </RadioGroup>
 
-            <Select v-if="item.type == 'Select'" size="small" v-model="formData[item.name]" clearable placeholder="请选择" @change="val => changed(val, item.name)">
+            <Select v-if="item.type == 'Select'" size="small" v-model="formData[item.name]" clearable placeholder="请选择" @on-change="val => changed(val, item.name)">
               <Option v-for="itemChild in item.selectOptions" :key="itemChild.code" :label="itemChild.name" :value="itemChild.code" />
             </Select>
 
-            <Slider v-if="item.type == 'Slider'" v-model="formData[item.name]" @change="val => changed(val, item.name)" />
+            <Slider v-if="item.type == 'Slider'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)" />
 
             <Button v-if="item.type == 'Button'" type="primary" size="small" plain @click="addStaticData">编辑</Button>
 
@@ -40,37 +40,37 @@
               </span>
             </Modal>
           </FormItem>
-          <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @change="changed($event, item.name)" />
-          <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @change="changed($event, item.name)" />
+          <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @on-change="changed($event, item.name)" />
+          <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @on-change="changed($event, item.name)" />
         </div>
         <div v-else-if="isShowForm(item, '[object Array]')" :key="'a-' + index">
           <Collapse accordion>
             <CollapseItem v-for="(itemChild, indexChild) in item" :key="indexChild" :title="itemChild.name" :name="indexChild">
               <template v-for="(itemChildList, idx) in itemChild.list">
                 <FormItem :key="idx" :label="itemChildList.label" :prop="itemChildList.name" :required="itemChildList.required">
-                  <InputNumber v-if="itemChildList.type == 'Input-number'" size="small" style="width:100%" v-model="formData[itemChildList.name]" controls-position="right" :placeholder="itemChildList.placeholder" @change="changed($event, itemChildList.name)" />
+                  <InputNumber v-if="itemChildList.type == 'InputNumber'" size="small" style="width:100%" v-model="formData[itemChildList.name]" controls-position="right" :placeholder="itemChildList.placeholder" @on-change="changed($event, itemChildList.name)" />
 
-                  <Input v-if="itemChildList.type == 'Input-text'" v-model.trim="formData[itemChildList.name]" type="text" size="small" placeholder="请输入内容" clearable @change="changed($event, itemChildList.name)" />
+                  <Input v-if="itemChildList.type == 'Input'" v-model.trim="formData[itemChildList.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, itemChildList.name)" />
 
-                  <Input v-if="itemChildList.type == 'Input-textarea'" v-model.trim="formData[itemChildList.name]" size="small" type="textarea" rows="2" placeholder="请输入内容" @change="changed($event, itemChildList.name)" />
+                  <Input v-if="itemChildList.type == 'Input-textarea'" v-model.trim="formData[itemChildList.name]" size="small" type="textarea" rows="2" placeholder="请输入内容" @on-change="changed($event, itemChildList.name)" />
 
-                  <i-switch v-if="itemChildList.type == 'i-switch'" v-model="formData[itemChildList.name]" placeholder="请输入内容" size="small" @change="changed($event, itemChildList.name)" />
+                  <i-switch v-if="itemChildList.type == 'i-switch'" v-model="formData[itemChildList.name]" placeholder="请输入内容" size="small" @on-change="changed($event, itemChildList.name)" />
 
-                  <ColorPicker v-if="itemChildList.type == 'vue-color'" v-model="formData[itemChildList.name]" @change="val => changed(val, itemChildList.name)" />
+                  <ColorPicker v-if="itemChildList.type == 'vue-color'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
 
                   <Upload v-if="itemChildList.type == 'Upload-picture'" size="small" action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" />
 
-                  <RadioGroup v-if="itemChildList.type == 'RadioGroup'" v-model="formData[itemChildList.name]" @change="val => changed(val, itemChildList.name)">
+                  <RadioGroup v-if="itemChildList.type == 'RadioGroup'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)">
                     <Radio v-for="it in itemChildList.selectOptions" :key="it.code" :label="it.code">{{ it.name }}</Radio>
                   </RadioGroup>
 
-                  <Select v-if="itemChildList.type == 'Select'" size="small" v-model="formData[itemChildList.name]" clearable placeholder="请选择" @change="val => changed(val, itemChildList.name)">
+                  <Select v-if="itemChildList.type == 'Select'" size="small" v-model="formData[itemChildList.name]" clearable placeholder="请选择" @on-change="val => changed(val, itemChildList.name)">
                     <Option v-for="it in itemChildList.selectOptions" :key="it.code" :label="it.name" :value="it.code" />
                   </Select>
 
-                  <Slider v-if="itemChildList.type == 'Slider'" v-model="formData[itemChildList.name]" @change="val => changed(val, itemChildList.name)" />
+                  <Slider v-if="itemChildList.type == 'Slider'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
                 </FormItem>
-                <customColorComponents v-if="itemChildList.type == 'customColor'" :key="'b-' + idx" v-model="formData[itemChildList.name]" @change="changed($event, itemChildList.name)" />
+                <customColorComponents v-if="itemChildList.type == 'customColor'" :key="'b-' + idx" v-model="formData[itemChildList.name]" @on-change="changed($event, itemChildList.name)" />
               </template>
             </CollapseItem>
           </Collapse>
@@ -139,6 +139,7 @@ export default {
       this.formData = newValue || {};
     },
     options (val) {
+      console.log('options', this.options);
       this.setDefaultValue();
       this.isShowData();
     }
@@ -204,6 +205,7 @@ export default {
     },
     // 组件拖入时 赋值
     setDefaultValue () {
+      console.log('deepClone');
       if (this.options && this.options.length > 0) {
         for (let i = 0; i < this.options.length; i++) {
           const obj = this.options[i];

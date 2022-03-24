@@ -17,6 +17,10 @@
                 <Panel :name="item.setCode">
                   {{item.setName}}
                   <div slot="content">
+                    <Poptip confirm :title="'确定删除' + item.setName + '吗？'" @on-ok="del(item)" class="deletePop" placement="bottom">
+                      <Icon type="md-trash" />
+                      <!-- <Button>Delete</Button> -->
+                    </Poptip>
                     <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
                       <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
                     </draggable>
@@ -374,6 +378,14 @@ export default {
     handleSelectionChange (val) {
       this.selectArr = val;
     },
+    //删除数据集数据
+    del (val) {
+      for (let i = 0; i < this.dataSet.length; i++) {
+        if (this.dataSet[i].setCode === val.setCode) {
+          this.dataSet.splice(i, 1);
+        }
+      }
+    },
     //关闭弹框
     closeDialog () {
       this.$emit('update:visib', false);
@@ -433,9 +445,20 @@ export default {
     color: #1ec0d1;
   }
   .dblist {
+    height: calc(100% - 5rem);
+    overflow-y: scroll;
     .row {
       padding: 0.2rem;
       margin: 0 1.6rem 0.3rem;
+    }
+    .deletePop {
+      position: absolute;
+      right: -1rem;
+      top: -1.8rem;
+      i {
+        color: #ff6161;
+        font-size: 1.02rem;
+      }
     }
   }
 }
@@ -461,6 +484,13 @@ export default {
       margin-right: 0.3rem;
     }
   }
+}
+/deep/
+  .ivu-collapse-simple
+  > .ivu-collapse-item
+  > .ivu-collapse-content
+  > .ivu-collapse-content-box {
+  position: relative;
 }
 
 /deep/.ivu-modal-fullscreen .ivu-modal-body {

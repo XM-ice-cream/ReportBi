@@ -33,7 +33,7 @@ export default {
 
     // 关闭模态框
     closeDialog () {
-      this.$emit("handleClose");
+      this.$emit("update:visib", false);
     },
     // onJsonChange (value) { },
     // onJsonSave (value) { }
