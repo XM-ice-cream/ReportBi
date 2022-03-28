@@ -67,7 +67,6 @@ export default {
   methods: {
     // 获取分页列表数据
     pageLoad (panelno) {
-      console.log('pageLoad', panelno);
       this.data = [];
       let obj = {
         orderField: "CreateTime", // 排序字段

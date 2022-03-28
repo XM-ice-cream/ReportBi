@@ -78,7 +78,7 @@
                     <DatePicker v-else v-model.trim="tableData[index].sampleItem" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
                   </template>
                   <template slot-scope="{row,index}" slot="mandatory">
-                    <Checkbox v-model="tableData[index].mandatory" @change="Mandatory(index)">必选 </Checkbox>
+                    <Checkbox v-model="tableData[index].mandatory" @on-change="Mandatory(index)">必选 </Checkbox>
                     <!-- <Button type="primary" icon="el-icon-plus" @click="permissionClick(row, index)"> 高级规则</Button> -->
                   </template>
                   <template slot-scope="{row,index}" slot="operator">
@@ -121,7 +121,7 @@ import {
   testTransformSet,
   insertDatacollectReq,
   modifyDatacollectReq,
-  getDeatilByIdReq
+  getDeatilByIdReq,
 } from "@/api/bill-design-manage/data-set.js";
 import Dictionary from "@/components/dictionary/index";
 // import { codemirror } from "vue-codemirror"; // 引入codeMirror全局实例
@@ -132,6 +132,7 @@ import "codemirror/theme/cobalt.css"; // 引入主题后还需要在 options 中
 import vueJsonEditor from "vue-json-editor";
 import MonacoEditor from "./monaco-editor.vue";
 import { validateEngOrNum } from "@/libs/validate";
+import { formatDate } from "@/libs/tools";
 export default {
   name: "Support",
   components: { Dictionary, vueJsonEditor, MonacoEditor },
@@ -139,15 +140,15 @@ export default {
     visib: {
       required: true,
       type: Boolean,
-      default: false
+      default: false,
     },
     dataSet: {
       required: false,
       type: Object,
       default: () => {
         return "";
-      }
-    }
+      },
+    },
   },
   data () {
     return {
@@ -160,15 +161,15 @@ export default {
       title: "自定义高级规则",
       ruleValidate: {
         setName: [
-          { required: true, message: "数据集名称必填", trigger: "blur" }
+          { required: true, message: "数据集名称必填", trigger: "blur" },
         ],
         setCode: [
           { required: true, message: "数据集编码必填", trigger: "blur" },
-          { validator: validateEngOrNum, trigger: "blur" }
+          { validator: validateEngOrNum, trigger: "blur" },
         ],
         sourceCode: [
-          { required: true, message: "数据源必选", trigger: "change" }
-        ]
+          { required: true, message: "数据源必选", trigger: "change" },
+        ],
       },
       sourceList: [],
       validationRules: "",
@@ -182,12 +183,12 @@ export default {
           sampleItem: "",
           mandatory: true,
           requiredFlag: 1,
-          validationRules: `function verification(data){\n\t//自定义脚本内容\n\t//可返回true/false单纯校验键入的data正确性\n\t//可返回文本，实时替换,比如当前时间等\n\t//return "2099-01-01 00:00:00";\n\treturn true;\n}`
-        }
+          validationRules: `function verification(data){\n\t//自定义脚本内容\n\t//可返回true/false单纯校验键入的data正确性\n\t//可返回文本，实时替换,比如当前时间等\n\t//return "2099-01-01 00:00:00";\n\treturn true;\n}`,
+        },
       ],
       columns: [
         {
-          title: 'No.',
+          title: "No.",
           type: "index",
           width: 30,
           align: "center",
@@ -199,19 +200,23 @@ export default {
         {
           title: "描述",
           slot: "paramDesc",
-        }, {
+        },
+        {
           title: "数据类型",
           slot: "paramType",
-        }, {
+        },
+        {
           title: "示例值",
           slot: "sampleItem",
-        }, {
+        },
+        {
           title: "校验",
           slot: "mandatory",
-        }, {
+        },
+        {
           title: "操作",
           slot: "operator",
-          width: '80'
+          width: "80",
         },
       ],
       isRowData: {},
@@ -220,29 +225,34 @@ export default {
       setType: "", //数据集类型，主要用于区分http   addSql  addHttp  edit
       //待删除
       dictionaryOptions: [], // 数据源类型
-      paramTypeList: [{
-        sourceName: '字符串',
-        sourceCode: 'String'
-      }, {
-        sourceName: '时间类型',
-        sourceCode: 'DateTime'
-      }, {
-        sourceName: '整型',
-        sourceCode: 'Int'
-      }, {
-        sourceName: '浮点类型',
-        sourceCode: 'Double'
-      }, {
-        sourceName: '布尔',
-        sourceCode: 'Boolean'
-      }],
+      paramTypeList: [
+        {
+          sourceName: "字符串",
+          sourceCode: "String",
+        },
+        {
+          sourceName: "时间类型",
+          sourceCode: "DateTime",
+        },
+        {
+          sourceName: "整型",
+          sourceCode: "Int",
+        },
+        {
+          sourceName: "浮点类型",
+          sourceCode: "Double",
+        },
+        {
+          sourceName: "布尔",
+          sourceCode: "Boolean",
+        },
+      ],
       isAdd: true,
     };
   },
   methods: {
     // 编辑数据集,获取单条数据详情
     addOrEditDataSet (row, type, isAdd) {
-      console.log(row, type, isAdd);
       this.setType = type;
       this.isAdd = isAdd;
       //   if (type == "http" && row.dynSentence) {
@@ -253,21 +263,24 @@ export default {
       this.dialogFormVisible = true;
       this.tabsActiveName = "first";
       this.testMassageCode = null;
-      !isAdd ? this.refeshEdit(row) : this.refeshAdd()
+      !isAdd ? this.refeshEdit(row) : this.refeshAdd();
     },
     //编辑
     refeshEdit (row) {
       this.updataDisabled = true;
       this.dialogFormVisibleTitle = "编辑数据集";
       this.tableData = [];
-      console.log(row);
       const obj = { setCode: row.setCode };
-      getDeatilByIdReq(obj).then(res => {
+      getDeatilByIdReq(obj).then((res) => {
         this.formData = res.result;
-        if (res.result.dataSetParamDtoList != null || res.result.dataSetParamDtoList.length > 0) {
+        if (
+          res.result.dataSetParamDtoList != null ||
+          res.result.dataSetParamDtoList.length > 0
+        ) {
           this.tableData = res.result.dataSetParamDtoList;
           this.tableData.find((value, i) => {
-            this.tableData[i].mandatory = value.requiredFlag == 1 ? true : false;
+            this.tableData[i].mandatory =
+              value.requiredFlag == 1 ? true : false;
           });
         }
       });
@@ -284,14 +297,13 @@ export default {
         setDesc: "",
         sourceCode: "",
         dynSentence: "",
-        enabled: 1
+        enabled: 1,
       };
-
     },
     //获取数据源下拉框
     getDataSourceList (type) {
-      const obj = { sourceType: type }
-      getAllDatasourceReq(obj).then(res => {
+      const obj = { sourceType: type };
+      getAllDatasourceReq(obj).then((res) => {
         const { code, result } = res;
         if (code !== 200) return;
         this.sourceList = result;
@@ -306,10 +318,10 @@ export default {
     async handleClickTabs (tab) {
       //   if (this.setType == "http") {
       //     //针对http数据源
-      //     console.log("http数据集" + this.httpForm);
       //     this.formData.dynSentence = JSON.stringify(this.httpForm);
       //   }
       if (tab == "third") {
+        this.cols = [];
         this.$refs.form.validate(async (valid) => {
           if (valid) {
             const params = {
@@ -317,18 +329,17 @@ export default {
               dynSentence: this.formData.dynSentence,
               dataSetParamDtoList: this.tableData,
               dataSetTransformDtoList: [],
-              setType: this.setType
+              setType: this.setType,
             };
             const { code, message } = await testTransformSet(params);
-            console.log(code);
             if (code != 200) {
               this.$Message.error(message);
               return;
-            };
+            }
             this.cols = JSON.parse(message);
             this.testMassageCode = code;
           }
-        })
+        });
       }
     },
 
@@ -344,7 +355,7 @@ export default {
       }
       this.$nextTick(() => {
         this.dialogPermissionVisible = true;
-      })
+      });
     },
     dialogValidationRules () {
       this.isRowData.validationRules = this.validationRules;
@@ -381,21 +392,30 @@ export default {
         sampleItem: "",
         mandatory: true,
         requiredFlag: 1,
-        validationRules: `function verification(data){\n\t//自定义脚本内容\n\t//可返回true/false单纯校验键入的data正确性\n\t//可返回文本，实时替换,比如当前时间等\n\t//return "2099-01-01 00:00:00";\n\treturn true;\n}`
+        validationRules: `function verification(data){\n\t//自定义脚本内容\n\t//可返回true/false单纯校验键入的data正确性\n\t//可返回文本，实时替换,比如当前时间等\n\t//return "2099-01-01 00:00:00";\n\treturn true;\n}`,
       });
-      console.log(this.tableData);
     },
     async submit (formName) {
       this.formData.setType = this.setType;
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           if (this.testMassageCode == 200) {
-            this.formData.dataSetParamDtoList = this.tableData;
+            this.formData.dataSetParamDtoList = this.tableData.map(item => {
+              if (item.paramType == 'DateTime') {
+                item.sampleItem = formatDate(item.sampleItem)
+              }
+              return { ...item }
+            });
             this.formData.dataSetTransformDtoList = this.itemFilterList;
             this.formData.caseResult = JSON.stringify(this.cols);
-            const requestApi = this.isAdd ? insertDatacollectReq : modifyDatacollectReq;
-            const { code } = await requestApi(this.formData);
-            if (code != 200) return;
+            const requestApi = this.isAdd
+              ? insertDatacollectReq
+              : modifyDatacollectReq;
+            const { code, message } = await requestApi(this.formData);
+            if (code != 200) {
+              this.$Message.error(message);
+              return;
+            }
             this.$Message.success("提交成功！");
             this.$emit("refreshList");
             this.closeDialog();
@@ -406,7 +426,7 @@ export default {
         }
       });
     },
-  }
+  },
 };
 </script>
 <style lang="less" scoped>

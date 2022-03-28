@@ -238,7 +238,7 @@ export const widgetBarCompare = {
                             name: 'splitNumberLeft',
                             required: false,
                             placeholder: '',
-                            value: ''
+                            value: 0
                         },
                         {
                             type: 'vue-color',
@@ -330,7 +330,7 @@ export const widgetBarCompare = {
                             name: 'splitNumberRight',
                             required: false,
                             placeholder: '',
-                            value: ''
+                            value: 0
                         },
                         {
                             type: 'vue-color',

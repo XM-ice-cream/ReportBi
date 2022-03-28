@@ -3,32 +3,20 @@
     <superslide v-if="hackReset" :options="options" class="txtScroll-top">
       <!--表头-->
       <div class="title">
-        <div
-          v-for="(item, index) in header"
-          :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]"
-          :key="index"
-        >
+        <div v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]" :key="index">
           {{ item.name }}
         </div>
       </div>
       <!--数据-->
       <div class="bd">
         <ul class="infoList">
-          <li
-            v-for="(item, index) in list"
-            :key="index"
-            :style="tableRowHeight()"
-          >
-            <div
-              v-for="(itemChild, idx) in header"
-              :key="idx"
-              :style="[
+          <li v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
+            <div v-for="(itemChild, idx) in header" :key="idx" :style="[
                 bodyTableStyle,
                 bodyTable(index),
                 tableFiledWidth(idx),
                 tableRowHeight()
-              ]"
-            >
+              ]">
               {{ item[itemChild.key] }}
             </div>
           </li>
@@ -47,7 +35,7 @@ export default {
     value: Object,
     ispreview: Boolean
   },
-  data() {
+  data () {
     return {
       hackReset: true,
       options: {
@@ -68,8 +56,7 @@ export default {
     };
   },
   computed: {
-    styleObj() {
-      console.log(this.optionsSetUp);
+    styleObj () {
       const allStyle = this.optionsPosition;
       return {
         position: this.ispreview ? "absolute" : "static",
@@ -80,7 +67,7 @@ export default {
         background: this.optionsSetUp.tableBgColor
       };
     },
-    headerTableStlye() {
+    headerTableStlye () {
       const headStyle = this.optionsSetUp;
       return {
         "text-align": headStyle.textAlign,
@@ -93,7 +80,7 @@ export default {
         "background-color": headStyle.headBackColor
       };
     },
-    bodyTableStyle() {
+    bodyTableStyle () {
       const bodyStyle = this.optionsSetUp;
       return {
         "text-align": bodyStyle.textAlign,
@@ -108,7 +95,7 @@ export default {
   },
   watch: {
     value: {
-      handler(val) {
+      handler (val) {
         this.optionsSetUp = val.setup;
         this.optionsPosition = val.position;
         this.optionsData = val.data;
@@ -117,23 +104,23 @@ export default {
       deep: true
     }
   },
-  mounted() {
+  mounted () {
     this.optionsSetUp = this.value.setup;
     this.optionsPosition = this.value.position;
     this.optionsData = this.value.data;
     this.initData();
   },
   methods: {
-    initData() {
+    initData () {
       this.handlerRollFn();
       this.handlerHead();
       this.handlerData();
       this.visConfig();
     },
-    visConfig() {
+    visConfig () {
       this.options.vis = this.optionsSetUp.vis;
     },
-    handlerRollFn() {
+    handlerRollFn () {
       const options = this.options;
       const rollSet = this.optionsSetUp;
       options.autoPlay = rollSet.isRoll;
@@ -144,20 +131,20 @@ export default {
       this.options = options;
       this.hackResetFun();
     },
-    handlerHead() {
+    handlerHead () {
       const head = this.optionsSetUp.dynamicAddTable;
       this.header = head;
     },
-    handlerData() {
+    handlerData () {
       const tableData = this.optionsData;
       tableData.dataType == "staticData"
         ? this.handlerStaticData(tableData.staticData)
         : this.handlerDynamicData(tableData.dynamicData, tableData.refreshTime);
     },
-    handlerStaticData(data) {
+    handlerStaticData (data) {
       this.list = data;
     },
-    handlerDynamicData(data, refreshTime) {
+    handlerDynamicData (data, refreshTime) {
       if (!data) return;
       if (this.ispreview) {
         this.getEchartData(data);
@@ -168,7 +155,7 @@ export default {
         this.getEchartData(data);
       }
     },
-    getEchartData(val) {
+    getEchartData (val) {
       const data = this.queryEchartsData(val);
       data.then(res => {
         this.list = res;
@@ -176,14 +163,14 @@ export default {
       });
     },
     // vue hack 之强制刷新组件
-    hackResetFun() {
+    hackResetFun () {
       this.hackReset = false;
       this.$nextTick(() => {
         this.hackReset = true;
       });
     },
     // 计算 奇偶背景色
-    bodyTable(index) {
+    bodyTable (index) {
       let styleJson = {};
       if (index % 2) {
         styleJson["background-color"] = this.optionsSetUp.eventColor;
@@ -192,7 +179,7 @@ export default {
       }
       return styleJson;
     },
-    tableRowHeight() {
+    tableRowHeight () {
       let styleJson = {};
       if (this.optionsSetUp.rowHeight) {
         styleJson["height"] = this.optionsSetUp.rowHeight + "px";
@@ -203,7 +190,7 @@ export default {
       }
       return styleJson;
     },
-    tableFiledWidth(index) {
+    tableFiledWidth (index) {
       let styleJson = {};
       if (this.optionsSetUp.dynamicAddTable[index].width) {
         styleJson["width"] = this.optionsSetUp.dynamicAddTable[index].width;

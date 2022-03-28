@@ -1,6 +1,6 @@
 
 <template>
-  <Select v-model="dictionary" placeholder="请选择" clearable @change="selectChange" size="small">
+  <Select v-model="dictionary" placeholder="请选择" clearable @on-change="selectChange" size="small">
     <Option v-for="item in dictionaryOptions" :key="item.id" :label="item.text" :value="item.id" />
   </Select>
 </template>

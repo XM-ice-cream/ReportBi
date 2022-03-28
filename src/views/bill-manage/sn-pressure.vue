@@ -73,7 +73,7 @@ export default {
       if (params.unitId) {
         // 获取表格数据
         getpressuredata(params).then((res) => {
-          console.log(res);
+
           if (res.code === 200) {
             const data = res.result || []
             this.lineData.yData = data.pressureArr.map((o, oIndex) => [oIndex, Number(o)]);

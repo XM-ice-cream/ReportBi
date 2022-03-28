@@ -43,7 +43,6 @@ export default {
   watch: {
     value: {
       handler (val) {
-        console.log('text', val);
         this.options = val;
         this.optionsData = val.data;
         this.setOptionsData();
@@ -66,7 +65,6 @@ export default {
       } else { };
     },
     dynamicDataFn (val, refreshTime) {
-      console.log('text', val);
       if (!val) return;
       if (this.ispreview) {
         this.getEchartData(val);
@@ -78,7 +76,6 @@ export default {
       }
     },
     getEchartData (val) {
-      console.log('getEchartData', val);
       const data = this.queryEchartsData(val);
       data.then(res => {
         this.styleColor.text = res[0].value;

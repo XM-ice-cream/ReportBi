@@ -13,7 +13,7 @@ const screenConfig = {
                 name: 'width',
                 required: false,
                 placeholder: 'px',
-                value: '1920',
+                value: 1920,
             },
             {
                 type: 'InputNumber',
@@ -21,7 +21,7 @@ const screenConfig = {
                 name: 'height',
                 required: false,
                 placeholder: 'px',
-                value: '1080',
+                value: 1080,
             },
             {
                 type: 'Input',
@@ -33,7 +33,7 @@ const screenConfig = {
             },
             {
                 // Input-textarea
-                type: 'Input',
+                type: 'InputTextarea',
                 label: '大屏简介',
                 name: 'description',
                 required: false,

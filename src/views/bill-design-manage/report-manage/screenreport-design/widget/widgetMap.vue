@@ -238,7 +238,6 @@ export default {
         tooltip: {
           trigger: "item",
           formatter: function (params) {
-            console.log(params);
             if (params.seriesType == "effectScatter") {
               if ("流入" == type) {
                 return (

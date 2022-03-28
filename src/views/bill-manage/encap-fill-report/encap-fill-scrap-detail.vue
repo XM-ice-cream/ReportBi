@@ -3,12 +3,7 @@
   <Modal draggable v-model="modalFlag" width="1250" title="EncapFillScrap明细" :styles="{ top: '20px' }" :closable="true">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
     <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
-    <BarEncapFill
-      ref="barEncapFill"
-      style="width: 900px; height: 420px"
-      :data="barData"
-      index="eqpEncapFill"
-    />
+    <BarEncapFill ref="barEncapFill" style="width: 900px; height: 420px" :data="barData" index="eqpEncapFill" />
     <div slot="footer">
       <Button @click="modalCancel">{{ $t("cancel") }}</Button>
     </div>
@@ -17,7 +12,7 @@
 
 <script>
 import { getpagelistScrapDetailReq, getpagelistDamRateReq } from "@/api/bill-manage/encap-fill-report";
-import { formatDate,renderDate } from "@/libs/tools";
+import { formatDate, renderDate } from "@/libs/tools";
 import BarEncapFill from "@/components/echarts/bar-encap-fill.vue";
 export default {
   name: "encap-fill-scrap-detail",
@@ -79,8 +74,6 @@ export default {
   methods: {
     // 获取分页列表数据
     pageLoad (startTime, endTime, lineName, stepName) {
-      console.log('pageLoad1', lineName);
-      console.log('pageLoad3', stepName);
       this.data = [];
       let obj = {
         orderField: "EQPID", // 排序字段
@@ -104,7 +97,6 @@ export default {
       })
       getpagelistDamRateReq(obj.data).then((res) => {
         if (res.code === 200) {
-      console.log('getpagelistDamRateReq', res.result);
           // this.barData = res || []
           let result = res.result;
           this.tableConfig.loading = result.length === 0;
@@ -131,13 +123,13 @@ export default {
     // 选择第几页
     pageChange (index) {
       this.req.pageIndex = index;
-      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.stepName)
+      this.pageLoad(this.paramData.startTime, this.paramData.endTime, this.paramData.lineName, this.paramData.stepName)
     },
     // 选择一页有条数据
     pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
-      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.stepName)
+      this.pageLoad(this.paramData.startTime, this.paramData.endTime, this.paramData.lineName, this.paramData.stepName)
     },
   }
 };

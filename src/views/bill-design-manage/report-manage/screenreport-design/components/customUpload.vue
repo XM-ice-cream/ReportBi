@@ -1,9 +1,9 @@
 <template>
   <div>
-    <Input clearable v-model.trim="uploadImgUrl" size="small" @change="changeInput">
+    <Input clearable v-model.trim="uploadImgUrl" size="small" @on-change="changeInput">
     <template slot="append">
       <i class="iconfont iconfolder-o"></i>
-      <input type="file" class="file" ref="files" @change="getImages" />
+      <input type="file" class="file" ref="files" @on-change="getImages" />
     </template>
     </Input>
   </div>
@@ -12,6 +12,7 @@
 import axios from "axios";
 // import { getToken } from "@/utils/auth";
 export default {
+  name: 'customUpload',
   model: {
     prop: "value",
     event: "input"
@@ -47,7 +48,6 @@ export default {
     },
     upload (imgUrl) {
       let that = this;
-      console.log(that.headers);
       let formdata = new FormData();
       formdata.append("file", imgUrl);
       axios

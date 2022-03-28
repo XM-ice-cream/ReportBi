@@ -14,7 +14,8 @@
                   <span class="title" :key="index">{{item.title}}</span>
                   <template v-for="(subitem,subindex) in item.children">
                     <FormItem :label='subitem.name' :key="subindex+'sub'">
-                      <Input type="text" v-model="subitem.value" />
+                      <Input type="text" v-model="subitem.value" v-if="subitem.type!=='DateTime'" />
+                      <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
                     </FormItem>
                   </template>
                 </template>
@@ -63,7 +64,6 @@ export default {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
-          console.log(this.visib, this.reportCode);
           this.searchPreview();
         })
       }
@@ -95,10 +95,12 @@ export default {
     async preview () {
       this.excelData = {};
       this.params.reportCode = this.reportCode;
-      console.log(this.params);
-      const { code, result } = await getExcelPreviewReq(this.params);
+      const { code, result, message } = await getExcelPreviewReq(this.params);
 
-      if (code != 200) return;
+      if (code != 200) {
+        this.$Message.error(message)
+        return
+      };
       this.reportName = JSON.parse(result.jsonStr).name;
       // 渲染查询表单
       this.params.setParam = JSON.parse(result.setParam);
@@ -107,7 +109,10 @@ export default {
       for (const i in extendObj) {
         const children = [];
         for (const y in extendObj[i]) {
-          children.push({ name: y, value: extendObj[i][y] });
+          const data = extendObj[i][y];
+          const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : 'String'
+
+          children.push({ name: y, value: extendObj[i][y], type });
         }
         extendArry.push({ name: i, children: children });
       }
@@ -115,8 +120,6 @@ export default {
 
       this.excelData = result.jsonStr;
       this.sheetData = result == null ? [{}] : JSON.parse(result.jsonStr);
-      console.log(this.excelData, result == null)
-      console.log(this.sheetData)
       this.createSheet();
     },
     async download (val) {
@@ -127,7 +130,10 @@ export default {
         result["exportType"] = val;
       }
       const { code, message } = await exportExcel(result);
-      if (code != 200) return;
+      if (code != 200) {
+        this.$Message.error(message);
+        return;
+      };
       this.$Message.success(message);
     },
     // 表单封装json
@@ -196,7 +202,6 @@ export default {
         ]
       };
       options.data = this.sheetData;
-      // console.log(this.sheetData)
       $(function () {
         luckysheet.create(options);
       });

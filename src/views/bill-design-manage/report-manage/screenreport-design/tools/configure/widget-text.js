@@ -27,7 +27,7 @@ export const widgetText = {
                 name: 'fontSize',
                 required: false,
                 placeholder: '',
-                value: '26',
+                value: 26,
             },
             {
                 type: 'vue-color',

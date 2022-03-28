@@ -254,7 +254,6 @@ export default {
             })
           }
           this.dataYield = result;
-          console.log(this.dataYield);
         }
       }).catch(() => (this.Yieldloading = false));
     },
@@ -340,11 +339,9 @@ export default {
 
     yieldClick (row, column, data, event) {
       this.$refs.yield.modal = true;
-      console.log(row, column, data, event);
     },
     qtyClick (row, column, data, event) {
       this.$refs.qty.modal = true;
-      console.log(row, column, data, event);
     },
     // 导出
     exportClick () {

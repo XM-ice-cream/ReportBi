@@ -70,13 +70,8 @@ export default {
     event: "input"
   },
   props: {
-    /*
-    widget-text widget-marquee widget-href widget-time widget-image widget-slider widget-video widget-table widget-iframe widget-universal
-    widget-linechart widget-barlinechart widget-piechart widget-hollow-piechart widget-funnel widget-gauge widget-china-map
-    */
     index: Number, // 当前组件，在工作区变量widgetInWorkbench中的索引
     type: String,
-    bigscreen: Object,
     value: {
       type: [Object],
       default: () => {
@@ -85,9 +80,9 @@ export default {
     step: Number
   },
   watch: {
-    type: {
+    value: {
       handler () {
-        console.log('type', this.type);
+        console.log('value', this.value);
       },
       immediate: true
     }
@@ -122,9 +117,9 @@ export default {
   },
   methods: {
     handleFocus ({ index, left, top, width, height }) {
+      console.log('handleFocus', { index, left, top, width, height });
     },
     handleBlur ({ index, left, top, width, height }) {
-      console.log('234');
       this.$emit("onActivated", { index, left, top, width, height });
       this.$refs.draggable.setActive(true);
     }

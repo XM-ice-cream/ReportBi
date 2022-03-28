@@ -1,22 +1,21 @@
 
 <template>
   <div class="collapse-input-style">
-    <Form :label-width="100" label-position="left">
+    <Form :label-width="80" label-position="left">
       <template v-for="(item, index) in options">
         <div v-if="isShowForm(item, '[object Object]')" :key="index">
-          <FormItem v-if="
-              inputShow[item.name] &&
-                item.type != 'dycustComponents' &&
-                item.type != 'dynamic-add-table'
+          <FormItem v-if=" inputShow[item.name] && item.type != 'dycustComponents' &&item.type != 'dynamic-add-table'
             " :label="item.label" :prop="item.name" :required="item.required">
-            <InputNumber v-if="item.type == 'Input-number'" size="small" style="width:100%" v-model.trim="formData[item.name]" controls-position="right" @on-change="changed($event, item.name)" />
+            <InputNumber v-if="item.type == 'InputNumber'" size="small" style="width:100%" v-model.trim="formData[item.name]" controls-position="right" @on-change="changed($event, item.name)" />
 
-            <Input v-if="item.type == 'Input-text'" v-model.trim="formData[item.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, item.name)" />
+            <Input v-if="item.type == 'Input'" v-model.trim="formData[item.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, item.name)" />
 
-            <Input v-if="item.type == 'Input-textarea'" v-model.trim="formData[item.name]" type="textarea" size="small" rows="2" placeholder="请输入内容" @on-change="changed($event, item.name)" />
+            <Input v-if="item.type == 'InputTextarea'" v-model.trim="formData[item.name]" type="textarea" size="small" rows="2" placeholder="请输入内容" @on-change="changed($event, item.name)" />
 
             <i-switch v-if="item.type == 'i-switch'" v-model="formData[item.name]" size="small" placeholder="请输入内容" @on-change="changed($event, item.name)" />
-            <ColorPicker v-if="item.type == 'vue-color'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)" />
+
+            <ColorPickerComponents v-if="item.type == 'vue-color'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)" />
+
             <customUpload v-if="item.type == 'custom-upload'" v-model="formData[item.name]" @on-change="changed($event, item.name)" />
 
             <RadioGroup v-if="item.type == 'RadioGroup'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)">
@@ -56,7 +55,7 @@
 
                   <i-switch v-if="itemChildList.type == 'i-switch'" v-model="formData[itemChildList.name]" placeholder="请输入内容" size="small" @on-change="changed($event, itemChildList.name)" />
 
-                  <ColorPicker v-if="itemChildList.type == 'vue-color'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
+                  <ColorPickerComponents v-if="itemChildList.type == 'vue-color'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
 
                   <Upload v-if="itemChildList.type == 'Upload-picture'" size="small" action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" />
 
@@ -81,7 +80,7 @@
 </template>
 
 <script>
-import ColorPicker from "./colorPicker.vue";
+import ColorPickerComponents from "./colorPickerComponents.vue";
 import vueJsonEditor from "vue-json-editor";
 import "codemirror/lib/codemirror.css"; // 核心样式
 import "codemirror/theme/cobalt.css"; // 引入主题后还需要在 options 中指定主题才会生效
@@ -94,10 +93,11 @@ import dynamicComponents from "./dynamicComponents.vue";
 import customColorComponents from "./customColorComponents";
 import dynamicAddTable from "./dynamicAddTable.vue";
 import customUpload from "./customUpload.vue";
+import { deepClone } from "@/libs/tools.js";
 export default {
   name: "DynamicForm",
   components: {
-    ColorPicker,
+    ColorPickerComponents,
     vueJsonEditor,
     dynamicComponents,
     customColorComponents,
@@ -110,10 +110,7 @@ export default {
   },
   props: {
     options: Array,
-    value: {
-      type: [Object],
-      default: () => { }
-    }
+    value: String
   },
   data () {
     return {
@@ -136,6 +133,7 @@ export default {
   },
   watch: {
     value (newValue, oldValue) {
+      console.log('newValue', newValue);
       this.formData = newValue || {};
     },
     options (val) {
@@ -158,11 +156,13 @@ export default {
     },
     // 无论哪个输入框改变 都需要触发事件 将值回传
     changed (val, key) {
-      if (val.extend) {
-        this.$set(this.formData, key, val.value);
+      if (val?.type) {
+        console.log('val type', val.target.value);
+        this.$set(this.formData, key, val.target.value);
       } else {
         this.$set(this.formData, key, val);
       }
+
       this.$emit("onChanged", this.formData);
       // key为当前用户操作的表单组件
       for (let i = 0; i < this.options.length; i++) {
@@ -205,14 +205,14 @@ export default {
     },
     // 组件拖入时 赋值
     setDefaultValue () {
-      console.log('deepClone');
       if (this.options && this.options.length > 0) {
         for (let i = 0; i < this.options.length; i++) {
           const obj = this.options[i];
+          console.log('setDefaultValue', Object.prototype.toString.call(obj), obj);
           if (Object.prototype.toString.call(obj) == "[object Object]") {
-            this.formData[this.options[i].name] = this.deepClone(
-              this.options[i].value
-            );
+            //先暂时这样，原本是浅拷贝的
+            this.formData[this.options[i].name] = this.options[i].value;
+            console.log(this.formData[this.options[i].name], this.options[i].value);
           } else if (Object.prototype.toString.call(obj) == "[object Array]") {
             for (let j = 0; j < obj.length; j++) {
               const list = obj[j].list;
