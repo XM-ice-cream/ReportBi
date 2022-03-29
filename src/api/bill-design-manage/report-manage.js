@@ -89,6 +89,7 @@ export const exportReq = data => {
         baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/export',
         method: 'post',
-        data
+        data,
+        responseType: 'arraybuffer',
     })
 }

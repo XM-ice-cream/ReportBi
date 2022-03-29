@@ -1,6 +1,7 @@
 <template>
   <div>
-    <Modal title="Excel 预览" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='850' :before-close="closeDialog">
+
+    <Modal :title="'Excel 预览('+finished+')'" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='850' :before-close="closeDialog">
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
@@ -13,7 +14,7 @@
                 <template v-for="(item,index) in tableData2">
                   <span class="title" :key="index">{{item.name}}</span>
                   <template v-for="(subitem,subindex) in item.children">
-                    <FormItem :label='subitem.name' :key="subindex+'sub'">
+                    <FormItem :label='subitem.name' :key="item.name+subindex">
                       <Input type="text" v-model.trim="subitem.value" v-if="subitem.type!=='DateTime'" />
                       <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
                     </FormItem>
@@ -37,10 +38,12 @@
           </Content>
         </Layout>
       </div>
+      <img :src="require('../../../assets/images/loading.gif')" v-if="loading" class="loading-img" />
       <div slot="footer" class="dialog-footer">
         <Button @click="closeDialog">取消</Button>
       </div>
     </Modal>
+
   </div>
 </template>
 <script>
@@ -66,10 +69,13 @@ export default {
       if (this.visib) {
         this.$nextTick(() => {
           this.params.reportCode = this.reportCode;
+          this.loading = true;
+          this.tableData2 = [];
           this.searchPreview();
         })
         return;
       }
+
 
     }
   },
@@ -83,89 +89,42 @@ export default {
       reportName: null,
       dataSet: null,
       tableData2: [],
+      loading: false,
       params: {
         reportCode: "",
         setParam: "",
         requestCount: 1,
-        pageSize: 10000
-      }
+        pageSize: 1000
+      },
+      maxInteral: 1,
+      finished: 'Loading...'
 
     };
   },
   methods: {
     async searchPreview () {
-      this.tableData2.forEach((item, itemIndex) => {
-        item.children.forEach((o, oIndex) => {
-          if (o.type === 'DateTime') {
-            this.tableData2[itemIndex].children[oIndex].value = formatDate(o.value)
-          }
-        })
-      })
+      this.dateFormate();
       //重置
       const arr = this.toObject(this.tableData2);
-      console.log(arr, this.tableData2);
       this.params.setParam = JSON.stringify(arr);
       this.params.requestCount = 1;//初始化请求次数为1
-      this.sheetData = [];
-
+      window.luckysheet.destroy();
       //每次都重新加载需要改成刷新
       this.intervalPreview()
-      //   this.intervalData = setInterval(() => {
-      //     this.intervalPreview();
-      //   }, 1000 * 30)
     },
     async intervalPreview () {
+      this.loading = true;
       await getExcelPreviewReq(this.params).then(res => {
         if (res.code == 200) {
-          const { result } = res;
-          const jsonStr_parse = JSON.parse(result.jsonStr);
-          const setParam_parse = JSON.parse(result.setParam);
-          let { setParam, requestCount, pageSize } = this.params
-          if (requestCount > 10) {
-            console.log(requestCount, '取消');
-            //取消循环
-            return;
-          }
+          this.loading = false;
+          let { setParam, requestCount, pageSize } = this.params;
+          const jsonStr_parse = JSON.parse(res.result.jsonStr);
+          const setParam_parse = JSON.parse(res.result.setParam);
           //第一次获取请求值
-          if (requestCount === 1) {
-            this.reportName = jsonStr_parse.name;
-            // 渲染查询表单
-            const extendObj = setParam = setParam_parse;
-            const extendArry = [];
-            for (const i in extendObj) {
-              const children = [];
-              for (const y in extendObj[i]) {
-                const data = extendObj[i][y];
-                const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : 'String';
-                children.push({ name: y, value: extendObj[i][y], type });
-              }
-              extendArry.push({ name: i, children: children });
-            }
-            this.tableData2 = extendArry;
-            this.sheetData = result == null ? [{}] : jsonStr_parse;
-            //初始化Excel
-            this.createSheet();
-            //继续获取excel数据
-            this.params.requestCount = requestCount + 1;
-            // this.intervalPreview();
-          } else {
-            console.log('jsonStr_parse', jsonStr_parse);
-            // jsonStr_parse.forEach((item, index) => {
-            //   console.log(item.celldata);
-            // //   item.celldata?.forEach(o => {
-            // //     o.r = o.r + (requestCount - 1) * pageSize;
-            // //     o.t = "v";
-            // //     o.i = "Sheet_o83W674a36gA_1648100608524";
-            // //     // this.sheetData[index].celldata.push({ ...o });
-            // //   })
-            // })
-            // luckysheet.setRangeValue(jsonStr_parse, { range: "A1:B2" })
-            //继续获取excel数据
-            this.params.requestCount = requestCount + 1;
-            this.intervalPreview();
-            console.log(' this.sheetData', this.sheetData, requestCount);
-          }
-
+          requestCount === 1 ? this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result) : this.addExcel(jsonStr_parse, requestCount, pageSize)
+          //跳出循环--停止获取excel数据
+          if (requestCount !== 1 && requestCount >= this.maxInteral) { this.finished = '加载完成！'; return };
+          this.params.requestCount = requestCount + 1;
         }
       })
 
@@ -174,13 +133,64 @@ export default {
       const { reportCode, setParam } = this.params
       const obj = {
         reportCode,
-        setParam
+        setParam,
+        requestCount: 1,
+        pageSize: 1000
       };
       exportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
         const fileName = reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
         exportFile(blob, fileName);
       });
+    },
+    //时间格式化
+    dateFormate () {
+      this.tableData2.forEach((item, itemIndex) => {
+        item.children.forEach((o, oIndex) => {
+          if (o.type === 'DateTime') {
+            this.tableData2[itemIndex].children[oIndex].value = formatDate(o.value)
+          }
+        })
+      })
+    },
+    initExcel (jsonStr_parse, setParam, setParam_parse, result) {
+      console.log('jsonStr_parse', jsonStr_parse);
+      this.reportName = jsonStr_parse.name;
+      // 渲染查询表单
+      this.tableData2 = this.getParamsList(setParam, setParam_parse);
+      this.sheetData = result == null ? [{}] : jsonStr_parse;
+      //获取最大调用preview 接口次数
+      this.maxInteral = jsonStr_parse.reduce((prev, cur) => { return Math.max(prev.pageCount, cur.pageCount) });
+      //初始化Excel
+      this.createSheet();
+      //继续获取excel数据 maxInteral 大于1 继续获取excel值
+      if (this.maxInteral > 1) this.intervalPreview();
+    },
+    addExcel (jsonStr_parse, requestCount, pageSize) {
+      jsonStr_parse.forEach((item, index) => {
+        item.celldata.forEach(o => {
+          o.r = o.r + (requestCount - 1) * pageSize;
+          let options = { order: index };
+          window.luckysheet.setCellValue(o.r, o.c, o.v, options)
+        })
+      })
+      //刷新
+      window.luckysheet.refresh();
+      this.intervalPreview();
+    },
+    getParamsList (setParam, setParam_parse) {
+      const extendObj = setParam = setParam_parse;
+      const extendArry = [];
+      for (const i in extendObj) {
+        const children = [];
+        for (const y in extendObj[i]) {
+          const data = extendObj[i][y];
+          const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : 'String';
+          children.push({ name: y, value: extendObj[i][y], type });
+        }
+        extendArry.push({ name: i, children: children });
+      }
+      return extendArry;
     },
     // 表单封装json
     toObject (val) {
@@ -205,6 +215,7 @@ export default {
         title: "", // 设定表格名称
         lang: "zh", // 设定表格语言
         plugins: ["chart"],
+        // loadUrl: getExcelPreviewReq.baseUrl + getExcelPreviewReq.url,
         data: [
           {
             name: "report", //工作表名称
@@ -266,6 +277,9 @@ export default {
 <style>
 .luckysheet-input-box {
   z-index: 1000;
+}
+#luckysheet-pivotTableFilter-byvalue-select .ListBox {
+  min-height: 150px !important;
 }
 </style>
 <style lang="less" scoped>
@@ -337,6 +351,15 @@ export default {
       margin-right: 0.3rem;
     }
   }
+}
+.loading-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  //   width: 5rem;
+  //   height: 5rem;
+  //   background: rgba(0, 0, 0, 0.2);
 }
 
 /deep/.ivu-modal-fullscreen .ivu-modal-body {
