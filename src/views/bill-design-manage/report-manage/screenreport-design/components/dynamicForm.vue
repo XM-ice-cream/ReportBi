@@ -14,7 +14,7 @@
 
             <i-switch v-if="item.type == 'i-switch'" v-model="formData[item.name]" size="small" placeholder="请输入内容" @on-change="changed($event, item.name)" />
 
-            <ColorPickerComponents v-if="item.type == 'vue-color'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)" />
+            <ColorPickerComponents v-if="item.type == 'vue-color'" v-model="formData[item.name]" @change="val => changed(val, item.name)" />
 
             <customUpload v-if="item.type == 'custom-upload'" v-model="formData[item.name]" @on-change="changed($event, item.name)" />
 
@@ -156,6 +156,7 @@ export default {
     },
     // 无论哪个输入框改变 都需要触发事件 将值回传
     changed (val, key) {
+      console.log('124890');
       if (val?.type) {
         console.log('val type', val.target.value);
         this.$set(this.formData, key, val.target.value);

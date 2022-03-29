@@ -73,12 +73,12 @@
               <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
               </TabPane>
-              <!-- <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据">
+              <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('data', val)" />
               </TabPane>
               <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('position', val)" />
-              </TabPane> -->
+              </TabPane>
             </Tabs>
           </Sider>
         </Layout>
@@ -128,8 +128,8 @@ export default {
       }
     },
     widgets: {
-      handler () {
-        console.log('widgets', this.widgets);
+      handler (val) {
+        this.handlerLayerWidget(val);
       },
       deep: true
     }
@@ -253,6 +253,7 @@ export default {
     },
 
     handlerLayerWidget (val) {
+
       const layerWidgetArr = [];
       for (let i = 0; i < val.length; i++) {
         const obj = {};
@@ -266,6 +267,7 @@ export default {
         layerWidgetArr.push(obj);
       }
       this.layerWidget = layerWidgetArr;
+      console.log(this.layerWidget);
     },
     async initEchartData () {
       const reportCode = this.$route.query.reportCode;

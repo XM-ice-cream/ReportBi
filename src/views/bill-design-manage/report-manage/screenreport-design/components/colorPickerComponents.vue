@@ -62,6 +62,6 @@ export default {
 <style>
 .ivu-select-dropdown {
   width: auto !important;
-  right: 2px !important;
+  /* right: 2px !important; */
 }
 </style>

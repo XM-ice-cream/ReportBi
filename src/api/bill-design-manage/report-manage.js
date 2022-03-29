@@ -82,3 +82,13 @@ export const getExcelPreviewReq = data => {
         data
     })
 }
+//Excel 导出
+export const exportReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        url: '/api/autoreportcenter/anonymous/v1/reportexcel/export',
+        method: 'post',
+        data
+    })
+}

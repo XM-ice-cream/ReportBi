@@ -9,17 +9,17 @@
             <div class="title">表格查询</div>
             <!-- DBlist -->
             <div class="dblist">
-              <Form ref="submitReq" :label-width="100" :label-colon="true">
+              <Form ref="submitReq" :label-width="80" :label-colon="true">
                 <template v-for="(item,index) in tableData2">
-                  <span class="title" :key="index">{{item.title}}</span>
+                  <span class="title" :key="index">{{item.name}}</span>
                   <template v-for="(subitem,subindex) in item.children">
                     <FormItem :label='subitem.name' :key="subindex+'sub'">
-                      <Input type="text" v-model="subitem.value" v-if="subitem.type!=='DateTime'" />
+                      <Input type="text" v-model.trim="subitem.value" v-if="subitem.type!=='DateTime'" />
                       <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
                     </FormItem>
                   </template>
                 </template>
-                <Button type="primary" @click="searchPreview()" style="width: 90%;margin-left: 25px;">查询</Button>
+                <Button type="primary" @click="searchPreview()" style="width: 100%;">查询</Button>
               </Form>
             </div>
           </Sider>
@@ -44,8 +44,9 @@
   </div>
 </template>
 <script>
-import { getExcelPreviewReq } from '@/api/bill-design-manage/report-manage.js'
+import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
+import { exportFile, formatDate } from "@/libs/tools";
 export default {
   name: "excelreport-preview",
   components: { draggable },
@@ -64,77 +65,122 @@ export default {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
+          this.params.reportCode = this.reportCode;
           this.searchPreview();
         })
+        return;
       }
+
     }
   },
   data () {
     return {
+      intervalData: '',
       options: {},
       sheet: {},
+      sheetData: [],
       reportId: null,
       reportName: null,
       dataSet: null,
       tableData2: [],
-      excelData: {},
       params: {
         reportCode: "",
-        setParam: ""
+        setParam: "",
+        requestCount: 1,
+        pageSize: 10000
       }
 
     };
   },
   methods: {
     async searchPreview () {
+      this.tableData2.forEach((item, itemIndex) => {
+        item.children.forEach((o, oIndex) => {
+          if (o.type === 'DateTime') {
+            this.tableData2[itemIndex].children[oIndex].value = formatDate(o.value)
+          }
+        })
+      })
+      //重置
       const arr = this.toObject(this.tableData2);
+      console.log(arr, this.tableData2);
       this.params.setParam = JSON.stringify(arr);
+      this.params.requestCount = 1;//初始化请求次数为1
+      this.sheetData = [];
+
       //每次都重新加载需要改成刷新
-      this.preview();
+      this.intervalPreview()
+      //   this.intervalData = setInterval(() => {
+      //     this.intervalPreview();
+      //   }, 1000 * 30)
     },
-    async preview () {
-      this.excelData = {};
-      this.params.reportCode = this.reportCode;
-      const { code, result, message } = await getExcelPreviewReq(this.params);
+    async intervalPreview () {
+      await getExcelPreviewReq(this.params).then(res => {
+        if (res.code == 200) {
+          const { result } = res;
+          const jsonStr_parse = JSON.parse(result.jsonStr);
+          const setParam_parse = JSON.parse(result.setParam);
+          let { setParam, requestCount, pageSize } = this.params
+          if (requestCount > 10) {
+            console.log(requestCount, '取消');
+            //取消循环
+            return;
+          }
+          //第一次获取请求值
+          if (requestCount === 1) {
+            this.reportName = jsonStr_parse.name;
+            // 渲染查询表单
+            const extendObj = setParam = setParam_parse;
+            const extendArry = [];
+            for (const i in extendObj) {
+              const children = [];
+              for (const y in extendObj[i]) {
+                const data = extendObj[i][y];
+                const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : 'String';
+                children.push({ name: y, value: extendObj[i][y], type });
+              }
+              extendArry.push({ name: i, children: children });
+            }
+            this.tableData2 = extendArry;
+            this.sheetData = result == null ? [{}] : jsonStr_parse;
+            //初始化Excel
+            this.createSheet();
+            //继续获取excel数据
+            this.params.requestCount = requestCount + 1;
+            // this.intervalPreview();
+          } else {
+            console.log('jsonStr_parse', jsonStr_parse);
+            // jsonStr_parse.forEach((item, index) => {
+            //   console.log(item.celldata);
+            // //   item.celldata?.forEach(o => {
+            // //     o.r = o.r + (requestCount - 1) * pageSize;
+            // //     o.t = "v";
+            // //     o.i = "Sheet_o83W674a36gA_1648100608524";
+            // //     // this.sheetData[index].celldata.push({ ...o });
+            // //   })
+            // })
+            // luckysheet.setRangeValue(jsonStr_parse, { range: "A1:B2" })
+            //继续获取excel数据
+            this.params.requestCount = requestCount + 1;
+            this.intervalPreview();
+            console.log(' this.sheetData', this.sheetData, requestCount);
+          }
 
-      if (code != 200) {
-        this.$Message.error(message)
-        return
-      };
-      this.reportName = JSON.parse(result.jsonStr).name;
-      // 渲染查询表单
-      this.params.setParam = JSON.parse(result.setParam);
-      const extendArry = [];
-      const extendObj = this.params.setParam;
-      for (const i in extendObj) {
-        const children = [];
-        for (const y in extendObj[i]) {
-          const data = extendObj[i][y];
-          const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : 'String'
-
-          children.push({ name: y, value: extendObj[i][y], type });
         }
-        extendArry.push({ name: i, children: children });
-      }
-      this.tableData2 = extendArry;
+      })
 
-      this.excelData = result.jsonStr;
-      this.sheetData = result == null ? [{}] : JSON.parse(result.jsonStr);
-      this.createSheet();
     },
-    async download (val) {
-      const result = {};
-      result["reportCode"] = this.reportCode;
-      result["setParam"] = JSON.stringify(this.params.setParam);
-      if (val != "") {
-        result["exportType"] = val;
-      }
-      const { code, message } = await exportExcel(result);
-      if (code != 200) {
-        this.$Message.error(message);
-        return;
+    async download () {
+      const { reportCode, setParam } = this.params
+      const obj = {
+        reportCode,
+        setParam
       };
-      this.$Message.success(message);
+      exportReq(obj).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     // 表单封装json
     toObject (val) {
@@ -253,6 +299,20 @@ export default {
     color: #1ec0d1;
   }
   .dblist {
+    padding: 0 5px;
+    .title {
+      width: 100%;
+      height: 1.5rem;
+      background-color: #efefef;
+      text-align: center;
+      display: inline-block;
+      line-height: 1.5rem;
+      color: #666262d9;
+      /* margin: 0 auto; */
+      /* margin-left: 10%; */
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
     .row {
       padding: 0.2rem;
       margin: 0 1.6rem 0.3rem;

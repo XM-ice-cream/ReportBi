@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='900' :before-close="closeDialog">
+    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='848' :before-close="closeDialog">
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
@@ -76,7 +76,7 @@
     </Modal>
 
     <!-- 数据集管理弹框--表格 -->
-    <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='901'>
+    <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='849'>
       <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='500' tooltip-effect="dark" @on-selection-change="handleSelectionChange"></Table>
       <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       <div slot="footer" class="dialog-footer">
