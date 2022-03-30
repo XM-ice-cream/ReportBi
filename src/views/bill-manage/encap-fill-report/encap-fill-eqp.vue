@@ -1,6 +1,6 @@
 /* EncapFillEqp */
 <template>
-  <Modal draggable v-model="modalFlag" width="1250" title="EncapFill机台" :styles="{ top: '20px' }" :closable="false">
+  <Modal draggable v-model="modalFlag" width="1250" title="Encap机台" :styles="{ top: '20px' }" :closable="false">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
     <div slot="footer">
       <Button @click="modalCancel">{{ $t("cancel") }}</Button>

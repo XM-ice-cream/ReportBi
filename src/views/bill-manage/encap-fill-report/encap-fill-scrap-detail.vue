@@ -1,6 +1,6 @@
 /* EncapFillScrap明细数据 */
 <template>
-  <Modal draggable v-model="modalFlag" width="1250" title="EncapFillScrap明细" :styles="{ top: '20px' }" :closable="true">
+  <Modal draggable v-model="modalFlag" width="1250" title="EncapScrap明细" :styles="{ top: '20px' }" :closable="true">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
     <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
     <BarEncapFill

@@ -1,6 +1,6 @@
 /* EncapFillDam明细数据 */
 <template>
-  <Modal draggable v-model="modalFlag" width="1250" title="EncapFillDam明细" :styles="{ top: '20px' }" :closable="false">
+  <Modal draggable v-model="modalFlag" width="1250" title="Encap明细" :styles="{ top: '20px' }" :closable="false">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
     <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
     <div slot="footer">
