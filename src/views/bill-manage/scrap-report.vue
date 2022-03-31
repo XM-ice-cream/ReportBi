@@ -149,6 +149,7 @@ export default {
         { title: this.$t("stage"), key: "stage", align: "center", width: 80, tooltip: true },
         { title: this.$t("curProcessName"), key: "curprocessname", align: "center", width: 150, tooltip: true },
         { title: this.$t("inProcessTime"), key: "inprocesstime", align: "center", width: 130, tooltip: true, render: renderDate, },
+        { title: "生产时间", key: "createdate", align: "center", width: 130, tooltip: true, render: renderDate, },
         { title: this.$t("description"), key: "description", align: "center", width: 150, tooltip: true },
         { title: this.$t("scrapReason"), key: "scrapreason", align: "center", width: 150, tooltip: true },
         // { title: this.$t("status"), key: "status", align: "center", width: 60, tooltip: true },
@@ -181,7 +182,7 @@ export default {
         for (var i = 0; i < files.length; i++) {
           let imgUrl = reviewUrl + files[i];
           console.log('==========imgUrl1=========', imgUrl)
-          window.open("http://10.191.19.62:8989/download?filefullname=\\\\10.191.19.180\\lpa\\L05-S1-OP2501\\20220323\\AH22U0330B2DC_DM02-T01-L05_OP25_3.2.1.98620_L05-S1-OP2501_20220322_193054.jpg", files[i]);
+          window.open(imgUrl, files[i]);
         }
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
