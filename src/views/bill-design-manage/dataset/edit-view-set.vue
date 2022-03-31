@@ -63,10 +63,10 @@
                 </Button>
                 <Table :data="tableData" border :columns="columns" :max-height="250" style="width: 100%">
                   <template slot-scope="{index}" slot="paramName">
-                    <Input v-model.trim="tableData[index].paramName" />
+                    <Input v-model.trim="tableData[index].paramName" clearable />
                   </template>
                   <template slot-scope="{index}" slot="paramDesc">
-                    <Input v-model.trim="tableData[index].paramDesc" />
+                    <Input v-model.trim="tableData[index].paramDesc" clearable />
                   </template>
                   <template slot-scope="{index}" slot="paramType">
                     <Select v-model.trim="tableData[index].paramType" clearable transfer>
@@ -74,8 +74,10 @@
                     </Select>
                   </template>
                   <template slot-scope="{index}" slot="sampleItem">
-                    <Input v-model.trim="tableData[index].sampleItem" v-if="tableData[index].paramType!=='DateTime'" />
-                    <DatePicker v-else v-model.trim="tableData[index].sampleItem" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
+                    <DatePicker v-if="tableData[index].paramType=='DateTime'" v-model.trim="tableData[index].sampleItem" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
+                    <!-- 数组为文本框 -->
+                    <Input type='textarea' :autosize="{minRows: 2,maxRows: 5}" v-else-if="tableData[index].paramType=='Array'" v-model.trim="tableData[index].sampleItem" clearable></Input>
+                    <Input v-model.trim="tableData[index].sampleItem" v-else clearable />
                   </template>
                   <template slot-scope="{row,index}" slot="mandatory">
                     <Checkbox v-model="tableData[index].mandatory" @on-change="Mandatory(index)">必选 </Checkbox>
@@ -233,6 +235,9 @@ export default {
         {
           sourceName: "时间类型",
           sourceCode: "DateTime",
+        }, {
+          sourceName: "数组",
+          sourceCode: "Array",
         },
         {
           sourceName: "整型",

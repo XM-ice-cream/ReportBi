@@ -4,40 +4,32 @@
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
-          <!-- <Sider hide-trigger class="layout-left"> -->
-          <Tabs type='card' size="small" value="图层">
-            <TabPane name='工具栏' label='工具栏'>
-              <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
-                <div class="tools-item">
-                  <span class="tools-item-icon">
-                    <i class="iconfont" :class="widget.icon"></i>
-                  </span>
-                  <span class="tools-item-text">{{ widget.label }}</span>
-                </div>
-              </draggable>
-            </TabPane>
-            <TabPane name='图层' label='图层'>
-              <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
-                <div class="tools-item">
-                  <span class="tools-item-icon">
-                    <i class="iconfont" :class="widget.icon"></i>
-                  </span>
-                  <span class="tools-item-text">{{ widget.label }}</span>
-                </div>
-              </draggable>
-              <!-- <draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }"> -->
-              <!-- <transition-group> -->
-              <!-- <div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)" style='width:500px;height:50px'> -->
-              <!-- <span class="tools-item-icon">
+          <Sider hide-trigger class="layout-left">
+            <Tabs type='card'>
+              <TabPane label='工具栏'>
+                <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
+                  <div class="tools-item">
+                    <span class="tools-item-icon">
+                      <i class="iconfont" :class="widget.icon"></i>
+                    </span>
+                    <span class="tools-item-text">{{ widget.label }}</span>
+                  </div>
+                </draggable>
+              </TabPane>
+              <TabPane label='图层'>
+                <draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }">
+                  <transition-group>
+                    <div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)">
+                      <span class="tools-item-icon">
                         <i class="iconfont" :class="item.icon"></i>
-                      </span> -->
-              <!-- <span class="tools-item-text" style='width:500px;height:50px'>{{ item.label }}</span>
-                </div> -->
-              <!-- </transition-group> -->
-              <!-- </draggable> -->
-            </TabPane>
-          </Tabs>
-          <!-- </Sider> -->
+                      </span>
+                      <span class="tools-item-text">{{ item.label }}</span>
+                    </div>
+                  </transition-group>
+                </draggable>
+              </TabPane>
+            </Tabs>
+          </Sider>
           <!-- 中间内容excel -->
           <Content class="layout-middle" style='width:calc(100% - 400px);height:100%'>
             <div class="push_btn">
@@ -77,15 +69,15 @@
           </Content>
           <!-- 右侧基础配置 -->
           <Sider hide-trigger class="layout-right">
-            <Tabs v-model="activeName">
+            <Tabs type='card'>
               <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
               </TabPane>
               <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据">
-                <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('data', val)" />
+                <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" />
               </TabPane>
               <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标">
-                <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('position', val)" />
+                <dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="val => widgetValueChanged('position', val)" />
               </TabPane>
             </Tabs>
           </Sider>
@@ -508,7 +500,7 @@ export default {
       console.log('setOptionsOnClickScreen', this.widgetOptions);
       this.screenCode = "screen";
       // 选中不同的组件 右侧都显示第一栏
-      this.activeName = "first";
+      //   this.activeName = "first";
       this.widgetOptions = getToolByCode("screen")["options"];
     },
 
@@ -967,7 +959,10 @@ export default {
 /deep/.ivu-tabs .ivu-tabs-content-animated {
   background-color: #242a30;
   height: calc(100% - 33px);
-  overflow-x: hidden;
+  //   overflow-x: hidden;
+}
+/deep/.ivu-tabs .ivu-tabs-tabpane {
+  background: #242a30;
   overflow-y: auto;
 }
 /deep/.ivu-tabs {
