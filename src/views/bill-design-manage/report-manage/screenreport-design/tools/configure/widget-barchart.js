@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 柱状图json
- * @version:
- * @Author: qianlishi
- * @Date: 2021-08-29 07:21:45
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:08:29
- */
 export const widgetBarchart = {
     code: 'widget-barchart',
     type: 'chart',
@@ -571,7 +563,7 @@ export const widgetBarchart = {
                             label: '字体字号',
                             name: 'tipFontSize',
                             required: false,
-                            placeholder: 12,
+                            placeholder: '',
                         },
                         {
                             type: 'vue-color',

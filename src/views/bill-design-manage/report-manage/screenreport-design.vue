@@ -4,32 +4,40 @@
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
-          <Sider hide-trigger class="layout-left">
-            <Tabs type='card'>
-              <TabPane label='工具栏'>
-                <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
-                  <div class="tools-item">
-                    <span class="tools-item-icon">
-                      <i class="iconfont" :class="widget.icon"></i>
-                    </span>
-                    <span class="tools-item-text">{{ widget.label }}</span>
-                  </div>
-                </draggable>
-              </TabPane>
-              <TabPane label='图层'>
-                <draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }">
-                  <transition-group>
-                    <div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)">
-                      <span class="tools-item-icon">
+          <!-- <Sider hide-trigger class="layout-left"> -->
+          <Tabs type='card' size="small" value="图层">
+            <TabPane name='工具栏' label='工具栏'>
+              <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
+                <div class="tools-item">
+                  <span class="tools-item-icon">
+                    <i class="iconfont" :class="widget.icon"></i>
+                  </span>
+                  <span class="tools-item-text">{{ widget.label }}</span>
+                </div>
+              </draggable>
+            </TabPane>
+            <TabPane name='图层' label='图层'>
+              <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
+                <div class="tools-item">
+                  <span class="tools-item-icon">
+                    <i class="iconfont" :class="widget.icon"></i>
+                  </span>
+                  <span class="tools-item-text">{{ widget.label }}</span>
+                </div>
+              </draggable>
+              <!-- <draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }"> -->
+              <!-- <transition-group> -->
+              <!-- <div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)" style='width:500px;height:50px'> -->
+              <!-- <span class="tools-item-icon">
                         <i class="iconfont" :class="item.icon"></i>
-                      </span>
-                      <span class="tools-item-text">{{ item.label }}</span>
-                    </div>
-                  </transition-group>
-                </draggable>
-              </TabPane>
-            </Tabs>
-          </Sider>
+                      </span> -->
+              <!-- <span class="tools-item-text" style='width:500px;height:50px'>{{ item.label }}</span>
+                </div> -->
+              <!-- </transition-group> -->
+              <!-- </draggable> -->
+            </TabPane>
+          </Tabs>
+          <!-- </Sider> -->
           <!-- 中间内容excel -->
           <Content class="layout-middle" style='width:calc(100% - 400px);height:100%'>
             <div class="push_btn">
@@ -129,6 +137,7 @@ export default {
     },
     widgets: {
       handler (val) {
+        console.log('监听', this.widgets);
         this.handlerLayerWidget(val);
       },
       deep: true
@@ -267,7 +276,7 @@ export default {
         layerWidgetArr.push(obj);
       }
       this.layerWidget = layerWidgetArr;
-      console.log(this.layerWidget);
+      console.log('this.layerWidget', this.layerWidget);
     },
     async initEchartData () {
       const reportCode = this.$route.query.reportCode;
@@ -359,7 +368,7 @@ export default {
     // 保存数据
     async saveData () {
       if (!this.widgets || this.widgets.length == 0) {
-        this.$message.error("请添加组件");
+        this.$Message.error("请添加组件");
         return;
       }
       const screenData = {
@@ -427,22 +436,13 @@ export default {
       //刷新大屏页面
       this.initEchartData();
       if (response.code == "200") {
-        this.$message({
-          message: "导入成功！",
-          type: "success",
-        });
+        this.$Message.success("导入成功！");
       } else {
-        this.$message({
-          message: response.message,
-          type: "error",
-        });
+        this.$Message.error(response.message);
       }
     },
     handleError (err) {
-      this.$message({
-        message: "上传失败！",
-        type: "error",
-      });
+      this.$Message.error("上传失败！");
     },
 
     // 在缩放模式下的大小
@@ -499,6 +499,7 @@ export default {
       return widgetJson;
     },
     layerClick (index) {
+      console.log('layerClick', index);
       this.widgetIndex = index;
       this.widgetsClick(index);
     },
@@ -873,6 +874,10 @@ export default {
   .layout-right {
     display: inline-block;
     height: 100%;
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+    flex: 0 0 300px !important;
   }
 
   /deep/ .el-tabs--border-card {

@@ -16,7 +16,8 @@
 
             <ColorPickerComponents v-if="item.type == 'vue-color'" v-model="formData[item.name]" @change="val => changed(val, item.name)" />
 
-            <customUpload v-if="item.type == 'custom-upload'" v-model="formData[item.name]" @on-change="changed($event, item.name)" />
+            <!-- 图片上传 -->
+            <customUpload v-if="item.type == 'custom-upload'" v-model="formData[item.name]" @change="changed($event, item.name)" />
 
             <RadioGroup v-if="item.type == 'RadioGroup'" v-model="formData[item.name]" @on-change="val => changed(val, item.name)">
               <Radio v-for="itemChild in item.selectOptions" :key="itemChild.code" :label="itemChild.code">{{ itemChild.name }}</Radio>
@@ -42,36 +43,39 @@
           <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @on-change="changed($event, item.name)" />
           <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @on-change="changed($event, item.name)" />
         </div>
-        <div v-else-if="isShowForm(item, '[object Array]')" :key="'a-' + index">
-          <Collapse accordion>
-            <CollapseItem v-for="(itemChild, indexChild) in item" :key="indexChild" :title="itemChild.name" :name="indexChild">
-              <template v-for="(itemChildList, idx) in itemChild.list">
-                <FormItem :key="idx" :label="itemChildList.label" :prop="itemChildList.name" :required="itemChildList.required">
-                  <InputNumber v-if="itemChildList.type == 'InputNumber'" size="small" style="width:100%" v-model="formData[itemChildList.name]" controls-position="right" :placeholder="itemChildList.placeholder" @on-change="changed($event, itemChildList.name)" />
+        <div v-else-if="isShowForm(item, '[object Array]')" :key="'a-' + index" class="screenCollapse">
+          <Collapse v-model="collapseIndex" accordion>
+            <Panel v-for="(itemChild, indexChild) in item" :key="indexChild" :name="itemChild.name">
+              {{itemChild.name}}
+              <p slot="content">
+                <template v-for="(itemChildList, idx) in itemChild.list">
+                  <FormItem :key="idx" :label="itemChildList.label" :prop="itemChildList.name" :required="itemChildList.required">
+                    <InputNumber v-if="itemChildList.type == 'InputNumber'" size="small" style="width:100%" v-model="formData[itemChildList.name]" controls-position="right" :placeholder="itemChildList.placeholder" @on-change="changed($event, itemChildList.name)" />
 
-                  <Input v-if="itemChildList.type == 'Input'" v-model.trim="formData[itemChildList.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, itemChildList.name)" />
+                    <Input v-if="itemChildList.type == 'Input'" v-model.trim="formData[itemChildList.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, itemChildList.name)" />
 
-                  <Input v-if="itemChildList.type == 'Input-textarea'" v-model.trim="formData[itemChildList.name]" size="small" type="textarea" rows="2" placeholder="请输入内容" @on-change="changed($event, itemChildList.name)" />
+                    <Input v-if="itemChildList.type == 'Input-textarea'" v-model.trim="formData[itemChildList.name]" size="small" type="textarea" rows="2" placeholder="请输入内容" @on-change="changed($event, itemChildList.name)" />
 
-                  <i-switch v-if="itemChildList.type == 'i-switch'" v-model="formData[itemChildList.name]" placeholder="请输入内容" size="small" @on-change="changed($event, itemChildList.name)" />
+                    <i-switch v-if="itemChildList.type == 'i-switch'" v-model="formData[itemChildList.name]" placeholder="请输入内容" size="small" @on-change="changed($event, itemChildList.name)" />
 
-                  <ColorPickerComponents v-if="itemChildList.type == 'vue-color'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
+                    <ColorPickerComponents v-if="itemChildList.type == 'vue-color'" v-model="formData[itemChildList.name]" @change="val => changed(val, itemChildList.name)" />
 
-                  <Upload v-if="itemChildList.type == 'Upload-picture'" size="small" action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" />
+                    <Upload v-if="itemChildList.type == 'Upload-picture'" size="small" action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" />
 
-                  <RadioGroup v-if="itemChildList.type == 'RadioGroup'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)">
-                    <Radio v-for="it in itemChildList.selectOptions" :key="it.code" :label="it.code">{{ it.name }}</Radio>
-                  </RadioGroup>
+                    <RadioGroup v-if="itemChildList.type == 'RadioGroup'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)">
+                      <Radio v-for="it in itemChildList.selectOptions" :key="it.code" :label="it.code">{{ it.name }}</Radio>
+                    </RadioGroup>
 
-                  <Select v-if="itemChildList.type == 'Select'" size="small" v-model="formData[itemChildList.name]" clearable placeholder="请选择" @on-change="val => changed(val, itemChildList.name)">
-                    <Option v-for="it in itemChildList.selectOptions" :key="it.code" :label="it.name" :value="it.code" />
-                  </Select>
+                    <Select v-if="itemChildList.type == 'Select'" size="small" v-model="formData[itemChildList.name]" clearable placeholder="请选择" @on-change="val => changed(val, itemChildList.name)">
+                      <Option v-for="it in itemChildList.selectOptions" :key="it.code" :label="it.name" :value="it.code" />
+                    </Select>
 
-                  <Slider v-if="itemChildList.type == 'Slider'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
-                </FormItem>
-                <customColorComponents v-if="itemChildList.type == 'customColor'" :key="'b-' + idx" v-model="formData[itemChildList.name]" @on-change="changed($event, itemChildList.name)" />
-              </template>
-            </CollapseItem>
+                    <Slider v-if="itemChildList.type == 'Slider'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
+                  </FormItem>
+                  <customColorComponents v-if="itemChildList.type == 'customColor'" :key="'b-' + idx" v-model="formData[itemChildList.name]" @on-change="changed($event, itemChildList.name)" />
+                </template>
+              </p>
+            </Panel>
           </Collapse>
         </div>
       </template>
@@ -128,7 +132,8 @@ export default {
         hintOptions: {
           completeSingle: true // 当匹配只有一项的时候是否自动补全
         }
-      }
+      },
+      collapseIndex: ''
     };
   },
   watch: {
@@ -156,14 +161,14 @@ export default {
     },
     // 无论哪个输入框改变 都需要触发事件 将值回传
     changed (val, key) {
-      console.log('124890');
+
       if (val?.type) {
         console.log('val type', val.target.value);
         this.$set(this.formData, key, val.target.value);
       } else {
         this.$set(this.formData, key, val);
       }
-
+      console.log('124890', this.formData);
       this.$emit("onChanged", this.formData);
       // key为当前用户操作的表单组件
       for (let i = 0; i < this.options.length; i++) {
@@ -235,6 +240,18 @@ export default {
 </script>
 
 <style scoped lang="less">
+.screenCollapse .ivu-collapse {
+  background-color: transparent;
+  border-radius: 3px;
+  border: none !important;
+}
+/deep/.screenCollapse {
+  .ivu-collapse-content {
+    color: #515a6e;
+    padding: 0 16px;
+    background-color: transparent;
+  }
+}
 /deep/ .FormItem {
   margin-bottom: 5px;
 }

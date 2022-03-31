@@ -35,6 +35,7 @@ export default {
       };
     },
     imgStyle () {
+      console.log('this.transStyle.imageAdress', this.transStyle.imageAdress);
       return {
         imageAdress: this.transStyle.imageAdress,
         "border-radius": this.transStyle.borderRadius + "px",

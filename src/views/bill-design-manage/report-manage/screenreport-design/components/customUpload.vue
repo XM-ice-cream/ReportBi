@@ -50,26 +50,26 @@ export default {
       let that = this;
       let formdata = new FormData();
       formdata.append("file", imgUrl);
-      axios
-        .post(this.requestUrl, formdata, {
-          headers: that.headers
-        })
-        .then(response => {
-          let res = response.data;
-          if (res.code == "200") {
-            that.uploadImgUrl = res.data.urlPath;
-            that.$emit("input", that.uploadImgUrl);
-            that.$emit("change", that.uploadImgUrl);
-          }
-        });
+      axios.post(this.requestUrl, formdata, {
+        headers: that.headers
+      }).then(response => {
+        let res = response.data;
+        if (res.code == "200") {
+          that.uploadImgUrl = res.data.urlPath;
+          that.$emit("input", that.uploadImgUrl);
+          that.$emit("change", that.uploadImgUrl);
+        }
+      });
     },
     changeInput (e) {
+
       if (e) {
         this.uploadImgUrl = e;
       } else {
         this.$refs.files.value = "";
         this.uploadImgUrl = "";
       }
+      console.log(e, this.uploadImgUrl);
       this.$emit("input", this.uploadImgUrl);
       this.$emit("change", this.uploadImgUrl);
     }

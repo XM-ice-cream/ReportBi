@@ -16,7 +16,7 @@
     </el-table>
 
     <Modal title="新增" :v-model="dialogVisible" width="30%" :before-close="handleClose">
-      <Form :model="rowFormData" label-width="50px">
+      <Form :model="rowFormData" :label-width="50">
         <FormItem label="名称:">
           <Input v-model.trim="rowFormData['name']" placeholder="请输入名称" size="small">
           </Input>

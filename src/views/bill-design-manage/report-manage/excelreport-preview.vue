@@ -46,10 +46,12 @@
 
   </div>
 </template>
+
 <script>
 import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
+import { exportExcel } from './export'
 export default {
   name: "excelreport-preview",
   components: { draggable },
@@ -94,11 +96,10 @@ export default {
         reportCode: "",
         setParam: "",
         requestCount: 1,
-        pageSize: 1000
+        pageSize: 10
       },
       maxInteral: 1,
       finished: 'Loading...'
-
     };
   },
   methods: {
@@ -108,6 +109,9 @@ export default {
       const arr = this.toObject(this.tableData2);
       this.params.setParam = JSON.stringify(arr);
       this.params.requestCount = 1;//初始化请求次数为1
+      this.sheetData = [{}];
+      this.finished = 'Loading...';
+      console.log(window.luckysheet);
       window.luckysheet.destroy();
       //每次都重新加载需要改成刷新
       this.intervalPreview()
@@ -120,28 +124,34 @@ export default {
           let { setParam, requestCount, pageSize } = this.params;
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
           const setParam_parse = JSON.parse(res.result.setParam);
+          console.log('jsonStr_parse', jsonStr_parse, requestCount);
+
+
           //第一次获取请求值
           requestCount === 1 ? this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result) : this.addExcel(jsonStr_parse, requestCount, pageSize)
-          //跳出循环--停止获取excel数据
-          if (requestCount !== 1 && requestCount >= this.maxInteral) { this.finished = '加载完成！'; return };
+
           this.params.requestCount = requestCount + 1;
         }
       })
 
     },
     async download () {
-      const { reportCode, setParam } = this.params
-      const obj = {
-        reportCode,
-        setParam,
-        requestCount: 1,
-        pageSize: 1000
-      };
-      exportReq(obj).then((res) => {
-        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-        const fileName = reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
-        exportFile(blob, fileName);
-      });
+      //刷新
+      window.luckysheet.refresh();
+      console.log('luckysheet.getAllSheets()', luckysheet.getAllSheets());
+      exportExcel(luckysheet.getAllSheets(), this.params.reportCode + '-' + `${formatDate(new Date())}`)
+      //   const { reportCode, setParam } = this.params
+      //   const obj = {
+      //     reportCode,
+      //     setParam,
+      //     requestCount: 1,
+      //     pageSize: 1000
+      //   };
+      //   exportReq(obj).then((res) => {
+      //     let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+      //     const fileName = reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+      //     exportFile(blob, fileName);
+      //   });
     },
     //时间格式化
     dateFormate () {
@@ -169,6 +179,7 @@ export default {
     addExcel (jsonStr_parse, requestCount, pageSize) {
       jsonStr_parse.forEach((item, index) => {
         item.celldata.forEach(o => {
+          if (!this.visib) return;
           o.r = o.r + (requestCount - 1) * pageSize;
           let options = { order: index };
           window.luckysheet.setCellValue(o.r, o.c, o.v, options)
@@ -176,7 +187,9 @@ export default {
       })
       //刷新
       window.luckysheet.refresh();
-      this.intervalPreview();
+      //跳出循环--停止获取excel数据
+      if (requestCount !== 1 && requestCount >= this.maxInteral) { this.finished = '加载完成！'; return };
+      if (this.visib) this.intervalPreview();
     },
     getParamsList (setParam, setParam_parse) {
       const extendObj = setParam = setParam_parse;
@@ -280,6 +293,13 @@ export default {
 }
 #luckysheet-pivotTableFilter-byvalue-select .ListBox {
   min-height: 150px !important;
+}
+.luckysheet-modal-controll-btn {
+  height: 20px;
+  width: 20px;
+  padding: 0;
+  text-align: center;
+  font-size: 0.01rem !important;
 }
 </style>
 <style lang="less" scoped>

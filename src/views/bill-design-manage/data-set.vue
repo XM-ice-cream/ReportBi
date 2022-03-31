@@ -51,7 +51,7 @@
         </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick">
           <template slot="operation" slot-scope="{ row }">
-            <Button @click="dataview(row)" class="tableBtn">数据预览</Button>
+            <span @click="dataview(row)" class="tableBtn">数据预览</span>
           </template>
         </Table>
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />

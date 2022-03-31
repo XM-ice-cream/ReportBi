@@ -26,6 +26,7 @@
   </div>
 </template>
 <script>
+// jQuery.noConflict();
 import vue from "vue";
 import VueSuperSlide from "vue-superslide";
 
@@ -46,7 +47,7 @@ export default {
         //effect: "top",
         autoPlay: true,
         vis: 5,
-        rowHeight: "50px"
+        rowHeight: 50
       },
       header: [],
       list: [],
