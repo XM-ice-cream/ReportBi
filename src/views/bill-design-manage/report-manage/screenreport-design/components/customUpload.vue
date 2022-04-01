@@ -1,9 +1,9 @@
 <template>
   <div>
-    <Input clearable v-model.trim="uploadImgUrl" size="small" @change="changeInput">
+    <Input clearable v-model.trim="uploadImgUrl" size="small" @on-change="changeInput">
     <template slot="append">
       <i class="iconfont iconfolder-o"></i>
-      <input type="file" class="file" ref="files" @change="getImages" />
+      <input type="file" class="file" ref="files" @on-change="getImages" />
     </template>
     </Input>
   </div>
@@ -12,6 +12,7 @@
 import axios from "axios";
 // import { getToken } from "@/utils/auth";
 export default {
+  name: 'customUpload',
   model: {
     prop: "value",
     event: "input"
@@ -47,29 +48,28 @@ export default {
     },
     upload (imgUrl) {
       let that = this;
-      console.log(that.headers);
       let formdata = new FormData();
       formdata.append("file", imgUrl);
-      axios
-        .post(this.requestUrl, formdata, {
-          headers: that.headers
-        })
-        .then(response => {
-          let res = response.data;
-          if (res.code == "200") {
-            that.uploadImgUrl = res.data.urlPath;
-            that.$emit("input", that.uploadImgUrl);
-            that.$emit("change", that.uploadImgUrl);
-          }
-        });
+      axios.post(this.requestUrl, formdata, {
+        headers: that.headers
+      }).then(response => {
+        let res = response.data;
+        if (res.code == "200") {
+          that.uploadImgUrl = res.data.urlPath;
+          that.$emit("input", that.uploadImgUrl);
+          that.$emit("change", that.uploadImgUrl);
+        }
+      });
     },
     changeInput (e) {
+
       if (e) {
         this.uploadImgUrl = e;
       } else {
         this.$refs.files.value = "";
         this.uploadImgUrl = "";
       }
+      console.log(e, this.uploadImgUrl);
       this.$emit("input", this.uploadImgUrl);
       this.$emit("change", this.uploadImgUrl);
     }

@@ -43,24 +43,16 @@ export default {
       this.$emit("update:visible", false);
     },
     deleteLayer () {
-      this.$confirm("是否删除所选图层?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
+      this.$Modal.confirm({
+        title: '是否删除所选图层?',
+        onOk: () => {
           this.$emit("deletelayer");
           this.$message({
             type: "success",
             message: "删除成功!"
           });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
+        }
+      })
     },
     copyLayer () {
       this.$emit("copylayer");

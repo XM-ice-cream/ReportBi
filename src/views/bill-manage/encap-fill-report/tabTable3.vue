@@ -7,13 +7,7 @@
         </i-col>
       </Row>
     </div>
-    <Table
-      :border="tableConfig.border"
-      :highlight-row="tableConfig.highlightRow"
-      :max-height="300"
-      :columns="columns"
-      :data="tableData"
-    >
+    <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :max-height="300" :columns="columns" :data="tableData">
     </Table>
     <!-- 饼图 -->
     <PieEncap ref="pieEncap" :data="pieData" index="PieEncap" />
@@ -39,10 +33,10 @@ export default {
     },
     queryObj: {
       type: Object,
-      default: () => {},
+      default: () => { },
     },
   },
-  data() {
+  data () {
     return {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
@@ -75,45 +69,44 @@ export default {
   },
   watch: {
     tableData: {
-      handler(newVal) {
+      handler (newVal) {
         this.data = newVal;
         this.tableConfig.loading = newVal.length === 0;
-        this.pieData =[];
+        this.pieData = [];
         // this.pieData = {
         //   series: [],
         //   legend: [],
         //   title: '',
         // }; // 饼图数据
-        let eqpList =[];
+        let eqpList = [];
         this.data.map(o => {
-          if(eqpList.includes(o.eqpId)){
-            let currentPieData =this.pieData[this.pieData.length-1];
+          if (eqpList.includes(o.eqpId)) {
+            let currentPieData = this.pieData[this.pieData.length - 1];
             currentPieData.series.push({ name: o.defectDes, value: o.defectQty });
-            if(!currentPieData.legend.includes(o.legend)){currentPieData.legend.push(o.defectDes)}
-          }else{
+            if (!currentPieData.legend.includes(o.legend)) { currentPieData.legend.push(o.defectDes) }
+          } else {
             this.pieData.push({
-              series: [{ name: o.defectDes, value: o.defectQty }],  
-              legend: [o.defectDes],          
+              series: [{ name: o.defectDes, value: o.defectQty }],
+              legend: [o.defectDes],
               title: o.eqpId,
-            }                   
+            }
             )
-             eqpList.push(o.eqpId)      
+            eqpList.push(o.eqpId)
           }
         })
-        console.log(this.pieData);
-       
-       
-          
+
+
+
       },
       deep: true,
     },
   },
-  mounted() {
+  mounted () {
     this.autoSize();
   },
   methods: {
     // 导出
-    exportClick() {
+    exportClick () {
       let obj = this.queryObj;
       byDefectExportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
@@ -122,7 +115,7 @@ export default {
       });
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 210;
     },
   },

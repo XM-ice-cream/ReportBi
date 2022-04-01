@@ -1,14 +1,14 @@
 <template>
-  <Input clearable v-model="colorValue" placeholder="请输入颜色" size="small" @change="changeColor">
+  <Input clearable v-model="colorValue" placeholder="请输入颜色" size="small" @on-change="changeColor">
   <template slot="append">
-    <ColorPicker v-model="colorValue" :predefine="predefineColors" show-alpha size="small" @change="changeColor" />
+    <ColorPicker v-model="colorValue" :predefine="predefineColors" alpha transfer size="small" @on-change="changeColor" />
   </template>
   </Input>
 </template>
 
 <script>
 export default {
-  name: "ColorPicker",
+  name: "ColorPickerComponents",
   model: {
     prop: "value",
     event: "input"
@@ -35,6 +35,7 @@ export default {
   },
   watch: {
     value (val) {
+      console.log('val', val);
       this.colorValue = val || "";
     }
   },
@@ -43,7 +44,8 @@ export default {
   },
   methods: {
     changeColor (val) {
-      this.colorValue = val || "";
+      console.log('this.colorValue', this.colorValue);
+      //   this.colorValue = val.target.value || "";
       this.$emit("input", this.colorValue);
       this.$emit("change", this.colorValue);
     }
@@ -55,5 +57,11 @@ export default {
 /deep/.ColorPicker--mini .ColorPicker__trigger {
   width: 23px;
   height: 23px;
+}
+</style>
+<style>
+.ivu-select-dropdown {
+  width: auto !important;
+  /* right: 2px !important; */
 }
 </style>

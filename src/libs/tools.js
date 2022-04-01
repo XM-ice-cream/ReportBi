@@ -1029,6 +1029,35 @@ export const deepCloneObj = (data) => {
     }
     return obj
 };
+//判断数据不为空
+export const isNotNull = (val) => {
+    return !isNull(val)
+};
+//判断数据是否为空
+export const isNull = (val) => {
+    // 特殊判断
+    if (val && parseInt(val) === 0) return false
+    const list = ['$parent']
+    if (val instanceof Date || typeof val === 'boolean' || typeof val === 'number') return false
+    if (val instanceof Array) {
+        if (val.length === 0) return true
+    } else if (val instanceof Object) {
+        val = deepClone(val)
+        list.forEach((ele) => {
+            delete val[ele]
+        })
+        for (let o in val) {
+            return false
+        }
+        return true
+    } else {
+        if (val === 'null' || val == null || val === 'undefined' || val === undefined || val === '') {
+            return true
+        }
+        return false
+    }
+    return false
+}
 // 获取对象类型
 function getObjectType(obj) {
     let toString = Object.prototype.toString
@@ -1068,4 +1097,4 @@ function isArrayFn(value) {
     } else {
         return Object.prototype.toString.call(value) === "[object Array]";
     }
-};
+}

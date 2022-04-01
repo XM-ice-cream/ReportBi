@@ -2,7 +2,7 @@
   <div>
     <Form :label-width="100" label-position="left">
       <FormItem label="数据集">
-        <Select size="small" v-model="dataSetValue" filterable placeholder="请选择" @change="selectDataSet">
+        <Select size="small" v-model="dataSetValue" filterable placeholder="请选择" @on-change="selectDataSet">
           <Option v-for="item in dataSet" :key="item.code" :label="item.setName" :value="item.id" />
         </Select>
       </FormItem>

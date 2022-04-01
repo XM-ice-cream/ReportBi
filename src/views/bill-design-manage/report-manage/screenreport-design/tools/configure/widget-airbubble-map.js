@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 气泡地图json
- * @version: 
- * @Author: qianlishi
- * @Date: 2021-08-29 07:35:32
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:10:01
- */
 export const widgetAirbubbleMap = {
     code: 'widgetAirBubbleMap',
     type: 'chart',

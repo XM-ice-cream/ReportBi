@@ -233,7 +233,6 @@ export default {
     show (row, processname) {
       this.isShow = true;
       this.wipJson = { workorder: row.workorder, processname: processname }
-      // console.log(row, processname, this.$refs.wipmodal);
       //   this.$refs.wipmodal.pageLoad(row.workorder, processname);
 
     },

@@ -31,7 +31,7 @@
             </Tabs>
           </Sider>
           <!-- 中间内容excel -->
-          <Content class="layout-middle" :style="{ width: middleWidth + 'px', height: middleHeight + 'px' }">
+          <Content class="layout-middle" style='width:calc(100% - 400px);height:100%'>
             <div class="push_btn">
               <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
                 <Button type="text" @click="preview()">
@@ -44,40 +44,42 @@
                 </Button>
               </Tooltip>
             </div>
-            <div class="workbench-container" style="width:100%;height:calc(100% - 1rem)" @mousedown="handleMouseDown">
+            <div class="workbench-container" style="width:100%;height:calc(100% - 1.5rem)" @mousedown="handleMouseDown">
+              <!-- 网页标尺辅助线 -->
               <vue-ruler-tool v-model="dashboard.presetLine" class="vueRuler" :step-length="50" :parent="true" :position="'relative'" :is-scale-revise="true" :visible.sync="dashboard.presetLineVisible" style="height:100%;width:100%">
+                <!-- workbench 工作台 -->
+                <!-- @click.self 只点击自己本身触发 -->
                 <div id="workbench" class="workbench" :style="{
-              transform: workbenchTransform,
-              width: bigscreenWidth + 'px',
-              height: '100%',
-              'background-color': dashboard.backgroundColor,
-              'background-image': 'url(' + dashboard.backgroundImage + ')',
-              'background-position': '0% 0%',
-              'background-size': '100% 100%',
-              'background-repeat': 'initial',
-              'background-attachment': 'initial',
-              'background-origin': 'initial',
-              'background-clip': 'initial'
-            }" @click.self="setOptionsOnClickScreen">
+                        width: '100%',
+                        height: '100%',
+                        'background-color': dashboard.backgroundColor,
+                        'background-image': 'url(' + dashboard.backgroundImage + ')',
+                        'background-position': '0% 0%',
+                        'background-size': '100% 100%',
+                        'background-repeat': 'initial',
+                        'background-attachment': 'initial',
+                        'background-origin': 'initial',
+                        'background-clip': 'initial'
+                        }" @click.self="setOptionsOnClickScreen">
                   <div v-if="grade" class="bg-grid"></div>
-                  <widget ref="widgets" v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :index="index" :step="step" :type="widget.type" :bigscreen="{ bigscreenWidth, bigscreenHeight }" @onActivated="setOptionsOnClickWidget" @contextmenu.prevent.native="rightClick($event, index)" @mousedown.prevent.native="widgetsClick(index)" @mouseup.prevent.native="widgetsMouseup" />
+                  <widget ref="widgets" v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :index="index" :step="1" :type="widget.type" :bigscreen="{ bigscreenWidth, bigscreenHeight }" @onActivated="setOptionsOnClickWidget" @contextmenu.prevent.native="rightClick($event, index)" @mousedown.prevent.native="widgetsClick(index)" @mouseup.prevent.native="widgetsMouseup" />
                 </div>
               </vue-ruler-tool>
             </div>
           </Content>
           <!-- 右侧基础配置 -->
-          <Sider hide-trigger class="layout-right" :style="{ width: widthLeftForOptions + 'px' }">
-            <!-- <Tabs v-model="activeName">
-              <TabPane v-if="widgetOptions.setup || widgetOptions.collapse" name="first" label="配置">
+          <Sider hide-trigger class="layout-right">
+            <Tabs type='card'>
+              <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
               </TabPane>
-              <TabPane v-if="widgetOptions.data" name="second" label="数据">
-                <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('data', val)" />
+              <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据">
+                <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" />
               </TabPane>
-              <TabPane v-if="widgetOptions.position" name="third" label="坐标">
-                <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('position', val)" />
+              <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标">
+                <dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="val => widgetValueChanged('position', val)" />
               </TabPane>
-            </Tabs> -->
+            </Tabs>
           </Sider>
         </Layout>
       </div>
@@ -95,9 +97,9 @@ import { widgetTools, getToolByCode } from "./screenreport-design/tools/index";
 import draggable from "vuedraggable";
 import VueRulerTool from "vue-ruler-tool"; // 大屏设计页面的标尺插件
 import widget from "./screenreport-design/widget/widget.vue";
-import { deepClone } from '@/libs/tools.js'
-import DynamicForm from './screenreport-design/components/dynamicForm.vue';
-import ContentMenu from './screenreport-design/components/contentMenu.vue';
+import { deepClone, isNotNull } from "@/libs/tools.js";
+import DynamicForm from "./screenreport-design/components/dynamicForm.vue";
+import ContentMenu from "./screenreport-design/components/contentMenu.vue";
 export default {
   name: "excelreport-design",
   components: { draggable, VueRulerTool, widget, DynamicForm, ContentMenu },
@@ -105,31 +107,37 @@ export default {
     visib: {
       required: true,
       type: Boolean,
-      default: false
+      default: false,
     },
     reportCode: {
       required: false,
       type: String,
-    }
+    },
   },
   watch: {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
-          console.log('nextTick');
           // 如果是新的设计工作台
           this.initEchartData();
           this.widgets = [];
           window.addEventListener("mouseup", () => {
             this.grade = false;
           });
-        })
+        });
       }
+    },
+    widgets: {
+      handler (val) {
+        console.log('监听', this.widgets);
+        this.handlerLayerWidget(val);
+      },
+      deep: true
     }
   },
   data () {
     return {
-      dialogFormVisibleTitle: '大屏 设计',
+      dialogFormVisibleTitle: "大屏 设计",
       uploadUrl:
         process.env.BASE_API +
         "/reportDashboard/import/" +
@@ -137,6 +145,7 @@ export default {
       grade: false,
       layerWidget: [],
       widgetTools: widgetTools, // 左侧工具栏的组件图标，将js变量加入到当前作用域
+      isNotNull: isNotNull,
       widthLeftForTools: 200, // 左侧工具栏宽度
       widthLeftForToolsHideButton: 15, // 左侧工具栏折叠按钮宽度
       widthLeftForOptions: 300, // 右侧属性配置区
@@ -156,7 +165,7 @@ export default {
         backgroundImage: "", // 大屏背景图片
         refreshSeconds: null, // 大屏刷新时间间隔
         presetLine: [], // 辅助线
-        presetLineVisible: true // 辅助线是否显示
+        presetLineVisible: true, // 辅助线是否显示
       },
       // 大屏的标记
       screenCode: "",
@@ -173,12 +182,12 @@ export default {
               height: 100,
               left: 0,
               top: 0,
-              zIndex: 0
-            }
+              zIndex: 0,
+            },
           },
           // options属性是从工具栏中拿到的tools中拿到
-          options: []
-        }
+          options: [],
+        },
       ], // 工作区中拖放的组件
 
       // 当前激活组件
@@ -187,73 +196,71 @@ export default {
       widgetOptions: {
         setup: [], // 配置
         data: [], // 数据
-        position: [] // 坐标
+        position: [], // 坐标
       },
       flagWidgetClickStopPropagation: false, // 点击组件时阻止事件冒泡传递到画布click事件上
       styleObj: {
         left: 0,
-        top: 0
+        top: 0,
       },
       visibleContentMenu: false,
       rightClickIndex: -1,
-      activeName: "first"
+      activeName: "first",
     };
   },
   computed: {
-    step () {
-      return Number(100 / (this.bigscreenScaleInWorkbench * 100));
-    },
-    headers () {
-      return {
-        Authorization: getToken() // 直接从本地获取token就行
-      };
-    },
-    // 左侧折叠切换时，动态计算中间区的宽度
-    middleWidth () {
-      let widthLeftAndRight = 0;
-      if (this.toolIsShow) {
-        widthLeftAndRight += this.widthLeftForTools; // 左侧工具栏宽度
-      }
-      widthLeftAndRight += this.widthLeftForToolsHideButton; // 左侧工具栏折叠按钮宽度
-      widthLeftAndRight += this.widthLeftForOptions; // 右侧配置栏宽度
-
-      let middleWidth = this.bodyWidth - widthLeftAndRight;
-      return middleWidth;
-    },
-    middleHeight () {
-      return this.bodyHeight;
-    },
-    // 设计台按大屏的缩放比例
-    bigscreenScaleInWorkbench () {
-      let widthScale =
-        (this.middleWidth - this.widthPaddingTools) / this.bigscreenWidth;
-      let heightScale =
-        (this.middleHeight - this.widthPaddingTools) / this.bigscreenHeight;
-      return Math.min(widthScale, heightScale);
-    },
-    workbenchTransform () {
-      return `scale(${this.bigscreenScaleInWorkbench}, ${this.bigscreenScaleInWorkbench
-        })`;
-    },
-    // 大屏在设计模式的大小
-    bigscreenWidthInWorkbench () {
-      console.log(this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools);
-      return this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools;
-    },
-    bigscreenHeightInWorkbench () {
-      return (
-        this.getPXUnderScale(this.bigscreenHeight) + this.widthPaddingTools
-      );
-    }
   },
   methods: {
+    // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
+    widgetOnDragged (evt, widgetCode) {
+      let widgetType = widgetCode;
+
+      // 获取结束坐标和列名
+      let eventX = evt.originalEvent.clientX; // 结束在屏幕的x坐标
+      let eventY = evt.originalEvent.clientY; // 结束在屏幕的y坐标
+
+      let workbenchPosition = this.getDomTopLeftById("workbench");
+
+      let widgetTopInWorkbench = eventY - workbenchPosition.top;
+      let widgetLeftInWorkbench = eventX - workbenchPosition.left;
+      // 计算在缩放模式下的x y
+      let x = widgetLeftInWorkbench / this.bigscreenScaleInWorkbench;
+      let y = widgetTopInWorkbench / this.bigscreenScaleInWorkbench;
+
+      // 复制一个组件
+      let tool = getToolByCode(widgetType);
+      let widgetJson = {
+        type: widgetType,
+        value: {
+          setup: {},
+          data: {},
+          position: {
+            width: 0,
+            height: 0,
+            left: 0,
+            top: 0,
+            zIndex: 0,
+          },
+        },
+        options: tool.options,
+      };
+      // 处理默认值
+      const widgetJsonValue = this.handleDefaultValue(widgetJson);
+      // 将选中的复制组件，放到工作区中去
+      console.log('widgetJsonValue', widgetJsonValue, deepClone(widgetJsonValue));
+      this.widgets.push(deepClone(widgetJsonValue));
+      // 激活新组件的配置属性
+      //   this.setOptionsOnClickWidget(this.widgets.length - 1);
+    },
+
     handlerLayerWidget (val) {
+
       const layerWidgetArr = [];
       for (let i = 0; i < val.length; i++) {
         const obj = {};
         obj.icon = getToolByCode(val[i].type).icon;
         const options = val[i].options["setup"];
-        options.forEach(el => {
+        options.forEach((el) => {
           if (el.name == "layerName") {
             obj.label = el.value;
           }
@@ -261,6 +268,7 @@ export default {
         layerWidgetArr.push(obj);
       }
       this.layerWidget = layerWidgetArr;
+      console.log('this.layerWidget', this.layerWidget);
     },
     async initEchartData () {
       const reportCode = this.$route.query.reportCode;
@@ -289,7 +297,7 @@ export default {
         backgroundImage: (data && data.backgroundImage) || "",
         height: (data && data.height) || "1080",
         title: (data && data.title) || "",
-        width: (data && data.width) || "1920"
+        width: (data && data.width) || "1920",
       };
     },
     handleInitEchartsData (data) {
@@ -301,7 +309,7 @@ export default {
         obj.value = {
           setup: widgets[i].value.setup,
           data: widgets[i].value.data,
-          position: widgets[i].value.position
+          position: widgets[i].value.position,
         };
         const tool = deepClone(getToolByCode(widgets[i].type));
         const option = tool.options;
@@ -322,7 +330,7 @@ export default {
           } else if (Object.prototype.toString.call(item) == "[object Array]") {
             for (let j = 0; j < item.length; j++) {
               const list = item[j].list;
-              list.forEach(el => {
+              list.forEach((el) => {
                 if (key == el.name) {
                   el.value = data.setup[key];
                 }
@@ -352,7 +360,7 @@ export default {
     // 保存数据
     async saveData () {
       if (!this.widgets || this.widgets.length == 0) {
-        this.$message.error("请添加组件");
+        this.$Message.error("请添加组件");
         return;
       }
       const screenData = {
@@ -362,9 +370,9 @@ export default {
           width: this.dashboard.width,
           height: this.dashboard.height,
           backgroundColor: this.dashboard.backgroundColor,
-          backgroundImage: this.dashboard.backgroundImage
+          backgroundImage: this.dashboard.backgroundImage,
         },
-        widgets: this.widgets
+        widgets: this.widgets,
       };
       //   const { code, data } = await insertDashboard(screenData);
       //   if (code == "200") {
@@ -375,7 +383,7 @@ export default {
     viewScreen () {
       let routeUrl = this.$router.resolve({
         path: "/bigscreen/viewer",
-        query: { reportCode: this.$route.query.reportCode }
+        query: { reportCode: this.$route.query.reportCode },
       });
       window.open(routeUrl.href, "_blank");
     },
@@ -385,9 +393,9 @@ export default {
 
       const param = {
         reportCode: this.$route.query.reportCode,
-        showDataSet: val
+        showDataSet: val,
       };
-      exportDashboard(param).then(res => {
+      exportDashboard(param).then((res) => {
         const that = this;
         const type = res.type;
         if (type == "application/json") {
@@ -420,83 +428,25 @@ export default {
       //刷新大屏页面
       this.initEchartData();
       if (response.code == "200") {
-        this.$message({
-          message: "导入成功！",
-          type: "success"
-        });
+        this.$Message.success("导入成功！");
       } else {
-        this.$message({
-          message: response.message,
-          type: "error"
-        });
+        this.$Message.error(response.message);
       }
     },
     handleError (err) {
-      this.$message({
-        message: "上传失败！",
-        type: "error"
-      });
+      this.$Message.error("上传失败！");
     },
 
     // 在缩放模式下的大小
     getPXUnderScale (px) {
-      console.log(this.bigscreenScaleInWorkbench);
       return this.bigscreenScaleInWorkbench * px;
     },
 
-    // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
-    widgetOnDragged (evt, widgetCode) {
-      console.log('widgetOnDragged', evt, widgetCode);
-      let widgetType = widgetCode;
 
-      // 获取结束坐标和列名
-      let eventX = evt.originalEvent.clientX; // 结束在屏幕的x坐标
-      let eventY = evt.originalEvent.clientY; // 结束在屏幕的y坐标
-
-      let workbenchPosition = this.getDomTopLeftById("workbench");
-      let widgetTopInWorkbench = eventY - workbenchPosition.top;
-      let widgetLeftInWorkbench = eventX - workbenchPosition.left;
-
-      // 计算在缩放模式下的x y
-      let x = widgetLeftInWorkbench / this.bigscreenScaleInWorkbench;
-      let y = widgetTopInWorkbench / this.bigscreenScaleInWorkbench;
-
-      // 复制一个组件
-      let tool = getToolByCode(widgetType);
-      let widgetJson = {
-        type: widgetType,
-        value: {
-          setup: {},
-          data: {},
-          position: {
-            width: 0,
-            height: 0,
-            left: 0,
-            top: 0,
-            zIndex: 0
-          }
-        },
-        options: tool.options
-      };
-      // 处理默认值
-      const widgetJsonValue = this.handleDefaultValue(widgetJson);
-      // 将选中的复制组件，放到工作区中去
-
-      this.widgets.push(deepClone(widgetJsonValue));
-      console.log(this.widgets, widgetJsonValue);
-      // 激活新组件的配置属性
-      //   this.setOptionsOnClickWidget(this.widgets.length - 1);
-    },
     // 获取dom在屏幕中的top和left
     getDomTopLeftById (id) {
-      let dom = document.getElementById(id)
-      let top = 0
-      let left = 0
-      if (dom != null) {
-        top = dom.getBoundingClientRect().top
-        left = dom.getBoundingClientRect().left
-      }
-      return { top: top, left: left }
+      let dom = document.getElementById(id);
+      return { top: dom?.getBoundingClientRect().top || 0, left: dom?.getBoundingClientRect().left || 0 };
     },
 
     // 对组件默认值处理
@@ -514,7 +464,7 @@ export default {
             ) {
               for (let j = 0; j < item.length; j++) {
                 const list = item[j].list;
-                list.forEach(el => {
+                list.forEach((el) => {
                   widgetJson.value.setup[el.name] = el.value;
                 });
               }
@@ -541,44 +491,20 @@ export default {
       return widgetJson;
     },
     layerClick (index) {
+      console.log('layerClick', index);
       this.widgetIndex = index;
       this.widgetsClick(index);
     },
     // 如果是点击大屏设计器中的底层，加载大屏底层属性
     setOptionsOnClickScreen () {
+      console.log('setOptionsOnClickScreen', this.widgetOptions);
       this.screenCode = "screen";
       // 选中不同的组件 右侧都显示第一栏
-      this.activeName = "first";
+      //   this.activeName = "first";
       this.widgetOptions = getToolByCode("screen")["options"];
     },
 
-    // 如果是点击某个组件，获取该组件的配置项
-    setOptionsOnClickWidget (obj) {
-      this.screenCode = "";
-      console.log(1);
-      if (typeof obj == "number") {
-        this.widgetOptions = deepClone(this.widgets[obj]["options"]);
-        console.log(this.widgetOptions);
-        return;
-      }
-      if (obj.index < 0 || obj.index >= this.widgets.length) {
-        return;
-      }
-      console.log(1);
-      this.widgetIndex = obj.index;
-      this.widgets[obj.index].value.position = obj;
-      this.widgets[obj.index].options.position.forEach(el => {
-        for (const key in obj) {
-          if (el.name == key) {
-            el.value = obj[key];
-          }
-        }
-      });
-      console.log(1);
-      this.widgetOptions = deepClone(this.widgets[obj.index]["options"]);
-      console.log(' this.widgetOptions', this.widgetOptions);
-      console.log(1);
-    },
+
     widgetsClick (index) {
       const draggableArr = this.$refs.widgets;
       for (let i = 0; i < draggableArr.length; i++) {
@@ -588,14 +514,39 @@ export default {
           this.$refs.widgets[i].$refs.draggable.setActive(false);
         }
       }
-      console.log('widgetsClick', index);
-      //   this.setOptionsOnClickWidget(index);
+      console.log("鼠标按下", index);
+      this.setOptionsOnClickWidget(index);
       this.grade = true;
     },
     widgetsMouseup (e) {
-      console.log(e);
       this.grade = false;
     },
+    // 如果是点击某个组件，获取该组件的配置项
+    setOptionsOnClickWidget (obj) {
+      this.screenCode = "";
+      if (typeof obj == "number") {
+
+        this.widgetOptions = deepClone(this.widgets[obj]["options"]);
+        console.log('number-setOptionsOnClickWidget', this.widgetOptions);
+        return;
+      }
+      if (obj.index < 0 || obj.index >= this.widgets.length) {
+        return;
+      }
+      this.widgetIndex = obj.index;
+      this.widgets[obj.index].value.position = obj;
+      this.widgets[obj.index].options.position.forEach((el) => {
+        for (const key in obj) {
+          if (el.name == key) {
+            el.value = obj[key];
+          }
+        }
+      });
+      this.widgetOptions = deepClone(this.widgets[obj.index]["options"]);
+      console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
+
+    },
+
     handleMouseDown () {
       const draggableArr = this.$refs.widgets;
       for (let i = 0; i < draggableArr.length; i++) {
@@ -604,9 +555,8 @@ export default {
     },
     // 将当前选中的组件，右侧属性值更新
     widgetValueChanged (key, val) {
-      console.log(key, val, this.screenCode);
+      console.log('key', this.screenCode, val);
       if (this.screenCode == "screen") {
-
         let newSetup = new Array();
         this.dashboard = deepClone(val);
         if (this.bigscreenWidth != this.dashboard.width) {
@@ -615,7 +565,7 @@ export default {
         if (this.bigscreenHeight != this.dashboard.height) {
           this.bigscreenHeight = this.dashboard.height;
         }
-        this.widgetOptions.setup.forEach(el => {
+        this.widgetOptions.setup.forEach((el) => {
           if (el.name == "width") {
             el.value = this.bigscreenWidth;
           } else if (el.name == "height") {
@@ -624,6 +574,7 @@ export default {
           newSetup.push(el);
         });
         this.widgetOptions.setup = newSetup;
+        console.log('widgetValueChanged', '右侧属性值更新setup', this.widgetOptions.setup);
       } else {
         for (let i = 0; i < this.widgets.length; i++) {
           if (this.widgetIndex == i) {
@@ -634,7 +585,6 @@ export default {
       }
     },
     rightClick (event, index) {
-      console.log('rightClick', index);
       this.rightClickIndex = index;
       const left = event.clientX;
       const top = event.clientY;
@@ -642,7 +592,7 @@ export default {
         this.styleObj = {
           left: left + "px",
           top: top + "px",
-          display: "block"
+          display: "block",
         };
       }
       this.visibleContentMenu = true;
@@ -672,6 +622,7 @@ export default {
         }
       }
     },
+    //图层拖拉结束
     datadragEnd (evt) {
       evt.preventDefault();
       this.widgets = this.swapArr(this.widgets, evt.oldIndex, evt.newIndex);
@@ -729,13 +680,10 @@ export default {
     },
     //关闭弹框
     closeDialog () {
-      this.$emit('update:visib', false);
+      this.$emit("update:visib", false);
     },
   },
-  mounted () {
-
-
-  }
+  mounted () { },
 };
 </script>
 <style>
@@ -918,6 +866,10 @@ export default {
   .layout-right {
     display: inline-block;
     height: 100%;
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+    flex: 0 0 300px !important;
   }
 
   /deep/ .el-tabs--border-card {
@@ -1007,7 +959,10 @@ export default {
 /deep/.ivu-tabs .ivu-tabs-content-animated {
   background-color: #242a30;
   height: calc(100% - 33px);
-  overflow-x: hidden;
+  //   overflow-x: hidden;
+}
+/deep/.ivu-tabs .ivu-tabs-tabpane {
+  background: #242a30;
   overflow-y: auto;
 }
 /deep/.ivu-tabs {

@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-// import wordCloud from "../../../../../../../static/wordCloud/echarts-wordcloud.min.js";
+import wordCloud from "../../../../../../../public/static/wordCloud/echarts-wordcloud.min.js";
 
 export default {
   name: "widgetWordCloud",

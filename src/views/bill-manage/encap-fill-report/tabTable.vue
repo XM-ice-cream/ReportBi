@@ -10,20 +10,9 @@
             </i-col>
           </Row>
         </div>
-        <Table
-          :border="tableConfig.border"
-          :highlight-row="tableConfig.highlightRow"
-          :max-height="tableConfig.height"
-          :columns="columns"
-          :data="data"
-        >
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :max-height="tableConfig.height" :columns="columns" :data="data">
         </Table>
-        <BarEncapFill
-          ref="barEncapFill"
-          style="width: 900px; height: 420px"
-          :data="barData"
-          index="lineEncapFill"
-        />
+        <BarEncapFill ref="barEncapFill" style="width: 900px; height: 420px" :data="barData" index="lineEncapFill" />
       </Card>
     </div>
     <encapFillScrapDetail :isShow.sync="isShow" :paramData="wipJson" />
@@ -42,7 +31,7 @@ import encapFillEqp from './encap-fill-eqp.vue';
 
 export default {
   name: "tabTable",
-  components: { BarEncapFill,encapFillScrapDetail,encapFillDamDetail,encapFillEqp },
+  components: { BarEncapFill, encapFillScrapDetail, encapFillDamDetail, encapFillEqp },
   props: {
     btnData: {
       type: Array,
@@ -54,10 +43,10 @@ export default {
     },
     queryObj: {
       type: Object,
-      default: () => {},
+      default: () => { },
     },
   },
-  data() {
+  data () {
     return {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
@@ -124,7 +113,7 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.show(params.row,'input'); //点击事件
+                      this.show(params.row, 'input'); //点击事件
                     },
                   },
                 },
@@ -165,7 +154,7 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.show(params.row,'fail'); //点击事件
+                      this.show(params.row, 'fail'); //点击事件
                     },
                   },
                 },
@@ -180,8 +169,7 @@ export default {
   },
   watch: {
     tableData: {
-      handler(newVal) {
-        console.log('=============newVal============',newVal)
+      handler (newVal) {
         this.data = newVal;
         this.tableConfig.loading = newVal.length === 0;
         this.barData.xAxisData = this.data.map((o) => o.lineName);
@@ -192,12 +180,12 @@ export default {
       deep: true,
     },
   },
-  mounted() {
+  mounted () {
     this.autoSize();
   },
   methods: {
     // 导出
-    exportClick() {
+    exportClick () {
       let obj = this.queryObj;
       byLineExportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
@@ -205,38 +193,32 @@ export default {
         exportFile(blob, fileName);
       });
     },
-    show (row,flag) {
+    show (row, flag) {
       let obj = this.queryObj;
-      console.log('======queryObj====',this.queryObj)
-      if(flag == 'fail')
-      {
-        if(row.failQty == 0)
-        {
+      if (flag == 'fail') {
+        if (row.failQty == 0) {
           this.isShow = false;
           this.isShowDam = true;
           this.isShowEqp = false;
         }
-        else
-        {
+        else {
           this.isShow = true;
           this.isShowDam = false;
           this.isShowEqp = false;
         }
       }
-      else
-      {
+      else {
         this.isShow = false;
         this.isShowDam = false;
         this.isShowEqp = true;
       }
       //this.isShow = true;
       this.wipJson = { startTime: obj.startTime, endTime: obj.endTime, lineName: row.lineName, stepName: obj.stepName }
-      // console.log(row, processname, this.$refs.wipmodal);
       //   this.$refs.wipmodal.pageLoad(row.workorder, processname);
 
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 210;
     },
   },

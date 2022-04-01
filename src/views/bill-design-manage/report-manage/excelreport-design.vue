@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='900' :before-close="closeDialog">
+    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='848' :before-close="closeDialog">
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
@@ -58,7 +58,7 @@
                     <Input v-model="rightForm.value" />
                   </FormItem>
                   <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
-                    <i-switch v-model="rightForm.auto" @change="autoChangeFunc($event)" /> &nbsp;
+                    <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event)" /> &nbsp;
                     <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
                       <i class="el-icon-question"> </i>
                     </Tooltip>
@@ -76,7 +76,7 @@
     </Modal>
 
     <!-- 数据集管理弹框--表格 -->
-    <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='901'>
+    <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='849'>
       <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='500' tooltip-effect="dark" @on-selection-change="handleSelectionChange"></Table>
       <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       <div slot="footer" class="dialog-footer">
@@ -108,7 +108,6 @@ export default {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
-          console.log(this.reportCode);
           this.design();
         })
       }
@@ -362,14 +361,20 @@ export default {
       this.reportExcelDto.setCodes = setCodeList.join("|");
       this.reportExcelDto.reportCode = this.reportCode;
       if (this.reportId == null) {
-        const { code } = await insertExcelReportReq(this.reportExcelDto);
-        if (code != 200) return;
+        const { code, message } = await insertExcelReportReq(this.reportExcelDto);
+        if (code != 200) {
+          this.$Message.error(message);
+          return;
+        };
         this.$Message.success("保存成功");
         this.closeDialog();
       } else {
         this.reportExcelDto.id = this.reportId;
-        const { code } = await modifyExcelReportReq(this.reportExcelDto);
-        if (code != 200) return;
+        const { code, message } = await modifyExcelReportReq(this.reportExcelDto);
+        if (code != 200) {
+          this.$Message.error(message);
+          return;
+        };
         this.$Message.success("更新成功");
         this.closeDialog();
       }

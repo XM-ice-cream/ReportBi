@@ -62,7 +62,6 @@ export default {
     }
   },
   mounted () {
-    console.log("初始化啦~");
     this.initEditor();
     global[this.editorInstance._id] = this;
     window.addEventListener("resize", this.layout);

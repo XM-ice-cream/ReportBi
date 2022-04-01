@@ -23,25 +23,11 @@
                     </FormItem>
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
-                      <DatePicker
-                        transfer
-                        type="datetime"
-                        :placeholder="$t('pleaseSelect') + $t('startTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
-                        :options="$config.datetimeOptions"
-                        v-model="req.startTime"
-                      ></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
-                      <DatePicker
-                        transfer
-                        type="datetime"
-                        :placeholder="$t('pleaseSelect') + $t('endTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
-                        :options="$config.datetimeOptions"
-                        v-model="req.endTime"
-                      ></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
@@ -191,18 +177,18 @@ export default {
     previewImage (fileFullName) {
       if (this.req.previewServerIP) {
         var files = fileFullName.split(',');
-        console.log('==========files=========',files)
+        console.log('==========files=========', files)
         let reviewUrl = this.req.previewServerIP + "/download?filefullname=";
-        for (var i = 0;i < files.length;i++){
-            let imgUrl = reviewUrl + files[i];
-            console.log('==========imgUrl1=========',imgUrl)
-            window.open(imgUrl,files[i]);
+        for (var i = 0; i < files.length; i++) {
+          let imgUrl = reviewUrl + files[i];
+          console.log('==========imgUrl1=========', imgUrl)
+          window.open(imgUrl, files[i]);
         }
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
       }
-    },  
-    downloadImage(fileFullName) {
+    },
+    downloadImage (fileFullName) {
       if (this.req.previewServerIP) {
         let imgurl = this.req.previewServerIP + "/download?filefullname=" + fileFullName; // 获取图片地址
         Spin.show();
@@ -226,7 +212,6 @@ export default {
     // 获取数据字典数据
     async getDataItemData () {
       this.AOIRreviewFileData = await this.getDataItemDetailList("AOIRreviewFile");
-      console.log('this.AOIRreviewFileData',this.AOIRreviewFileData)
       this.req.previewServerIP = this.AOIRreviewFileData?.[0].detailCode;
     },
     async getDataItemDetailList (itemCode) {
