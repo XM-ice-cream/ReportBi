@@ -21,6 +21,10 @@
                     <FormItem :label="$t('smallBoardCode')">
                       <Input type="text" v-model="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode') + $t('multiple,separated')"></Input>
                     </FormItem>
+                    <!-- 站点 -->
+                    <FormItem :label="$t('stepName')">
+                      <Input type="text" v-model="req.stepName" placeholder="请输入站点(输入小条码时才有效)"></Input>
+                    </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')">
                       <v-selectpage v-if="searchPoptipModal" ref="workOrder" class="select-page-style" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
@@ -87,6 +91,7 @@ export default {
         total: 50,
         panel: "", //大板序号
         unitId: "", // 小板序号
+        stepName: "",
         workOrder: "", //工单
         rid: "", 
         lotCode: "", 
@@ -130,8 +135,8 @@ export default {
   methods: {
     // 获取分页列表数据
     pageLoad () {
-      let { pageSize, pageIndex, panel, unitId, workOrder, rid, lotCode, tfencode } = this.req;
-      if (!panel && !unitId && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
+      let { pageSize, pageIndex, panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req;
+      if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
       this.tableConfig.loading = true;
       const obj = {
         orderField: "panel", // 排序字段
@@ -141,6 +146,7 @@ export default {
         data: {
           panel: commaSplitString(panel).join(),
           unitId: commaSplitString(unitId).join(),
+          stepName,
           workOrder,
           rid, 
           lotCode, 
@@ -175,11 +181,12 @@ export default {
     },
     // 导出
     exportClick () {
-      let { panel, unitId, workOrder, rid, lotCode, tfencode } = this.req;
-      if (!panel && !unitId && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
+      let { panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req;
+      if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
       const obj = {
         panel: commaSplitString(panel).join(),
         unitId: commaSplitString(unitId).join(),
+        stepName,
         workOrder,
         rid, 
         lotCode, 
