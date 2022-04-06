@@ -1871,6 +1871,7 @@ export default {
     'barcode-maintain': '条码维护',
     'project-maintain': '项目维护',
     'quality-yield-query-report': '质量良率查询报告',
+    'led-wip-report': 'LedWip看板报表',
     'op30-report': 'OP30看板',
     'throwup-wms-log': '上抛WMS日志',
     'sn-query': 'SN查询',
