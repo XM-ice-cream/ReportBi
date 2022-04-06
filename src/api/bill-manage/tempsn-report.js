@@ -7,7 +7,7 @@ import {
 export const getpagelistReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.19.55:5700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/anonymous/v1/tempsn/gettempsn',
         method: 'post',
         data
@@ -19,7 +19,7 @@ export const exportReq = data => {
     return requestCenter({
         loading: true,
         timeout: 0,
-        baseUrl: 'http://10.191.19.55:5700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/anonymous/v1/tempsn/export',
         method: 'post',
         responseType: 'arraybuffer',
@@ -30,7 +30,7 @@ export const exportReq = data => {
 export const addReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.19.55:5700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/anonymous/v1/tempsn/addtempsn',
         method: 'post',
         data

@@ -193,8 +193,8 @@ export default {
     submitClick (isClose = false) {
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
-          let obj = { data: this.batchData };
-          console.log(obj);
+          let obj = { addData: this.batchData };
+          console.log('====OBJ====',obj);
           addReq(obj).then((res) => {
             if (res.code === 200) {
               this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
