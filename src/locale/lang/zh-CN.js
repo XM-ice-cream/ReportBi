@@ -1932,6 +1932,7 @@ export default {
     'bill-design-manage': '报表设计',
     'dataset': '数据集',
     'report-manage': '报表管理',
+    'tempsn-report': 'TempSn报表',
 
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',

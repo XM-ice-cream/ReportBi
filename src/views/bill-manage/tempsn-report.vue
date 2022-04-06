@@ -1,6 +1,20 @@
 /* TempSn报表 */
 <template>
   <div class="page-style">
+    <!-- 右侧抽屉 Form表单 -->
+    <Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
+      <Form ref="submitReq" :label-width="90" :label-colon="true" @submit.native.prevent>
+        <!-- 批量新增参数 -->
+        <FormItem label="批量新增" prop="batchData">
+          <Input type="text" v-model="batchData" placeholder="格式:SN1,SN2,SN3,SN4....SNn;Scrap" />
+        </FormItem>
+
+        <!-- 按钮 -->
+        <FormItem>
+          <drawer-button :text="drawerTitle" @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
+        </FormItem>
+      </Form>
+    </Drawer>
     <!-- 页面表格 -->
     <div class="comment">
       <Card :bordered="false" dis-hover class="card-style">
@@ -21,37 +35,15 @@
                     <FormItem :label="$t('endTime')" prop="endTime">
                       <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
-                    <!-- 工单 -->
-                    <FormItem :label="$t('workOrder')" prop="workOrder">
-                      <Input v-model="req.workOrder" :placeholder="$t('pleaseEnter') + $t('workOrder')" @on-search="pageLoad" />
+                    <!-- SN -->
+                    <FormItem label="SN" prop="sn">
+                      <Input v-model="req.sn" :placeholder="$t('pleaseEnter') + 'sn'" @on-search="pageLoad" />
                     </FormItem>
-                    <!-- 大条码 -->
-                    <FormItem :label="$t('panelNo')" prop="panel">
-                      <Input v-model.trim="req.panel" placeholder="请输入大板码号,多个以英文逗号或空格分隔" />
+                    <!-- SN -->
+                    <FormItem label="状态" prop="status">
+                      <Input v-model="req.status" :placeholder="$t('pleaseEnter') + 'status'" @on-search="pageLoad" />
                     </FormItem>
-                    <!-- 小条码 -->
-                    <FormItem :label="$t('smallBoardCode')" prop="unitId">
-                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode')" />
-                    </FormItem>
-                    <!-- DateCode -->
-                    <FormItem label="DateCode" prop="dateCode">
-                      <Input v-model.trim="req.dateCode" :placeholder="$t('pleaseEnter') + 'DateCode'" />
-                    </FormItem>
-                    <!-- LotCode -->
-                    <FormItem label="LotCode" prop="lotCode">
-                      <Input v-model.trim="req.lotCode" :placeholder="$t('pleaseEnter') + 'LotCode'" />
-                    </FormItem>
-                    <!-- ReelId -->
-                    <FormItem label="ReelId" prop="reelId">
-                      <Input v-model.trim="req.reelId" :placeholder="$t('pleaseEnter') + 'ReelId'" />
-                    </FormItem>
-                    <!-- 类别 -->
-                    <FormItem :label="$t('category')" prop="category">
-                      <Select v-model="req.category" clearable :placeholder="$t('pleaseSelect') + $t('category')" transfer>
-                        <Option v-for="(item, i) in categoryList" :value="item.detailName" :key="i">{{ item.detailName }}
-                        </Option>
-                      </Select>
-                    </FormItem>
+
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -61,7 +53,7 @@
               </Poptip>
             </i-col>
             <i-col span="18">
-              <button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
+              <button-custom :btnData="btnData" @on-export-click="exportClick" @on-add-click="addClick"></button-custom>
             </i-col>
           </Row>
         </div>
@@ -74,8 +66,7 @@
 
 <script>
 import { getpagelistReq, exportReq, addReq } from "@/api/bill-manage/tempsn-report";
-import { getButtonBoolean, formatDate, exportFile } from "@/libs/tools";
-import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
+import { getButtonBoolean, formatDate, exportFile, renderDate } from "@/libs/tools";
 
 export default {
   name: "tempsn-report",
@@ -90,15 +81,11 @@ export default {
       req: {
         startTime: "",
         endTime: "",
-        workOrder: "", //工单
-        panel: "",
-        unitId: "",
-        dateCode: "",
-        lotCode: "",
-        reelId: "",
-        category: "",
+        sn: "",
+        status: "",
         ...this.$config.pageConfig,
       }, //查询数据
+      batchData: '',
       columns: [
         {
           type: "index",
@@ -109,17 +96,19 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: this.$t("panelNo"), key: "pcbId", align: "center" },
-        { title: "BinCode", key: "binCode", align: "center" },
-        { title: this.$t("pn"), key: "pn", align: "center" },
-        { title: this.$t("footPosition"), key: "electricalreference", align: "center" },
-        { title: "ReelId", key: "wafeRid", align: "center" },
-        { title: this.$t("row"), key: "rowNo", align: "center", width: 60 },
-        { title: this.$t("column"), key: "columnNo", align: "center", width: 60 },
-        { title: "LotCode", key: "lotCode", align: "center" },
-        { title: "DateCode", key: "dateCode", align: "center" },
-        { title: this.$t("time"), key: "localTime", align: "center", width: 150 },
+        { title: 'ID', key: "id", align: "center", width: '250' },
+        { title: "SN", key: "sn", align: "center" },
+        { title: 'Status', key: "status", align: "center" },
+        { title: 'Process', key: "process", align: "center" },
+        { title: "Op1", key: "oP1", align: "center" },
+        { title: 'Op2', key: "oP2", align: "center" },
+        { title: "Op3", key: "oP3", align: "center" },
+        { title: 'Op4', key: "oP4", align: "center" },
+        { title: "Op5", key: "oP5", align: "center" },
+        { title: '创建时间', key: "createTime", align: "center", render: renderDate },
       ], // 表格数据
+      drawerFlag: false,
+      drawerTitle: this.$t("add")
     };
   },
   activated () {
@@ -127,7 +116,6 @@ export default {
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
-    this.getDataItemData();
   },
   // 导航离开该组件的对应路由时调用
   beforeRouteLeave (to, from, next) {
@@ -144,26 +132,21 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category } = this.req;
+      let { startTime, endTime, sn, status } = this.req;
       if (startTime && endTime) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
             this.tableConfig.loading = true;
             let obj = {
-              orderField: "PN", // 排序字段
+              orderField: "sn", // 排序字段
               ascending: true, // 是否升序
               pageSize: this.req.pageSize, // 分页大小
               pageIndex: this.req.pageIndex, // 当前页码
               data: {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
-                workOrder,
-                panel,
-                unitId,
-                dateCode,
-                lotCode,
-                reelId,
-                category,
+                sn,
+                status
               },
             };
             getpagelistReq(obj).then((res) => {
@@ -184,36 +167,47 @@ export default {
     },
     // 导出
     exportClick () {
-      let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category } = this.req;
+      let { startTime, endTime, sn, status } = this.req;
       if (startTime && endTime) {
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
-          workOrder,
-          panel,
-          unitId,
-          dateCode,
-          lotCode,
-          reelId,
-          category,
+          sn,
+          status
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-          const fileName = `${this.$t("bom-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+          const fileName = `${this.$t("tempsn-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
           exportFile(blob, fileName);
         });
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
       }
     },
-    // 获取数据字典数据
-    getDataItemData () {
-      const obj = { itemCode: 'BOMCategory', enabled: 1 }
-      getDataItemReq(obj).then((res) => {
-        if (res.code === 200) {
-          this.categoryList = res.result || [];
+    // 点击新增按钮触发
+    addClick () {
+      this.drawerFlag = true;
+      this.drawerTitle = this.$t("add");
+    },
+    //提交
+    submitClick (isClose = false) {
+      this.$refs.submitReq.validate((validate) => {
+        if (validate) {
+          let obj = { data: this.batchData };
+          console.log(obj);
+          addReq(obj).then((res) => {
+            if (res.code === 200) {
+              this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+              this.pageLoad();
+              if (isClose) this.cancelClick();
+            } else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")},${errorType(this, res)}`);
+          });
         }
-      })
+      });
+    },
+    // 左侧抽屉取消
+    cancelClick () {
+      this.drawerFlag = false;
     },
     // 点击重置按钮触发
     resetClick () {
