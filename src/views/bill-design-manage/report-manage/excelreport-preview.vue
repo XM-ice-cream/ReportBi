@@ -14,9 +14,10 @@
                 <template v-for="(item,index) in tableData2">
                   <span class="title" :key="index">{{item.name}}</span>
                   <template v-for="(subitem,subindex) in item.children">
-                    <FormItem :label='subitem.name' :key="item.name+subindex">
-                      <Input type="text" v-model.trim="subitem.value" v-if="subitem.type!=='DateTime'" />
-                      <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
+                    <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                      <Input type="text" v-model.trim="subitem.value" v-if="subitem.type==='String'" clearable />
+                      <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" v-else-if="subitem.type==='textarea'" clearable />
+                      <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
                     </FormItem>
                   </template>
                 </template>
@@ -77,7 +78,7 @@ export default {
         })
         return;
       }
-
+      window.luckysheet.destroy();
 
     }
   },
@@ -96,10 +97,15 @@ export default {
         reportCode: "",
         setParam: "",
         requestCount: 1,
-        pageSize: 10
+        pageSize: 100
       },
+      requestCountList: [],
       maxInteral: 1,
-      finished: 'Loading...'
+      finished: 'Loading...',
+      // 验证实体
+      ruleValidate: {
+
+      }
     };
   },
   methods: {
@@ -115,30 +121,122 @@ export default {
       window.luckysheet.destroy();
       //每次都重新加载需要改成刷新
       this.intervalPreview()
+
     },
-    async intervalPreview () {
+    async intervalPreview (changeIndex) {
+      // console.log(133);
       this.loading = true;
+
+      const result = window.luckysheet.getAllSheets().filter(item => item.status === 1)[0];
+      let index = '';
+      //    console.log('window.luckysheet.getAllSheets())', window.luckysheet.getAllSheets());
+      if (result?.index) {
+        index = changeIndex ? changeIndex : result.index;
+        this.requestCountList[index] = this.requestCountList[index] + 1;
+        this.params.requestCount = this.requestCountList[index];
+        //  console.log('index', index, changeIndex);
+      }
+      if (this.params.requestCount > 100) return;
       await getExcelPreviewReq(this.params).then(res => {
         if (res.code == 200) {
           this.loading = false;
           let { setParam, requestCount, pageSize } = this.params;
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
           const setParam_parse = JSON.parse(res.result.setParam);
-          console.log('jsonStr_parse', jsonStr_parse, requestCount);
-
-
           //第一次获取请求值
-          requestCount === 1 ? this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result) : this.addExcel(jsonStr_parse, requestCount, pageSize)
-
-          this.params.requestCount = requestCount + 1;
+          requestCount === 1 ? this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result) : this.addExcel(jsonStr_parse, requestCount, pageSize, index)
+        } else {
+          this.$Message.error(res.message);
+          this.sheetData = [{}];
+          this.finished = '加载完成！';
+          //初始化Excel
+          this.createSheet();
         }
       })
 
     },
+    initExcel (jsonStr_parse, setParam, setParam_parse, result) {
+      //  console.log('jsonStr_parse', jsonStr_parse);
+      //  console.log(window.luckysheet);
+      this.reportName = jsonStr_parse.name;
+      // 渲染查询表单
+      this.tableData2 = this.getParamsList(setParam, setParam_parse);
+
+
+      let firstPageCount = 0;
+      //获取每个sheet 的接口请求次数
+      jsonStr_parse.forEach((item, itemIndex) => {
+        const { index, pageCount, status } = item;
+        this.requestCountList[index + 'count'] = pageCount; //index sheet 总共请求次数
+        this.requestCountList[index] = 1//index sheet 当前sheet
+        //如果状态为启动 则记录请求次数
+        if (status) firstPageCount = pageCount;
+      })
+      //初始化Excel
+      this.sheetData = result == null ? [{}] : jsonStr_parse;
+      this.createSheet();
+      //继续获取excel数据 maxInteral 大于1 继续获取excel值
+      //   firstPageCount > 1 ? this.intervalPreview() : this.finished = '加载完成！'
+      //   this.finished = '加载完成！'
+    },
+    async addExcel (jsonStr_parse, requestCount, pageSize, Sheetindex) {
+      await jsonStr_parse.forEach((item, index) => {
+        if (Sheetindex === item.index) {
+          item.celldata.forEach((o, oIndex) => {
+            if (!this.visib) return;
+            o.r = o.r + (requestCount - 1) * pageSize;
+            let options = { order: index };
+            // console.log(o.r, o.c, o.v, requestCount, (requestCount - 1) * pageSize, options);
+            if (o.c == 0) {
+              window.luckysheet.insertRow(o.r, options);
+              // console.log('insertRowBottom');
+              // window.luckysheet.refresh()
+            };
+            window.luckysheet.setCellValue(o.r, o.c, o.v, options)
+            // console.log(o);
+
+
+          })
+          //   console.log(item.celldata, window.luckysheet.getRangeValue());
+          //   const options = { range: 'A12:L22' }
+          //   window.luckysheet.setRangeValue([[item.celldata]], options);
+
+        }
+
+      })
+      // console.log(jsonStr_parse);
+      //   window.luckysheet.updataSheet({ data: jsonStr_parse });
+      //刷新
+      //   window.luckysheet.refresh();
+      //跳出循环--停止获取excel数据
+      if (requestCount !== 1 && requestCount >= this.requestCountList[Sheetindex + 'count']) { this.finished = '加载完成！'; return };
+      //   if (this.visib) this.intervalPreview();
+    },
+    getParamsList (setParam, setParam_parse) {
+      const extendObj = setParam = setParam_parse;
+      const extendArry = [];
+      for (const i in extendObj) {
+        const children = [];
+        for (const y in extendObj[i]) {
+          if (!y.endsWith('required')) {
+            const data = extendObj[i][y];
+            console.log(data.includes('\n'));
+            const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : (data.includes('\n') ? 'textarea' : 'String');
+            children.push({ name: y, value: extendObj[i][y], type, required: extendObj[i][y + 'required'] });
+            this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
+            //  console.log(this.ruleValidate);
+          }
+
+        }
+        extendArry.push({ name: i, children: children });
+      }
+      console.log('extendArry', extendArry);
+      return extendArry;
+    },
     async download () {
       //刷新
       window.luckysheet.refresh();
-      console.log('luckysheet.getAllSheets()', luckysheet.getAllSheets());
+      //  console.log('luckysheet.getAllSheets()', luckysheet.getAllSheets());
       exportExcel(luckysheet.getAllSheets(), this.params.reportCode + '-' + `${formatDate(new Date())}`)
       //   const { reportCode, setParam } = this.params
       //   const obj = {
@@ -153,82 +251,32 @@ export default {
       //     exportFile(blob, fileName);
       //   });
     },
-    //时间格式化
-    dateFormate () {
-      this.tableData2.forEach((item, itemIndex) => {
-        item.children.forEach((o, oIndex) => {
-          if (o.type === 'DateTime') {
-            this.tableData2[itemIndex].children[oIndex].value = formatDate(o.value)
-          }
-        })
-      })
-    },
-    initExcel (jsonStr_parse, setParam, setParam_parse, result) {
-      console.log('jsonStr_parse', jsonStr_parse);
-      this.reportName = jsonStr_parse.name;
-      // 渲染查询表单
-      this.tableData2 = this.getParamsList(setParam, setParam_parse);
-      this.sheetData = result == null ? [{}] : jsonStr_parse;
-      //获取最大调用preview 接口次数
-      this.maxInteral = jsonStr_parse.reduce((prev, cur) => { return Math.max(prev.pageCount, cur.pageCount) });
-      //初始化Excel
-      this.createSheet();
-      //继续获取excel数据 maxInteral 大于1 继续获取excel值
-      if (this.maxInteral > 1) this.intervalPreview();
-    },
-    addExcel (jsonStr_parse, requestCount, pageSize) {
-      jsonStr_parse.forEach((item, index) => {
-        item.celldata.forEach(o => {
-          if (!this.visib) return;
-          o.r = o.r + (requestCount - 1) * pageSize;
-          let options = { order: index };
-          window.luckysheet.setCellValue(o.r, o.c, o.v, options)
-        })
-      })
-      //刷新
-      window.luckysheet.refresh();
-      //跳出循环--停止获取excel数据
-      if (requestCount !== 1 && requestCount >= this.maxInteral) { this.finished = '加载完成！'; return };
-      if (this.visib) this.intervalPreview();
-    },
-    getParamsList (setParam, setParam_parse) {
-      const extendObj = setParam = setParam_parse;
-      const extendArry = [];
-      for (const i in extendObj) {
-        const children = [];
-        for (const y in extendObj[i]) {
-          const data = extendObj[i][y];
-          const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : 'String';
-          children.push({ name: y, value: extendObj[i][y], type });
-        }
-        extendArry.push({ name: i, children: children });
-      }
-      return extendArry;
-    },
-    // 表单封装json
-    toObject (val) {
-      const objfirst = {};
-      const objSecond = {};
-      val.forEach(el => {
-        el.name ? (objfirst[el.name] = el.children) : "";
-      });
-      for (const key in objfirst) {
-        const newObj = {};
-        objfirst[key].map(ev => {
-          Object.assign(newObj, { [ev.name]: ev.value });
-        });
-        objSecond[key] = newObj;
-      }
-      return objSecond;
-    },
+
     //初始化表格
     createSheet () {
+      const _this = this;
       const options = {
         container: "luckysheetpreview", // 设定DOM容器的id
         title: "", // 设定表格名称
         lang: "zh", // 设定表格语言
         plugins: ["chart"],
-        // loadUrl: getExcelPreviewReq.baseUrl + getExcelPreviewReq.url,
+        hook: {
+          sheetDeactivateAfter: function (index, isPivotInitial, isNewSheet) {
+            console.info(index, isPivotInitial, isNewSheet);
+
+          },
+          scroll: function (position) {
+            const { scrollTop } = position;
+            console.log(position.scrollTop, (scrollTop % 60) % 20);
+            if ((scrollTop % 60) % 20 == 0) {
+              console.log('123');
+              const result = window.luckysheet.getAllSheets().filter(item => item.status === 1)[0];
+              console.log(_this.requestCountList[result.index] >= _this.params.requestCount, _this.params.requestCount);
+              if (_this.requestCountList[result.index] >= _this.params.requestCount) _this.intervalPreview();
+            }
+          }
+
+        },
         data: [
           {
             name: "report", //工作表名称
@@ -275,6 +323,34 @@ export default {
       $(function () {
         luckysheet.create(options);
       });
+    },
+    //时间格式化
+    dateFormate () {
+      this.tableData2.forEach((item, itemIndex) => {
+        item.children.forEach((o, oIndex) => {
+          if (o.type === 'DateTime') {
+            this.tableData2[itemIndex].children[oIndex].value = formatDate(o.value)
+          }
+        })
+      })
+    },
+    // 表单封装json
+    toObject (val) {
+      const objfirst = {};
+      const objSecond = {};
+      val.forEach(el => {
+        el.name ? (objfirst[el.name] = el.children) : "";
+      });
+      for (const key in objfirst) {
+        const newObj = {};
+        objfirst[key].map(ev => {
+          //  console.log(ev);
+          Object.assign(newObj, { [ev.name]: ev.value, [ev.name + 'required']: ev.required });
+        });
+        //  console.log('objSecond[key]', newObj);
+        objSecond[key] = newObj;
+      }
+      return objSecond;
     },
     //关闭弹框
     closeDialog () {

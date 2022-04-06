@@ -27,10 +27,10 @@
 </template>
 <script>
 // jQuery.noConflict();
-import vue from "vue";
-import VueSuperSlide from "vue-superslide";
+// import vue from "vue";
+// import VueSuperSlide from "vue-superslide";
 
-vue.use(VueSuperSlide);
+// vue.use(VueSuperSlide);
 export default {
   props: {
     value: Object,

@@ -222,7 +222,8 @@ export default {
             } else {
               that.rightForm.auto = false
             }
-          }
+          },
+
         },
         data: [
           {
@@ -351,7 +352,9 @@ export default {
         ) {
           let dataSetParam = {};
           code.dataSetParamDtoList.forEach(value => {
-            dataSetParam[value.paramName] = value.sampleItem;
+            const paramName = value.paramName;
+            dataSetParam[paramName] = value.sampleItem;
+            dataSetParam[paramName + 'required'] = value.requiredFlag;
           });
           setParams[code.setCode] = dataSetParam;
         }
