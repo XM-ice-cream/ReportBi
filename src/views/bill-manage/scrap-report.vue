@@ -145,7 +145,6 @@ export default {
         { title: this.$t("unitId"), key: "unitid", align: "center", width: 150, tooltip: true },
         { title: this.$t("lineName"), key: "linename", align: "center", width: 120, tooltip: true },
         { title: this.$t("modelName"), key: "modelname", align: "center", width: 120, tooltip: true },
-        { title: "分析单位", key: "unitcode", align: "center", width: 150, tooltip: true },
         { title: this.$t("stage"), key: "stage", align: "center", width: 80, tooltip: true },
         { title: this.$t("curProcessName"), key: "curprocessname", align: "center", width: 150, tooltip: true },
         { title: this.$t("inProcessTime"), key: "inprocesstime", align: "center", width: 130, tooltip: true, render: renderDate, },
@@ -153,10 +152,11 @@ export default {
         { title: this.$t("description"), key: "description", align: "center", width: 150, tooltip: true },
         { title: this.$t("scrapReason"), key: "scrapreason", align: "center", width: 150, tooltip: true },
         // { title: this.$t("status"), key: "status", align: "center", width: 60, tooltip: true },
+        { title: "分析单位", key: "unitcode", align: "center", width: 150, tooltip: true },
         { title: this.$t("name"), key: "name", align: "center", width: 100, tooltip: true },
         { title: this.$t("createUserName"), key: "createusername", align: "center", width: 100, tooltip: true },
         { title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true },
-        { title: this.$t("image"), slot: "image", align: "center", width: 80 },
+        // { title: this.$t("image"), slot: "image", align: "center", width: 80 },
       ], // 表格数据
     };
   },
