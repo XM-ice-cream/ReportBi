@@ -118,7 +118,7 @@ export const getDataReq = data => {
         timeout: 0,
         baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
         url: '/api/autoreportcenter/anonymous/v1/reportdashboard/getdata',
-        method: 'get',
-        params: data,
+        method: 'post',
+        data,
     })
 }

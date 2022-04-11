@@ -387,7 +387,7 @@ export const widgetMoreBarLine = {
                             name: 'textInterval',
                             required: false,
                             placeholder: '',
-                            value: ''
+                            value: 1
                         },
                         {
                             type: 'i-switch',

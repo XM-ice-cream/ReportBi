@@ -22,6 +22,7 @@
 <script>
 // import { queryAllDataSet, detailBysetId } from "@/api/bigscreen";
 import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
+// import { getDataReq } from '@/api/bill-design-manage/report-manage.js'
 import Dictionary from "@/components/dictionary/index";
 
 export default {
@@ -59,8 +60,9 @@ export default {
   computed: {
     setCode () {
       let code = "";
+      console.log('seTcode', this.dataSet, this.dataSetValue);
       this.dataSet.forEach(el => {
-        if (el.id == this.dataSetValue) {
+        if (el.setCode == this.dataSetValue) {
           code = el.setCode;
         }
       });
@@ -117,13 +119,12 @@ export default {
     // 数据集回显
     async echoDataSet (val) {
       if (!val) return;
-      const setCode = val.setCode;
+      this.dataSetValue = val.setCode;
+      console.log('setCode', this.dataSetValue);
 
       await this.loadDataSet();
 
-      this.dataSetValue = this.dataSet.filter(
-        el => setCode == el.setCode
-      )[0].id;
+      console.log('this.dataSetValue', this.dataSetValue);
 
       await this.selectDataSet();
       this.echoDynamicData(val);
@@ -145,4 +146,3 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped></style>

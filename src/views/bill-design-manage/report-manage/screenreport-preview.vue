@@ -54,7 +54,9 @@ export default {
       const { code, result } = await previewScreenReq({ reportCode: reportCode });
       if (code != 200) return;
       const equipment = document.body.clientWidth;
+      const clientHeight = document.body.clientHeight
       const ratioEquipment = equipment / result.dashboard.width;
+      console.log(ratioEquipment);
       this.bigScreenStyle = {
         width: result.dashboard.width + "px",
         height: result.dashboard.height + "px",

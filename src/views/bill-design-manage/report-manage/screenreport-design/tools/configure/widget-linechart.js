@@ -367,7 +367,7 @@ export const widgetLinechart = {
                             name: 'textInterval',
                             required: false,
                             placeholder: '',
-                            value: ''
+                            value: 1
                         },
                         {
                             type: 'i-switch',
@@ -475,7 +475,7 @@ export const widgetLinechart = {
                             name: 'splitNumber',
                             required: false,
                             placeholder: '',
-                            value: ''
+                            value: 0
                         },
                         {
                             type: 'i-switch',

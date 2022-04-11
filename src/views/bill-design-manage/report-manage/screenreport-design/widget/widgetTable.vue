@@ -16,7 +16,7 @@
                 bodyTable(index),
                 tableFiledWidth(idx),
                 tableRowHeight()
-              ]">
+              ]" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;" :title='item[itemChild.key]'>
               {{ item[itemChild.key] }}
             </div>
           </li>
@@ -96,6 +96,7 @@ export default {
   watch: {
     value: {
       handler (val) {
+        console.log('Table', val);
         this.optionsSetUp = val.setup;
         this.optionsPosition = val.position;
         this.optionsData = val.data;
@@ -113,6 +114,7 @@ export default {
   },
   methods: {
     initData () {
+      console.log('Table', 'initData');
       this.handlerRollFn();
       this.handlerHead();
       this.handlerData();
@@ -157,7 +159,9 @@ export default {
       }
     },
     getEchartData (val) {
+      console.log('getEchartData', this);
       const data = this.queryEchartsData(val);
+
       data.then(res => {
         this.list = res;
         this.hackResetFun();

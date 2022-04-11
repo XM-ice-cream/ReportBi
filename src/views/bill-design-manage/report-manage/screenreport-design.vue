@@ -163,12 +163,10 @@ export default {
     },
 
     workbenchTransform () {
-      console.log('workbenchTransform', this.bigscreenScaleInWorkbench, this.bigscreenScaleInWorkbench);
       return `scale(${this.bigscreenScaleInWorkbench}, ${this.bigscreenScaleInWorkbench})`;
     },
     // 大屏在设计模式的大小
     bigscreenWidthInWorkbench () {
-      console.log('bigscreenWidthInWorkbench', this.bigscreenWidth, this.widthPaddingTools, this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools);
       return this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools;
     },
     bigscreenHeightInWorkbench () {
@@ -180,7 +178,6 @@ export default {
     bigscreenScaleInWorkbench () {
       let widthScale = (this.middleWidth - this.widthPaddingTools) / this.bigscreenWidth;
       let heightScale = (this.middleHeight - this.widthPaddingTools) / this.bigscreenHeight;
-      console.log('bigscreenScaleInWorkbench', this.middleWidth, this.widthPaddingTools, this.bigscreenWidth, this.bigscreenHeight, this.middleHeight);
       return Math.min(widthScale, heightScale);
     },
   },
@@ -189,10 +186,6 @@ export default {
       dialogFormVisibleTitle: "大屏 设计",
       bodyWidth: document.body.clientWidth,
       bodyHeight: document.body.clientHeight,
-      uploadUrl:
-        process.env.BASE_API +
-        "/reportDashboard/import/" +
-        this.$route.query.reportCode,
       grade: false,
       layerWidget: [],
       widgetTools: widgetTools, // 左侧工具栏的组件图标，将js变量加入到当前作用域
@@ -439,6 +432,7 @@ export default {
       const { code, data } = await addScreenReq(screenData);
       if (code == 200) {
         this.$Message.success("保存成功！");
+        this.closeDialog();
       }
     },
     // 预览
@@ -498,7 +492,6 @@ export default {
 
     // 在缩放模式下的大小
     getPXUnderScale (px) {
-      console.log('getPXUnderScale', this.bigscreenScaleInWorkbench, px, this.bigscreenScaleInWorkbench * px);
       return this.bigscreenScaleInWorkbench * px;
     },
 

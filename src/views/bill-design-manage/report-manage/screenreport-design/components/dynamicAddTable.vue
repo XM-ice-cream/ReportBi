@@ -2,10 +2,10 @@
   <div>
     <Button type="primary" size="small" icon="el-icon-plus" plain @click="handleAddClick" style="margin-bottom: 0.3rem">新增</Button>
     <Table border :columns='columns' :data="formData" style="width:100%">
-      <template slot-scope='scope' slot='operator'>
+      <template slot-scope='{ row, index }' slot='operator'>
         <div class="button-group">
-          <Button @click="handleEditorClick(scope.$index, scope.row)" type="text" size="small">编辑</Button>
-          <Button type="text" size="small" @click="handleDeleteClick(scope.$index, scope.row)">删除</Button>
+          <Button @click="handleEditorClick(index, row)" type="text" size="small">编辑</Button>
+          <Button type="text" size="small" @click="handleDeleteClick(index,row)">删除</Button>
         </div>
 
       </template>
@@ -28,15 +28,15 @@
     <Modal title="新增" v-model="dialogVisible" width="30%" :before-close="handleClose">
       <Form :model="rowFormData" :label-width="50">
         <FormItem label="名称:">
-          <Input v-model.trim="rowFormData['name']" placeholder="请输入名称" size="small">
+          <Input type='text' v-model.trim="rowFormData['name']" placeholder="请输入名称" size="small">
           </Input>
         </FormItem>
         <FormItem label="key值:">
-          <Input v-model.trim="rowFormData['key']" placeholder="请输入key值" size="small">
+          <Input type='text' v-model.trim="rowFormData['key']" placeholder="请输入key值" size="small">
           </Input>
         </FormItem>
         <FormItem label="宽度:">
-          <Input v-model.trim="rowFormData['width']" placeholder="请输入宽度" size="small">
+          <Input type='text' v-model.trim="rowFormData['width']" placeholder="请输入宽度" size="small">
           </Input>
         </FormItem>
       </Form>
@@ -71,7 +71,7 @@ export default {
       columns: [
         { title: '名称', key: 'name', align: 'center', tooltip: true, ellipsis: true },
         { title: 'key值', key: 'key', align: 'center', tooltip: true, ellipsis: true },
-        { title: '宽度', key: 'width', align: 'center', tooltip: true, ellipsis: true, width: '40' },
+        { title: '宽度', key: 'width', align: 'center', tooltip: true, ellipsis: true },
         { title: '操作', slot: 'operator', align: 'center', tooltip: true, ellipsis: true, width: '80' }
       ]
     };
@@ -80,7 +80,11 @@ export default {
     // 新增
     handleAddClick () {
       console.log('handleAddClick');
-      this.rowFormData = {};
+      this.rowFormData = {
+        name: "",
+        key: "",
+        width: ""
+      };
       this.flag = true;
       this.dialogVisible = true;
     },
@@ -97,6 +101,7 @@ export default {
     },
     // 保存
     handleSaveClick () {
+      console.log(this.formData, this.indexEditor, this.rowFormData);
       if (this.flag) {
         // 新增
         this.formData.push(this.rowFormData);

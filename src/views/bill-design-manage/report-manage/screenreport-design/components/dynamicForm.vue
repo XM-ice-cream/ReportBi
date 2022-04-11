@@ -40,7 +40,7 @@
               </span>
             </Modal>
           </FormItem>
-          <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @on-change="changed($event, item.name)" />
+          <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @change="changed($event, item.name)" />
           <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @change="changed($event, item.name)" />
         </div>
         <div v-else-if="isShowForm(item, '[object Array]')" :key="'a-' + index" class="screenCollapse">
@@ -72,7 +72,7 @@
 
                     <Slider v-if="itemChildList.type == 'Slider'" v-model="formData[itemChildList.name]" @on-change="val => changed(val, itemChildList.name)" />
                   </FormItem>
-                  <customColorComponents v-if="itemChildList.type == 'customColor'" :key="'b-' + idx" v-model="formData[itemChildList.name]" @on-change="changed($event, itemChildList.name)" />
+                  <customColorComponents v-if="itemChildList.type == 'customColor'" :key="'b-' + idx" v-model="formData[itemChildList.name]" @change="changed($event, itemChildList.name)" />
                 </template>
               </p>
             </Panel>

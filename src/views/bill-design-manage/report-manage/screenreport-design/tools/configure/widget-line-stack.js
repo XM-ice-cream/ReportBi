@@ -367,7 +367,7 @@ export const widgetLineStack = {
                             name: 'textInterval',
                             required: false,
                             placeholder: '',
-                            value: ''
+                            value: 0
                         },
                         {
                             type: 'vue-color',

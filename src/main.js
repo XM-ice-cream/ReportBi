@@ -18,6 +18,7 @@ import animate from 'animate.css'
 import Avue from '@smallwei/avue';
 import '@smallwei/avue/lib/index.css';
 import ECharts from 'vue-echarts'
+import mixins from './libs/queryform'
 // 引入elementui 部分组件
 import {
     Input
@@ -81,6 +82,9 @@ const localVersion = localStorage.getItem('projectVersion')
 if (!localVersion || version !== localVersion) {
     localStorage.setItem('projectVersion', process.env.VERSION)
 }
+
+//混合机制--mixins，用来更高效的实现组件内容的复用
+Vue.mixin(mixins)
 
 // 创建vue对象
 window.$Vue = new Vue({
