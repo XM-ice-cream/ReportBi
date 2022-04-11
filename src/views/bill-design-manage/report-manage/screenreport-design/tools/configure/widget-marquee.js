@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 滚动文件json
- * @version: 
- * @Author: qianlishi
- * @Date: 2021-08-29 07:00:00
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:17:39
- */
 export const widgetMarquee = {
     code: 'widget-marquee',
     type: 'html',
@@ -51,7 +43,7 @@ export const widgetMarquee = {
                 name: 'letterSpacing',
                 required: false,
                 placeholder: '',
-                value: '0',
+                value: 0,
             },
             {
                 type: 'vue-color',

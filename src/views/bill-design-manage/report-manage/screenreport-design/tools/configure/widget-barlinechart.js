@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 柱线图
- * @version:
- * @Author: qianlishi
- * @Date: 2021-08-29 07:26:48
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:11:57
- */
 export const widgetBarlinechart = {
     code: 'widget-barlinechart',
     type: 'chart',
@@ -519,7 +511,7 @@ export const widgetBarlinechart = {
                             name: 'splitNumberRight',
                             required: false,
                             placeholder: '',
-                            value: ''
+                            value: 0
                         },
                         {
                             type: 'vue-color',

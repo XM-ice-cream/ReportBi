@@ -1,7 +1,17 @@
 <template>
   <div>
-    <Button type="primary" size="small" icon="el-icon-plus" plain @click="handleAddClick">新增</Button>
-    <el-table :data="formData" style="width: 100%">
+    <Button type="primary" size="small" icon="el-icon-plus" plain @click="handleAddClick" style="margin-bottom: 0.3rem">新增</Button>
+    <Table border :columns='columns' :data="formData" style="width:100%">
+      <template slot-scope='scope' slot='operator'>
+        <div class="button-group">
+          <Button @click="handleEditorClick(scope.$index, scope.row)" type="text" size="small">编辑</Button>
+          <Button type="text" size="small" @click="handleDeleteClick(scope.$index, scope.row)">删除</Button>
+        </div>
+
+      </template>
+
+    </Table>
+    <!-- <el-table :data="formData" style="width: 100%">
       <el-table-column prop="name" label="名称" width="60" />
       <el-table-column prop="key" label="key值" width="70" />
       <el-table-column prop="width" label="宽度" width="50" />
@@ -13,9 +23,9 @@
           </div>
         </template>
       </el-table-column>
-    </el-table>
+    </el-table> -->
 
-    <Modal title="新增" :v-model="dialogVisible" width="30%" :before-close="handleClose">
+    <Modal title="新增" v-model="dialogVisible" width="30%" :before-close="handleClose">
       <Form :model="rowFormData" :label-width="50">
         <FormItem label="名称:">
           <Input v-model.trim="rowFormData['name']" placeholder="请输入名称" size="small">
@@ -57,12 +67,19 @@ export default {
       },
       flag: true, // true 新增， false 编辑
       indexEditor: -1, // 编辑第几个数据
-      tableData: []
+      tableData: [],
+      columns: [
+        { title: '名称', key: 'name', align: 'center', tooltip: true, ellipsis: true },
+        { title: 'key值', key: 'key', align: 'center', tooltip: true, ellipsis: true },
+        { title: '宽度', key: 'width', align: 'center', tooltip: true, ellipsis: true, width: '40' },
+        { title: '操作', slot: 'operator', align: 'center', tooltip: true, ellipsis: true, width: '80' }
+      ]
     };
   },
   methods: {
     // 新增
     handleAddClick () {
+      console.log('handleAddClick');
       this.rowFormData = {};
       this.flag = true;
       this.dialogVisible = true;

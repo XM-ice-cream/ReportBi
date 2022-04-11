@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 超链接文本
- * @version: 
- * @Author: qianlishi
- * @Date: 2021-08-29 07:03:58
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:14:21
- */
 export const widgetHref = {
     code: 'widget-href',
     type: 'html',

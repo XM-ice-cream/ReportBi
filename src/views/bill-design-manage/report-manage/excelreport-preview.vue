@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <Modal :title="'Excel 预览('+finished+')'" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='850' :before-close="closeDialog">
+    <Modal title="Excel 预览" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='905' :before-close="closeDialog" class="excel">
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
@@ -16,7 +16,7 @@
                   <template v-for="(subitem,subindex) in item.children">
                     <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                       <Input type="text" v-model.trim="subitem.value" v-if="subitem.type==='String'" clearable />
-                      <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" v-else-if="subitem.type==='textarea'" clearable />
+                      <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" v-else-if="subitem.type==='Array'" clearable />
                       <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
                     </FormItem>
                   </template>
@@ -52,6 +52,7 @@
 import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
+import { getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 import { exportExcel } from './export'
 export default {
   name: "excelreport-preview",
@@ -71,13 +72,17 @@ export default {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
+          console.log(window);
           this.params.reportCode = this.reportCode;
           this.loading = true;
           this.tableData2 = [];
           this.searchPreview();
+          window.jQuery.noConflict();
+          console.log(window);
         })
         return;
       }
+      // 销毁luckysheet
       window.luckysheet.destroy();
 
     }
@@ -97,7 +102,7 @@ export default {
         reportCode: "",
         setParam: "",
         requestCount: 1,
-        pageSize: 100
+        pageSize: 1000 * 10
       },
       requestCountList: [],
       maxInteral: 1,
@@ -144,7 +149,8 @@ export default {
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
           const setParam_parse = JSON.parse(res.result.setParam);
           //第一次获取请求值
-          requestCount === 1 ? this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result) : this.addExcel(jsonStr_parse, requestCount, pageSize, index)
+          requestCount === 1 ? this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result) : ''
+          //   : this.addExcel(jsonStr_parse, requestCount, pageSize, index)
         } else {
           this.$Message.error(res.message);
           this.sheetData = [{}];
@@ -175,6 +181,7 @@ export default {
       //初始化Excel
       this.sheetData = result == null ? [{}] : jsonStr_parse;
       this.createSheet();
+      if (firstPageCount > 1) this.$Message.warning('最大只显示一万笔数据')
       //继续获取excel数据 maxInteral 大于1 继续获取excel值
       //   firstPageCount > 1 ? this.intervalPreview() : this.finished = '加载完成！'
       //   this.finished = '加载完成！'
@@ -216,13 +223,20 @@ export default {
       const extendObj = setParam = setParam_parse;
       const extendArry = [];
       for (const i in extendObj) {
+        // console.log(i);
+        // getDeatilByIdReq({ setCode: i }).then(res => {
+        //   console.log(res);
+        //   if(res.code==200){
+
+        //   }
+        // })
         const children = [];
         for (const y in extendObj[i]) {
-          if (!y.endsWith('required')) {
+          if (!y.endsWith('required') && !y.endsWith('type')) {
             const data = extendObj[i][y];
             console.log(data.includes('\n'));
-            const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : (data.includes('\n') ? 'textarea' : 'String');
-            children.push({ name: y, value: extendObj[i][y], type, required: extendObj[i][y + 'required'] });
+            const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : (data.includes('\n') ? 'Array' : 'String');
+            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
             this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
             //  console.log(this.ruleValidate);
           }
@@ -265,16 +279,16 @@ export default {
             console.info(index, isPivotInitial, isNewSheet);
 
           },
-          scroll: function (position) {
-            const { scrollTop } = position;
-            console.log(position.scrollTop, (scrollTop % 60) % 20);
-            if ((scrollTop % 60) % 20 == 0) {
-              console.log('123');
-              const result = window.luckysheet.getAllSheets().filter(item => item.status === 1)[0];
-              console.log(_this.requestCountList[result.index] >= _this.params.requestCount, _this.params.requestCount);
-              if (_this.requestCountList[result.index] >= _this.params.requestCount) _this.intervalPreview();
-            }
-          }
+          //   scroll: function (position) {
+          //     const { scrollTop } = position;
+          //     console.log(position.scrollTop, (scrollTop % 60) % 20);
+          //     if ((scrollTop % 60) % 20 == 0) {
+          //       console.log('123');
+          //       const result = window.luckysheet.getAllSheets().filter(item => item.status === 1)[0];
+          //       console.log(_this.requestCountList[result.index] >= _this.params.requestCount, _this.params.requestCount);
+          //       if (_this.requestCountList[result.index] >= _this.params.requestCount) _this.intervalPreview();
+          //     }
+          //   }
 
         },
         data: [
@@ -345,7 +359,7 @@ export default {
         const newObj = {};
         objfirst[key].map(ev => {
           //  console.log(ev);
-          Object.assign(newObj, { [ev.name]: ev.value, [ev.name + 'required']: ev.required });
+          Object.assign(newObj, { [ev.name]: ev.value, [ev.name + 'required']: ev.required, [ev.name + 'type']: ev.type });
         });
         //  console.log('objSecond[key]', newObj);
         objSecond[key] = newObj;
@@ -367,6 +381,7 @@ export default {
 .luckysheet-input-box {
   z-index: 1000;
 }
+
 #luckysheet-pivotTableFilter-byvalue-select .ListBox {
   min-height: 150px !important;
 }
@@ -376,6 +391,10 @@ export default {
   padding: 0;
   text-align: center;
   font-size: 0.01rem !important;
+}
+.ivu-modal-mask,
+.ivu-modal-wrap {
+  z-index: 910 !important;
 }
 </style>
 <style lang="less" scoped>

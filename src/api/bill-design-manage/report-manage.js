@@ -82,14 +82,43 @@ export const getExcelPreviewReq = data => {
         data
     })
 }
-//Excel 导出
-export const exportReq = data => {
+//图片上传
+export const uploadImageReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
-        url: '/api/autoreportcenter/anonymous/v1/reportexcel/export',
+        url: '/api/autoreportcenter/v1/ftpfile/uploadimage',
         method: 'post',
         data,
-        responseType: 'arraybuffer',
+    })
+}
+//新增大屏
+export const addScreenReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        url: '/api/autoreportcenter/anonymous/v1/reportdashboard/insert',
+        method: 'post',
+        data,
+    })
+}
+//预览大屏
+export const previewScreenReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        url: '/api/autoreportcenter/anonymous/v1/reportdashboard/preview',
+        method: 'get',
+        params: data,
+    })
+}
+//获取大屏数据
+export const getDataReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        url: '/api/autoreportcenter/anonymous/v1/reportdashboard/getdata',
+        method: 'get',
+        params: data,
     })
 }

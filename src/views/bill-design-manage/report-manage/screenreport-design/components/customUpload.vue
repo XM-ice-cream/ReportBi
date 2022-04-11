@@ -3,14 +3,13 @@
     <Input clearable v-model.trim="uploadImgUrl" size="small" @on-change="changeInput">
     <template slot="append">
       <i class="iconfont iconfolder-o"></i>
-      <input type="file" class="file" ref="files" @on-change="getImages" />
+      <input type="file" class="file" ref="files" @change="getImages" />
     </template>
     </Input>
   </div>
 </template>
 <script>
-import axios from "axios";
-// import { getToken } from "@/utils/auth";
+import { uploadImageReq } from '@/api/bill-design-manage/report-manage.js'
 export default {
   name: 'customUpload',
   model: {
@@ -25,10 +24,6 @@ export default {
   },
   data () {
     return {
-      requestUrl: process.env.BASE_API + "/file/upload",
-      headers: {
-        Authorization: getToken()
-      },
       fileList: [],
       uploadImgUrl: ""
     };
@@ -40,36 +35,32 @@ export default {
     getImages (el) {
       let file = el.target.files[0];
       let type = file.type.split("/")[0];
+      console.log('file', file);
       if (type === "image") {
         this.upload(file);
       } else {
-        this.$message.warn("只能上次图片格式");
+        this.$Message.warn("只能上次图片格式");
       }
     },
     upload (imgUrl) {
       let that = this;
       let formdata = new FormData();
-      formdata.append("file", imgUrl);
-      axios.post(this.requestUrl, formdata, {
-        headers: that.headers
-      }).then(response => {
-        let res = response.data;
-        if (res.code == "200") {
-          that.uploadImgUrl = res.data.urlPath;
+      formdata.append("data", imgUrl);
+      uploadImageReq(formdata).then(res => {
+        if (res.code == 200) {
+          that.uploadImgUrl = res.result.url;
           that.$emit("input", that.uploadImgUrl);
           that.$emit("change", that.uploadImgUrl);
         }
       });
     },
     changeInput (e) {
-
       if (e) {
         this.uploadImgUrl = e;
       } else {
         this.$refs.files.value = "";
         this.uploadImgUrl = "";
       }
-      console.log(e, this.uploadImgUrl);
       this.$emit("input", this.uploadImgUrl);
       this.$emit("change", this.uploadImgUrl);
     }

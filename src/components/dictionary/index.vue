@@ -45,7 +45,9 @@ export default {
     async getSystem () {
       //   const { code, data } = await getDictList(this.dictKey);
       //   if (code != "200") return;
-      this.dictionaryOptions = [];
+      this.dictionaryOptions = [{ id: "text", text: "文本数字", extend: null }];
+      //默认第一条
+      this.dictionary = this.dictionaryOptions[0]
     },
     selectChange (val) {
       this.$emit("input", val);

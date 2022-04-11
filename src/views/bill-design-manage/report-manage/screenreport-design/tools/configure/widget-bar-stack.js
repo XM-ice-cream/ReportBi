@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 柱状堆叠图
- * @version:
- * @Author: qianlishi
- * @Date: 2021-08-29 07:37:09
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:11:09
- */
 export const widgetBarStack = {
     code: 'widgetBarStackChart',
     type: 'chart',

@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 图片json
- * @version: 
- * @Author: qianlishi
- * @Date: 2021-08-29 07:07:23
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:14:51
- */
 export const widgetImage = {
     code: 'widget-image',
     type: 'html',
@@ -51,7 +43,7 @@ export const widgetImage = {
                 name: 'imageAdress',
                 required: false,
                 placeholder: '',
-                value: 'http://10.108.26.197:9095/file/download/fd20d563-00aa-45e2-b5db-aff951f814ec',
+                value: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pptjia.com%2Fimage%2F20190902%2F5014c164c90b8e20726363b718939681.jpg&refer=http%3A%2F%2Fimg.pptjia.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1651913631&t=e0f460f526a4ec2390cd74f3a3873054',
             },
             {
                 type: 'vue-color',

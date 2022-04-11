@@ -1931,7 +1931,7 @@ export default {
     'sn-pressure': 'SN 压力测试 看板',
     'bill-design-manage': '报表设计',
     'dataset': '数据集',
-    'report-manage': '报表管理',
+    'design-report-manage': '报表管理',
     'tempsn-report': 'TempSn报表',
 
     // <!--------------------------------Button Name----------------------------------------->

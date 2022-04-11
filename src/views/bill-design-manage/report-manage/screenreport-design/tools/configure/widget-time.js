@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 时间控件json
- * @version: 
- * @Author: qianlishi
- * @Date: 2021-08-29 07:05:52
- * @LastEditors: qianlishi
- * @LastEditTime: 2021-09-28 14:20:30
- */
 export const widgetTime = {
     code: 'widget-time',
     type: 'html',
@@ -76,7 +68,7 @@ export const widgetTime = {
                 name: 'letterSpacing',
                 required: false,
                 placeholder: '',
-                value: '0'
+                value: 0
             },
             {
                 type: 'InputNumber',

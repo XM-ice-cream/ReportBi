@@ -10,7 +10,7 @@
 
             <Input v-if="item.type == 'Input'" v-model.trim="formData[item.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, item.name)" />
 
-            <Input v-if="item.type == 'InputTextarea'" v-model.trim="formData[item.name]" type="textarea" size="small" rows="2" placeholder="请输入内容" @on-change="changed($event, item.name)" />
+            <Input v-if="item.type == 'InputTextarea'" v-model.trim="formData[item.name]" type="textarea" size="small" :rows="2" placeholder="请输入内容" @on-change="changed($event, item.name)" />
 
             <i-switch v-if="item.type == 'i-switch'" v-model="formData[item.name]" size="small" placeholder="请输入内容" @on-change="changed($event, item.name)" />
 
@@ -41,7 +41,7 @@
             </Modal>
           </FormItem>
           <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @on-change="changed($event, item.name)" />
-          <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @on-change="changed($event, item.name)" />
+          <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @change="changed($event, item.name)" />
         </div>
         <div v-else-if="isShowForm(item, '[object Array]')" :key="'a-' + index" class="screenCollapse">
           <Collapse v-model="collapseIndex" accordion>
@@ -54,7 +54,7 @@
 
                     <Input v-if="itemChildList.type == 'Input'" v-model.trim="formData[itemChildList.name]" type="text" size="small" placeholder="请输入内容" clearable @on-change="changed($event, itemChildList.name)" />
 
-                    <Input v-if="itemChildList.type == 'Input-textarea'" v-model.trim="formData[itemChildList.name]" size="small" type="textarea" rows="2" placeholder="请输入内容" @on-change="changed($event, itemChildList.name)" />
+                    <Input v-if="itemChildList.type == 'Input-textarea'" v-model.trim="formData[itemChildList.name]" size="small" type="textarea" :rows="2" placeholder="请输入内容" @on-change="changed($event, itemChildList.name)" />
 
                     <i-switch v-if="itemChildList.type == 'i-switch'" v-model="formData[itemChildList.name]" placeholder="请输入内容" size="small" @on-change="changed($event, itemChildList.name)" />
 

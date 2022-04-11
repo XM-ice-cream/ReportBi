@@ -43,7 +43,7 @@ export const widgetText = {
                 name: 'letterSpacing',
                 required: false,
                 placeholder: '',
-                value: '0',
+                value: 0,
             },
             {
                 type: 'vue-color',

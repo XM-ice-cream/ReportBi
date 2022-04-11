@@ -31,7 +31,7 @@
             </Tabs>
           </Sider>
           <!-- 中间内容excel -->
-          <Content class="layout-middle" style='width:calc(100% - 400px);height:100%'>
+          <Content class="layout-middle content" style='width:calc(100% - 400px);height:100%'>
             <div class="push_btn">
               <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
                 <Button type="text" @click="preview()">
@@ -44,23 +44,27 @@
                 </Button>
               </Tooltip>
             </div>
-            <div class="workbench-container" style="width:100%;height:calc(100% - 1.5rem)" @mousedown="handleMouseDown">
+            <div class="workbench-container" :style="{
+          width: bigscreenWidthInWorkbench + 'px',
+          height: bigscreenHeightInWorkbench + 'px'
+        }" @mousedown="handleMouseDown">
               <!-- 网页标尺辅助线 -->
               <vue-ruler-tool v-model="dashboard.presetLine" class="vueRuler" :step-length="50" :parent="true" :position="'relative'" :is-scale-revise="true" :visible.sync="dashboard.presetLineVisible" style="height:100%;width:100%">
                 <!-- workbench 工作台 -->
                 <!-- @click.self 只点击自己本身触发 -->
                 <div id="workbench" class="workbench" :style="{
-                        width: '100%',
-                        height: '100%',
-                        'background-color': dashboard.backgroundColor,
-                        'background-image': 'url(' + dashboard.backgroundImage + ')',
-                        'background-position': '0% 0%',
-                        'background-size': '100% 100%',
-                        'background-repeat': 'initial',
-                        'background-attachment': 'initial',
-                        'background-origin': 'initial',
-                        'background-clip': 'initial'
-                        }" @click.self="setOptionsOnClickScreen">
+                      transform: workbenchTransform,
+                    width: bigscreenWidth + 'px',
+                    height:  + 'px',
+                    'background-color': dashboard.backgroundColor,
+                    'background-image': 'url(' + dashboard.backgroundImage + ')',
+                    'background-position': '0% 0%',
+                    'background-size': '100% 100%',
+                    'background-repeat': 'initial',
+                    'background-attachment': 'initial',
+                    'background-origin': 'initial',
+                    'background-clip': 'initial'
+                    }" @click.self="setOptionsOnClickScreen">
                   <div v-if="grade" class="bg-grid"></div>
                   <widget ref="widgets" v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :index="index" :step="1" :type="widget.type" :bigscreen="{ bigscreenWidth, bigscreenHeight }" @onActivated="setOptionsOnClickWidget" @contextmenu.prevent.native="rightClick($event, index)" @mousedown.prevent.native="widgetsClick(index)" @mouseup.prevent.native="widgetsMouseup" />
                 </div>
@@ -100,6 +104,8 @@ import widget from "./screenreport-design/widget/widget.vue";
 import { deepClone, isNotNull } from "@/libs/tools.js";
 import DynamicForm from "./screenreport-design/components/dynamicForm.vue";
 import ContentMenu from "./screenreport-design/components/contentMenu.vue";
+import { addScreenReq, previewScreenReq } from '@/api/bill-design-manage/report-manage.js'
+
 export default {
   name: "excelreport-design",
   components: { draggable, VueRulerTool, widget, DynamicForm, ContentMenu },
@@ -124,20 +130,65 @@ export default {
           window.addEventListener("mouseup", () => {
             this.grade = false;
           });
+          this.getPXUnderScale(this.bigscreenWidth)
         });
       }
     },
     widgets: {
       handler (val) {
-        console.log('监听', this.widgets);
+        //  console.log('监听', this.widgets);
         this.handlerLayerWidget(val);
       },
       deep: true
     }
   },
+  computed: {
+    step () {
+      return Number(100 / (this.bigscreenScaleInWorkbench * 100));
+    },
+    // 左侧折叠切换时，动态计算中间区的宽度
+    middleWidth () {
+      let widthLeftAndRight = 0;
+      if (this.toolIsShow) {
+        widthLeftAndRight += this.widthLeftForTools; // 左侧工具栏宽度
+      }
+      widthLeftAndRight += this.widthLeftForToolsHideButton; // 左侧工具栏折叠按钮宽度
+      widthLeftAndRight += this.widthLeftForOptions; // 右侧配置栏宽度
+
+      let middleWidth = this.bodyWidth - widthLeftAndRight;
+      return middleWidth;
+    },
+    middleHeight () {
+      return this.bodyHeight;
+    },
+
+    workbenchTransform () {
+      console.log('workbenchTransform', this.bigscreenScaleInWorkbench, this.bigscreenScaleInWorkbench);
+      return `scale(${this.bigscreenScaleInWorkbench}, ${this.bigscreenScaleInWorkbench})`;
+    },
+    // 大屏在设计模式的大小
+    bigscreenWidthInWorkbench () {
+      console.log('bigscreenWidthInWorkbench', this.bigscreenWidth, this.widthPaddingTools, this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools);
+      return this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools;
+    },
+    bigscreenHeightInWorkbench () {
+      return (
+        this.getPXUnderScale(this.bigscreenHeight) + this.widthPaddingTools
+      );
+    },
+    // 设计台按大屏的缩放比例
+    bigscreenScaleInWorkbench () {
+      let widthScale = (this.middleWidth - this.widthPaddingTools) / this.bigscreenWidth;
+      let heightScale = (this.middleHeight - this.widthPaddingTools) / this.bigscreenHeight;
+      console.log('bigscreenScaleInWorkbench', this.middleWidth, this.widthPaddingTools, this.bigscreenWidth, this.bigscreenHeight, this.middleHeight);
+      return Math.min(widthScale, heightScale);
+    },
+  },
   data () {
     return {
       dialogFormVisibleTitle: "大屏 设计",
+      bodyWidth: document.body.clientWidth,
+      bodyHeight: document.body.clientHeight,
       uploadUrl:
         process.env.BASE_API +
         "/reportDashboard/import/" +
@@ -208,9 +259,8 @@ export default {
       activeName: "first",
     };
   },
-  computed: {
-  },
   methods: {
+
     // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
     widgetOnDragged (evt, widgetCode) {
       let widgetType = widgetCode;
@@ -247,12 +297,12 @@ export default {
       // 处理默认值
       const widgetJsonValue = this.handleDefaultValue(widgetJson);
       // 将选中的复制组件，放到工作区中去
-      console.log('widgetJsonValue', widgetJsonValue, deepClone(widgetJsonValue));
+      //   console.log('widgetJsonValue', widgetJsonValue, deepClone(widgetJsonValue));
       this.widgets.push(deepClone(widgetJsonValue));
       // 激活新组件的配置属性
       //   this.setOptionsOnClickWidget(this.widgets.length - 1);
     },
-
+    //通过监听widgets 获取图层参数
     handlerLayerWidget (val) {
 
       const layerWidgetArr = [];
@@ -268,19 +318,25 @@ export default {
         layerWidgetArr.push(obj);
       }
       this.layerWidget = layerWidgetArr;
-      console.log('this.layerWidget', this.layerWidget);
+      // console.log('this.layerWidget', this.layerWidget);
     },
+    // 渲染初始化大屏报表
     async initEchartData () {
-      const reportCode = this.$route.query.reportCode;
-      //   const { code, data } = await detailDashboard(reportCode);
-      //   if (code != 200) return;
-      //   const processData = this.handleInitEchartsData(data);
-      //   const screenData = this.handleBigScreen(data.dashboard);
-      //   this.widgets = processData;
-      //   this.dashboard = screenData;
-      //   this.bigscreenWidth = this.dashboard.width;
-      //   this.bigscreenHeight = this.dashboard.height;
+
+      const reportCode = this.reportCode;
+
+      const { code, result } = await previewScreenReq({ reportCode: reportCode });
+      if (code != 200) return;
+      //   console.log('initEchartData', reportCode, result);
+      const processData = this.handleInitEchartsData(result);
+      const screenData = this.handleBigScreen(result.dashboard);
+      this.widgets = processData;
+      //   console.log(this.widgets);
+      this.dashboard = screenData;
+      this.bigscreenWidth = this.dashboard.width;
+      this.bigscreenHeight = this.dashboard.height;
     },
+    // 获取大屏参数--宽高，背景颜色，图片
     handleBigScreen (data) {
       const optionScreen = getToolByCode("screen").options;
       const setup = optionScreen.setup;
@@ -300,8 +356,10 @@ export default {
         width: (data && data.width) || "1920",
       };
     },
+    // 大屏 图表
     handleInitEchartsData (data) {
       const widgets = data.dashboard ? data.dashboard.widgets : [];
+      // console.log('widgets', widgets);
       const widgetsData = [];
       for (let i = 0; i < widgets.length; i++) {
         let obj = {};
@@ -313,12 +371,15 @@ export default {
         };
         const tool = deepClone(getToolByCode(widgets[i].type));
         const option = tool.options;
+
         const options = this.handleOptionsData(widgets[i].value, option);
+        //  console.log(obj.value, widgets[i].value, option, options);
         obj.options = options;
         widgetsData.push(obj);
       }
       return widgetsData;
     },
+    // 大屏 右侧参数
     handleOptionsData (data, option) {
       for (const key in data.setup) {
         for (let i = 0; i < option.setup.length; i++) {
@@ -358,13 +419,13 @@ export default {
       return option;
     },
     // 保存数据
-    async saveData () {
+    async save () {
       if (!this.widgets || this.widgets.length == 0) {
         this.$Message.error("请添加组件");
         return;
       }
       const screenData = {
-        reportCode: this.$route.query.reportCode,
+        reportCode: this.reportCode,
         dashboard: {
           title: this.dashboard.title,
           width: this.dashboard.width,
@@ -374,18 +435,16 @@ export default {
         },
         widgets: this.widgets,
       };
-      //   const { code, data } = await insertDashboard(screenData);
-      //   if (code == "200") {
-      //     this.$message.success("保存成功！");
-      //   }
+      //   console.log('screenData', screenData);
+      const { code, data } = await addScreenReq(screenData);
+      if (code == 200) {
+        this.$Message.success("保存成功！");
+      }
     },
     // 预览
-    viewScreen () {
-      let routeUrl = this.$router.resolve({
-        path: "/bigscreen/viewer",
-        query: { reportCode: this.$route.query.reportCode },
-      });
-      window.open(routeUrl.href, "_blank");
+    preview () {
+      this.closeDialog();
+      this.$parent.previewScreenVisib = true;
     },
     //  导出
     async exportDashboard (val) {
@@ -439,6 +498,7 @@ export default {
 
     // 在缩放模式下的大小
     getPXUnderScale (px) {
+      console.log('getPXUnderScale', this.bigscreenScaleInWorkbench, px, this.bigscreenScaleInWorkbench * px);
       return this.bigscreenScaleInWorkbench * px;
     },
 
@@ -491,13 +551,13 @@ export default {
       return widgetJson;
     },
     layerClick (index) {
-      console.log('layerClick', index);
+      // console.log('layerClick', index);
       this.widgetIndex = index;
       this.widgetsClick(index);
     },
     // 如果是点击大屏设计器中的底层，加载大屏底层属性
     setOptionsOnClickScreen () {
-      console.log('setOptionsOnClickScreen', this.widgetOptions);
+      //   console.log('setOptionsOnClickScreen', this.widgetOptions);
       this.screenCode = "screen";
       // 选中不同的组件 右侧都显示第一栏
       //   this.activeName = "first";
@@ -514,7 +574,7 @@ export default {
           this.$refs.widgets[i].$refs.draggable.setActive(false);
         }
       }
-      console.log("鼠标按下", index);
+      // console.log("鼠标按下", index);
       this.setOptionsOnClickWidget(index);
       this.grade = true;
     },
@@ -527,7 +587,7 @@ export default {
       if (typeof obj == "number") {
 
         this.widgetOptions = deepClone(this.widgets[obj]["options"]);
-        console.log('number-setOptionsOnClickWidget', this.widgetOptions);
+        //  console.log('number-setOptionsOnClickWidget', this.widgetOptions);
         return;
       }
       if (obj.index < 0 || obj.index >= this.widgets.length) {
@@ -543,7 +603,7 @@ export default {
         }
       });
       this.widgetOptions = deepClone(this.widgets[obj.index]["options"]);
-      console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
+      //  console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
 
     },
 
@@ -555,7 +615,7 @@ export default {
     },
     // 将当前选中的组件，右侧属性值更新
     widgetValueChanged (key, val) {
-      console.log('key', this.screenCode, val);
+      //  console.log('key', this.screenCode, val);
       if (this.screenCode == "screen") {
         let newSetup = new Array();
         this.dashboard = deepClone(val);
@@ -574,7 +634,7 @@ export default {
           newSetup.push(el);
         });
         this.widgetOptions.setup = newSetup;
-        console.log('widgetValueChanged', '右侧属性值更新setup', this.widgetOptions.setup);
+        //  console.log('widgetValueChanged', '右侧属性值更新setup', this.widgetOptions.setup);
       } else {
         for (let i = 0; i < this.widgets.length; i++) {
           if (this.widgetIndex == i) {
@@ -871,6 +931,17 @@ export default {
     max-width: 300px !important;
     flex: 0 0 300px !important;
   }
+  .content {
+    .push_btn {
+      text-align: right;
+      margin-right: 0.3rem;
+      i {
+        color: #6c6666;
+        font-size: 1.12rem;
+        margin-right: 0.3rem;
+      }
+    }
+  }
 
   /deep/ .el-tabs--border-card {
     border: 0;
@@ -943,6 +1014,7 @@ export default {
     }
   }
 }
+
 /deep/.ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab {
   border: none;
   background: transparent;
@@ -964,6 +1036,7 @@ export default {
 /deep/.ivu-tabs .ivu-tabs-tabpane {
   background: #242a30;
   overflow-y: auto;
+  padding: 0 0.5rem;
 }
 /deep/.ivu-tabs {
   height: 100%;

@@ -26,11 +26,10 @@
   </div>
 </template>
 <script>
-// jQuery.noConflict();
-// import vue from "vue";
-// import VueSuperSlide from "vue-superslide";
+import vue from "vue";
+import VueSuperSlide from "vue-superslide";
 
-// vue.use(VueSuperSlide);
+vue.use(VueSuperSlide);
 export default {
   props: {
     value: Object,
@@ -101,6 +100,7 @@ export default {
         this.optionsPosition = val.position;
         this.optionsData = val.data;
         this.initData();
+        console.log(VueSuperSlide, this);
       },
       deep: true
     }

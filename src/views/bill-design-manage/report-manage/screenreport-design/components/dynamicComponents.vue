@@ -1,13 +1,16 @@
 <template>
   <div>
-    <Form :label-width="100" label-position="left">
+    <Form :label-width="80" label-position="left">
       <FormItem label="数据集">
         <Select size="small" v-model="dataSetValue" filterable placeholder="请选择" @on-change="selectDataSet">
-          <Option v-for="item in dataSet" :key="item.code" :label="item.setName" :value="item.id" />
+          <Option v-for="item in dataSet" :key="item.setCode" :label="item.setName" :value="item.setCode" />
         </Select>
       </FormItem>
       <FormItem v-for="(item, index) in userNameList" :key="index" :label="item.paramName">
-        <Input v-model.trim="item.sampleItem" size="small" />
+        <Input type="text" v-model.trim="item.sampleItem" v-if="item.paramType==='String'" clearable size="small" />
+        <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="item.sampleItem" v-else-if="item.paramType==='Array'" clearable size="small" />
+        <DatePicker v-else v-model="item.sampleItem" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable size="small"></DatePicker>
+        <!-- <Input v-model.trim="item.sampleItem" size="small" /> -->
       </FormItem>
       <FormItem v-for="item in setParamList" :key="item" :label="item">
         <Dictionary v-model="params[item]" :dict-key="getDictKey()" @input="selectParams($event, item)" />
@@ -18,6 +21,7 @@
 </template>
 <script>
 // import { queryAllDataSet, detailBysetId } from "@/api/bigscreen";
+import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 import Dictionary from "@/components/dictionary/index";
 
 export default {
@@ -68,16 +72,25 @@ export default {
     this.echoDataSet(this.formData);
   },
   methods: {
+    //获取全部数据集
     async loadDataSet () {
-      const { code, data } = await queryAllDataSet();
-      this.dataSet = data;
-      if (code != "200") return;
+      let obj = {
+        orderField: "setCode", // 排序字段
+        ascending: true, // 是否升序
+        pageSize: 9999, // 分页大小
+        pageIndex: 1, // 当前页码
+        data: { sourceCode: "", setCode: "", setName: "" },
+      };
+      const { code, result } = await getpagelistReq(obj);
+      this.dataSet = result.data;
+      if (code != 200) return;
     },
+    // 获取选中数据集具体数据
     async selectDataSet () {
-      const { code, data } = await detailBysetId(this.dataSetValue);
-      this.userNameList = data.dataSetParamDtoList;
-      this.setParamList = data.setParamList;
-      if (code != "200") return;
+      const { code, result } = await getDeatilByIdReq({ setCode: this.dataSetValue });
+      this.userNameList = result.dataSetParamDtoList;
+      this.setParamList = result.setParamList;
+      if (code != 200) return;
     },
     async saveDataBtn () {
       const contextData = {};
