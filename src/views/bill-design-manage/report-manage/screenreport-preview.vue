@@ -1,6 +1,6 @@
 
 <template>
-  <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='900' :before-close="closeDialog" class="screenpreview">
+  <Modal :mask-closable="false" :closable="false" v-model="visib" fullscreen :z-index='900' class="screenpreview">
     <div class="layout">
       <div :style="bigScreenStyle">
         <widget v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :type="widget.type" />
@@ -54,8 +54,9 @@ export default {
       const { code, result } = await previewScreenReq({ reportCode: reportCode });
       if (code != 200) return;
       const equipment = document.body.clientWidth;
-      const clientHeight = document.body.clientHeight
+      const clientHeight = document.body.clientHeight - 40
       const ratioEquipment = equipment / result.dashboard.width;
+      const ratioEquipmentH = clientHeight / result.dashboard.height;
       console.log(ratioEquipment);
       this.bigScreenStyle = {
         width: result.dashboard.width + "px",
@@ -68,7 +69,7 @@ export default {
         "background-attachment": "initial",
         "background-origin": "initial",
         "background-clip": "initial",
-        transform: `scale(${ratioEquipment}, ${ratioEquipment})`,
+        transform: `scale(${ratioEquipment}, ${ratioEquipmentH})`,
         "transform-origin": "0 0"
       };
       this.widgets = result.dashboard.widgets;
@@ -85,12 +86,12 @@ export default {
   width: 100%;
   overflow: auto;
   position: absolute;
-  top: 2.5rem;
+  top: 0;
   right: 0;
   left: 0px;
   bottom: 2.5rem;
   padding: 0;
-  background-color: #242a30;
+  background-color: #f3f3f3;
 }
 </style>
 <style scoped lang="less">

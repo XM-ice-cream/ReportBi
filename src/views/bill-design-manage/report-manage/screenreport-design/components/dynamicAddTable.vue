@@ -11,20 +11,6 @@
       </template>
 
     </Table>
-    <!-- <el-table :data="formData" style="width: 100%">
-      <el-table-column prop="name" label="名称" width="60" />
-      <el-table-column prop="key" label="key值" width="70" />
-      <el-table-column prop="width" label="宽度" width="50" />
-      <el-table-column label="操作" width="100">
-        <template slot-scope="scope">
-          <div class="button-group">
-            <Button @click="handleEditorClick(scope.$index, scope.row)" type="text" size="small">编辑</Button>
-            <Button type="text" size="small" @click="handleDeleteClick(scope.$index, scope.row)">删除</Button>
-          </div>
-        </template>
-      </el-table-column>
-    </el-table> -->
-
     <Modal title="新增" v-model="dialogVisible" width="30%" :before-close="handleClose">
       <Form :model="rowFormData" :label-width="50">
         <FormItem label="名称:">
@@ -128,37 +114,7 @@ export default {
 /deep/::-webkit-scrollbar-track-piece {
   background-color: transparent;
 }
-/deep/ .el-table__body-wrapper::-webkit-scrollbar {
-  width: 0; // 横向滚动条
-  height: 8px; // 纵向滚动条 必写
-}
-// 滚动条的滑块
-/deep/ .el-table__body-wrapper::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-  background-color: rgba(144, 146, 152, 0.3);
-}
-/deep/.el-table,
-/deep/.el-table__expanded-cell,
-/deep/.el-table th,
-/deep/.el-table tr {
-  background-color: transparent !important;
-  color: #859094 !important;
-  font-size: 12px !important;
-}
-/deep/.el-table td,
-/deep/.el-table th.is-leaf {
-  border-bottom: none;
-  line-height: 26px;
-}
-/deep/.el-table tbody tr:hover {
-  background-color: #263445 !important;
-}
-/deep/.el-table tbody tr:hover > td {
-  background-color: #263445 !important;
-}
-/deep/.el-table::before {
-  height: 0;
-}
+
 .button-group .Button {
   padding: 0;
 }

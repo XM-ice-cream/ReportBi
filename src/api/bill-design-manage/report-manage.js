@@ -122,3 +122,15 @@ export const getDataReq = data => {
         data,
     })
 }
+//获取数据字典
+export const getDictReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        url: '/api/autoreportcenter/anonymous/v1/datadicts/getpagelist',
+        method: 'post',
+        data,
+    })
+}
+
+export const baseImgUrl = 'http://10.191.21.54:8700' + '/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_301380426780512256.jpg'

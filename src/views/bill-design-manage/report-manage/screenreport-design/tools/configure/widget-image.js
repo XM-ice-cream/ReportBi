@@ -1,3 +1,6 @@
+import {
+    baseImgUrl
+} from '@/api/bill-design-manage/report-manage.js'
 export const widgetImage = {
     code: 'widget-image',
     type: 'html',
@@ -43,7 +46,7 @@ export const widgetImage = {
                 name: 'imageAdress',
                 required: false,
                 placeholder: '',
-                value: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pptjia.com%2Fimage%2F20190902%2F5014c164c90b8e20726363b718939681.jpg&refer=http%3A%2F%2Fimg.pptjia.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1651913631&t=e0f460f526a4ec2390cd74f3a3873054',
+                value: baseImgUrl,
             },
             {
                 type: 'vue-color',

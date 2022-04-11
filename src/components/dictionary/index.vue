@@ -6,7 +6,7 @@
 </template>
 
 <script>
-// import { getDictList } from "@/api/bill-design-manage/dict-data"; // 获取数据字典
+import { getDictReq } from "@/api/bill-design-manage/report-manage"; // 获取数据字典
 export default {
   name: "GetDictionary",
   props: {
@@ -43,11 +43,11 @@ export default {
   methods: {
     // 获取数据字典
     async getSystem () {
-      //   const { code, data } = await getDictList(this.dictKey);
-      //   if (code != "200") return;
-      this.dictionaryOptions = [{ id: "text", text: "文本数字", extend: null }];
+      const { code, result } = await getDictReq(this.dictKey);
+      if (code != 200) return;
+      this.dictionaryOptions = result;
       //默认第一条
-      this.dictionary = this.dictionaryOptions[0]
+      //   this.dictionary = this.dictionaryOptions[0]
     },
     selectChange (val) {
       this.$emit("input", val);
