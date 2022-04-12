@@ -72,6 +72,7 @@ export default {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
+          console.log(window);
           this.params.reportCode = this.reportCode;
           this.loading = true;
           this.tableData2 = [];
@@ -199,11 +200,11 @@ export default {
       //刷新
       window.luckysheet.refresh();
       exportExcel(luckysheet.getAllSheets(), this.params.reportCode + '-' + `${formatDate(new Date())}`)
-        exportReq(this.params).then((res) => {
-          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-          const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
-          exportFile(blob, fileName);
-        });
+      exportReq(this.params).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     //初始化表格
     createSheet () {
@@ -221,8 +222,8 @@ export default {
             })
             console.log(this.jsonStr)
             console.log(this.jsonStr[this.jsonIndex])
-             this.params.total = this.jsonStr[this.jsonIndex].total
-             this.params.pageCount = this.jsonStr[this.jsonIndex].pageCount
+            this.params.total = this.jsonStr[this.jsonIndex].total
+            this.params.totalPage = this.jsonStr[this.jsonIndex].pageCount
           }
         },
         data: [
