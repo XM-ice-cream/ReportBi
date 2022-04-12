@@ -151,9 +151,9 @@ export default {
       if (!data) return;
       if (this.ispreview) {
         this.getEchartData(data);
-        this.flagInter = setInterval(() => {
-          this.getEchartData(data);
-        }, refreshTime);
+        // this.flagInter = setInterval(() => {
+        //   this.getEchartData(data);
+        // }, refreshTime);
       } else {
         this.getEchartData(data);
       }

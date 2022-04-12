@@ -53,8 +53,8 @@ export default {
       const reportCode = this.reportCode;
       const { code, result } = await previewScreenReq({ reportCode: reportCode });
       if (code != 200) return;
-      const equipment = document.body.clientWidth;
-      const clientHeight = document.body.clientHeight - 40
+      const equipment = document.body.clientWidth - 15;
+      const clientHeight = document.body.clientHeight
       const ratioEquipment = equipment / result.dashboard.width;
       const ratioEquipmentH = clientHeight / result.dashboard.height;
       console.log(ratioEquipment);

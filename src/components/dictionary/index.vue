@@ -1,7 +1,7 @@
 
 <template>
   <Select v-model="dictionary" placeholder="请选择" clearable @on-change="selectChange" size="small">
-    <Option v-for="item in dictionaryOptions" :key="item.id" :label="item.text" :value="item.id" />
+    <Option v-for="item in dictionaryOptions" :key="item.id" :label="item.dataName" :value="item.dataType" />
   </Select>
 </template>
 
@@ -39,11 +39,12 @@ export default {
   },
   mounted () {
     this.dictionary = this.value;
+    console.log('this.value', this.value);
   },
   methods: {
     // 获取数据字典
     async getSystem () {
-      const { code, result } = await getDictReq(this.dictKey);
+      const { code, result } = await getDictReq({ chartType: this.dictKey });
       if (code != 200) return;
       this.dictionaryOptions = result;
       //默认第一条

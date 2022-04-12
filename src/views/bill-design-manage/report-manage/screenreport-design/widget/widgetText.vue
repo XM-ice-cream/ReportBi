@@ -68,9 +68,9 @@ export default {
       if (!val) return;
       if (this.ispreview) {
         this.getEchartData(val);
-        this.flagInter = setInterval(() => {
-          this.getEchartData(val);
-        }, refreshTime);
+        // this.flagInter = setInterval(() => {
+        //   this.getEchartData(val);
+        // }, refreshTime);
       } else {
         this.getEchartData(val);
       }

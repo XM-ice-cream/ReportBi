@@ -57,8 +57,8 @@ export default {
       columns: [
         { title: '名称', key: 'name', align: 'center', tooltip: true, ellipsis: true },
         { title: 'key值', key: 'key', align: 'center', tooltip: true, ellipsis: true },
-        { title: '宽度', key: 'width', align: 'center', tooltip: true, ellipsis: true },
-        { title: '操作', slot: 'operator', align: 'center', tooltip: true, ellipsis: true, width: '80' }
+        { title: '宽度', key: 'width', align: 'center', tooltip: true, ellipsis: true, width: '40' },
+        { title: '操作', slot: 'operator', align: 'center', tooltip: true, ellipsis: true, width: '70' }
       ]
     };
   },

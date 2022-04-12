@@ -6,7 +6,7 @@
           <!-- 左侧 -->
           <Sider hide-trigger class="layout-left">
             <Tabs type='card'>
-              <TabPane label='工具栏'>
+              <TabPane label='工具栏' name="tools">
                 <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
                   <div class="tools-item">
                     <span class="tools-item-icon">
@@ -16,7 +16,7 @@
                   </div>
                 </draggable>
               </TabPane>
-              <TabPane label='图层'>
+              <TabPane label='图层' name='layer'>
                 <draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }">
                   <transition-group>
                     <div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)">
