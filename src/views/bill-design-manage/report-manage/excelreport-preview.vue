@@ -34,7 +34,8 @@
                 </Button>
               </Tooltip>
             </div>
-            <div id="luckysheetpreview" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
+            <div id="luckysheetpreview" style="margin:0;padding:0;position:absolute;width:100%;height:calc(100% - 34px);left: 0;top: 0;"></div>
+            <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
             <div style="display:none"></div>
           </Content>
         </Layout>
@@ -49,10 +50,9 @@
 </template>
 
 <script>
-import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage.js'
+import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage'
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
-import { getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 import { exportExcel } from './export'
 export default {
   name: "excelreport-preview",
@@ -82,7 +82,6 @@ export default {
       }
       // 销毁luckysheet
       window.luckysheet.destroy();
-
     }
   },
   data () {
@@ -99,56 +98,52 @@ export default {
       params: {
         reportCode: "",
         setParam: "",
-        requestCount: 1,
-        pageSize: 1000 * 10
+        pageSize: 30, // 每页显示数
+        requestCount: 1, // 当前页
+        orderField: 'CREATEDATE', // 排序字段
+        ascending: false, // 排序类型true升序 false降序
+        total: 0, //  总条数
+        totalPage: 0 //  总页数
+        // ...this.$config.pageConfig,
       },
       requestCountList: [],
-      maxInteral: 1,
+      jsonStr:[], // json数据
+      jsonIndex:0, // json数据
       finished: 'Loading...',
       // 验证实体
-      ruleValidate: {
-
-      }
+      ruleValidate: {}
     };
   },
   methods: {
     async searchPreview () {
-      this.dateFormate();
+      this.dateFormate()
       //重置
-      const arr = this.toObject(this.tableData2);
-      this.params.setParam = JSON.stringify(arr);
-      this.params.requestCount = 1;//初始化请求次数为1
-      this.sheetData = [{}];
-      this.finished = 'Loading...';
-      // console.log(window.luckysheet);
-      window.luckysheet.destroy();
+      const arr = this.toObject(this.tableData2)
+      this.params.setParam = JSON.stringify(arr)
+      this.sheetData = [{}]
+      this.finished = 'Loading...'
+      window.luckysheet.destroy()
       //每次都重新加载需要改成刷新
       this.intervalPreview()
-
     },
-    async intervalPreview (changeIndex) {
-      // console.log(133);
+    async intervalPreview () {
       this.loading = true;
-
       const result = window.luckysheet.getAllSheets().filter(item => item.status === 1)[0];
       let index = '';
-      //    console.log('window.luckysheet.getAllSheets())', window.luckysheet.getAllSheets());
       if (result?.index) {
-        index = changeIndex ? changeIndex : result.index;
+        index = result.index;
         this.requestCountList[index] = this.requestCountList[index] + 1;
-        this.params.requestCount = this.requestCountList[index];
-        //  console.log('index', index, changeIndex);
       }
       if (this.params.requestCount > 100) return;
       await getExcelPreviewReq(this.params).then(res => {
-        if (res.code == 200) {
+        if (res.code === 200) {
           this.loading = false;
-          let { setParam, requestCount, pageSize } = this.params;
+          let { setParam } = this.params;
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
           const setParam_parse = JSON.parse(res.result.setParam);
+          this.jsonStr = jsonStr_parse
           //第一次获取请求值
-          requestCount === 1 ? this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result) : ''
-          //   : this.addExcel(jsonStr_parse, requestCount, pageSize, index)
+          this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result)
         } else {
           this.$Message.error(res.message);
           this.sheetData = [{}];
@@ -160,81 +155,41 @@ export default {
 
     },
     initExcel (jsonStr_parse, setParam, setParam_parse, result) {
-      //  console.log('jsonStr_parse', jsonStr_parse);
-      //  console.log(window.luckysheet);
       this.reportName = jsonStr_parse.name;
       // 渲染查询表单
       this.tableData2 = this.getParamsList(setParam, setParam_parse);
 
-
       let firstPageCount = 0;
       //获取每个sheet 的接口请求次数
-      jsonStr_parse.forEach((item, itemIndex) => {
+      jsonStr_parse.forEach((item) => {
         const { index, pageCount, status } = item;
         this.requestCountList[index + 'count'] = pageCount; //index sheet 总共请求次数
         this.requestCountList[index] = 1//index sheet 当前sheet
         //如果状态为启动 则记录请求次数
         if (status) firstPageCount = pageCount;
       })
+      this.params={
+        ...this.params,
+        total:jsonStr_parse[this.jsonIndex].total,
+        totalPage:jsonStr_parse[this.jsonIndex].pageCount
+      }
       //初始化Excel
       this.sheetData = result == null ? [{}] : jsonStr_parse;
       this.createSheet();
       if (firstPageCount > 1) this.$Message.warning('最大只显示一万笔数据')
-      //继续获取excel数据 maxInteral 大于1 继续获取excel值
-      //   firstPageCount > 1 ? this.intervalPreview() : this.finished = '加载完成！'
-      //   this.finished = '加载完成！'
-    },
-    async addExcel (jsonStr_parse, requestCount, pageSize, Sheetindex) {
-      await jsonStr_parse.forEach((item, index) => {
-        if (Sheetindex === item.index) {
-          item.celldata.forEach((o, oIndex) => {
-            if (!this.visib) return;
-            o.r = o.r + (requestCount - 1) * pageSize;
-            let options = { order: index };
-            // console.log(o.r, o.c, o.v, requestCount, (requestCount - 1) * pageSize, options);
-            if (o.c == 0) {
-              window.luckysheet.insertRow(o.r, options);
-              // console.log('insertRowBottom');
-              // window.luckysheet.refresh()
-            };
-            window.luckysheet.setCellValue(o.r, o.c, o.v, options)
-            // console.log(o);
-
-
-          })
-          //   console.log(item.celldata, window.luckysheet.getRangeValue());
-          //   const options = { range: 'A12:L22' }
-          //   window.luckysheet.setRangeValue([[item.celldata]], options);
-
-        }
-
-      })
-      // console.log(jsonStr_parse);
-      //   window.luckysheet.updataSheet({ data: jsonStr_parse });
-      //刷新
-      //   window.luckysheet.refresh();
-      //跳出循环--停止获取excel数据
-      if (requestCount !== 1 && requestCount >= this.requestCountList[Sheetindex + 'count']) { this.finished = '加载完成！'; return };
-      //   if (this.visib) this.intervalPreview();
     },
     getParamsList (setParam, setParam_parse) {
       const extendObj = setParam = setParam_parse;
       const extendArry = [];
       for (const i in extendObj) {
-        // console.log(i);
-        // getDeatilByIdReq({ setCode: i }).then(res => {
-        //   console.log(res);
-        //   if(res.code==200){
-
-        //   }
-        // })
         const children = [];
         for (const y in extendObj[i]) {
           if (!y.endsWith('required') && !y.endsWith('type')) {
+            // const data = extendObj[i][y];
+            // const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : (data.includes('\n') ? 'Array' : 'String');
             children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
             this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
           }
-
         }
         extendArry.push({ name: i, children: children });
       }
@@ -243,46 +198,32 @@ export default {
     async download () {
       //刷新
       window.luckysheet.refresh();
-      //  console.log('luckysheet.getAllSheets()', luckysheet.getAllSheets());
       exportExcel(luckysheet.getAllSheets(), this.params.reportCode + '-' + `${formatDate(new Date())}`)
-      //   const { reportCode, setParam } = this.params
-      //   const obj = {
-      //     reportCode,
-      //     setParam,
-      //     requestCount: 1,
-      //     pageSize: 1000
-      //   };
-      //   exportReq(obj).then((res) => {
-      //     let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-      //     const fileName = reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
-      //     exportFile(blob, fileName);
-      //   });
+        exportReq(this.params).then((res) => {
+          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+          const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+          exportFile(blob, fileName);
+        });
     },
-
     //初始化表格
     createSheet () {
-      const _this = this;
       const options = {
         container: "luckysheetpreview", // 设定DOM容器的id
         title: "", // 设定表格名称
         lang: "zh", // 设定表格语言
         plugins: ["chart"],
         hook: {
-          sheetDeactivateAfter: function (index, isPivotInitial, isNewSheet) {
-            console.info(index, isPivotInitial, isNewSheet);
-
-          },
-          //   scroll: function (position) {
-          //     const { scrollTop } = position;
-          //     console.log(position.scrollTop, (scrollTop % 60) % 20);
-          //     if ((scrollTop % 60) % 20 == 0) {
-          //       console.log('123');
-          //       const result = window.luckysheet.getAllSheets().filter(item => item.status === 1)[0];
-          //       console.log(_this.requestCountList[result.index] >= _this.params.requestCount, _this.params.requestCount);
-          //       if (_this.requestCountList[result.index] >= _this.params.requestCount) _this.intervalPreview();
-          //     }
-          //   }
-
+          sheetActivate:(index)=>{
+            this.jsonStr.forEach((item,itemIndex)=>{
+              if(item.index === index) {
+                this.jsonIndex = itemIndex
+              }
+            })
+            console.log(this.jsonStr)
+            console.log(this.jsonStr[this.jsonIndex])
+             this.params.total = this.jsonStr[this.jsonIndex].total
+             this.params.pageCount = this.jsonStr[this.jsonIndex].pageCount
+          }
         },
         data: [
           {
@@ -343,32 +284,37 @@ export default {
     },
     // 表单封装json
     toObject (val) {
-      const objfirst = {};
-      const objSecond = {};
+      const objfirst = {}
+      const objSecond = {}
       val.forEach(el => {
-        el.name ? (objfirst[el.name] = el.children) : "";
+        el.name ? (objfirst[el.name] = el.children) : ""
       });
       for (const key in objfirst) {
         const newObj = {};
         objfirst[key].map(ev => {
-          //  console.log(ev);
-          Object.assign(newObj, { [ev.name]: ev.value, [ev.name + 'required']: ev.required, [ev.name + 'type']: ev.type });
+          Object.assign(newObj, { [ev.name]: ev.value, [ev.name + 'required']: ev.required, [ev.name + 'type']: ev.type })
         });
-        //  console.log('objSecond[key]', newObj);
-        objSecond[key] = newObj;
+        objSecond[key] = newObj
       }
-      return objSecond;
+      return objSecond
     },
     //关闭弹框
     closeDialog () {
-      this.$emit('update:visib', false);
+      this.$emit('update:visib', false)
     },
-  },
-  mounted () {
-
-
+    // 选择第几页
+    pageChange (index) {
+      this.params.requestCount = index
+      this.searchPreview()
+    },
+    // 选择一页几条数据
+    pageSizeChange (index) {
+      this.params.requestCount = 1
+      this.params.pageSize = index
+      this.searchPreview()
+    }
   }
-};
+}
 </script>
 <style>
 .luckysheet-input-box {
@@ -397,9 +343,7 @@ export default {
   max-width: 250px !important;
   flex: 0 0 250px !important;
   height: 100%;
-  //   border: 2px solid #3d85c6;
   margin: 0 0.5rem;
-  /* padding: 0 0.5rem; */
   background-color: transparent;
   .title {
     width: 100%;
@@ -430,8 +374,6 @@ export default {
       display: inline-block;
       line-height: 1.5rem;
       color: #666262d9;
-      /* margin: 0 auto; */
-      /* margin-left: 10%; */
       border-radius: 5px;
       margin-bottom: 1rem;
     }
@@ -465,9 +407,6 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  //   width: 5rem;
-  //   height: 5rem;
-  //   background: rgba(0, 0, 0, 0.2);
 }
 
 /deep/.ivu-modal-fullscreen .ivu-modal-body {
@@ -477,7 +416,7 @@ export default {
   top: 43px;
   bottom: 43px;
   right: 0;
-  left: 0px;
+  left: 0;
   padding: 0;
 }
 /deep/.layout,
@@ -504,5 +443,11 @@ export default {
 }
 /deep/ #luckysheet-row-count-show {
   width: 1.2rem !important;
+}
+.excel-page {
+  width: 98%;
+  position: absolute;
+  bottom: 0;
+  z-index: 9999;
 }
 </style>
