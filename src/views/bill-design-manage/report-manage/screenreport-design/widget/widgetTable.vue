@@ -1,5 +1,5 @@
 <template>
-  <div :style="styleObj">
+  <div :style="styleObj" class="widgetTable">
     <superslide v-if="hackReset" :options="options" class="txtScroll-top">
       <!--表头-->
       <!-- <div class="title">
@@ -7,31 +7,29 @@
           {{ item.name }}
         </div>
       </div> -->
-      <!-- <table class="title">
-        <tr>
-          <th v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]" :key="index">
-            {{ item.name }}
-          </th>
-        </tr>
-      </table> -->
       <!--数据-->
       <div class="bd">
         <table class="infoList">
-          <tr class="title" :style="tableRowHeight()">
-            <td v-for="(item, index) in header" style="height:0px !important;line-height:0px !important" :style="[headerTableStlye, tableFiledWidth(index)]" :key="index">
-              {{ item.name }}
-            </td>
-          </tr>
-          <tr v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
-            <td v-for="(itemChild, idx) in header" :key="idx" :style="[
+          <thead>
+            <tr class="title" :style="tableRowHeight()">
+              <th v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index)]" :key="index">
+                {{ item.name }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
+              <td v-for="(itemChild, idx) in header" :key="idx" :style="[
                 bodyTableStyle,
                 bodyTable(index),
                 tableFiledWidth(idx),
                 tableRowHeight()
               ]" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;" :title='item[itemChild.key]'>
-              {{ item[itemChild.key] }}
-            </td>
-          </tr>
+                {{ item[itemChild.key] }}
+              </td>
+            </tr>
+          </tbody>
+
         </table>
         <!-- <ul class="infoList">
           <li v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
@@ -63,8 +61,8 @@ export default {
     return {
       hackReset: true,
       options: {
-        titCell: ".hd ul",
-        mainCell: ".bd ul",
+        // titCell: ".hd ul",
+        // mainCell: ".bd table tbody",
         effect: "topLoop",
         autoPage: true,
         //effect: "top",
@@ -91,7 +89,7 @@ export default {
         background: this.optionsSetUp.tableBgColor
       };
     },
-    headerTableStlye () {
+    headerTableStlye (index) {
       const headStyle = this.optionsSetUp;
       return {
         "text-align": headStyle.textAlign,
@@ -104,6 +102,7 @@ export default {
         "background-color": headStyle.headBackColor,
         'height': '20px',
         'line-height': '20px',
+        // 'width': this.optionsSetUp.dynamicAddTable[index].width
       };
     },
     bodyTableStyle () {
@@ -219,9 +218,11 @@ export default {
     },
     tableFiledWidth (index) {
       let styleJson = {};
-      if (this.optionsSetUp.dynamicAddTable[index].width) {
-        styleJson["width"] = this.optionsSetUp.dynamicAddTable[index].width;
+      const tableWidth = this.optionsSetUp.dynamicAddTable[index].width;
+      if (tableWidth) {
+        styleJson["width"] = !tableWidth.includes('%') ? tableWidth + 'px' : tableWidth;
       }
+      console.log('styleJson', styleJson);
       return styleJson;
     }
   }
@@ -250,12 +251,17 @@ export default {
   width: 100%;
   overflow: auto;
 }
+.widgetTable table {
+  table-layout: fixed;
+  width: 100%;
+}
 
 .txtScroll-top .infoList td {
   //   height: 50px;
   //   line-height: 50px;
   //   display: flex;
   //   flex-direction: row;
+  word-wrap: break-word;
 }
 
 .txtScroll-top .infoList td > div {

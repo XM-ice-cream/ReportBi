@@ -72,7 +72,6 @@ export default {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
-          console.log(window);
           this.params.reportCode = this.reportCode;
           this.loading = true;
           this.tableData2 = [];
@@ -108,8 +107,8 @@ export default {
         // ...this.$config.pageConfig,
       },
       requestCountList: [],
-      jsonStr:[], // json数据
-      jsonIndex:0, // json数据
+      jsonStr: [], // json数据
+      jsonIndex: 0, // json数据
       finished: 'Loading...',
       // 验证实体
       ruleValidate: {}
@@ -169,10 +168,10 @@ export default {
         //如果状态为启动 则记录请求次数
         if (status) firstPageCount = pageCount;
       })
-      this.params={
+      this.params = {
         ...this.params,
-        total:jsonStr_parse[this.jsonIndex].total,
-        totalPage:jsonStr_parse[this.jsonIndex].pageCount
+        total: jsonStr_parse[this.jsonIndex].total,
+        totalPage: jsonStr_parse[this.jsonIndex].pageCount
       }
       //初始化Excel
       this.sheetData = result == null ? [{}] : jsonStr_parse;
@@ -214,16 +213,16 @@ export default {
         lang: "zh", // 设定表格语言
         plugins: ["chart"],
         hook: {
-          sheetActivate:(index)=>{
-            this.jsonStr.forEach((item,itemIndex)=>{
-              if(item.index === index) {
+          sheetActivate: (index) => {
+            this.jsonStr.forEach((item, itemIndex) => {
+              if (item.index === index) {
                 this.jsonIndex = itemIndex
               }
             })
             console.log(this.jsonStr)
             console.log(this.jsonStr[this.jsonIndex])
             this.params.total = this.jsonStr[this.jsonIndex].total
-            this.params.totalPage = this.jsonStr[this.jsonIndex].pageCount
+            this.params.pageCount = this.jsonStr[this.jsonIndex].pageCount
           }
         },
         data: [
