@@ -177,11 +177,9 @@ export default {
     previewImage (fileFullName) {
       if (this.req.previewServerIP) {
         var files = fileFullName.split(',');
-        console.log('==========files=========', files)
         let reviewUrl = this.req.previewServerIP + "/download?filefullname=";
         for (var i = 0; i < files.length; i++) {
           let imgUrl = reviewUrl + files[i];
-          console.log('==========imgUrl1=========', imgUrl)
           window.open(imgUrl, files[i]);
         }
       } else {

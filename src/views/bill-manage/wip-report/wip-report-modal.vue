@@ -64,7 +64,6 @@ export default {
   methods: {
     // 获取分页列表数据
     pageLoad (workorder, currentProcess) {
-      console.log('pageLoad', workorder, currentProcess);
       this.data = [];
       let obj = {
         orderField: "workorder", // 排序字段
@@ -95,7 +94,7 @@ export default {
       if (workorder && processname) {
         let obj = {
           workorder, //工单
-          currentProcess:processname,
+          currentProcess: processname,
         };
         exportDetailReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });

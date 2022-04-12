@@ -35,7 +35,6 @@ export default {
   },
   watch: {
     value (val) {
-      console.log('val', val);
       this.colorValue = val || "";
     }
   },
@@ -44,7 +43,6 @@ export default {
   },
   methods: {
     changeColor (val) {
-      console.log('this.colorValue', this.colorValue);
       //   this.colorValue = val.target.value || "";
       this.$emit("input", this.colorValue);
       this.$emit("change", this.colorValue);

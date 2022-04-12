@@ -57,7 +57,6 @@ export default {
       const clientHeight = document.body.clientHeight
       const ratioEquipment = equipment / result.dashboard.width;
       const ratioEquipmentH = clientHeight / result.dashboard.height;
-      console.log(ratioEquipment);
       this.bigScreenStyle = {
         width: result.dashboard.width + "px",
         height: result.dashboard.height + "px",
@@ -70,7 +69,7 @@ export default {
         "background-origin": "initial",
         "background-clip": "initial",
         transform: `scale(${ratioEquipment}, ${ratioEquipmentH})`,
-        "transform-origin": "0 0"
+        "transform-origin": "0 0",
       };
       this.widgets = result.dashboard.widgets;
     },

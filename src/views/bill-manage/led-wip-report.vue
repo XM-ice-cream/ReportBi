@@ -3,67 +3,67 @@
   <div class="page-style">
     <!-- 页面表格 -->
     <div class="comment">
-     
-          <Card :bordered="false" dis-hover class="card-style">
-            <div slot="title">
-              <Row>
-                <i-col span="12">
-                  <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-                    <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">{{ $t("selectQuery") }}</Button>
-                    <div class="poptip-style-content" slot="content">
-                      <Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
-                        
-                        <!-- workOrderInfo -->
-                        <FormItem :label="$t('workOrderInfo')" prop="workOrderInfo">
-                          <Input v-model.trim="req.workOrderInfo" :placeholder="
+
+      <Card :bordered="false" dis-hover class="card-style">
+        <div slot="title">
+          <Row>
+            <i-col span="12">
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
+                <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">{{ $t("selectQuery") }}</Button>
+                <div class="poptip-style-content" slot="content">
+                  <Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
+
+                    <!-- workOrderInfo -->
+                    <FormItem :label="$t('workOrderInfo')" prop="workOrderInfo">
+                      <Input v-model.trim="req.workOrderInfo" :placeholder="
                               $t('pleaseEnter') +'指定格式的'+ $t('workOrderInfo')
                             " @on-keyup.enter="searchClick" />
-                        </FormItem>
-                      </Form>
-                      <div class="poptip-style-button">
-                        <Button @click="resetClick">{{ $t("reset") }}</Button>
-                        <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
-                      </div>
-                    </div>
-                  </Poptip>
-                </i-col>
-                <i-col span="12">
-                  <button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
-                </i-col>
-              </Row>
-            </div>
-            <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
-              
-              <!-- 工单 -->
-              <template slot-scope="{ row }" slot="moNumber">
-                <div style="white-space:pre">{{ row.moNumber}}</div>
-              </template>
-              <!-- 工单数量 -->
-              <template slot-scope="{ row }" slot="moQty">
-                <div style="white-space:pre">{{ row.moQty }}</div>
-              </template>
-              
-            </Table>
-          </Card>
-        <!-- <TabKanban /> -->
+                    </FormItem>
+                  </Form>
+                  <div class="poptip-style-button">
+                    <Button @click="resetClick">{{ $t("reset") }}</Button>
+                    <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
+                  </div>
+                </div>
+              </Poptip>
+            </i-col>
+            <i-col span="12">
+              <button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
+            </i-col>
+          </Row>
+        </div>
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
+
+          <!-- 工单 -->
+          <template slot-scope="{ row }" slot="moNumber">
+            <div style="white-space:pre">{{ row.moNumber}}</div>
+          </template>
+          <!-- 工单数量 -->
+          <template slot-scope="{ row }" slot="moQty">
+            <div style="white-space:pre">{{ row.moQty }}</div>
+          </template>
+
+        </Table>
+      </Card>
+      <!-- <TabKanban /> -->
     </div>
   </div>
 </template>
 
 <script>
-import { getlistReq,exportReq} from "@/api/bill-manage/led-wip-report";
+import { getlistReq, exportReq } from "@/api/bill-manage/led-wip-report";
 import { formatDate, getButtonBoolean } from "@/libs/tools";
 import { exportFile } from "@/libs/tools";
 
 export default {
-  components: {  },
+  components: {},
   name: "led-wip-report",
   data () {
     return {
-     
+
       data: [], // 表格数据
       btnData: [],
-      searchPoptipModal:false,
+      searchPoptipModal: false,
       req: {
         workOrderInfo: "", //workOrderInfo
         // ...this.$config.pageConfig,
@@ -202,7 +202,7 @@ export default {
           key: "step14",
         }
       ],
-       tableConfig: { ...this.$config.tableConfig }, // table配置
+      tableConfig: { ...this.$config.tableConfig }, // table配置
     };
   },
   activated () {
@@ -218,12 +218,10 @@ export default {
     pageLoad () {
       this.tableConfig.loading = false;
       const { workOrderInfo } = this.req;
-      console.log(this.req);
-      console.log(workOrderInfo);
       if (workOrderInfo) {
         this.tableConfig.loading = true;
         this.searchObj = {
-          condition : workOrderInfo
+          condition: workOrderInfo
         };
         getlistReq(this.searchObj)
           .then((res) => {
@@ -240,10 +238,10 @@ export default {
     },
     // 导出
     exportClick () {
-      const {workOrderInfo } = this.req;
+      const { workOrderInfo } = this.req;
       if (workOrderInfo) {
         const obj = {
-          condition:workOrderInfo
+          condition: workOrderInfo
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
@@ -265,7 +263,7 @@ export default {
     searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
-    },  
+    },
   },
   mounted () {
     this.pageLoad();
@@ -273,5 +271,4 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-
 </style>

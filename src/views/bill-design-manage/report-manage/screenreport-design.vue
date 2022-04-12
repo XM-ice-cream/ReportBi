@@ -55,7 +55,7 @@
                 <div id="workbench" class="workbench" :style="{
                       transform: workbenchTransform,
                     width: bigscreenWidth + 'px',
-                    height:  + 'px',
+                    height: bigscreenHeight + 'px',
                     'background-color': dashboard.backgroundColor,
                     'background-image': 'url(' + dashboard.backgroundImage + ')',
                     'background-position': '0% 0%',
@@ -63,7 +63,8 @@
                     'background-repeat': 'initial',
                     'background-attachment': 'initial',
                     'background-origin': 'initial',
-                    'background-clip': 'initial'
+                    'background-clip': 'initial',
+                     'overflow-y':'auto',
                     }" @click.self="setOptionsOnClickScreen">
                   <div v-if="grade" class="bg-grid"></div>
                   <widget ref="widgets" v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :index="index" :step="1" :type="widget.type" :bigscreen="{ bigscreenWidth, bigscreenHeight }" @onActivated="setOptionsOnClickWidget" @contextmenu.prevent.native="rightClick($event, index)" @mousedown.prevent.native="widgetsClick(index)" @mouseup.prevent.native="widgetsMouseup" />

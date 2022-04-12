@@ -194,7 +194,6 @@ export default {
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
           let obj = { addData: this.batchData };
-          console.log('====OBJ====',obj);
           addReq(obj).then((res) => {
             if (res.code === 200) {
               this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);

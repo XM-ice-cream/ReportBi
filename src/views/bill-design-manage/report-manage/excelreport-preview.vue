@@ -72,13 +72,11 @@ export default {
     visib () {
       if (this.visib) {
         this.$nextTick(() => {
-          console.log(window);
           this.params.reportCode = this.reportCode;
           this.loading = true;
           this.tableData2 = [];
           this.searchPreview();
           window.jQuery.noConflict();
-          console.log(window);
         })
         return;
       }
@@ -122,7 +120,7 @@ export default {
       this.params.requestCount = 1;//初始化请求次数为1
       this.sheetData = [{}];
       this.finished = 'Loading...';
-      console.log(window.luckysheet);
+      // console.log(window.luckysheet);
       window.luckysheet.destroy();
       //每次都重新加载需要改成刷新
       this.intervalPreview()
@@ -233,18 +231,13 @@ export default {
         const children = [];
         for (const y in extendObj[i]) {
           if (!y.endsWith('required') && !y.endsWith('type')) {
-            const data = extendObj[i][y];
-            console.log(data.includes('\n'));
-            const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : (data.includes('\n') ? 'Array' : 'String');
             children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
             this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
-            //  console.log(this.ruleValidate);
           }
 
         }
         extendArry.push({ name: i, children: children });
       }
-      console.log('extendArry', extendArry);
       return extendArry;
     },
     async download () {

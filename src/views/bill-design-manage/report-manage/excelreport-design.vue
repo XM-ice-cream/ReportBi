@@ -112,7 +112,7 @@ export default {
         this.$nextTick(() => {
           this.design();
           window.jQuery.noConflict();
-          console.log(window);
+          //  console.log(window);
         })
         return;
       }

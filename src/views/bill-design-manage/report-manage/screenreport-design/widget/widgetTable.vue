@@ -96,12 +96,10 @@ export default {
   watch: {
     value: {
       handler (val) {
-        console.log('Table', val);
         this.optionsSetUp = val.setup;
         this.optionsPosition = val.position;
         this.optionsData = val.data;
         this.initData();
-        console.log(VueSuperSlide, this);
       },
       deep: true
     }
@@ -114,7 +112,6 @@ export default {
   },
   methods: {
     initData () {
-      console.log('Table', 'initData');
       this.handlerRollFn();
       this.handlerHead();
       this.handlerData();
@@ -159,7 +156,6 @@ export default {
       }
     },
     getEchartData (val) {
-      console.log('getEchartData', this);
       const data = this.queryEchartsData(val);
 
       data.then(res => {

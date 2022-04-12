@@ -735,6 +735,52 @@ export const widgetBarlinechart = {
                         }],
                     }, ],
                 },
+                {
+                    name: '滚动条设定',
+                    list: [{
+                        type: 'i-switch',
+                        label: '显示',
+                        name: 'isShowScroll',
+                        required: false,
+                        placeholder: '',
+                        value: false
+                    }, {
+                        type: 'InputNumber',
+                        label: '高度',
+                        name: 'scrollHeight',
+                        require: false,
+                        placeholder: '',
+                        value: 11
+                    }, {
+                        type: 'Input',
+                        label: 'Bottom',
+                        name: 'scrollBottom',
+                        require: false,
+                        placeholder: '',
+                        value: '7%'
+                    }, {
+                        type: 'InputNumber',
+                        label: '开始位置',
+                        name: 'scrollStart',
+                        require: false,
+                        placeholder: '',
+                        value: 0
+                    }, {
+                        type: 'InputNumber',
+                        label: '结束位置',
+                        name: 'scrollEnd',
+                        require: false,
+                        placeholder: '',
+                        value: 100
+                    }, {
+                        type: 'vue-color',
+                        label: '背景颜色',
+                        name: 'backgroundColor',
+                        required: false,
+                        placeholder: '',
+                        value: 'rgba(47, 69, 84, 0)'
+                    }],
+                },
             ],
         ],
         // 数据

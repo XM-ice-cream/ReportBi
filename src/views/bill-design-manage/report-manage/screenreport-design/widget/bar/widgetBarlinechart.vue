@@ -27,6 +27,15 @@ export default {
           trigger: "item",
           formatter: "{a} <br/>{b} : {c}%"
         },
+        dataZoom: [
+          {
+            show: true,
+            backgroundColor: "rgba(47, 69, 84, 0)",
+            fillerColor: "rgba(78, 151, 247, 0.4)",
+            handleSize: "100%",
+            height: 11
+          },
+        ],
         legend: {
           textStyle: {
             color: "#fff"
@@ -141,6 +150,7 @@ export default {
       this.setOptionsMargin();
       this.setOptionsLegend();
       this.setOptionsColor();
+      this.setOptionsDataZoom();
     },
     // 标题修改
     setOptionsTitle () {
@@ -393,6 +403,21 @@ export default {
       optionsData.dataType == "staticData"
         ? this.staticDataFn(optionsData.staticData)
         : this.dynamicDataFn(optionsData.dynamicData, optionsData.refreshTime);
+    },
+    //滚动条设定
+    setOptionsDataZoom () {
+      const optionsSetup = this.optionsSetup;
+      const dataZoom = {
+        show: optionsSetup.isShowScroll,
+        backgroundColor: optionsSetup.backgroundColor,
+        fillerColor: "rgba(78, 151, 247, 0.4)",
+        handleSize: "100%",
+        height: optionsSetup.scrollHeight,
+        bottom: optionsSetup.scrollBottom,
+        start: optionsSetup.scrollStart,
+        end: optionsSetup.scrollEnd,
+      };
+      this.options.dataZoom = dataZoom;
     },
     staticDataFn (val) {
       const series = this.options.series;

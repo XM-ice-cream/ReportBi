@@ -138,11 +138,11 @@ export default {
   },
   watch: {
     value (newValue, oldValue) {
-      console.log('newValue', newValue);
+      //  console.log('newValue', newValue);
       this.formData = newValue || {};
     },
     options (val) {
-      console.log('options', this.options);
+      //   console.log('options', this.options);
       this.setDefaultValue();
       this.isShowData();
     }
@@ -163,12 +163,11 @@ export default {
     changed (val, key) {
 
       if (val?.type) {
-        console.log('val type', val.target.value);
+        //   console.log('val type', val.target.value);
         this.$set(this.formData, key, val.target.value);
       } else {
         this.$set(this.formData, key, val);
       }
-      console.log('124890', this.formData);
       this.$emit("onChanged", this.formData);
       // key为当前用户操作的表单组件
       for (let i = 0; i < this.options.length; i++) {
@@ -214,11 +213,9 @@ export default {
       if (this.options && this.options.length > 0) {
         for (let i = 0; i < this.options.length; i++) {
           const obj = this.options[i];
-          console.log('setDefaultValue', Object.prototype.toString.call(obj), obj);
           if (Object.prototype.toString.call(obj) == "[object Object]") {
             //先暂时这样，原本是浅拷贝的
             this.formData[this.options[i].name] = this.options[i].value;
-            console.log(this.formData[this.options[i].name], this.options[i].value);
           } else if (Object.prototype.toString.call(obj) == "[object Array]") {
             for (let j = 0; j < obj.length; j++) {
               const list = obj[j].list;

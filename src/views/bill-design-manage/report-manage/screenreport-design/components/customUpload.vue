@@ -35,7 +35,6 @@ export default {
     getImages (el) {
       let file = el.target.files[0];
       let type = file.type.split("/")[0];
-      console.log('file', file);
       if (type === "image") {
         this.upload(file);
       } else {

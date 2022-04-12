@@ -39,7 +39,7 @@ export default {
   },
   mounted () {
     this.dictionary = this.value;
-    console.log('this.value', this.value);
+    // console.log('this.value', this.value);
   },
   methods: {
     // 获取数据字典
