@@ -132,5 +132,17 @@ export const getDictReq = data => {
         data,
     })
 }
+// 导出
+export const exportReq = data => {
+    return requestCenter({
+        loading: true,
+        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        url: '/api/autoreportcenter/anonymous/v1/reportexcel/export',
+        method: 'post',
+        responseType: 'arraybuffer',
+        data
+    })
+}
+
 
 export const baseImgUrl = 'http://10.191.21.54:8700' + '/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_301380426780512256.jpg'
