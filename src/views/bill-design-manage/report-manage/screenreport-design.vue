@@ -785,10 +785,11 @@ export default {
         line-height: 30px;
         text-align: center;
         display: block;
-        border: 1px solid #3a4659;
-        background: #282a30;
+        border: 1px solid #07375e;
+        background: #072a4f;
       }
       .tools-item-text {
+        color: #129db4;
       }
     }
   }
@@ -1014,21 +1015,25 @@ export default {
   background: transparent;
 }
 /deep/.ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab-active {
-  background: #242a30;
-  color: #27ce88;
+  background: #000d18;
+  color: #14b5c7;
+  font-weight: bold;
 }
 /deep/.ivu-modal-fullscreen .ivu-modal-body {
   padding: 0px;
   top: 2.63rem;
   bottom: 39px;
 }
+/deep/.ivu-form-label-left .ivu-form-item-label {
+  color: #129db4;
+}
 /deep/.ivu-tabs .ivu-tabs-content-animated {
-  background-color: #242a30;
+  background-color: #000d18;
   height: calc(100% - 33px);
   //   overflow-x: hidden;
 }
 /deep/.ivu-tabs .ivu-tabs-tabpane {
-  background: #242a30;
+  background: #000d18;
   overflow-y: auto;
   padding: 0 0.5rem;
 }

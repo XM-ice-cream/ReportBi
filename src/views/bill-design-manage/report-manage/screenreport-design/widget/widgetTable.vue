@@ -2,14 +2,38 @@
   <div :style="styleObj">
     <superslide v-if="hackReset" :options="options" class="txtScroll-top">
       <!--表头-->
-      <div class="title">
+      <!-- <div class="title">
         <div v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]" :key="index">
           {{ item.name }}
         </div>
-      </div>
+      </div> -->
+      <!-- <table class="title">
+        <tr>
+          <th v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]" :key="index">
+            {{ item.name }}
+          </th>
+        </tr>
+      </table> -->
       <!--数据-->
       <div class="bd">
-        <ul class="infoList">
+        <table class="infoList">
+          <tr class="title" :style="tableRowHeight()">
+            <td v-for="(item, index) in header" style="height:0px !important;line-height:0px !important" :style="[headerTableStlye, tableFiledWidth(index)]" :key="index">
+              {{ item.name }}
+            </td>
+          </tr>
+          <tr v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
+            <td v-for="(itemChild, idx) in header" :key="idx" :style="[
+                bodyTableStyle,
+                bodyTable(index),
+                tableFiledWidth(idx),
+                tableRowHeight()
+              ]" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;" :title='item[itemChild.key]'>
+              {{ item[itemChild.key] }}
+            </td>
+          </tr>
+        </table>
+        <!-- <ul class="infoList">
           <li v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
             <div v-for="(itemChild, idx) in header" :key="idx" :style="[
                 bodyTableStyle,
@@ -20,7 +44,7 @@
               {{ item[itemChild.key] }}
             </div>
           </li>
-        </ul>
+        </ul> -->
       </div>
     </superslide>
   </div>
@@ -75,9 +99,11 @@ export default {
         "border-style": headStyle.isLine ? "solid" : "none",
         "border-width": headStyle.borderWidth + "px",
         "border-color": headStyle.borderColor,
-        display: headStyle.isHeader ? "block" : "none",
+        // display: headStyle.isHeader ? "block" : "none",
         color: headStyle.headColor,
-        "background-color": headStyle.headBackColor
+        "background-color": headStyle.headBackColor,
+        'height': '20px',
+        'line-height': '20px',
       };
     },
     bodyTableStyle () {
@@ -148,9 +174,9 @@ export default {
       if (!data) return;
       if (this.ispreview) {
         this.getEchartData(data);
-        // this.flagInter = setInterval(() => {
-        //   this.getEchartData(data);
-        // }, refreshTime);
+        this.flagInter = setInterval(() => {
+          this.getEchartData(data);
+        }, refreshTime);
       } else {
         this.getEchartData(data);
       }
@@ -209,29 +235,30 @@ export default {
 }
 
 .title {
-  display: flex;
-  flex-direction: row;
+  //   display: flex;
+  //   flex-direction: row;
   width: 100%;
 }
 
 .title > div {
-  height: 50px;
-  line-height: 50px;
+  //   height: 50px;
+  //   line-height: 50px;
   width: 100%;
 }
 
 .txtScroll-top .bd {
   width: 100%;
+  overflow: auto;
 }
 
-.txtScroll-top .infoList li {
-  height: 50px;
-  line-height: 50px;
-  display: flex;
-  flex-direction: row;
+.txtScroll-top .infoList td {
+  //   height: 50px;
+  //   line-height: 50px;
+  //   display: flex;
+  //   flex-direction: row;
 }
 
-.txtScroll-top .infoList li > div {
+.txtScroll-top .infoList td > div {
   width: 100%;
 }
 
