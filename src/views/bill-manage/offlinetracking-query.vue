@@ -56,11 +56,11 @@
                     </FormItem>
                     <!-- 大板码 -->
                     <FormItem label="PanelNo" prop="panelNo">
-                      <Input v-model="req.panelNo" :placeholder="$t('pleaseEnter') + 'PanelNo'" @keyup.enter.native="searchClick" />
+                      <Input v-model="req.panelNo" :placeholder="$t('pleaseEnter') + 'PanelNo' + $t('multiple,separated')" @keyup.enter.native="searchClick" />
                     </FormItem>
                     <!-- SN -->
-                    <FormItem label="SN" prop="sn">
-                      <Input v-model="req.sn" :placeholder="$t('pleaseEnter') + 'SN'" @keyup.enter.native="searchClick" />
+                    <FormItem label="Carrier SN" prop="sn">
+                      <Input v-model="req.sn" :placeholder="$t('pleaseEnter') + 'SN'+ $t('multiple,separated')" @keyup.enter.native="searchClick" />
                     </FormItem>
                     <!-- 类型 -->
                     <FormItem :label="$t('type')" prop="type">
