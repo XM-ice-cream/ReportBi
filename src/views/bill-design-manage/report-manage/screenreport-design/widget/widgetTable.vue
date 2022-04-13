@@ -55,7 +55,8 @@ vue.use(VueSuperSlide);
 export default {
   props: {
     value: Object,
-    ispreview: Boolean
+    ispreview: Boolean,
+    visib: Boolean,
   },
   data () {
     return {
@@ -127,7 +128,12 @@ export default {
         this.initData();
       },
       deep: true
-    }
+    },
+    visib () {
+      if (!this.visib) {
+        clearInterval(this.flagInter)
+      }
+    },
   },
   mounted () {
     this.optionsSetUp = this.value.setup;
@@ -222,7 +228,6 @@ export default {
       if (tableWidth) {
         styleJson["width"] = !tableWidth.includes('%') ? tableWidth + 'px' : tableWidth;
       }
-      console.log('styleJson', styleJson);
       return styleJson;
     }
   }
@@ -233,6 +238,7 @@ export default {
 .txtScroll-top {
   overflow: hidden;
   position: relative;
+  height: 100%;
 }
 
 .title {
@@ -250,10 +256,16 @@ export default {
 .txtScroll-top .bd {
   width: 100%;
   overflow: auto;
+  //   overflow: hidden;
+  height: 100%;
 }
 .widgetTable table {
   table-layout: fixed;
   width: 100%;
+  height: 100%;
+  tbody {
+    overflow: scroll;
+  }
 }
 
 .txtScroll-top .infoList td {

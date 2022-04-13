@@ -11,7 +11,8 @@ export default {
   components: {},
   props: {
     value: Object,
-    ispreview: Boolean
+    ispreview: Boolean,
+    visib: false
   },
   data () {
     return {
@@ -261,7 +262,12 @@ export default {
         this.editorOptions();
       },
       deep: true
-    }
+    },
+    visib () {
+      if (!this.visib) {
+        clearInterval(this.flagInter)
+      }
+    },
   },
   mounted () {
     this.optionsStyle = this.value.position;

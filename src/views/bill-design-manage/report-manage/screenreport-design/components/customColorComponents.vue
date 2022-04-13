@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="custom-color">
     <Button type="primary" size="small" icon="el-icon-plus" plain @click="handleAddClick">新增</Button>
     <Table :columns='columns' :data="formData" style="width: 100%">
       <template slot-scope="{ row }" slot="color">
@@ -127,7 +127,18 @@ export default {
     flex-direction: row;
   }
 }
-
+.custom-color {
+  /deep/.ivu-btn-primary {
+    color: #fff;
+    background-color: #155697;
+    border-color: #155697;
+    padding: 0 1.3rem;
+    margin-bottom: 0.3rem;
+  }
+  /deep/.ivu-table {
+    background-color: transparent;
+  }
+}
 /deep/.ColorPicker--mini,
 /deep/.ColorPicker--mini .ColorPicker__trigger {
   width: 23px;

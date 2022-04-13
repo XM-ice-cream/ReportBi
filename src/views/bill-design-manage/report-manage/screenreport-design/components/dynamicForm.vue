@@ -246,7 +246,7 @@ export default {
   .ivu-collapse-content {
     color: #515a6e;
     padding: 0 16px;
-    background-color: transparent;
+    background-color: #020202;
   }
 }
 /deep/ .FormItem {

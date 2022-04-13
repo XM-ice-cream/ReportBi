@@ -1,7 +1,7 @@
 
 <template>
   <div>
-    <component :is="type" :value="value" :ispreview="true" />
+    <component :is="type" :value="value" :ispreview="true" :visib='visib' />
   </div>
 </template>
 
@@ -71,11 +71,17 @@ export default {
   },
   props: {
     type: String,
+    visib: Boolean,
     value: {
       type: [Object],
       default: () => {
       }
     }
+  },
+  watch: {
+    visib () {
+      console.log('temp', this.visib);
+    },
   },
   data () {
     return {};

@@ -72,6 +72,7 @@ export default {
   props: {
     index: Number, // 当前组件，在工作区变量widgetInWorkbench中的索引
     type: String,
+    visib: Boolean,
     value: {
       type: [Object],
       default: () => {

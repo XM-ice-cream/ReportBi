@@ -3,7 +3,7 @@
   <Modal :mask-closable="false" :closable="false" v-model="visib" fullscreen :z-index='900' class="screenpreview">
     <div class="layout">
       <div :style="bigScreenStyle">
-        <widget v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :type="widget.type" />
+        <widget :visib='visib' v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :type="widget.type" />
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
@@ -41,6 +41,7 @@ export default {
   watch: {
     visib () {
       if (this.visib) {
+        console.log('preview', this.visib);
         this.$nextTick(() => {
           this.getData();
         });

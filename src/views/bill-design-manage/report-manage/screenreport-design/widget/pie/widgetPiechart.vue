@@ -10,7 +10,8 @@ export default {
   components: {},
   props: {
     value: Object,
-    ispreview: Boolean
+    ispreview: Boolean,
+    visib: Boolean,
   },
   data () {
     return {
@@ -72,7 +73,14 @@ export default {
         this.editorOptions();
       },
       deep: true
-    }
+    },
+    visib () {
+      console.log('123');
+      if (!this.visib) {
+        console.log('123');
+        clearInterval(this.flagInter)
+      }
+    },
   },
   created () {
     this.optionsStyle = this.value.position;

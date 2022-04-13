@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='900' :before-close="closeDialog">
+    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='900' :before-close="closeDialog" class="screen-design">
       <div class="layout">
         <Layout>
           <!-- 左侧 -->
@@ -780,13 +780,14 @@ export default {
       .tools-item-icon {
         color: #409eff;
         margin-right: 10px;
-        width: 53px;
-        height: 30px;
+        width: 2.4rem;
+        height: 2.4rem;
         line-height: 30px;
         text-align: center;
         display: block;
         border: 1px solid #07375e;
         background: #072a4f;
+        border-radius: 50%;
       }
       .tools-item-text {
         color: #129db4;
@@ -1009,6 +1010,54 @@ export default {
     }
   }
 }
+.screen-design {
+  /deep/ .ivu-input {
+    border: 1px solid #036595;
+    border-radius: 10px !important;
+    color: #17cbdd;
+    background-color: #072a4f;
+  }
+  /deep/.ivu-select-small.ivu-select-single .ivu-select-selection {
+    border: 1px solid #036595;
+    border-radius: 10px !important;
+    color: #17cbdd;
+    background-color: #072a4f;
+  }
+  /deep/.ivu-modal .ivu-select-dropdown {
+    border: 1px solid #036595;
+    border-radius: 10px !important;
+    color: #17cbdd;
+    background-color: #072a4f;
+  }
+  /deep/.ivu-input-number {
+    border: 1px solid #036595;
+    border-radius: 10px !important;
+    color: #17cbdd;
+    background-color: #072a4f;
+  }
+  /deep/ .ivu-input-number-small input {
+    border: 1px solid #036595;
+    border-radius: 10px !important;
+    color: #17cbdd;
+    background-color: #072a4f;
+  }
+  /deep/.ivu-collapse > .ivu-collapse-item > .ivu-collapse-header {
+    color: #15b3c8;
+    border: 1px dashed #15b3c8;
+    margin-bottom: 0.8rem;
+    background: #072a4f;
+  }
+  /deep/.ivu-collapse > .ivu-collapse-item-active {
+    border-top: 2px solid #1de3d1 !important;
+  }
+  /deep/.ivu-collapse > .ivu-collapse-item {
+    border-top: none;
+  }
+  /deep/.ivu-input-group-append {
+    background-color: transparent;
+    border: none;
+  }
+}
 
 /deep/.ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab {
   border: none;
@@ -1051,5 +1100,6 @@ export default {
 }
 /deep/.ivu-tabs-nav {
   background: #263445;
+  color: #14b5c7;
 }
 </style>
