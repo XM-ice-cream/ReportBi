@@ -75,9 +75,7 @@ export default {
       deep: true
     },
     visib () {
-      console.log('123');
       if (!this.visib) {
-        console.log('123');
         clearInterval(this.flagInter)
       }
     },

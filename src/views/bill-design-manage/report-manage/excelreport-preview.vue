@@ -53,7 +53,7 @@
 import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage'
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
-import { exportExcel } from './export'
+
 export default {
   name: "excelreport-preview",
   components: { draggable },
@@ -76,6 +76,7 @@ export default {
           this.loading = true;
           this.tableData2 = [];
           this.searchPreview();
+          // 解决Jquery 版本冲突问题
           window.jQuery.noConflict();
         })
         return;
@@ -103,71 +104,57 @@ export default {
         orderField: 'CREATEDATE', // 排序字段
         ascending: false, // 排序类型true升序 false降序
         total: 0, //  总条数
-        totalPage: 0 //  总页数
+        totalPage: 0, //  总页数,
+        sheetIndex: '',//sheet 当前激活索引
         // ...this.$config.pageConfig,
       },
-      requestCountList: [],
       jsonStr: [], // json数据
-      jsonIndex: 0, // json数据
-      finished: 'Loading...',
+      jsonIndex: 0, // json索引
       // 验证实体
       ruleValidate: {}
     };
   },
   methods: {
     async searchPreview () {
+      // 左侧查询参数--时间格式化 
       this.dateFormate()
-      //重置
+      //左侧查询参数 --必要参数接收
       const arr = this.toObject(this.tableData2)
       this.params.setParam = JSON.stringify(arr)
       this.sheetData = [{}]
-      this.finished = 'Loading...'
       window.luckysheet.destroy()
       //每次都重新加载需要改成刷新
       this.intervalPreview()
     },
     async intervalPreview () {
       this.loading = true;
-      const result = window.luckysheet.getAllSheets().filter(item => item.status === 1)[0];
-      let index = '';
-      if (result?.index) {
-        index = result.index;
-        this.requestCountList[index] = this.requestCountList[index] + 1;
-      }
-      if (this.params.requestCount > 100) return;
       await getExcelPreviewReq(this.params).then(res => {
         if (res.code === 200) {
           this.loading = false;
           let { setParam } = this.params;
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
           const setParam_parse = JSON.parse(res.result.setParam);
-          this.jsonStr = jsonStr_parse
+          this.jsonStr = jsonStr_parse;
+          console.log('this.jsonStr', this.jsonStr);
           //第一次获取请求值
-          this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result)
+          this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result);
         } else {
           this.$Message.error(res.message);
           this.sheetData = [{}];
-          this.finished = '加载完成！';
           //初始化Excel
           this.createSheet();
         }
       })
 
     },
+    // 初始化Excel
     initExcel (jsonStr_parse, setParam, setParam_parse, result) {
+      console.log('初始化Excel');
       this.reportName = jsonStr_parse.name;
       // 渲染查询表单
       this.tableData2 = this.getParamsList(setParam, setParam_parse);
-
-      let firstPageCount = 0;
-      //获取每个sheet 的接口请求次数
-      jsonStr_parse.forEach((item) => {
-        const { index, pageCount, status } = item;
-        this.requestCountList[index + 'count'] = pageCount; //index sheet 总共请求次数
-        this.requestCountList[index] = 1//index sheet 当前sheet
-        //如果状态为启动 则记录请求次数
-        if (status) firstPageCount = pageCount;
-      })
+      //   const { total, pageCount } = jsonStr_parse.filter(item => item.status === 1)[0];
+      //   this.params = { ...this.params, total, totalPage: pageCount }
       this.params = {
         ...this.params,
         total: jsonStr_parse[this.jsonIndex].total,
@@ -176,8 +163,8 @@ export default {
       //初始化Excel
       this.sheetData = result == null ? [{}] : jsonStr_parse;
       this.createSheet();
-      if (firstPageCount > 1) this.$Message.warning('最大只显示一万笔数据')
     },
+    //获取查询参数 并获得参数类型及是否必填
     getParamsList (setParam, setParam_parse) {
       const extendObj = setParam = setParam_parse;
       const extendArry = [];
@@ -185,8 +172,6 @@ export default {
         const children = [];
         for (const y in extendObj[i]) {
           if (!y.endsWith('required') && !y.endsWith('type')) {
-            // const data = extendObj[i][y];
-            // const type = (isNaN(data) && !isNaN(Date.parse(data))) ? 'DateTime' : (data.includes('\n') ? 'Array' : 'String');
             children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
             this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
           }
@@ -195,10 +180,12 @@ export default {
       }
       return extendArry;
     },
+    // Excel导出
     async download () {
       //刷新
-      window.luckysheet.refresh();
-      exportExcel(luckysheet.getAllSheets(), this.params.reportCode + '-' + `${formatDate(new Date())}`)
+      //   window.luckysheet.refresh();
+      //   exportExcel(luckysheet.getAllSheets(), this.params.reportCode + '-' + `${formatDate(new Date())}`)
+
       exportReq(this.params).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
         const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
@@ -220,9 +207,13 @@ export default {
               }
             })
             console.log(this.jsonStr)
-            console.log(this.jsonStr[this.jsonIndex])
-            this.params.total = this.jsonStr[this.jsonIndex].total
-            this.params.pageCount = this.jsonStr[this.jsonIndex].pageCount
+            console.log(this.jsonStr[this.jsonIndex]);
+            console.log(index);
+            this.params.total = this.jsonStr[this.jsonIndex].total;//总数量
+            this.params.totalPage = this.jsonStr[this.jsonIndex].pageCount; //总页数
+            this.params.requestCount = 1;//切换sheet 重置起始页
+            this.params.sheetIndex = index;
+            this.searchPreview();
           }
         },
         data: [
