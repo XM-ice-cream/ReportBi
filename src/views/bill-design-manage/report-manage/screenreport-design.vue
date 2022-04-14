@@ -75,14 +75,14 @@
           </Content>
           <!-- 右侧基础配置 -->
           <Sider hide-trigger class="layout-right">
-            <Tabs type='card' v-model='activeName'>
-              <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置">
+            <Tabs type='card' v-model='activeName' @on-click='clickTabs'>
+              <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置" :index='1'>
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
               </TabPane>
-              <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据">
+              <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据" :index='2'>
                 <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" />
               </TabPane>
-              <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标">
+              <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标" :index='3'>
                 <dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="val => widgetValueChanged('position', val)" />
               </TabPane>
             </Tabs>
@@ -555,7 +555,7 @@ export default {
       //   console.log('setOptionsOnClickScreen', this.widgetOptions);
       this.screenCode = "screen";
       // 选中不同的组件 右侧都显示第一栏
-      //   this.activeName = "first";
+      this.activeName = "first";
       this.widgetOptions = getToolByCode("screen")["options"];
     },
 
@@ -571,7 +571,7 @@ export default {
         }
       }
       console.log("鼠标按下", index);
-      //   this.activeName = 'first';
+      // this.activeName = 'first';
       this.setOptionsOnClickWidget(index);
       this.grade = true;
     },
@@ -603,7 +603,8 @@ export default {
           }
         }
       });
-      this.widgetOptions = deepClone(this.widgets[obj.index]["options"]);
+      this.widgetOptions = { ...this.widgets[obj.index]["options"] }
+      console.log('isNotNull(widgetOptions.data)', this.isNotNull(this.widgetOptions.data));
       console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
 
     },
