@@ -138,6 +138,16 @@ export default {
   /deep/.ivu-table {
     background-color: transparent;
   }
+  /deep/.ivu-table th {
+    background: transparent;
+    color: #15b3c8;
+    border: 1px solid;
+  }
+  /deep/.ivu-table-small td {
+    height: 40px;
+    background: transparent;
+    border: 1px solid #15b3c8;
+  }
 }
 /deep/.ColorPicker--mini,
 /deep/.ColorPicker--mini .ColorPicker__trigger {

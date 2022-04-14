@@ -44,10 +44,11 @@
                 </Button>
               </Tooltip>
             </div>
-            <div class="workbench-container" :style="{
-          width: bigscreenWidthInWorkbench + 'px',
-          height: bigscreenHeightInWorkbench + 'px'
-        }" @mousedown="handleMouseDown">
+            <!-- :style="{
+                width: bigscreenWidthInWorkbench + 'px',
+                height: bigscreenHeightInWorkbench + 'px'
+                }" -->
+            <div class="workbench-container" style="width: 100%;height: calc(100% - 35px);" @mousedown="handleMouseDown">
               <!-- 网页标尺辅助线 -->
               <vue-ruler-tool v-model="dashboard.presetLine" class="vueRuler" :step-length="50" :parent="true" :position="'relative'" :is-scale-revise="true" :visible.sync="dashboard.presetLineVisible" style="height:100%;width:100%">
                 <!-- workbench 工作台 -->
@@ -74,7 +75,7 @@
           </Content>
           <!-- 右侧基础配置 -->
           <Sider hide-trigger class="layout-right">
-            <Tabs type='card'>
+            <Tabs type='card' v-model='activeName'>
               <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置">
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
               </TabPane>
@@ -562,13 +563,15 @@ export default {
     widgetsClick (index) {
       const draggableArr = this.$refs.widgets;
       for (let i = 0; i < draggableArr.length; i++) {
+        console.log(this.$refs.widgets[i].$refs.draggable);
         if (i == index) {
           this.$refs.widgets[i].$refs.draggable.setActive(true);
         } else {
           this.$refs.widgets[i].$refs.draggable.setActive(false);
         }
       }
-      // console.log("鼠标按下", index);
+      console.log("鼠标按下", index);
+      //   this.activeName = 'first';
       this.setOptionsOnClickWidget(index);
       this.grade = true;
     },
@@ -578,13 +581,17 @@ export default {
     // 如果是点击某个组件，获取该组件的配置项
     setOptionsOnClickWidget (obj) {
       this.screenCode = "";
+      console.log(obj, this.widgets[obj]);
       if (typeof obj == "number") {
 
-        this.widgetOptions = deepClone(this.widgets[obj]["options"]);
+        this.widgetOptions = { ...this.widgets[obj]["options"] }
+        console.log('number', this.widgetOptions);
+        // this.widgetOptions = deepClone(this.widgets[obj]["options"]);
         //  console.log('number-setOptionsOnClickWidget', this.widgetOptions);
         return;
       }
       if (obj.index < 0 || obj.index >= this.widgets.length) {
+        console.log('return');
         return;
       }
       this.widgetIndex = obj.index;
@@ -597,7 +604,7 @@ export default {
         }
       });
       this.widgetOptions = deepClone(this.widgets[obj.index]["options"]);
-      //  console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
+      console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
 
     },
 
@@ -762,7 +769,7 @@ export default {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     border: 0px;
-    background-color: #263445;
+    background-color: #072a4f;
 
     //工具栏一个元素
     .tools-item {
@@ -821,10 +828,10 @@ export default {
     position: relative;
     //width: calc(100% - 445px);
     height: 100%;
-    background-color: rgb(36, 42, 48);
+    background-color: #000d18;
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    border: 1px solid rgb(36, 42, 48);
+    border: 1px solid #000d18;
     align-items: center;
     vertical-align: middle;
     text-align: center;
@@ -926,11 +933,16 @@ export default {
     min-width: 300px !important;
     max-width: 300px !important;
     flex: 0 0 300px !important;
+    background: #072a4f;
   }
   .content {
     .push_btn {
       text-align: right;
       margin-right: 0.3rem;
+      background-color: #072a4f;
+      height: 32px;
+      padding: 0;
+      margin: 0;
       i {
         color: #6c6666;
         font-size: 1.12rem;
@@ -1017,6 +1029,18 @@ export default {
     color: #17cbdd;
     background-color: #072a4f;
   }
+  /deep/.ivu-select-input {
+    color: #17cbdd;
+  }
+  /deep/ .ivu-select-item {
+    color: #cee8eb;
+  }
+  /deep/ .ivu-select-item-selected:hover {
+    color: #17cbdd;
+  }
+  /deep/ .ivu-select-item:hover {
+    color: #17cbdd;
+  }
   /deep/.ivu-select-small.ivu-select-single .ivu-select-selection {
     border: 1px solid #036595;
     border-radius: 10px !important;
@@ -1084,13 +1108,14 @@ export default {
 /deep/.ivu-tabs .ivu-tabs-tabpane {
   background: #000d18;
   overflow-y: auto;
-  padding: 0 0.5rem;
+  padding: 1rem 0.5rem 0;
 }
 /deep/.ivu-tabs {
   height: 100%;
 }
 /deep/.ivu-tabs-bar {
   margin-bottom: 0px;
+  border-bottom: none;
 }
 /deep/.ivu-tabs-nav .ivu-tabs-tab {
   padding: 8px 16px;
@@ -1099,7 +1124,7 @@ export default {
   padding: 0;
 }
 /deep/.ivu-tabs-nav {
-  background: #263445;
+  background: #072a4f;
   color: #14b5c7;
 }
 </style>

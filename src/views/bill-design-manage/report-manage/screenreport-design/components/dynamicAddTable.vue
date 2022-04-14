@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="add-table">
     <Button type="primary" size="small" icon="el-icon-plus" plain @click="handleAddClick" style="margin-bottom: 0.3rem">新增</Button>
     <Table border :columns='columns' :data="formData" style="width:100%">
       <template slot-scope='{ row, index }' slot='operator'>
@@ -117,5 +117,31 @@ export default {
 
 .button-group .Button {
   padding: 0;
+}
+.add-table {
+  /deep/.ivu-btn-primary {
+    color: #fff;
+    background-color: #155697;
+    border-color: #155697;
+    padding: 0 1.3rem;
+    margin-bottom: 0.3rem;
+  }
+  /deep/.ivu-table {
+    background-color: transparent;
+  }
+  /deep/.ivu-table th {
+    background: transparent;
+    color: #15b3c8;
+    border: 1px solid;
+  }
+  /deep/.ivu-table-small td {
+    height: 40px;
+    background: transparent;
+    border: 1px solid #15b3c8;
+    color: #fff;
+  }
+  /deep/.ivu-btn-text {
+    color: #515a6e;
+  }
 }
 </style>

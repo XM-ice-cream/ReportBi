@@ -1,37 +1,15 @@
 <template>
-  <div :style="styleObj" class="widgetTable">
+  <div :style="styleObj">
     <superslide v-if="hackReset" :options="options" class="txtScroll-top">
       <!--表头-->
-      <!-- <div class="title">
+      <div class="title">
         <div v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]" :key="index">
           {{ item.name }}
         </div>
-      </div> -->
+      </div>
       <!--数据-->
       <div class="bd">
-        <table class="infoList">
-          <thead>
-            <tr class="title" :style="tableRowHeight()">
-              <th v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index)]" :key="index">
-                {{ item.name }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
-              <td v-for="(itemChild, idx) in header" :key="idx" :style="[
-                bodyTableStyle,
-                bodyTable(index),
-                tableFiledWidth(idx),
-                tableRowHeight()
-              ]" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;" :title='item[itemChild.key]'>
-                {{ item[itemChild.key] }}
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-        <!-- <ul class="infoList">
+        <ul class="infoList">
           <li v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
             <div v-for="(itemChild, idx) in header" :key="idx" :style="[
                 bodyTableStyle,
@@ -42,7 +20,7 @@
               {{ item[itemChild.key] }}
             </div>
           </li>
-        </ul> -->
+        </ul>
       </div>
     </superslide>
   </div>
@@ -62,8 +40,8 @@ export default {
     return {
       hackReset: true,
       options: {
-        // titCell: ".hd ul",
-        // mainCell: ".bd table tbody",
+        titCell: ".hd ul",
+        mainCell: ".bd ul",
         effect: "topLoop",
         autoPage: true,
         //effect: "top",
@@ -80,6 +58,7 @@ export default {
   },
   computed: {
     styleObj () {
+      console.log(this.optionsSetUp);
       const allStyle = this.optionsPosition;
       return {
         position: this.ispreview ? "absolute" : "static",
@@ -90,7 +69,7 @@ export default {
         background: this.optionsSetUp.tableBgColor
       };
     },
-    headerTableStlye (index) {
+    headerTableStlye () {
       const headStyle = this.optionsSetUp;
       return {
         "text-align": headStyle.textAlign,
@@ -98,12 +77,11 @@ export default {
         "border-style": headStyle.isLine ? "solid" : "none",
         "border-width": headStyle.borderWidth + "px",
         "border-color": headStyle.borderColor,
-        // display: headStyle.isHeader ? "block" : "none",
+        display: headStyle.isHeader ? "block" : "none",
         color: headStyle.headColor,
         "background-color": headStyle.headBackColor,
         'height': '20px',
         'line-height': '20px',
-        // 'width': this.optionsSetUp.dynamicAddTable[index].width
       };
     },
     bodyTableStyle () {
@@ -122,6 +100,7 @@ export default {
   watch: {
     value: {
       handler (val) {
+        console.log('Table', val);
         this.optionsSetUp = val.setup;
         this.optionsPosition = val.position;
         this.optionsData = val.data;
@@ -143,6 +122,7 @@ export default {
   },
   methods: {
     initData () {
+      console.log('Table', 'initData');
       this.handlerRollFn();
       this.handlerHead();
       this.handlerData();
@@ -188,7 +168,6 @@ export default {
     },
     getEchartData (val) {
       const data = this.queryEchartsData(val);
-
       data.then(res => {
         this.list = res;
         this.hackResetFun();
@@ -238,45 +217,33 @@ export default {
 .txtScroll-top {
   overflow: hidden;
   position: relative;
-  height: 100%;
 }
 
 .title {
-  //   display: flex;
-  //   flex-direction: row;
+  display: flex;
+  flex-direction: row;
   width: 100%;
 }
 
 .title > div {
-  //   height: 50px;
-  //   line-height: 50px;
+  height: 50px;
+  line-height: 50px;
   width: 100%;
 }
 
 .txtScroll-top .bd {
   width: 100%;
-  overflow: auto;
-  //   overflow: hidden;
-  height: 100%;
-}
-.widgetTable table {
-  table-layout: fixed;
-  width: 100%;
-  height: 100%;
-  tbody {
-    overflow: scroll;
-  }
 }
 
-.txtScroll-top .infoList td {
-  //   height: 50px;
-  //   line-height: 50px;
-  //   display: flex;
-  //   flex-direction: row;
-  word-wrap: break-word;
+.txtScroll-top .infoList li {
+  height: 50px;
+  line-height: 50px;
+  display: flex;
+  flex-direction: row;
+  //   display: inline-block;
 }
 
-.txtScroll-top .infoList td > div {
+.txtScroll-top .infoList li > div {
   width: 100%;
 }
 

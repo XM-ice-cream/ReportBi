@@ -244,7 +244,7 @@ export default {
 }
 /deep/.screenCollapse {
   .ivu-collapse-content {
-    color: #515a6e;
+    color: #ffffff;
     padding: 0 16px;
     background-color: #020202;
   }

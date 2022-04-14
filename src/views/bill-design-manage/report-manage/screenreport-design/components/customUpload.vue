@@ -2,7 +2,8 @@
   <div>
     <Input clearable v-model.trim="uploadImgUrl" size="small" @on-change="changeInput">
     <template slot="append">
-      <i class="iconfont iconfolder-o"></i>
+      <!-- <i class="iconfont iconfolder-o"></i> -->
+      <Icon type="md-image" class="icon-image" />
       <input type="file" class="file" ref="files" @change="getImages" />
     </template>
     </Input>
@@ -70,15 +71,27 @@ export default {
 .file {
   position: absolute;
   width: 100%;
-  padding: 100%;
+  padding: 25%;
   right: 0;
   top: 0;
   opacity: 0;
+}
+.icon-image {
+  font-size: 1.22rem;
+  border: 1px solid #035c89;
+  background: #072a4f;
+  color: #17f5e0;
+  /* width: 30px; */
+  /* height: 27px; */
+  border-radius: 10px;
+  padding: 1.5px 5px;
+  text-align: center;
 }
 /deep/.Input-group__append,
 /deep/.Input-group__prepend {
   padding: 0 10px !important;
   overflow: hidden;
+  position: relative;
 }
 .iconfont {
   font-size: 12px;
