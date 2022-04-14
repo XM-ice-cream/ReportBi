@@ -1933,6 +1933,7 @@ export default {
     'dataset': '数据集',
     'design-report-manage': '报表管理',
     'tempsn-report': 'TempSn报表',
+    'fox-log-report': 'FoxLog报表',
 
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
