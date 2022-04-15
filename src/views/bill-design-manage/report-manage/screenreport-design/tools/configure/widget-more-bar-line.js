@@ -653,7 +653,7 @@ export const widgetMoreBarLine = {
                             name: 'lineColor',
                             required: false,
                             placeholder: '',
-                            value: '#e68b55'
+                            value: '#fff'
                         },
                     ],
                 },

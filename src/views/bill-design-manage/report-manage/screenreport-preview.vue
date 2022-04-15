@@ -53,7 +53,7 @@ export default {
     },
     //适应布局
     onRiseze () {
-      const { widgetsWidth, widgetsHeight, backgroundColor, backgroundImage } = this.req;
+      const { widgetsWidth, widgetsHeight, backgroundImage } = this.req;
       const equipment = document.body.clientWidth;
       const clientHeight = document.body.clientHeight
       const ratioEquipment = equipment / widgetsWidth;
@@ -61,7 +61,7 @@ export default {
       this.bigScreenStyle = {
         width: widgetsWidth + "px",
         height: widgetsHeight + "px",
-        "background-color": backgroundColor,
+        "background-color": '#000d18',//大屏基础背景色
         "background-image": "url(" + backgroundImage + ")",
         "background-position": "0% 0%",
         "background-size": "100% 100%",
