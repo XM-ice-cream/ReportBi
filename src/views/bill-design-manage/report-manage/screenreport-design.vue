@@ -75,7 +75,7 @@
           </Content>
           <!-- 右侧基础配置 -->
           <Sider hide-trigger class="layout-right">
-            <Tabs type='card' v-model='activeName' @on-click='clickTabs'>
+            <Tabs type='card' v-model='activeName'>
               <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置" :index='1'>
                 <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
               </TabPane>
@@ -570,7 +570,7 @@ export default {
           this.$refs.widgets[i].$refs.draggable.setActive(false);
         }
       }
-      console.log("鼠标按下", index);
+      //   console.log("鼠标按下", index);
       // this.activeName = 'first';
       this.setOptionsOnClickWidget(index);
       this.grade = true;
@@ -581,17 +581,17 @@ export default {
     // 如果是点击某个组件，获取该组件的配置项
     setOptionsOnClickWidget (obj) {
       this.screenCode = "";
-      console.log(obj, this.widgets[obj]);
+      // console.log(obj, this.widgets[obj]);
       if (typeof obj == "number") {
 
         this.widgetOptions = { ...this.widgets[obj]["options"] }
-        console.log('number', this.widgetOptions);
+        // console.log('number', this.widgetOptions);
         // this.widgetOptions = deepClone(this.widgets[obj]["options"]);
         //  console.log('number-setOptionsOnClickWidget', this.widgetOptions);
         return;
       }
       if (obj.index < 0 || obj.index >= this.widgets.length) {
-        console.log('return');
+        //  console.log('return');
         return;
       }
       this.widgetIndex = obj.index;
@@ -604,8 +604,8 @@ export default {
         }
       });
       this.widgetOptions = { ...this.widgets[obj.index]["options"] }
-      console.log('isNotNull(widgetOptions.data)', this.isNotNull(this.widgetOptions.data));
-      console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
+      //  console.log('isNotNull(widgetOptions.data)', this.isNotNull(this.widgetOptions.data));
+      //  console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
 
     },
 

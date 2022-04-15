@@ -2,56 +2,53 @@
 <template>
   <div class="page-style">
     <!-- 左侧抽屉 -->
-    <Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true"
-           :before-close="cancelClick">
+    <Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true" :before-close="cancelClick">
       <Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
         <Row :gutter="10">
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <!-- 报表名称 -->
-            <FormItem :label="$t('reportName')" prop="reportName">
-              <Input v-model.trim="submitData.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')"/>
-            </FormItem>
+          <!-- 报表名称 -->
+          <FormItem :label="$t('reportName')" prop="reportName">
+            <Input v-model.trim="submitData.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')" />
+          </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <!-- 报表编码 -->
-            <FormItem :label="$t('reportCode')" prop="reportCode">
-              <Input v-model.trim="submitData.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')"
-                     v-if="this.isAdd"/>
-              <span v-else>{{ submitData.reportCode }}</span>
-            </FormItem>
+          <!-- 报表编码 -->
+          <FormItem :label="$t('reportCode')" prop="reportCode">
+            <Input v-model.trim="submitData.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')" v-if="this.isAdd" />
+            <span v-else>{{ submitData.reportCode }}</span>
+          </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <!-- 报表类型 -->
-            <FormItem :label="$t('reportType')" prop="reportType">
-              <Select v-model="submitData.reportType" clearable :placeholder="$t('pleaseSelect') + $t('status')"
-                      transfer v-if="this.isAdd">
-                <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
-                  {{ item.detailName }}
-                </Option>
-              </Select>
-              <span v-else>{{ submitData.reportType }}</span>
-            </FormItem>
+          <!-- 报表类型 -->
+          <FormItem :label="$t('reportType')" prop="reportType">
+            <Select v-model="submitData.reportType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer v-if="this.isAdd">
+              <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
+                {{ item.detailName }}
+              </Option>
+            </Select>
+            <span v-else>{{ submitData.reportType }}</span>
+          </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <!-- 制作人 -->
-            <FormItem :label="$t('reportAuthor')" prop="reportAuthor">
-              <Input v-model.trim="submitData.reportAuthor" :placeholder="$t('pleaseEnter') + $t('reportAuthor')"/>
-            </FormItem>
+          <!-- 制作人 -->
+          <FormItem :label="$t('reportAuthor')" prop="reportAuthor">
+            <Input v-model.trim="submitData.reportAuthor" :placeholder="$t('pleaseEnter') + $t('reportAuthor')" />
+          </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <!-- 描述 -->
-            <FormItem :label="$t('reportDesc')" prop="reportDesc">
-              <Input v-model.trim="submitData.reportDesc" :placeholder="$t('pleaseEnter') + $t('reportDesc')"/>
-            </FormItem>
+          <!-- 描述 -->
+          <FormItem :label="$t('reportDesc')" prop="reportDesc">
+            <Input v-model.trim="submitData.reportDesc" :placeholder="$t('pleaseEnter') + $t('reportDesc')" />
+          </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <!-- 状态 -->
-            <FormItem :label="$t('enabled')" prop="enabled">
-              <i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
-                <span slot="open">有效</span>
-                <span slot="close">失效</span>
-              </i-switch>
-            </FormItem>
+          <!-- 状态 -->
+          <FormItem :label="$t('enabled')" prop="enabled">
+            <i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+              <span slot="open">有效</span>
+              <span slot="close">失效</span>
+            </i-switch>
+          </FormItem>
           </Col>
         </Row>
       </Form>
@@ -67,18 +64,15 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400"
-                      trigger="manual" transfer>
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
                 <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent
-                        @keyup.native.enter="searchClick">
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 报表类型 -->
                     <FormItem :label="$t('reportType')" prop="reportType">
-                      <Select v-model="req.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')"
-                              transfer>
+                      <Select v-model="req.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')" transfer>
                         <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
                           {{ item.detailName }}
                         </Option>
@@ -86,18 +80,15 @@
                     </FormItem>
                     <!-- 报表名称 -->
                     <FormItem :label="$t('reportName')" prop="reportName">
-                      <Input v-model="req.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')"
-                             @on-search="searchClick"/>
+                      <Input v-model="req.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')" @on-search="searchClick" />
                     </FormItem>
                     <!-- 报表编码 -->
                     <FormItem :label="$t('reportCode')" prop="reportCode">
-                      <Input v-model="req.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')"
-                             @on-search="searchClick"/>
+                      <Input v-model="req.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')" @on-search="searchClick" />
                     </FormItem>
                     <!-- 制作人 -->
                     <FormItem :label="$t('reportAuthor')" prop="reportAuthor">
-                      <Input v-model="req.reportAuthor" :placeholder="$t('pleaseEnter') + $t('reportAuthor')"
-                             @on-search="searchClick"/>
+                      <Input v-model="req.reportAuthor" :placeholder="$t('pleaseEnter') + $t('reportAuthor')" @on-search="searchClick" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -108,14 +99,11 @@
               </Poptip>
             </i-col>
             <i-col span="18">
-              <button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick"
-                             @on-delete-click="deleteClick"></button-custom>
+              <button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
             </i-col>
           </Row>
         </div>
-        <Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height"
-               :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick"
-               @on-selection-change="selectClick">
+        <Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick">
           <template slot-scope="{ row }" slot="reportType">
             <Tag v-if="row.reportType === 'excel'" color="blue">Excel报表</Tag>
             <Tag v-else-if="row.reportType === 'largescreen'" color="green">大屏报表</Tag>
@@ -125,17 +113,16 @@
             <Button class="tableBtn" type="text" @click="preview(row)">预览</Button>
           </template>
         </Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize"
-                     @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
+        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
     <!-- Excel 的设计与预览 -->
-    <excelreport-design :visib.sync="excelVisib" :reportCode="selectObj.reportCode"/>
-    <excelreport-preview :visib.sync="previewVisib" :reportCode="selectObj.reportCode"/>
+    <excelreport-design :visib.sync="excelVisib" :reportCode="selectObj.reportCode" />
+    <excelreport-preview :visib.sync="previewVisib" :reportCode="selectObj.reportCode" />
 
     <!-- 大屏的设计与预览 -->
-    <screenreport-design :visib.sync="screenVisib" :reportCode="selectObj.reportCode"/>
-    <screenreport-preview :visib.sync="previewScreenVisib" :reportCode="selectObj.reportCode"/>
+    <screenreport-design :visib.sync="screenVisib" :reportCode="selectObj.reportCode" />
+    <!-- <screenreport-preview :visib.sync="previewScreenVisib" :reportCode="selectObj.reportCode" /> -->
   </div>
 </template>
 
@@ -146,27 +133,27 @@ import {
   deleteReportReq,
   modifyReportReq
 } from "@/api/bill-design-manage/report-manage.js";
-import {getButtonBoolean, renderIsEnabled} from "@/libs/tools";
+import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import excelreportDesign from './report-manage/excelreport-design.vue';
 import ExcelreportPreview from './report-manage/excelreport-preview.vue';
 import ScreenreportDesign from './report-manage/screenreport-design.vue';
 import ScreenreportPreview from './report-manage/screenreport-preview.vue';
 
 export default {
-  components: {excelreportDesign, ExcelreportPreview, ScreenreportDesign, ScreenreportPreview},
+  components: { excelreportDesign, ExcelreportPreview, ScreenreportDesign, ScreenreportPreview },
   name: "design-report-manage",
-  data() {
+  data () {
     return {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
-      tableConfig: {...this.$config.tableConfig}, // table配置
+      tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
       drawerTitle: this.$t("add"),
       btnData: [],
       isAdd: true,
       selectObj: {},//表格选中
       selectArr: [],//表格多选
-      reportTypeList: [{detailValue: 'excel', detailName: 'Excel报表'}, {detailValue: 'largescreen', detailName: '大屏报表'}],
+      reportTypeList: [{ detailValue: 'excel', detailName: 'Excel报表' }, { detailValue: 'largescreen', detailName: '大屏报表' }],
       submitData: {
         enabled: 1,
         remark: "",
@@ -197,13 +184,13 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: this.$t("reportName"), key: "reportName", align: "center", tooltip: true,},
-        {title: this.$t("reportCode"), key: "reportCode", align: "center", tooltip: true,},
-        {title: this.$t("reportType"), key: "reportType", align: "center", slot: "reportType", width: 120},
-        {title: this.$t("reportAuthor"), key: "reportAuthor", align: "center", tooltip: true},
-        {title: this.$t("dataSetDesc"), key: "reportDesc", align: "center", tooltip: true,},
-        {title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80},
-        {title: this.$t("operator"), slot: "operator", align: "center", width: '100'},
+        { title: this.$t("reportName"), key: "reportName", align: "center", tooltip: true, },
+        { title: this.$t("reportCode"), key: "reportCode", align: "center", tooltip: true, },
+        { title: this.$t("reportType"), key: "reportType", align: "center", slot: "reportType", width: 120 },
+        { title: this.$t("reportAuthor"), key: "reportAuthor", align: "center", tooltip: true },
+        { title: this.$t("dataSetDesc"), key: "reportDesc", align: "center", tooltip: true, },
+        { title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
+        { title: this.$t("operator"), slot: "operator", align: "center", width: '100' },
       ], // 表格数据
       // 验证实体
       ruleValidate: {
@@ -231,28 +218,28 @@ export default {
       previewScreenVisib: false,
     };
   },
-  activated() {
+  activated () {
     this.pageLoad();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
   },
   // 导航离开该组件的对应路由时调用
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave (to, from, next) {
     this.searchPoptipModal = false;
     next();
   },
   methods: {
     // 点击搜索按钮触发
-    searchClick() {
+    searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
     },
     // 获取分页列表数据
-    pageLoad() {
+    pageLoad () {
       this.data = [];
       this.tableConfig.loading = true;
-      const {reportType, reportName, reportAuthor, reportCode} = this.req
+      const { reportType, reportName, reportAuthor, reportCode } = this.req
       let obj = {
         orderField: "reportType", // 排序字段
         ascending: true, // 是否升序
@@ -265,34 +252,34 @@ export default {
       getpagelistReq(obj).then((res) => {
         this.tableConfig.loading = false;
         if (res.code === 200) {
-          let {data, pageSize, pageIndex, total, totalPage} = res.result;
+          let { data, pageSize, pageIndex, total, totalPage } = res.result;
           this.data = data || [];
-          this.req = {...this.req, pageSize, pageIndex, total, totalPage};
+          this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
         }
       }).catch(() => (this.tableConfig.loading = false));
       this.searchPoptipModal = false;
     },
     // 点击新增按钮触发
-    addClick() {
+    addClick () {
       this.drawerFlag = true;
       this.isAdd = true;
       this.drawerTitle = this.$t("add");
     },
     // 点击编辑按钮触发
-    editClick() {
+    editClick () {
       if (this.selectObj) {
-        let {reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled} = this.selectObj;
-        this.submitData = {reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled};
+        let { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled } = this.selectObj;
+        this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled };
         this.drawerFlag = true;
         this.isAdd = false;
         this.drawerTitle = this.$t("edit");
       } else this.$Msg.warning(this.$t("oneData"));
     },
     //提交
-    submitClick() {
+    submitClick () {
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
-          let obj = {...this.submitData};
+          let obj = { ...this.submitData };
           let request = this.isAdd ? insertReportReq(obj) : modifyReportReq(obj);
           request.then((res) => {
             if (res.code === 200) {
@@ -305,13 +292,13 @@ export default {
         }
       });
     },
-    cancelClick() {
+    cancelClick () {
       this.drawerFlag = false;
       this.$refs.submitReq.resetFields(); //清除表单红色提示
     },
     //删除
-    deleteClick() {
-      const deleteData = this.selectArr.length > 0 ? this.selectArr : (this.selectObj ? [{...this.selectObj}] : []);
+    deleteClick () {
+      const deleteData = this.selectArr.length > 0 ? this.selectArr : (this.selectObj ? [{ ...this.selectObj }] : []);
       if (deleteData.length == 0) {
         this.$Message.error('无选中删除数据');
         return;
@@ -334,20 +321,20 @@ export default {
     },
 
     // 某一行高亮时触发
-    currentClick(currentRow) {
+    currentClick (currentRow) {
       this.selectObj = currentRow;
     },
     //删除选择的数据
-    selectClick(selection) {
+    selectClick (selection) {
       this.selectArr = selection;
     },
     // 点击重置按钮触发
-    resetClick() {
+    resetClick () {
       this.$refs.searchReq.resetFields();
     },
     //设计
-    design(data) {
-      this.selectObj = {...data};
+    design (data) {
+      this.selectObj = { ...data };
       if (data.reportType === 'excel') {
         this.excelVisib = true;
       }
@@ -357,27 +344,35 @@ export default {
       }
     },
     // 预览
-    preview(data) {
-      this.selectObj = {...data};
+    preview (data) {
+      this.selectObj = { ...data };
       if (data.reportType === 'excel') {
         this.previewVisib = true;
       }
+      // 大屏预览 跳转到新窗口
       if (data.reportType === 'largescreen') {
-        this.previewScreenVisib = true;
+        // this.previewScreenVisib = true;
+        const { href } = this.$router.resolve({
+          path: '/bill-design-manage/screenreport-preview',
+          query: {
+            reportCode: this.selectObj.reportCode
+          }
+        });
+        window.open(href, '_blank');
       }
 
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 120 - 60;
     },
     // 选择第几页
-    pageChange(index) {
+    pageChange (index) {
       this.req.pageIndex = index;
       this.pageLoad();
     },
     // 选择一页有条数据
-    pageSizeChange(index) {
+    pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
       this.pageLoad();

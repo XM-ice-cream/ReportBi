@@ -143,6 +143,5 @@ export const exportReq = data => {
         data
     })
 }
-
-
-export const baseImgUrl = 'http://10.191.21.54:8700' + '/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_301380426780512256.jpg'
+//大屏默认背景图片
+export const baseImgUrl = 'http://10.191.21.54:8700' + '/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_302730907880656896.png'

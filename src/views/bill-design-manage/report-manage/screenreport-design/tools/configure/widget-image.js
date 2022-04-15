@@ -16,14 +16,14 @@ export const widgetImage = {
                 placeholder: '',
                 value: '图片',
             },
-            // {
-            //     type: 'i-switch',
-            //     label: '开启旋转',
-            //     name: 'startRotate',
-            //     required: false,
-            //     placeholder: '',
-            //     value: false,
-            // },
+            {
+                type: 'i-switch',
+                label: '开启旋转',
+                name: 'startRotate',
+                required: false,
+                placeholder: '',
+                value: false,
+            },
             {
                 type: 'Slider',
                 label: '透明度',

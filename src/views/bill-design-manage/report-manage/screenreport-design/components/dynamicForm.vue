@@ -161,7 +161,7 @@ export default {
     },
     // 无论哪个输入框改变 都需要触发事件 将值回传
     changed (val, key) {
-
+      console.log('值改变');
       if (val?.type) {
         //   console.log('val type', val.target.value);
         this.$set(this.formData, key, val.target.value);

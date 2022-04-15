@@ -1,15 +1,10 @@
 
 <template>
-  <Modal :mask-closable="false" :closable="false" v-model="visib" fullscreen :z-index='900' class="screenpreview">
-    <div class="layout">
-      <div :style="bigScreenStyle">
-        <widget :visib='visib' v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :type="widget.type" />
-      </div>
+  <div style="height:100%">
+    <div :style="bigScreenStyle">
+      <widget :visib='true' v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :type="widget.type" />
     </div>
-    <div slot="footer" class="dialog-footer">
-      <Button @click="closeDialog">取消</Button>
-    </div>
-  </Modal>
+  </div>
 </template>
 
 <script>
@@ -20,49 +15,54 @@ export default {
   components: {
     widget
   },
-  props: {
-    visib: {
-      required: true,
-      type: Boolean,
-      default: false,
-    },
-    reportCode: {
-      required: false,
-      type: String,
-    },
-  },
   data () {
     return {
       bigScreenStyle: {},
       widgets: [],
       dialogFormVisibleTitle: '大屏预览',
+      req: {
+        widgetsWidth: 0,
+        widgetsHeight: 0,
+        backgroundColor: '',
+        backgroundImage: ''
+      },
+
     };
   },
   watch: {
-    visib () {
-      if (this.visib) {
-        console.log('preview', this.visib);
-        this.$nextTick(() => {
-          this.getData();
-        });
-      }
-    },
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.getData();
+      window.addEventListener('resize', () => {
+        this.onRiseze();
+      })
+    });
   },
   methods: {
     //获取预览数据
     async getData () {
-      const reportCode = this.reportCode;
+      const reportCode = this.$route.query.reportCode;
       const { code, result } = await previewScreenReq({ reportCode: reportCode });
       if (code != 200) return;
-      const equipment = document.body.clientWidth - 15;
+      const { width, height, backgroundColor, backgroundImage, widgets } = result.dashboard;
+      this.req = { ...this.req, widgetsWidth: width, widgetsHeight: height, backgroundColor, backgroundImage };
+      this.onRiseze();
+      this.widgets = widgets;
+
+    },
+    //适应布局
+    onRiseze () {
+      const { widgetsWidth, widgetsHeight, backgroundColor, backgroundImage } = this.req;
+      const equipment = document.body.clientWidth;
       const clientHeight = document.body.clientHeight
-      const ratioEquipment = equipment / result.dashboard.width;
-      const ratioEquipmentH = clientHeight / result.dashboard.height;
+      const ratioEquipment = equipment / widgetsWidth;
+      const ratioEquipmentH = clientHeight / widgetsHeight;
       this.bigScreenStyle = {
-        width: result.dashboard.width + "px",
-        height: result.dashboard.height + "px",
-        "background-color": result.dashboard.backgroundColor,
-        "background-image": "url(" + result.dashboard.backgroundImage + ")",
+        width: widgetsWidth + "px",
+        height: widgetsHeight + "px",
+        "background-color": backgroundColor,
+        "background-image": "url(" + backgroundImage + ")",
         "background-position": "0% 0%",
         "background-size": "100% 100%",
         "background-repeat": "initial",
@@ -71,13 +71,10 @@ export default {
         "background-clip": "initial",
         transform: `scale(${ratioEquipment}, ${ratioEquipmentH})`,
         "transform-origin": "0 0",
+        'overflow-y': 'auto',
+        'overflow-x': 'hidden'
       };
-      this.widgets = result.dashboard.widgets;
-    },
-    //关闭弹框
-    closeDialog () {
-      this.$emit("update:visib", false);
-    },
+    }
   }
 };
 </script>
