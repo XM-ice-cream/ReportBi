@@ -141,7 +141,7 @@ export default {
     color: #fff;
   }
   /deep/.ivu-btn-text {
-    color: #515a6e;
+    color: #15b3c8;
   }
 }
 </style>

@@ -154,7 +154,7 @@ export const widgetTable = {
                             name: 'headBackColor',
                             require: false,
                             placeholder: '',
-                            value: '#0a73ff',
+                            value: '#0038c0',
                         },
                     ],
                 },
@@ -166,7 +166,7 @@ export const widgetTable = {
                             name: 'bodyColor',
                             required: false,
                             placeholder: '',
-                            value: '#fff',
+                            value: 'rgba(55,113,255,1)',
                         },
                         {
                             type: 'vue-color',
@@ -174,7 +174,7 @@ export const widgetTable = {
                             name: 'tableBgColor',
                             require: false,
                             placeholder: '',
-                            value: '',
+                            value: 'rgba(0,0,0,0.4)',
                         },
                         {
                             type: 'vue-color',
@@ -182,7 +182,7 @@ export const widgetTable = {
                             name: 'oldColor',
                             require: false,
                             placeholder: '',
-                            value: '#0a2732',
+                            value: '',
                         },
                         {
                             type: 'vue-color',
@@ -190,7 +190,7 @@ export const widgetTable = {
                             name: 'eventColor',
                             required: false,
                             placeholder: '',
-                            value: '#003b51'
+                            value: ''
                         }
                     ],
                 },

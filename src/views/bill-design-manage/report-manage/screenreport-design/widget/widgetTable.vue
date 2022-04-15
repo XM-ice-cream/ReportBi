@@ -8,7 +8,7 @@
         </div>
       </div>
       <!--数据-->
-      <div class="bd">
+      <div class="bd" :style='{ background: optionsSetUp.tableBgColor}'>
         <ul class="infoList">
           <li v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
             <div v-for="(itemChild, idx) in header" :key="idx" :style="[
@@ -66,7 +66,7 @@ export default {
         height: allStyle.height + "px",
         left: allStyle.left + "px",
         top: allStyle.top + "px",
-        background: this.optionsSetUp.tableBgColor
+
       };
     },
     headerTableStlye () {
@@ -82,6 +82,8 @@ export default {
         "background-color": headStyle.headBackColor,
         'height': '20px',
         'line-height': '20px',
+        'border-radius': '10px 10px 0px 0px',
+        'margin': '0px 3px'
       };
     },
     bodyTableStyle () {
@@ -93,7 +95,8 @@ export default {
         "border-width": bodyStyle.borderWidth + "px",
         "border-color": bodyStyle.borderColor,
         color: bodyStyle.bodyColor,
-        "background-color": bodyStyle.tableBgColor
+        "background-color": bodyStyle.tableBgColor,
+        'margin': '0px 3px'
       };
     }
   },

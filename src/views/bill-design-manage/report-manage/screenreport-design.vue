@@ -33,39 +33,28 @@
           <!-- 中间内容excel -->
           <Content class="layout-middle content" style='width:calc(100% - 400px);height:100%'>
             <div class="push_btn">
+              <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
+                <Button type="text" @click="save(false)">
+                  <Icon type="ios-folder" />
+                </Button>
+              </Tooltip>
               <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
                 <Button type="text" @click="preview()">
                   <Icon type="md-eye" />
                 </Button>
               </Tooltip>
-              <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
-                <Button type="text" @click="save()">
-                  <Icon type="ios-folder" />
-                </Button>
-              </Tooltip>
+
             </div>
-            <!-- :style="{
-                width: bigscreenWidthInWorkbench + 'px',
-                height: bigscreenHeightInWorkbench + 'px'
-                }" -->
-            <div class="workbench-container" style="width: 100%;height: calc(100% - 35px);" @mousedown="handleMouseDown">
+            <div class="workbench-container" @mousedown="handleMouseDown">
               <!-- 网页标尺辅助线 -->
               <vue-ruler-tool v-model="dashboard.presetLine" class="vueRuler" :step-length="50" :parent="true" :position="'relative'" :is-scale-revise="true" :visible.sync="dashboard.presetLineVisible" style="height:100%;width:100%">
                 <!-- workbench 工作台 -->
-                <!-- @click.self 只点击自己本身触发 -->
                 <div id="workbench" class="workbench" :style="{
-                      transform: workbenchTransform,
+                    transform: workbenchTransform,
                     width: bigscreenWidth + 'px',
                     height: bigscreenHeight + 'px',
                     'background-color': dashboard.backgroundColor,
-                    'background-image': 'url(' + dashboard.backgroundImage + ')',
-                    'background-position': '0% 0%',
-                    'background-size': '100% 100%',
-                    'background-repeat': 'initial',
-                    'background-attachment': 'initial',
-                    'background-origin': 'initial',
-                    'background-clip': 'initial',
-                     'overflow-y':'auto',
+                    'background-image': 'url(' + dashboard.backgroundImage + ')'
                     }" @click.self="setOptionsOnClickScreen">
                   <div v-if="grade" class="bg-grid"></div>
                   <widget ref="widgets" v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :index="index" :step="1" :type="widget.type" :bigscreen="{ bigscreenWidth, bigscreenHeight }" @onActivated="setOptionsOnClickWidget" @contextmenu.prevent.native="rightClick($event, index)" @mousedown.prevent.native="widgetsClick(index)" @mouseup.prevent.native="widgetsMouseup" />
@@ -91,7 +80,7 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <Button @click="closeDialog">取消</Button>
-        <Button type="primary" @click="save()">保存</Button>
+        <Button type="primary" @click="save(true)">保存并关闭</Button>
       </div>
     </Modal>
 
@@ -414,7 +403,7 @@ export default {
       return option;
     },
     // 保存数据
-    async save () {
+    async save (flag) {
       if (!this.widgets || this.widgets.length == 0) {
         this.$Message.error("请添加组件");
         return;
@@ -434,62 +423,18 @@ export default {
       const { code, data } = await addScreenReq(screenData);
       if (code == 200) {
         this.$Message.success("保存成功！");
-        this.closeDialog();
+        if (flag) { this.closeDialog(); }
       }
     },
-    // 预览
+    // 预览--跳转至新窗口
     preview () {
-      this.closeDialog();
-      this.$parent.previewScreenVisib = true;
-    },
-    //  导出
-    async exportDashboard (val) {
-      const fileName = this.$route.query.reportCode + ".zip";
-
-      const param = {
-        reportCode: this.$route.query.reportCode,
-        showDataSet: val,
-      };
-      exportDashboard(param).then((res) => {
-        const that = this;
-        const type = res.type;
-        if (type == "application/json") {
-          let reader = new FileReader();
-          reader.readAsText(res, "utf-8");
-          reader.onload = function () {
-            const data = JSON.parse(reader.result);
-            that.$message.error(data.message);
-          };
-          return;
-        }
-
-        const blob = new Blob([res], { type: "application/octet-stream" });
-        if (window.navigator.msSaveOrOpenBlob) {
-          //msSaveOrOpenBlob方法返回bool值
-          navigator.msSaveBlob(blob, fileName); //本地保存
-        } else {
-          const link = document.createElement("a"); //a标签下载
-          link.href = window.URL.createObjectURL(blob);
-          link.download = fileName;
-          link.click();
-          window.URL.revokeObjectURL(link.href);
+      const { href } = this.$router.resolve({
+        path: '/bill-design-manage/screenreport-preview',
+        query: {
+          reportCode: this.reportCode
         }
       });
-    },
-    // 上传成功的回调
-    handleUpload (response, file, fileList) {
-      //清除Upload组件中的文件
-      this.$refs.upload.clearFiles();
-      //刷新大屏页面
-      this.initEchartData();
-      if (response.code == "200") {
-        this.$Message.success("导入成功！");
-      } else {
-        this.$Message.error(response.message);
-      }
-    },
-    handleError (err) {
-      this.$Message.error("上传失败！");
+      window.open(href, '_blank');
     },
 
     // 在缩放模式下的大小
@@ -559,7 +504,7 @@ export default {
       this.widgetOptions = getToolByCode("screen")["options"];
     },
 
-
+    // 点击组件
     widgetsClick (index) {
       const draggableArr = this.$refs.widgets;
       for (let i = 0; i < draggableArr.length; i++) {
@@ -570,28 +515,22 @@ export default {
           this.$refs.widgets[i].$refs.draggable.setActive(false);
         }
       }
-      //   console.log("鼠标按下", index);
       // this.activeName = 'first';
       this.setOptionsOnClickWidget(index);
       this.grade = true;
     },
+    // 鼠标弹起不显示网格
     widgetsMouseup (e) {
       this.grade = false;
     },
     // 如果是点击某个组件，获取该组件的配置项
     setOptionsOnClickWidget (obj) {
       this.screenCode = "";
-      // console.log(obj, this.widgets[obj]);
       if (typeof obj == "number") {
-
         this.widgetOptions = { ...this.widgets[obj]["options"] }
-        // console.log('number', this.widgetOptions);
-        // this.widgetOptions = deepClone(this.widgets[obj]["options"]);
-        //  console.log('number-setOptionsOnClickWidget', this.widgetOptions);
         return;
       }
       if (obj.index < 0 || obj.index >= this.widgets.length) {
-        //  console.log('return');
         return;
       }
       this.widgetIndex = obj.index;
@@ -604,11 +543,8 @@ export default {
         }
       });
       this.widgetOptions = { ...this.widgets[obj.index]["options"] }
-      //  console.log('isNotNull(widgetOptions.data)', this.isNotNull(this.widgetOptions.data));
-      //  console.log('normal-setOptionsOnClickWidget', this.widgetOptions);
-
     },
-
+    // 激活组件拖拽
     handleMouseDown () {
       const draggableArr = this.$refs.widgets;
       for (let i = 0; i < draggableArr.length; i++) {
@@ -617,7 +553,6 @@ export default {
     },
     // 将当前选中的组件，右侧属性值更新
     widgetValueChanged (key, val) {
-      //  console.log('key', this.screenCode, val);
       if (this.screenCode == "screen") {
         let newSetup = new Array();
         this.dashboard = deepClone(val);
@@ -883,7 +818,8 @@ export default {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-
+      width: 100%;
+      height: calc(100% - 35px);
       .vueRuler {
         width: 100%;
         padding: 18px 0px 0px 18px;
@@ -900,6 +836,14 @@ export default {
         transform-origin: 0 0;
         margin: 0;
         padding: 0;
+        background-position: 0% 0%;
+        background-size: 100% 100%;
+        background-repeat: initial;
+        background-attachment: initial;
+        background-origin: initial;
+        background-clip: initial;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
 
       .bg-grid {
@@ -939,15 +883,16 @@ export default {
   .content {
     .push_btn {
       text-align: right;
-      margin-right: 0.3rem;
       background-color: #072a4f;
       height: 32px;
-      padding: 0;
+      padding: 0.3rem;
       margin: 0;
-      i {
-        color: #6c6666;
-        font-size: 1.12rem;
-        margin-right: 0.3rem;
+      button {
+        margin-right: 0.6rem;
+        i {
+          color: #17f5e0;
+          font-size: 1.12rem;
+        }
       }
     }
   }
@@ -1029,6 +974,9 @@ export default {
     border-radius: 10px !important;
     color: #17cbdd;
     background-color: #072a4f;
+  }
+  /deep/.ivu-radio-wrapper {
+    color: #17cbdd;
   }
   /deep/.ivu-select-input {
     color: #17cbdd;
