@@ -58,7 +58,6 @@ export default {
   },
   computed: {
     styleObj () {
-      console.log(this.optionsSetUp);
       const allStyle = this.optionsPosition;
       return {
         position: this.ispreview ? "absolute" : "static",
@@ -103,7 +102,6 @@ export default {
   watch: {
     value: {
       handler (val) {
-        console.log('Table', val);
         this.optionsSetUp = val.setup;
         this.optionsPosition = val.position;
         this.optionsData = val.data;
@@ -125,7 +123,6 @@ export default {
   },
   methods: {
     initData () {
-      console.log('Table', 'initData');
       this.handlerRollFn();
       this.handlerHead();
       this.handlerData();

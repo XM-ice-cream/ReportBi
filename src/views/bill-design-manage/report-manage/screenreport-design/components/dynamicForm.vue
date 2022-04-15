@@ -114,25 +114,13 @@ export default {
   },
   props: {
     options: Array,
-    value: String
+    value: String | Boolean
   },
   data () {
     return {
       formData: {},
       inputShow: {}, // 控制表单是否显示
       dialogVisibleStaticData: false,
-      validationRules: "",
-      optionsJavascript: {
-        mode: "text/javascript",
-        tabSize: 2, // 缩进格式
-        lineNumbers: true, // 显示行号
-        line: true,
-        styleActiveLine: true, // 高亮选中行
-
-        hintOptions: {
-          completeSingle: true // 当匹配只有一项的时候是否自动补全
-        }
-      },
       collapseIndex: ''
     };
   },
@@ -161,9 +149,7 @@ export default {
     },
     // 无论哪个输入框改变 都需要触发事件 将值回传
     changed (val, key) {
-      console.log('值改变');
       if (val?.type) {
-        //   console.log('val type', val.target.value);
         this.$set(this.formData, key, val.target.value);
       } else {
         this.$set(this.formData, key, val);

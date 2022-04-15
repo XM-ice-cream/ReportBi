@@ -127,7 +127,6 @@ export default {
     },
     widgets: {
       handler (val) {
-        //  console.log('监听', this.widgets);
         this.handlerLayerWidget(val);
       },
       deep: true
@@ -281,7 +280,6 @@ export default {
       // 处理默认值
       const widgetJsonValue = this.handleDefaultValue(widgetJson);
       // 将选中的复制组件，放到工作区中去
-      //   console.log('widgetJsonValue', widgetJsonValue, deepClone(widgetJsonValue));
       this.widgets.push(deepClone(widgetJsonValue));
       // 激活新组件的配置属性
       //   this.setOptionsOnClickWidget(this.widgets.length - 1);
@@ -302,7 +300,6 @@ export default {
         layerWidgetArr.push(obj);
       }
       this.layerWidget = layerWidgetArr;
-      // console.log('this.layerWidget', this.layerWidget);
     },
     // 渲染初始化大屏报表
     async initEchartData () {
@@ -311,11 +308,9 @@ export default {
 
       const { code, result } = await previewScreenReq({ reportCode: reportCode });
       if (code != 200) return;
-      //   console.log('initEchartData', reportCode, result);
       const processData = this.handleInitEchartsData(result);
       const screenData = this.handleBigScreen(result.dashboard);
       this.widgets = processData;
-      //   console.log(this.widgets);
       this.dashboard = screenData;
       this.bigscreenWidth = this.dashboard.width;
       this.bigscreenHeight = this.dashboard.height;
@@ -343,7 +338,6 @@ export default {
     // 大屏 图表
     handleInitEchartsData (data) {
       const widgets = data.dashboard ? data.dashboard.widgets : [];
-      // console.log('widgets', widgets);
       const widgetsData = [];
       for (let i = 0; i < widgets.length; i++) {
         let obj = {};
@@ -357,7 +351,6 @@ export default {
         const option = tool.options;
 
         const options = this.handleOptionsData(widgets[i].value, option);
-        //  console.log(obj.value, widgets[i].value, option, options);
         obj.options = options;
         widgetsData.push(obj);
       }
@@ -419,7 +412,6 @@ export default {
         },
         widgets: this.widgets,
       };
-      //   console.log('screenData', screenData);
       const { code, data } = await addScreenReq(screenData);
       if (code == 200) {
         this.$Message.success("保存成功！");
@@ -491,13 +483,11 @@ export default {
       return widgetJson;
     },
     layerClick (index) {
-      // console.log('layerClick', index);
       this.widgetIndex = index;
       this.widgetsClick(index);
     },
     // 如果是点击大屏设计器中的底层，加载大屏底层属性
     setOptionsOnClickScreen () {
-      //   console.log('setOptionsOnClickScreen', this.widgetOptions);
       this.screenCode = "screen";
       // 选中不同的组件 右侧都显示第一栏
       this.activeName = "first";
@@ -508,7 +498,6 @@ export default {
     widgetsClick (index) {
       const draggableArr = this.$refs.widgets;
       for (let i = 0; i < draggableArr.length; i++) {
-        console.log(this.$refs.widgets[i].$refs.draggable);
         if (i == index) {
           this.$refs.widgets[i].$refs.draggable.setActive(true);
         } else {

@@ -60,7 +60,6 @@ export default {
   computed: {
     setCode () {
       let code = "";
-      // console.log('seTcode', this.dataSet, this.dataSetValue);
       this.dataSet.forEach(el => {
         if (el.setCode == this.dataSetValue) {
           code = el.setCode;
@@ -120,11 +119,8 @@ export default {
     async echoDataSet (val) {
       if (!val) return;
       this.dataSetValue = val.setCode;
-      //  console.log('setCode', this.dataSetValue);
 
       await this.loadDataSet();
-
-      //   console.log('this.dataSetValue', this.dataSetValue);
 
       await this.selectDataSet();
       this.echoDynamicData(val);

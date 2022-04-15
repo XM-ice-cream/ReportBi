@@ -135,7 +135,6 @@ export default {
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
           const setParam_parse = JSON.parse(res.result.setParam);
           this.jsonStr = jsonStr_parse;
-          console.log('this.jsonStr', this.jsonStr);
           //第一次获取请求值
           this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result);
         } else {
@@ -149,7 +148,6 @@ export default {
     },
     // 初始化Excel
     initExcel (jsonStr_parse, setParam, setParam_parse, result) {
-      console.log('初始化Excel');
       this.reportName = jsonStr_parse.name;
       // 渲染查询表单
       this.tableData2 = this.getParamsList(setParam, setParam_parse);
@@ -206,9 +204,6 @@ export default {
                 this.jsonIndex = itemIndex
               }
             })
-            console.log(this.jsonStr)
-            console.log(this.jsonStr[this.jsonIndex]);
-            console.log(index);
             this.params.total = this.jsonStr[this.jsonIndex].total;//总数量
             this.params.totalPage = this.jsonStr[this.jsonIndex].pageCount; //总页数
             this.params.requestCount = 1;//切换sheet 重置起始页

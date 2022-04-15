@@ -65,7 +65,6 @@ export default {
   methods: {
     // 新增
     handleAddClick () {
-      //  console.log('handleAddClick');
       this.rowFormData = {
         name: "",
         key: "",
@@ -87,7 +86,6 @@ export default {
     },
     // 保存
     handleSaveClick () {
-      //   console.log(this.formData, this.indexEditor, this.rowFormData);
       if (this.flag) {
         // 新增
         this.formData.push(this.rowFormData);
