@@ -7,7 +7,7 @@ import {
 export const addUnitinfoTravel = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.19.56:8090' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/v1/analogdata/addunitinfotravel',
         method: 'post',
         data
@@ -18,7 +18,7 @@ export const addUnitinfoTravel = data => {
 export const addSerinData = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.19.56:8090' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/v1/analogdata/addserindata',
         method: 'post',
         data
@@ -28,7 +28,7 @@ export const addSerinData = data => {
 export const addKnsData = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.19.56:8090' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/v1/analogdata/addknsdata',
         method: 'post',
         data
@@ -38,7 +38,7 @@ export const addKnsData = data => {
 export const addToolingData = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.19.56:8090' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/v1/analogdata/addtoolingdata',
         method: 'post',
         data
