@@ -32,16 +32,17 @@
           <!-- 中间内容excel -->
           <Content class="content">
             <div class="push_btn">
+              <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
+                <Button type="text" @click="save(false)">
+                  <Icon type="ios-folder" />
+                </Button>
+              </Tooltip>
               <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
                 <Button type="text" @click="preview()">
                   <Icon type="md-eye" />
                 </Button>
               </Tooltip>
-              <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
-                <Button type="text" @click="save()">
-                  <Icon type="ios-folder" />
-                </Button>
-              </Tooltip>
+
             </div>
             <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
             <div style="display:none"></div>
@@ -71,7 +72,7 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <Button @click="closeDialog">取消</Button>
-        <Button type="primary" @click="save()">保存</Button>
+        <Button type="primary" @click="save(true)">保存并关闭</Button>
       </div>
     </Modal>
 
@@ -342,7 +343,7 @@ export default {
       this.$parent.previewVisib = true;
     },
     //保存
-    async save () {
+    async save (flag) {
       const jsonData = luckysheet.getAllSheets();
       for (let i = 0; i < jsonData.length; i++) {
         //清空data数据，以celldata数据为主
@@ -379,7 +380,7 @@ export default {
           return;
         };
         this.$Message.success("保存成功");
-        this.closeDialog();
+        if (flag) this.closeDialog();
       } else {
         this.reportExcelDto.id = this.reportId;
         const { code, message } = await modifyExcelReportReq(this.reportExcelDto);
