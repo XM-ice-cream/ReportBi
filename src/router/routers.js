@@ -2,6 +2,24 @@ import Main from '@/components/main'
 
 // 其他页面路由模块
 const otherRouter = [{
+        path: '/bill-design-manage/excelreport-preview',
+        name: 'excelreport-preview',
+        meta: {
+            title: 'Excel - 预览',
+            hideInMenu: true,
+            notCache: true
+        },
+        component: () => import( /* webpackChunkName: "/excelreport-preview" */ '@/views/bill-design-manage/report-manage/excelreport-preview.vue')
+    }, {
+        path: '/bill-design-manage/excelreport-design',
+        name: 'excelreport-design',
+        meta: {
+            title: 'Excel - 设计',
+            hideInMenu: true,
+            notCache: true
+        },
+        component: () => import( /* webpackChunkName: "excelreport-design" */ '@/views/bill-design-manage/report-manage/excelreport-design.vue')
+    }, {
         path: '/bill-design-manage/screenreport-preview',
         name: 'screen-preview',
         meta: {
@@ -10,6 +28,16 @@ const otherRouter = [{
             notCache: true
         },
         component: () => import( /* webpackChunkName: "screenreport-preview" */ '@/views/bill-design-manage/report-manage/screenreport-preview.vue')
+    },
+    {
+        path: '/bill-design-manage/screenreport-design',
+        name: 'screen-design',
+        meta: {
+            title: '大屏 - 设计',
+            hideInMenu: true,
+            notCache: true
+        },
+        component: () => import( /* webpackChunkName: "screenreport-design" */ '@/views/bill-design-manage/report-manage/screenreport-design.vue')
     },
     {
         path: '/',

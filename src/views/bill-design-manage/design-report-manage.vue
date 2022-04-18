@@ -117,11 +117,11 @@
       </Card>
     </div>
     <!-- Excel 的设计与预览 -->
-    <excelreport-design :visib.sync="excelVisib" :reportCode="selectObj.reportCode" />
-    <excelreport-preview :visib.sync="previewVisib" :reportCode="selectObj.reportCode" />
+    <!-- <excelreport-design :visib.sync="excelVisib" :reportCode="selectObj.reportCode" />
+    <excelreport-preview :visib.sync="previewVisib" :reportCode="selectObj.reportCode" /> -->
 
     <!-- 大屏的设计与预览 -->
-    <screenreport-design :visib.sync="screenVisib" :reportCode="selectObj.reportCode" />
+    <!-- <screenreport-design :visib.sync="screenVisib" :reportCode="selectObj.reportCode" /> -->
     <!-- <screenreport-preview :visib.sync="previewScreenVisib" :reportCode="selectObj.reportCode" /> -->
   </div>
 </template>
@@ -335,32 +335,27 @@ export default {
     //设计
     design (data) {
       this.selectObj = { ...data };
-      if (data.reportType === 'excel') {
-        this.excelVisib = true;
-      }
-      ;
-      if (data.reportType === 'largescreen') {
-        this.screenVisib = true;
-      }
+      const href = this.skipUrl(data.reportType + 'Design', this.selectObj.reportCode);
+      window.open(href, '_blank');
     },
     // 预览
     preview (data) {
       this.selectObj = { ...data };
-      if (data.reportType === 'excel') {
-        this.previewVisib = true;
+      const href = this.skipUrl(data.reportType + 'Preview', this.selectObj.reportCode);
+      window.open(href, '_blank');
+    },
+    skipUrl (key, reportCode) {
+      const obj = {
+        excelPreview: '/bill-design-manage/excelreport-preview',
+        largescreenPreview: '/bill-design-manage/screenreport-preview',
+        excelDesign: '/bill-design-manage/excelreport-design',
+        largescreenDesign: '/bill-design-manage/screenreport-design'
       }
-      // 大屏预览 跳转到新窗口
-      if (data.reportType === 'largescreen') {
-        // this.previewScreenVisib = true;
-        const { href } = this.$router.resolve({
-          path: '/bill-design-manage/screenreport-preview',
-          query: {
-            reportCode: this.selectObj.reportCode
-          }
-        });
-        window.open(href, '_blank');
-      }
-
+      const { href } = this.$router.resolve({
+        path: obj[key],
+        query: { reportCode }
+      });
+      return href;
     },
     // 自动改变表格高度
     autoSize () {

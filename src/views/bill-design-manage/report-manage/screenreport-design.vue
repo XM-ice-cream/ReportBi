@@ -1,89 +1,82 @@
 <template>
-  <div>
-    <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='900' :before-close="closeDialog" class="screen-design">
-      <div class="layout">
-        <Layout>
-          <!-- 左侧 -->
-          <Sider hide-trigger class="layout-left">
-            <Tabs type='card'>
-              <TabPane label='工具栏' name="tools">
-                <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
-                  <div class="tools-item">
+  <div style="height:100%">
+    <div class="layout screen-design">
+      <Layout>
+        <!-- 左侧 -->
+        <Sider hide-trigger class="layout-left">
+          <Tabs type='card'>
+            <TabPane label='工具栏' name="tools">
+              <draggable v-for="widget in widgetTools" :key="widget.code" @end="evt => widgetOnDragged(evt, widget.code)">
+                <div class="tools-item">
+                  <span class="tools-item-icon">
+                    <i class="iconfont" :class="widget.icon"></i>
+                  </span>
+                  <span class="tools-item-text">{{ widget.label }}</span>
+                </div>
+              </draggable>
+            </TabPane>
+            <TabPane label='图层' name='layer'>
+              <draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }">
+                <transition-group>
+                  <div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)">
                     <span class="tools-item-icon">
-                      <i class="iconfont" :class="widget.icon"></i>
+                      <i class="iconfont" :class="item.icon"></i>
                     </span>
-                    <span class="tools-item-text">{{ widget.label }}</span>
+                    <span class="tools-item-text">{{ item.label }}</span>
                   </div>
-                </draggable>
-              </TabPane>
-              <TabPane label='图层' name='layer'>
-                <draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }">
-                  <transition-group>
-                    <div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)">
-                      <span class="tools-item-icon">
-                        <i class="iconfont" :class="item.icon"></i>
-                      </span>
-                      <span class="tools-item-text">{{ item.label }}</span>
-                    </div>
-                  </transition-group>
-                </draggable>
-              </TabPane>
-            </Tabs>
-          </Sider>
-          <!-- 中间内容excel -->
-          <Content class="layout-middle content" style='width:calc(100% - 400px);height:100%'>
-            <div class="push_btn">
-              <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
-                <Button type="text" @click="save(false)">
-                  <Icon type="ios-folder" />
-                </Button>
-              </Tooltip>
-              <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
-                <Button type="text" @click="preview()">
-                  <Icon type="md-eye" />
-                </Button>
-              </Tooltip>
+                </transition-group>
+              </draggable>
+            </TabPane>
+          </Tabs>
+        </Sider>
+        <!-- 中间内容excel -->
+        <Content class="layout-middle content" style='width:calc(100% - 400px);height:100%'>
+          <div class="push_btn">
+            <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
+              <Button type="text" @click="save(false)">
+                <Icon type="ios-folder" />
+              </Button>
+            </Tooltip>
+            <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
+              <Button type="text" @click="preview()">
+                <Icon type="md-eye" />
+              </Button>
+            </Tooltip>
 
-            </div>
-            <div class="workbench-container" @mousedown="handleMouseDown">
-              <!-- 网页标尺辅助线 -->
-              <vue-ruler-tool v-model="dashboard.presetLine" class="vueRuler" :step-length="50" :parent="true" :position="'relative'" :is-scale-revise="true" :visible.sync="dashboard.presetLineVisible" style="height:100%;width:100%">
-                <!-- workbench 工作台 -->
-                <div id="workbench" class="workbench" :style="{
+          </div>
+          <div class="workbench-container" @mousedown="handleMouseDown">
+            <!-- 网页标尺辅助线 -->
+            <vue-ruler-tool v-model="dashboard.presetLine" class="vueRuler" :step-length="50" :parent="true" :position="'relative'" :is-scale-revise="true" :visible.sync="dashboard.presetLineVisible" style="height:100%;width:100%">
+              <!-- workbench 工作台 -->
+              <div id="workbench" class="workbench" :style="{
                     transform: workbenchTransform,
                     width: bigscreenWidth + 'px',
                     height: bigscreenHeight + 'px',
                     'background-color': dashboard.backgroundColor,
                     'background-image': 'url(' + dashboard.backgroundImage + ')'
                     }" @click.self="setOptionsOnClickScreen">
-                  <div v-if="grade" class="bg-grid"></div>
-                  <widget ref="widgets" v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :index="index" :step="1" :type="widget.type" :bigscreen="{ bigscreenWidth, bigscreenHeight }" @onActivated="setOptionsOnClickWidget" @contextmenu.prevent.native="rightClick($event, index)" @mousedown.prevent.native="widgetsClick(index)" @mouseup.prevent.native="widgetsMouseup" />
-                </div>
-              </vue-ruler-tool>
-            </div>
-          </Content>
-          <!-- 右侧基础配置 -->
-          <Sider hide-trigger class="layout-right">
-            <Tabs type='card' v-model='activeName'>
-              <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置" :index='1'>
-                <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
-              </TabPane>
-              <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据" :index='2'>
-                <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" />
-              </TabPane>
-              <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标" :index='3'>
-                <dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="val => widgetValueChanged('position', val)" />
-              </TabPane>
-            </Tabs>
-          </Sider>
-        </Layout>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <Button @click="closeDialog">取消</Button>
-        <Button type="primary" @click="save(true)">保存并关闭</Button>
-      </div>
-    </Modal>
-
+                <div v-if="grade" class="bg-grid"></div>
+                <widget ref="widgets" v-for="(widget, index) in widgets" :key="index" v-model="widget.value" :index="index" :step="1" :type="widget.type" :bigscreen="{ bigscreenWidth, bigscreenHeight }" @onActivated="setOptionsOnClickWidget" @contextmenu.prevent.native="rightClick($event, index)" @mousedown.prevent.native="widgetsClick(index)" @mouseup.prevent.native="widgetsMouseup" />
+              </div>
+            </vue-ruler-tool>
+          </div>
+        </Content>
+        <!-- 右侧基础配置 -->
+        <Sider hide-trigger class="layout-right">
+          <Tabs type='card' v-model='activeName'>
+            <TabPane v-if="isNotNull(widgetOptions.setup) || isNotNull(widgetOptions.collapse)" name="first" label="配置" :index='1'>
+              <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
+            </TabPane>
+            <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据" :index='2'>
+              <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" />
+            </TabPane>
+            <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标" :index='3'>
+              <dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="val => widgetValueChanged('position', val)" />
+            </TabPane>
+          </Tabs>
+        </Sider>
+      </Layout>
+    </div>
     <content-menu :visible.sync="visibleContentMenu" :style-obj="styleObj" @deletelayer="deletelayer" @copylayer="copylayer" @istopLayer="istopLayer" @setlowLayer="setlowLayer" @moveupLayer="moveupLayer" @movedownLayer="movedownLayer" />
   </div>
 </template>
@@ -100,31 +93,8 @@ import { addScreenReq, previewScreenReq } from '@/api/bill-design-manage/report-
 export default {
   name: "excelreport-design",
   components: { draggable, VueRulerTool, widget, DynamicForm, ContentMenu },
-  props: {
-    visib: {
-      required: true,
-      type: Boolean,
-      default: false,
-    },
-    reportCode: {
-      required: false,
-      type: String,
-    },
-  },
+
   watch: {
-    visib () {
-      if (this.visib) {
-        this.$nextTick(() => {
-          // 如果是新的设计工作台
-          this.initEchartData();
-          this.widgets = [];
-          window.addEventListener("mouseup", () => {
-            this.grade = false;
-          });
-          this.getPXUnderScale(this.bigscreenWidth)
-        });
-      }
-    },
     widgets: {
       handler (val) {
         this.handlerLayerWidget(val);
@@ -240,6 +210,7 @@ export default {
       visibleContentMenu: false,
       rightClickIndex: -1,
       activeName: "first",
+      reportCode: ''
     };
   },
   methods: {
@@ -415,7 +386,6 @@ export default {
       const { code, data } = await addScreenReq(screenData);
       if (code == 200) {
         this.$Message.success("保存成功！");
-        if (flag) { this.closeDialog(); }
       }
     },
     // 预览--跳转至新窗口
@@ -664,12 +634,19 @@ export default {
         this.widgets.unshift(this.widgets.splice(this.rightClickIndex, 1)[0]);
       }
     },
-    //关闭弹框
-    closeDialog () {
-      this.$emit("update:visib", false);
-    },
   },
-  mounted () { },
+  mounted () {
+    this.$nextTick(() => {
+      // 如果是新的设计工作台
+      this.reportCode = this.$route.query.reportCode
+      this.initEchartData();
+      this.widgets = [];
+      window.addEventListener("mouseup", () => {
+        this.grade = false;
+      });
+      this.getPXUnderScale(this.bigscreenWidth)
+    });
+  },
 };
 </script>
 <style>

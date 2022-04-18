@@ -1,50 +1,44 @@
 <template>
-  <div>
-
-    <Modal title="Excel 预览" :mask-closable="false" :closable="true" v-model="visib" fullscreen :z-index='905' :before-close="closeDialog" class="excel">
-      <div class="layout">
-        <Layout>
-          <!-- 左侧 -->
-          <Sider hide-trigger class="sider">
-            <!-- 数据集管理 -->
-            <div class="title">表格查询</div>
-            <!-- DBlist -->
-            <div class="dblist">
-              <Form ref="submitReq" :label-width="80" :label-colon="true">
-                <template v-for="(item,index) in tableData2">
-                  <span class="title" :key="index">{{item.name}}</span>
-                  <template v-for="(subitem,subindex) in item.children">
-                    <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
-                      <Input type="text" v-model.trim="subitem.value" v-if="subitem.type==='String'" clearable />
-                      <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" v-else-if="subitem.type==='Array'" clearable />
-                      <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
-                    </FormItem>
-                  </template>
+  <div style="height:100%">
+    <div class="layout">
+      <Layout>
+        <!-- 左侧 -->
+        <Sider hide-trigger class="sider">
+          <!-- 数据集管理 -->
+          <div class="title">表格查询</div>
+          <!-- DBlist -->
+          <div class="dblist">
+            <Form ref="submitReq" :label-width="80" :label-colon="true">
+              <template v-for="(item,index) in tableData2">
+                <span class="title" :key="index">{{item.name}}</span>
+                <template v-for="(subitem,subindex) in item.children">
+                  <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                    <Input type="text" v-model.trim="subitem.value" v-if="subitem.type==='String'" clearable />
+                    <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" v-else-if="subitem.type==='Array'" clearable />
+                    <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+                  </FormItem>
                 </template>
-                <Button type="primary" @click="searchPreview()" style="width: 100%;">查询</Button>
-              </Form>
-            </div>
-          </Sider>
-          <!-- 中间内容excel -->
-          <Content class="content">
-            <div class="push_btn">
-              <Tooltip class="item" effect="dark" content="导出excel" placement="bottom-start">
-                <Button type="text" @click="download()">
-                  <Icon type="md-cloud-download" />
-                </Button>
-              </Tooltip>
-            </div>
-            <div id="luckysheetpreview" style="margin:0;padding:0;position:absolute;width:100%;height:calc(100% - 34px);left: 0;top: 0;"></div>
-            <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
-            <div style="display:none"></div>
-          </Content>
-        </Layout>
-      </div>
-      <img :src="require('../../../assets/images/loading.gif')" v-if="loading" class="loading-img" />
-      <div slot="footer" class="dialog-footer">
-        <Button @click="closeDialog">取消</Button>
-      </div>
-    </Modal>
+              </template>
+              <Button type="primary" @click="searchPreview()" style="width: 100%;">查询</Button>
+            </Form>
+          </div>
+        </Sider>
+        <!-- 中间内容excel -->
+        <Content class="content">
+          <div class="push_btn">
+            <Tooltip class="item" effect="dark" content="导出excel" placement="bottom-start">
+              <Button type="text" @click="download()">
+                <Icon type="md-cloud-download" />
+              </Button>
+            </Tooltip>
+          </div>
+          <div id="luckysheetpreview" style="margin:0;padding:0;position:absolute;width:100%;height:calc(100% - 34px);left: 0;top: 0;"></div>
+          <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+          <div style="display:none"></div>
+        </Content>
+      </Layout>
+    </div>
+    <img :src="require('../../../assets/images/loading.gif')" v-if="loading" class="loading-img" />
 
   </div>
 </template>
@@ -57,34 +51,6 @@ import { exportFile, formatDate } from "@/libs/tools";
 export default {
   name: "excelreport-preview",
   components: { draggable },
-  props: {
-    visib: {
-      required: true,
-      type: Boolean,
-      default: false
-    },
-    reportCode: {
-      required: false,
-      type: String,
-    }
-  },
-  watch: {
-    visib () {
-      if (this.visib) {
-        this.$nextTick(() => {
-          this.params.reportCode = this.reportCode;
-          this.loading = true;
-          this.tableData2 = [];
-          this.searchPreview();
-          // 解决Jquery 版本冲突问题
-          window.jQuery.noConflict();
-        })
-        return;
-      }
-      // 销毁luckysheet
-      window.luckysheet.destroy();
-    }
-  },
   data () {
     return {
       intervalData: '',
@@ -96,6 +62,7 @@ export default {
       dataSet: null,
       tableData2: [],
       loading: false,
+      reportCode: '',
       params: {
         reportCode: "",
         setParam: "",
@@ -299,7 +266,20 @@ export default {
       this.params.pageSize = index
       this.searchPreview()
     }
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.reportCode = this.$route.query.reportCode;
+      this.params.reportCode = this.reportCode;
+      this.loading = true;
+      this.tableData2 = [];
+      this.searchPreview();
+      // 解决Jquery 版本冲突问题
+      //   window.jQuery.noConflict();
+    })
   }
+  // 销毁luckysheet
+  // window.luckysheet.destroy();
 }
 </script>
 <style>
