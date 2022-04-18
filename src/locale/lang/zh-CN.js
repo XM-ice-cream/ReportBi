@@ -1589,6 +1589,11 @@ export default {
     reportAuthor: '制作人',
     reportDesc: '描述',
     operator: '操作',
+    //模拟数据
+    originalSn: '参照SN',
+    originalPanel: '参照Panel',
+    currentSn: '替换SN',
+    currentPanel: '替换Panel',
 
     // <!--------------------------------Menu Name----------------------------------------->
     'error-404': '找不到页面',
@@ -1934,6 +1939,8 @@ export default {
     'design-report-manage': '报表管理',
     'tempsn-report': 'TempSn报表',
     'fox-log-report': 'FoxLog报表',
+    'analog-data': '模拟数据',
+    'preview-excel': 'Excel报表',
 
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
