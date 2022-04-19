@@ -210,7 +210,7 @@ export default {
       color: #3a3b3ae0;
       font-weight: 600;
       width: 100%;
-      border-bottom: 1px solid #cccccc8f;
+      //   border-bottom: 1px solid #cccccc8f;
       //圆圈
       .circle {
         width: 3rem;
@@ -245,6 +245,7 @@ export default {
           //   background: #ccc;
           margin-right: 0.6rem;
           padding: 0.2rem;
+          border-radius: 4px;
         }
         i {
           width: 2rem;
