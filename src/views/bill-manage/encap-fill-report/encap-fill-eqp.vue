@@ -4,19 +4,21 @@
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
     <div slot="footer">
       <Button @click="modalCancel">{{ $t("cancel") }}</Button>
+      <Button @click="exportClick">{{ $t("export") }}</Button>
     </div>
   </Modal>
 </template>
 
 <script>
-import { getpagelistEqpReq } from "@/api/bill-manage/encap-fill-report";
-import { formatDate } from "@/libs/tools";
+import { getpagelistEqpReq, byEqpExportReq } from "@/api/bill-manage/encap-fill-report";
+import { exportFile, formatDate } from "@/libs/tools";
 export default {
   name: "encap-fill-eqp",
   data () {
     return {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [],
+      queryObj: {},
       columns: [
         {
           type: "index", fixed: "left", width: 50, align: "center",
@@ -63,13 +65,13 @@ export default {
     // 获取分页列表数据
     pageLoad (startTime, endTime, lineName, stepName) {
       this.data = [];
-      let obj = {
+      this.queryObj = {
         startTime: formatDate(startTime),
         endTime: formatDate(endTime),
         lineName,
         stepName,
       };
-      getpagelistEqpReq(obj).then((res) => {
+      getpagelistEqpReq(this.queryObj).then((res) => {
         if (res.code === 200) {
           this.data = res.result || []
         }
@@ -78,6 +80,14 @@ export default {
       this.searchPoptipModal = false;
 
 
+    },
+    // 导出
+    exportClick () {
+      byEqpExportReq(this.queryObj).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `${this.$t("encap-fill-report")}-线体机台${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     modalCancel () {
       this.modalFlag = false;
