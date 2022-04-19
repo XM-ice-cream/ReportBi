@@ -20,10 +20,22 @@
             </FormItem>
             <FormItem>
               <Button type="primary" @click="reset()" size="default">{{ $t("reset") }}</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('unitinfo')" size="default" :loading="loading.unitinfo">添加过站</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('serin')" size="default" :loading="loading.serin">添加Serin</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('kns')" size="default" :loading="loading.kns">添加KNS</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('tooling')" size="default" :loading="loading.tooling">添加Tooling</Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('unitinfo')" size="default" :loading="loading.unitinfo">
+                <span v-if="!loading.unitinfo">添加过站</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('serin')" size="default" :loading="loading.serin">
+                <span v-if="!loading.serin">添加Serin</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('kns')" size="default" :loading="loading.kns">
+                <span v-if="!loading.kns">添加KNS</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('tooling')" size="default" :loading="loading.tooling">
+                <span v-if="!loading.tooling"> 添加Tooling</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
             </FormItem>
           </Form>
         </Row>
