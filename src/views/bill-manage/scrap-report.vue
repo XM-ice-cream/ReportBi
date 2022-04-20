@@ -101,7 +101,7 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/scrap-report";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
-import { formatDate, getButtonBoolean, exportFile, renderDate, commaSplitString } from "@/libs/tools";
+import { formatDate, getButtonBoolean, exportFile, commaSplitString } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { Spin } from "view-design";
 import axios from "axios";
@@ -147,8 +147,8 @@ export default {
         { title: this.$t("modelName"), key: "modelname", align: "center", width: 120, tooltip: true },
         { title: this.$t("stage"), key: "stage", align: "center", width: 80, tooltip: true },
         { title: this.$t("curProcessName"), key: "curprocessname", align: "center", width: 150, tooltip: true },
-        { title: '生产时间', key: "inprocesstime", align: "center", width: 130, tooltip: true, render: renderDate, },
-        { title: "报废时间", key: "createdate", align: "center", width: 130, tooltip: true, render: renderDate, },
+        { title: '生产时间', key: "inprocesstime", align: "center", width: 100, tooltip: true, },
+        { title: "报废时间", key: "createdate", align: "center", width: 100, tooltip: true, },
         { title: this.$t("description"), key: "description", align: "center", width: 150, tooltip: true },
         { title: this.$t("scrapReason"), key: "scrapreason", align: "center", width: 150, tooltip: true },
         // { title: this.$t("status"), key: "status", align: "center", width: 60, tooltip: true },
