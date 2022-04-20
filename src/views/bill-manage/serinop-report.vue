@@ -12,7 +12,7 @@
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent>
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" :rules='ruleValiadate'>
                     <!-- 站点 -->
                     <FormItem :label="$t('stepName')" prop="stationType">
                       <Select v-model="req.stationType" clearable filterable :placeholder="`${$t('pleaseEnter')} 站点`">
@@ -21,7 +21,7 @@
                     </FormItem>
                     <!-- Barcode -->
                     <FormItem :label="$t('bigBoardCode')" prop="barCode">
-                      <Input type="text" v-model.trim="req.barCode" @on-keyup.enter="searchClick" clearable :placeholder="$t('pleaseEnter') + $t('bigBoardCode') + $t('multiple,separated')" />
+                      <Input type="text" v-model.trim="req.barCode" @keyup.enter.native='searchClick()' clearable :placeholder="$t('pleaseEnter') + $t('bigBoardCode') + $t('multiple,separated')" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -37,10 +37,6 @@
           </Row>
         </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
-          <template slot-scope="{ row }" slot="sendFlag">
-            <span style="color:#43e36c" v-if="row.sendFlag === 'Y'">是</span>
-            <span style="color:#EC808D" v-else>否</span>
-          </template>
         </Table>
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
@@ -64,37 +60,113 @@ export default {
         stationType: 'OP20', // 站点
         ...this.$config.pageConfig,
       }, //查询数据
-      columns: [
+      columns: [],
+      OP20columns: [
         {
           type: "index", fixed: "left", width: 50, align: "center",
           indexMethod: (row) => {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: this.$t("workOrder"), key: "workOrder", align: "center" },
-        { title: this.$t("model"), key: "project", align: "center" },
-        { title: this.$t("eqpId"), key: "eq_Id", align: "center", tooltip: true },
-        { title: 'Config', key: "config", align: "center", tooltip: true },
-        { title: 'APN', key: "apn", align: "center", tooltip: true },
-        { title: this.$t("line"), key: "line", align: "center", tooltip: true },
-        { title: this.$t("stationName"), key: "station", align: "center" },
-        { title: this.$t("bigBoardCode"), key: "barCode", align: "center", tooltip: true },
-        { title: this.$t("rev"), key: "rev", align: "center" },
-        { title: this.$t("totalResult"), key: "total_Result", align: "center" },
-        { title: this.$t("serinState"), key: "state", align: "center" },
-        { title: this.$t("sendFlag"), key: "sendFlag", align: "center", width: 70, slot: "sendFlag" },
-        { title: this.$t("startTime"), key: "startTime", width: 125, align: "center", render: renderDate, },
-        { title: this.$t("fileCreateTime"), key: "file_CreateTime", width: 125, align: "center", render: renderDate, },
+        { title: 'barCode', key: "barCode", align: "center", minWidth: 100 },
+        { title: 'areaStandard', key: "areA_STANDARD", align: "center", minWidth: 100 },
+        { title: 'area', key: "area", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'compName', key: "comp_Name", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'faI9', key: "faI9", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'faI10', key: "faI10", align: "center", minWidth: 100 },
+        { title: 'padGap', key: "paD_GAP", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'partType', key: "part_Type", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'pinNum', key: "pinNum", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'result', key: "result", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'xoffset', key: "xoffset", align: "center", width: 70, tooltip: true, minWidth: 100 },
+        { title: 'yoffset', key: "yoffset", width: 125, align: "center", tooltip: true, minWidth: 100 },
+        { title: 'offestX', key: "srO_TO_CUPAD_OFFSETX", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'offestY', key: "srO_TO_CUPAD_OFFSETY", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'startTime', key: "startTime", align: "center", render: renderDate, tooltip: true, minWidth: 200 },
+        { title: 'stationType', key: "stationType", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'status', key: "status", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'volumeStandard', key: "volumE_STANDARD", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'volume', key: "volume", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'heightStandard', key: "heighT_STANDARD", align: "center", tooltip: true, minWidth: 150 },
+        { title: 'height', key: "height", align: "center", minWidth: 100 },
+        { title: 'top', key: "top", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'bottom', key: "bottom", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'left', key: "left", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'right', key: "right", align: "center", tooltip: true, minWidth: 100 },
+
+      ], // 表格数据
+      OP25columns: [
+        {
+          type: "index", fixed: "left", width: 50, align: "center",
+          indexMethod: (row) => {
+            return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
+          },
+        },
+        { title: 'barCode', key: "barCode", align: "center", minWidth: 100 },
+        { title: 'boardNo', key: "boardNo", align: "center", minWidth: 100 },
+        { title: 'compName', key: "compName", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'compType', key: "compType", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'errorCode', key: "errorCode", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'missingpartresult', key: "missingpartresult", align: "center", minWidth: 100 },
+        { title: 'shiftresult', key: "shiftresult", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'solderjointresult', key: "solderjointresult", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'startTime', key: "startTime", align: "center", render: renderDate, tooltip: true, minWidth: 200 },
+        { title: 'stationId', key: "stationId", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'stationType', key: "stationType", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'status', key: "status", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'windowType', key: "windowType", align: "center", tooltip: true, minWidth: 100 }
+
+      ], // 表格数据
+      OP30columns: [
+        {
+          type: "index", fixed: "left", width: 50, align: "center",
+          indexMethod: (row) => {
+            return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
+          },
+        },
+        { title: 'barCode', key: "barCode", align: "center", minWidth: 100 },
+        { title: 'compName', key: "comp_Name", align: "center", minWidth: 100 },
+        { title: 'errorCode', key: "errorCode", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'grayLevel', key: "graY_LEVEL", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'partType', key: "part_type", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'posx', key: "posx", align: "center", minWidth: 100 },
+        { title: 'posy', key: "posy", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'shiftx', key: "shiftx", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'shifty', key: "shifty", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'startTime', key: "startTime", align: "center", render: renderDate, tooltip: true, minWidth: 200 },
+        { title: 'stationType', key: "stationType", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'status', key: "status", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'theta', key: "theta", align: "center", tooltip: true, minWidth: 100 }
+
       ], // 表格数据
       data: [], // 表格数据
       btnData: [],
       stationTypeList: ['OP20', 'OP25', 'OP30'], // 线体数据
+      ruleValiadate: {
+        stationType: [
+          {
+            required: true,
+            message: `${this.$t("pleaseEnter")}${this.$t("stepName")}`,
+            trigger: "blur",
+          },
+        ],
+        barCode: [
+          {
+            required: true,
+            message: `${this.$t("pleaseEnter")}${this.$t("bigBoardCode")}`,
+            trigger: "blur",
+          },
+        ]
+      }
     };
   },
   mounted () {
-    this.pageLoad();
+    //默认OP20列
+    this.columns = this.OP20columns;
+    // this.pageLoad();
   },
   activated () {
+    this.tableConfig.loading = false;
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
@@ -107,22 +179,26 @@ export default {
   methods: {
     // 获取分页列表数据
     pageLoad () {
+
       this.tableConfig.loading = false;
       const { barCode, stationType } = this.req
       this.$refs.searchReq.validate((validate) => {
         if (validate) {
+          console.log('134');
           this.tableConfig.loading = true;
           let obj = {
             orderField: 'BarCode', // 排序字段
             ascending: this.req.ascending, // 是否升序
             pageSize: this.req.pageSize, // 分页大小
             pageIndex: this.req.pageIndex, // 当前页码
+            total: 0,
             data: {
               barCode: commaSplitString(barCode).join(),
               stationType
             },
           };
           const getpagelistReq = this.getRequest('get' + stationType);
+          this.columns = stationType === 'OP20' ? this.OP20columns : (stationType === 'OP25' ? this.OP25columns : this.OP30columns)
           console.log(getpagelistReq);
           getpagelistReq(obj).then((res) => {
             this.tableConfig.loading = false;
@@ -130,8 +206,11 @@ export default {
               let { data, pageSize, pageIndex, total, totalPage } = res.result;
               this.data = data || [];
               this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+
             }
           }).catch(() => (this.tableConfig.loading = false));
+        } else {
+          this.poptipModal = true;
         }
       });
     },
@@ -139,8 +218,6 @@ export default {
 
     // serin导出
     exportClick () {
-      if (!this.req.startTime || !this.req.endTime)
-        return this.$Message.warning(`${this.$t("pleaseSelect")}${this.$t("timeHorizon")}`);
       const { stationType, barCode } = this.req;
       const obj = {
         barCode: commaSplitString(barCode).join(),
