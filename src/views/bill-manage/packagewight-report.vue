@@ -104,9 +104,9 @@ export default {
         { title: "unitId56", key: "unitId56", align: "center", minWidth: 200, tooltip: true },
         { title: "Line", key: "lineName", align: "center", width: 110, tooltip: true },
         { title: this.$t("stepName"), key: "curprocessName", align: "center", width: 100, tooltip: true },
-        { title: 'DataKey', key: "dataKey", align: "center", width: 100 },
-        { title: 'DataType', key: "dataType", align: "center", width: 100 },
-        { title: '重量', key: "value", align: "center", width: 40 },
+        { title: 'DataKey', key: "dataKey", align: "center", width: 100, tooltip: true },
+        { title: 'DataType', key: "dataType", align: "center", width: 100, tooltip: true },
+        { title: '重量', key: "value", align: "center", width: 60, tooltip: true },
         { title: '称重时间', key: "createDate", align: "center", width: 130, tooltip: true, render: renderDate },
         { title: this.$t("createUser"), key: "createUserName", align: "center", width: 70, tooltip: true },
       ], // 表格数据

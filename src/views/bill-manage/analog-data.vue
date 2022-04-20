@@ -159,9 +159,7 @@ export default {
   /deep/.ivu-form .ivu-FormItem-label {
     font-size: 21px;
   }
-  /deep/.ivu-btn-primary {
-    width: 100px;
-  }
+
   /deep/ textarea.ivu-input,
   .ivu-input,
   .ivu-btn {
