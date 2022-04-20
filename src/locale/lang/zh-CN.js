@@ -1942,6 +1942,7 @@ export default {
     'analog-data': '模拟数据',
     'preview-excel': 'Excel报表',
     'serinop-report': 'SerinOp报表',
+    'packagewight-report': '包装报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

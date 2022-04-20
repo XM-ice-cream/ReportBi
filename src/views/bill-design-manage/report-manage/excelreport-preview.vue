@@ -19,7 +19,7 @@
                   </FormItem>
                 </template>
               </template>
-              <Button type="primary" @click="searchPreview()" style="width: 100%;">查询</Button>
+              <Button type="primary" @click="searchPreview(false)" style="width: 100%;">查询</Button>
             </Form>
           </div>
         </Sider>
@@ -82,16 +82,20 @@ export default {
     };
   },
   methods: {
-    async searchPreview () {
-      // 左侧查询参数--时间格式化 
-      this.dateFormate()
+    async searchPreview (flag = true) {
+
+      if (!flag) this.params.requestCount = 1;  // 点击查询按钮
+
+      this.dateFormate();  // 左侧查询参数--时间格式化 
+
       //左侧查询参数 --必要参数接收
       const arr = this.toObject(this.tableData2)
       this.params.setParam = JSON.stringify(arr)
-      this.sheetData = [{}]
-      window.luckysheet.destroy()
-      //每次都重新加载需要改成刷新
-      this.intervalPreview()
+
+      this.sheetData = [{}] //表格数据
+      window.luckysheet.destroy() //销毁
+
+      this.intervalPreview()  //每次都重新加载需要改成刷新
     },
     async intervalPreview () {
       this.loading = true;
@@ -251,10 +255,6 @@ export default {
       }
       return objSecond
     },
-    //关闭弹框
-    closeDialog () {
-      this.$emit('update:visib', false)
-    },
     // 选择第几页
     pageChange (index) {
       this.params.requestCount = index
@@ -282,6 +282,8 @@ export default {
   // window.luckysheet.destroy();
 }
 </script>
+ <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
+
 <style>
 .luckysheet-input-box {
   z-index: 1000;
@@ -413,7 +415,7 @@ export default {
 .excel-page {
   width: 98%;
   position: absolute;
-  bottom: 0;
+  bottom: 8px;
   z-index: 9999;
 }
 </style>

@@ -14,14 +14,14 @@
                 <div class="poptip-style-content" slot="content">
                   <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent>
                     <!-- 站点 -->
-                    <FormItem :label="$t('stepName')" prop="station">
-                      <Select v-model="req.station" clearable filterable :placeholder="`${$t('pleaseEnter')} 站点`">
+                    <FormItem :label="$t('stepName')" prop="stationType">
+                      <Select v-model="req.stationType" clearable filterable :placeholder="`${$t('pleaseEnter')} 站点`">
                         <Option v-for="(item, i) in stationTypeList" :value="item" :key="i">{{ item }}</Option>
                       </Select>
                     </FormItem>
                     <!-- Barcode -->
-                    <FormItem :label="$t('bigBoardCode')" prop="barcode">
-                      <Input type="text" v-model.trim="req.barcode" @on-keyup.enter="searchClick" clearable :placeholder="$t('pleaseEnter') + $t('bigBoardCode') + $t('multiple,separated')" />
+                    <FormItem :label="$t('bigBoardCode')" prop="barCode">
+                      <Input type="text" v-model.trim="req.barCode" @on-keyup.enter="searchClick" clearable :placeholder="$t('pleaseEnter') + $t('bigBoardCode') + $t('multiple,separated')" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -60,8 +60,8 @@ export default {
       noRepeatRefresh: false, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
       req: {
-        barcode: '', // 大板码
-        station: 'OP20', // 站点
+        barCode: '', // 大板码
+        stationType: 'OP20', // 站点
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -108,7 +108,7 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      const { barcode, station } = this.req
+      const { barCode, stationType } = this.req
       this.$refs.searchReq.validate((validate) => {
         if (validate) {
           this.tableConfig.loading = true;
@@ -118,11 +118,11 @@ export default {
             pageSize: this.req.pageSize, // 分页大小
             pageIndex: this.req.pageIndex, // 当前页码
             data: {
-              barcode: commaSplitString(barcode).join(),
-              station
+              barCode: commaSplitString(barCode).join(),
+              stationType
             },
           };
-          const getpagelistReq = this.getRequest('get' + station);
+          const getpagelistReq = this.getRequest('get' + stationType);
           console.log(getpagelistReq);
           getpagelistReq(obj).then((res) => {
             this.tableConfig.loading = false;
@@ -141,15 +141,15 @@ export default {
     exportClick () {
       if (!this.req.startTime || !this.req.endTime)
         return this.$Message.warning(`${this.$t("pleaseSelect")}${this.$t("timeHorizon")}`);
-      const { station, barcode } = this.req;
+      const { stationType, barCode } = this.req;
       const obj = {
-        barcode: commaSplitString(barcode).join(),
-        station
+        barCode: commaSplitString(barCode).join(),
+        stationType
       };
-      const exportReq = this.getRequest('export' + station);
+      const exportReq = this.getRequest('export' + stationType);
       exportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-        const fileName = `${station}${formatDate(new Date())}.xlsx`; // 自定义文件名
+        const fileName = `${stationType}${formatDate(new Date())}.xlsx`; // 自定义文件名
         exportFile(blob, fileName);
       });
     },

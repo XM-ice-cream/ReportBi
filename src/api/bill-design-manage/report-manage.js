@@ -135,6 +135,7 @@ export const getDictReq = data => {
 // 导出
 export const exportReq = data => {
     return requestCenter({
+        timeout: 1000 * 60 * 5, //最长等待五分钟
         loading: true,
         baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/export',
