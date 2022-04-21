@@ -45,7 +45,7 @@ export default {
       if (type === "image") {
         this.upload(file);
       } else {
-        this.$Message.warn("只能上次图片格式");
+        this.$Message.warn("只能上传图片格式");
       }
     },
 
