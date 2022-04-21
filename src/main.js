@@ -19,6 +19,7 @@ import Avue from '@smallwei/avue';
 import '@smallwei/avue/lib/index.css';
 import ECharts from 'vue-echarts'
 import mixins from './libs/queryform'
+import '@/assets/iconfont/iconfont.css'
 // 引入elementui 部分组件
 import {
     Input

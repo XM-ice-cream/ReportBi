@@ -415,6 +415,7 @@ export default {
   }
 };
 </script>
+ <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
 <style>
 .luckysheet-input-box {
   z-index: 1000;

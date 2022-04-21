@@ -375,6 +375,7 @@ export default {
   },
 };
 </script>
+
 <style scoped lang='less'>
 .tableBtn {
   padding: 0 0.2rem;

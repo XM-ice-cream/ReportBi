@@ -31,7 +31,7 @@
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
-                      <v-selectpage v-if="searchPoptipModal" class="select-page-style" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
+                      <v-selectpage v-if="searchPoptipModal" multiple class="select-page-style" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
                           (res) => {
                             return {
                               totalRow: res.total,
@@ -43,19 +43,19 @@
                     </FormItem>
                     <!-- 大条码 -->
                     <FormItem :label="$t('panelNo')" prop="panelNo">
-                      <Input v-model.trim="req.panelNo" :placeholder="$t('pleaseEnter') + 'PanelNo'" />
+                      <Input v-model.trim="req.panelNo" :placeholder="$t('pleaseEnter') + 'PanelNo'+ $t('multiple,separated')" />
                     </FormItem>
                     <!-- 小条码 -->
                     <FormItem :label="$t('barCoding')" prop="unitId">
-                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('barCoding')" />
+                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('barCoding')+ $t('multiple,separated')" />
                     </FormItem>
                     <!-- 线体名称 -->
                     <FormItem :label="$t('lineName')" prop="lineName">
-                      <Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + $t('lineName')" />
+                      <Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + $t('lineName')+ $t('multiple,separated')" />
                     </FormItem>
                     <!-- 机种名称 -->
                     <FormItem :label="$t('modelName')" prop="modelName">
-                      <Input v-model.trim="req.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')" />
+                      <Input v-model.trim="req.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')+ $t('multiple,separated')" />
                     </FormItem>
                     <!-- 备注 -->
                     <FormItem :label="$t('remark')" prop="remark">
@@ -101,7 +101,7 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/scrap-report";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
-import { formatDate, getButtonBoolean, exportFile, renderDate } from "@/libs/tools";
+import { formatDate, getButtonBoolean, exportFile, commaSplitString } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { Spin } from "view-design";
 import axios from "axios";
@@ -147,8 +147,8 @@ export default {
         { title: this.$t("modelName"), key: "modelname", align: "center", width: 120, tooltip: true },
         { title: this.$t("stage"), key: "stage", align: "center", width: 80, tooltip: true },
         { title: this.$t("curProcessName"), key: "curprocessname", align: "center", width: 150, tooltip: true },
-        { title: this.$t("inProcessTime"), key: "inprocesstime", align: "center", width: 130, tooltip: true, render: renderDate, },
-        { title: "生产时间", key: "createdate", align: "center", width: 130, tooltip: true, render: renderDate, },
+        { title: '生产时间', key: "inprocesstime", align: "center", width: 100, tooltip: true, },
+        { title: "报废时间", key: "createdate", align: "center", width: 100, tooltip: true, },
         { title: this.$t("description"), key: "description", align: "center", width: 150, tooltip: true },
         { title: this.$t("scrapReason"), key: "scrapreason", align: "center", width: 150, tooltip: true },
         // { title: this.$t("status"), key: "status", align: "center", width: 60, tooltip: true },
@@ -235,7 +235,13 @@ export default {
         ascending: false, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
-        data: { startTime: formatDate(startTime), endTime: formatDate(endTime), workOrder, unitId, panelNo, lineName, modelName, remark },
+        data: {
+          startTime: formatDate(startTime), endTime: formatDate(endTime), workOrder,
+          unitId: commaSplitString(unitId).join(),
+          panelNo: commaSplitString(panelNo).join(),
+          lineName: commaSplitString(lineName).join(),
+          modelName: commaSplitString(modelName).join(), remark
+        },
       };
       getpagelistReq(obj)
         .then((res) => {

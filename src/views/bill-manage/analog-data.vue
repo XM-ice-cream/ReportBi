@@ -20,10 +20,22 @@
             </FormItem>
             <FormItem>
               <Button type="primary" @click="reset()" size="default">{{ $t("reset") }}</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('unitinfo')" size="default">添加过站</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('serin')" size="default">添加Serin</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('kns')" size="default">添加KNS</Button> &nbsp;&nbsp;
-              <Button type="primary" @click="submit('tooling')" size="default">添加Tooling</Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('unitinfo')" size="default" :loading="loading.unitinfo">
+                <span v-if="!loading.unitinfo">添加过站</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('serin')" size="default" :loading="loading.serin">
+                <span v-if="!loading.serin">添加Serin</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('kns')" size="default" :loading="loading.kns">
+                <span v-if="!loading.kns">添加KNS</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
+              <Button type="primary" @click="submit('tooling')" size="default" :loading="loading.tooling">
+                <span v-if="!loading.tooling"> 添加Tooling</span>
+                <span v-else>正在提交，请等待...</span>
+              </Button> &nbsp;&nbsp;
             </FormItem>
           </Form>
         </Row>
@@ -55,6 +67,13 @@ export default {
         currentSn: "",
         currentPanel: ""
       }, //查询数据
+      //加载中
+      loading: {
+        unitinfo: false,
+        serin: false,
+        kns: false,
+        tooling: false
+      },
       // 验证实体
       ruleValidate: {
         originalSn: [
@@ -95,13 +114,17 @@ export default {
       const requestApi = this.apiData(flag);
       this.$refs.submitReq.validate(validate => {
         if (validate) {
+          this.loading[flag] = true;
           requestApi({ ...this.req }).then(res => {
+            this.loading[flag] = false;
             if (res.code === 200) {
               this.reqList.push({ ...this.req })
               this.$Message.success('提交成功！');
             } else {
               this.$Message.error(res.message)
             }
+          }).catch(() => {
+            this.loading[flag] = false;
           })
         }
       })

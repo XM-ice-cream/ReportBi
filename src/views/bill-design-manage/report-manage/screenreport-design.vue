@@ -691,7 +691,7 @@ export default {
         margin-right: 10px;
         width: 2.4rem;
         height: 2.4rem;
-        line-height: 30px;
+        line-height: 2.4rem;
         text-align: center;
         display: block;
         border: 1px solid #07375e;
