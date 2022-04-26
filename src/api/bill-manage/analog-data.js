@@ -2,6 +2,26 @@ import {
     requestCenter
 } from '@/libs/request'
 /*模拟数据 接口 */
+// 获取线体
+export const getLineReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/v1/analogdata/getlinebysation',
+        method: 'post',
+        data
+    })
+}
+// 获取设备ID
+export const getEqpIdReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/v1/analogdata/geteqpidbyline',
+        method: 'post',
+        data
+    })
+}
 
 // 添加过站记录
 export const addUnitinfoTravel = data => {
