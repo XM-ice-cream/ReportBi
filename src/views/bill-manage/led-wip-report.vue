@@ -15,9 +15,16 @@
 
                     <!-- workOrderInfo -->
                     <FormItem :label="$t('workOrderInfo')" prop="workOrderInfo">
-                      <Input v-model.trim="req.workOrderInfo" :placeholder="
-                              $t('pleaseEnter') +'指定格式的'+ $t('workOrderInfo')
-                            " @on-keyup.enter="searchClick" />
+                      <!-- <Input :placeholder="
+                              请上传固定格式的excel档
+                            " type="file" @on-change="changeFile" /> -->
+                        <Input clearable v-model.trim="uploadImgUrl" size="small" @on-change="changeInput">
+                          <template slot="append">
+                            <!-- <i class="iconfont iconfolder-o"></i> -->
+                            <Icon type="md-image" class="icon-image" />
+                            <input type="file" class="file" ref="files" @change="getImages" />
+                          </template>
+                        </Input>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -60,11 +67,12 @@ export default {
   name: "led-wip-report",
   data () {
     return {
-
+      uploadImgUrl : "",
       data: [], // 表格数据
       btnData: [],
       searchPoptipModal: false,
       req: {
+        
         workOrderInfo: "", //workOrderInfo
         // ...this.$config.pageConfig,
       }, //查询数据
@@ -214,27 +222,46 @@ export default {
     this.searchPoptipModal = false;
   },
   methods: {
-    // 获取分页列表数据
-    pageLoad () {
-      this.tableConfig.loading = false;
-      const { workOrderInfo } = this.req;
-      if (workOrderInfo) {
-        this.tableConfig.loading = true;
-        this.searchObj = {
-          condition: workOrderInfo
-        };
-        getlistReq(this.searchObj)
-          .then((res) => {
-            this.tableConfig.loading = false;
-            if (res.code === 200) {
-              this.data = res.result || [];
-              this.searchPoptipModal = false;
-            }
-          })
-          .catch(() => (this.tableConfig.loading = false));
+    getImages (el) {
+      console.log("执行了getImages方法");
+      let file = el.target.files[0];
+      let type = file.name.split(".")[1];
+      console.log(type.toLowerCase());
+      if (type.toLowerCase() === "xlsx") {
+        this.uploadImgUrl = file.name;
+        this.pageLoad(file);
       } else {
-        this.$Message.warning("请完善查询条件");
+        this.$Message.warn("只能上传xlsx格式");
       }
+    },
+    changeInput (e) {
+      console.log("执行");
+      if (e) {
+        this.uploadImgUrl = e;
+      } else {
+        this.$refs.files.value = "";
+        this.uploadImgUrl = "";
+      }
+      this.$emit("input", this.uploadImgUrl);
+      this.$emit("change", this.uploadImgUrl);
+    },
+    // 获取分页列表数据
+    pageLoad (file) {
+      this.tableConfig.loading = false;
+      let formData = new FormData();
+      formData.append("data", file);
+
+      getlistReq(formData)
+        .then((res) => {
+          this.tableConfig.loading = false;
+          if (res.code === 200) {
+            this.data = res.result || [];
+            this.searchPoptipModal = false;
+          }else{
+            this.$Message.warning(res.message);
+          }
+        })
+        .catch(() => (this.tableConfig.loading = false));
     },
     // 导出
     exportClick () {
@@ -257,7 +284,8 @@ export default {
     },
     // 点击重置按钮触发
     resetClick () {
-      this.$refs.searchReq.resetFields();
+        this.$refs.files.value = "";
+        this.uploadImgUrl = "";
     },
     // 点击搜索按钮触发
     searchClick () {
@@ -271,4 +299,11 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+.file {
+  position: absolute;
+  width: 100%;
+  right: 0;
+  top: 0;
+  opacity: 0;
+}
 </style>
