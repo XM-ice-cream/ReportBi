@@ -1943,6 +1943,7 @@ export default {
     'preview-excel': 'Excel报表',
     'serinop-report': 'SerinOp报表',
     'packagewight-report': '包装报表',
+    'quality-yield-lake-report': 'K01&K10 Yield Report',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

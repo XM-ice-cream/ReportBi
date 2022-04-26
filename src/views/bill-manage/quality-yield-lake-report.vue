@@ -13,6 +13,14 @@
                     <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">{{ $t("selectQuery") }}</Button>
                     <div class="poptip-style-content" slot="content">
                       <Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
+                        <!-- 流程名称 -->
+                        <FormItem label="流程名称" prop="routeName">
+                          <Select v-model="req.routeName">
+                            <Option v-for="(item, i) in kRouteNameList" :value="item.detailName" :key="i">
+                              {{ item.detailName }}
+                            </Option>
+                          </Select>
+                        </FormItem>
                         <!-- 起始时间 -->
                         <FormItem :label="$t('startTime')" prop="startTime">
                           <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
@@ -33,10 +41,9 @@
                         ">
                           </v-selectpage>
                         </FormItem>
-                        <!-- config -->
-                        <FormItem :label="$t('config')" prop="config">
-                          <Input v-model.trim="req.config" :placeholder="$t('pleaseEnter') + $t('config')
-                            " @on-keyup.enter="searchClick" />
+                        <!-- 站点 -->
+                        <FormItem :label="$t('stepName')">
+                          <Input type="text" v-model="req.stepName" placeholder="请输入站点"></Input>
                         </FormItem>
                       </Form>
                       <div class="poptip-style-button">
@@ -52,44 +59,64 @@
               </Row>
             </div>
             <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
-              <!-- Cum Input @click="show(row, 1) style="color:blue;cursor:pointer""-->
+              <!-- 投入 -->
               <template slot-scope="{ row }" slot="inputs">
-                <div>
+                <div @click="show(row, 1,'input')" style="color:blue;cursor:pointer">
                   {{ row.inputs }}
                 </div>
               </template>
-              <!-- 产出 @click="show(row, 2)"-->
+              <!-- 产出 -->
               <template slot-scope="{ row }" slot="outputs">
-                <div>
+                <div @click="show(row, 2,'output')" style="color:blue;cursor:pointer">
                   {{ row.outputs }}
                 </div>
               </template>
-              <!-- 一次检查pass @click="show(row, 3)-->
-              <template slot-scope="{ row }" slot="firstPass">
-                <div>
-                  {{ row.firstPass }}
+              <!-- 首次Pass -->
+              <template slot-scope="{ row }" slot="firstpass">
+                <div @click="show(row, 3,'firstoutput')" style="color:blue;cursor:pointer">
+                  {{ row.firstpass }}
                 </div>
               </template>
-              <!-- Cum RePass @click="show(row, 4)-->
-              <template slot-scope="{ row }" slot="rePass">
-                <div>
-                  {{ row.rePass }}
+              <!--所有不良-->
+              <template slot-scope="{ row }" slot="defect">
+                <div @click="show(row, 4,'alldefect')" style="color:blue;cursor:pointer">
+                  {{ row.defect }}
                 </div>
               </template>
-              <!-- 良率 -->
-              <template slot-scope="{ row }" slot="yield">
-                <div>{{ (row.yield * 100).toFixed(2) }}%</div>
+              <!-- 最终不良 -->
+              <template slot-scope="{ row }" slot="defectnow">
+                <div @click="show(row, 5,'lastdefect')" style="color:blue;cursor:pointer">
+                  {{ row.defectnow }}
+                </div>
+              </template>
+              <!-- 一次良率 -->
+              <template slot-scope="{ row }" slot="firstrate">
+                <div>
+                  {{ (row.firstrate*100).toFixed(2) }}%
+                </div>
+              </template>
+              <!-- 重测良率 -->
+              <template slot-scope="{ row }" slot="rerate">
+                <div>
+                  {{ (row.rerate*100).toFixed(2) }}%
+                </div>
+              </template>
+              <!-- 最终良率 -->
+              <template slot-scope="{ row }" slot="yieldrate">
+                <div>
+                  {{ (row.yieldrate*100).toFixed(2) }}%
+                </div>
               </template>
             </Table>
           </Card>
         </TabPane>
-        <!-- <TabPane label="投入数" name="tab2" :index="2" v-if="tab2">
+        <TabPane label="投入" name="tab2" :index="2" v-if="tab2">
           <TabTable ref="tab2" />
         </TabPane>
-        <TabPane label="一次检测通过" name="tab3" :index="3" v-if="tab3">
+        <TabPane label="产出" name="tab3" :index="3" v-if="tab3">
           <TabTable ref="tab3" />
         </TabPane>
-        <TabPane label="重测pass" name="tab4" :index="4" v-if="tab4">
+        <TabPane label="首次Pass" name="tab4" :index="4" v-if="tab4">
           <TabTable ref="tab4" />
         </TabPane>
         <TabPane label="所有不良" name="tab5" :index="5" v-if="tab5">
@@ -98,9 +125,6 @@
         <TabPane label="最终不良" name="tab6" :index="6" v-if="tab6">
           <TabTable ref="tab6" />
         </TabPane>
-        <TabPane label="产出" name="tab7" :index="7" v-if="tab7">
-          <TabTable ref="tab7" />
-        </TabPane> -->
       </Tabs>
     </div>
   </div>
@@ -110,22 +134,22 @@
 import { getlistReq, trackOutExportReq } from "@/api/bill-manage/quality-yield-lake-report";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
 import { formatDate, getButtonBoolean } from "@/libs/tools"; //commaSplitString
-// import TabTable from "./quality-yield-query-report/tabTable.vue";
+import TabTable from "./quality-yield-lake-report/tabTable.vue";
 import { exportFile } from "@/libs/tools";
+import { getlistReq as dataItemList } from "@/api/system-manager/data-item";
 
 export default {
-  //   components: { TabTable },
+  components: { TabTable },
   name: "quality-yield-lake-report",
   data () {
     return {
       tabName: "tab1",
       tab1: true,
-      //   tab2: false,
-      //   tab3: false,
-      //   tab4: false,
-      //   tab5: false,
-      //   tab6: false,
-      //   tab7: false,
+      tab2: false,
+      tab3: false,
+      tab4: false,
+      tab5: false,
+      tab6: false,
       workerPageListUrl: workerPageListUrl(),
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
@@ -138,12 +162,9 @@ export default {
         startTime: "",
         endTime: "",
         workOrder: "", //工单
-        pn: "", // 料号,
-        linename: "", // 线体
-        subline: '',
-        buildtype: "", //段别
-        unitid: "", //unidId
-        config: "",
+        routeName: "",//流程名称
+        stepName: "",//站点
+        type: "",//类型
         ...this.$config.pageConfig,
       }, //查询数据
       searchObj: {},
@@ -161,50 +182,96 @@ export default {
           },
         },
         {
-          title: 'MSTEPID',
-          key: "stepName",
+          title: '流程名称',
+          key: "routeName",
+          minWidth: 140,
+          ellipsis: true,
+          tooltip: true,
+          align: 'center'
+        }, {
+          title: '站点名称',
+          key: "stepname",
           minWidth: 140,
           ellipsis: true,
           tooltip: true,
           align: 'center'
         },
         {
-          title: 'Cum Input',
+          title: '投入',
           minWidth: 80,
           align: "center",
           slot: "inputs",
         },
         {
-          title: "Cum Output",
+          title: "产出",
           minWidth: 80,
           align: "center",
           slot: "outputs",
+        }, {
+          title: "WIP",
+          key: "wip",
+          minWidth: 140,
+          ellipsis: true,
+          tooltip: true,
+          align: 'center'
         },
         {
-          title: "Cum 1stPass",
+          title: "首次Pass",
           minWidth: 80,
           align: "center",
-          slot: "firstPass",
+          slot: "firstpass",
         },
         {
-          title: "Cum RePass",
-          minWidth: 80,
-          align: "center",
-          slot: "rePass",
+          title: "重测pass",
+          key: "retest",
+          minWidth: 140,
+          ellipsis: true,
+          tooltip: true,
+          align: 'center'
         },
         {
-          title: "Cum Yield",
+          title: "所有不良",
           minWidth: 80,
           align: "center",
-          slot: "yield",
+          slot: "defect",
+        }, {
+          title: "最终不良",
+          minWidth: 80,
+          align: "center",
+          slot: "defectnow",
+        }, {
+          title: "一次良率",
+          slot: "firstrate",
+          minWidth: 140,
+          ellipsis: true,
+          tooltip: true,
+          align: 'center'
+        }, {
+          title: "重测良率",
+          slot: "rerate",
+          minWidth: 140,
+          ellipsis: true,
+          tooltip: true,
+          align: 'center'
+        },
+        {
+          title: "最终良率",
+          slot: "yieldrate",
+          minWidth: 140,
+          ellipsis: true,
+          tooltip: true,
+          align: 'center'
         },
       ],
+      kRouteNameList: [],//流程名称下拉
     };
   },
   activated () {
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    //获取数据字典数据
+    this.getDataItemData();
   },
   deactivated () {
     this.searchPoptipModal = false;
@@ -216,13 +283,15 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      const { workOrder, config, startTime, endTime } = this.req;
+      const { workOrder, stepName, startTime, endTime, type, routeName } = this.req;
       this.tableConfig.loading = true;
       this.searchObj = {
         startDate: formatDate(startTime),
         endDate: formatDate(endTime),
         workorder: workOrder, //commaSplitString(workOrder).join()
-        config,
+        stepName,
+        type,
+        routeName
       };
       getlistReq(this.searchObj).then((res) => {
         this.tableConfig.loading = false;
@@ -230,35 +299,47 @@ export default {
           this.data = res.result || [];
           this.searchPoptipModal = false;
         }
-      })
-        .catch(() => (this.tableConfig.loading = false));
+      }).catch(() => (this.tableConfig.loading = false));
     },
     // 导出
     exportClick () {
-      const { workOrder, config, startTime, endTime } = this.req;
+      const { workOrder, stepName, startTime, endTime, type, routeName } = this.req;
       const obj = {
         startDate: formatDate(startTime),
         endDate: formatDate(endTime),
         workorder: workOrder,//commaSplitString(workOrder).join(),
-        config
+        stepName,
+        type,
+        routeName
       };
       trackOutExportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-        const fileName = `${this.$t("quality-yield-query-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+        const fileName = `${this.$t("quality-yield-lake-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
         exportFile(blob, fileName);
       });
     },
     // 表格单元格点击事件
-    show (row, type) {
-      let obj = { ...this.searchObj, tracktype: String(type), stepname: row.stepname };
-      let index = type + 1;
-      this.tabName = "tab" + index;
-      this["tab" + index] = true;
+    show (row, index, type) {
+      let obj = { ...this.searchObj, type: type, routeName: row.routeName, stepName: row.stepname };
+      let tabindex = index + 1;
+      this.tabName = "tab" + tabindex;
+      this["tab" + tabindex] = true;
       this.$nextTick(() => {
-        this.$refs["tab" + index].req.pageIndex = 1;
-        this.$refs["tab" + index].queryObj = obj;
-        this.$refs["tab" + index].pageLoad(obj);
+        this.$refs["tab" + tabindex].req.pageIndex = 1;
+        this.$refs["tab" + tabindex].queryObj = obj;
+        this.$refs["tab" + tabindex].pageLoad(obj);
       });
+    },
+    // 获取数据字典数据
+    async getDataItemData () {
+      this.kRouteNameList = await this.getDataItemDetailList("K_RouteName");
+    },
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await dataItemList({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) arr = res.result || [];
+      });
+      return arr;
     },
     // 自动改变表格高度
     autoSize () {
