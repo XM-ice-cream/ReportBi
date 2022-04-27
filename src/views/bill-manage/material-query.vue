@@ -58,7 +58,7 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/material-query";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
-import { formatDate, getButtonBoolean, exportFile, commaSplitString } from "@/libs/tools";
+import { formatDate, getButtonBoolean, exportFile, commaSplitString, limitStrLength } from "@/libs/tools";
 export default {
   name: "material-query",
   data () {
@@ -118,6 +118,11 @@ export default {
       this.tableConfig.loading = false;
       let { panel, unitId, workOrder } = this.req;
       if (panel || unitId || workOrder) {
+        if (limitStrLength(panel) || limitStrLength(unitId) || limitStrLength(workOrder)) {
+          this.$Message.error('查询条件超出最大长度2000!');
+          this.searchPoptipModal = true;
+          return;
+        }
         this.tableConfig.loading = true;
         let obj = {
           orderField: "objName", // 排序字段
@@ -140,6 +145,7 @@ export default {
             }
           })
           .catch(() => (this.tableConfig.loading = false));
+        this.searchPoptipModal = false;
       } else {
         this.$Message.warning(this.$t("pleaseEnter") + this.$t("selectQuery"));
       }
@@ -148,11 +154,16 @@ export default {
     exportClick () {
       let { panel, unitId, workOrder } = this.req;
       if (panel || unitId || workOrder) {
+        if (limitStrLength(panel) || limitStrLength(unitId) || limitStrLength(workOrder)) {
+          this.$Message.error('查询条件超出最大长度2000!');
+          return;
+        }
         const obj = {
           panel: commaSplitString(this.req.panel).join(),
           unitId: commaSplitString(this.req.unitId).join(),
           workOrder: this.req.workOrder,
         };
+
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
           const fileName = `${this.$t("material-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名

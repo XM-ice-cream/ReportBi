@@ -72,7 +72,7 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/consumable-material-query";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
-import { getButtonBoolean, commaSplitString, formatDate, exportFile } from "@/libs/tools";
+import { getButtonBoolean, commaSplitString, formatDate, exportFile, limitStrLength } from "@/libs/tools";
 
 export default {
   name: "consumable-material-query",
@@ -93,9 +93,9 @@ export default {
         unitId: "", // 小板序号
         stepName: "",
         workOrder: "", //工单
-        rid: "", 
-        lotCode: "", 
-        tfencode: "", 
+        rid: "",
+        lotCode: "",
+        tfencode: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -136,7 +136,17 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       let { pageSize, pageIndex, panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req;
-      if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
+      if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件');
+      if (limitStrLength(panel) || limitStrLength(unitId) || limitStrLength(lotCode) || limitStrLength(tfencode)) {
+        this.$Message.error('查询条件超出最大长度2000!');
+        this.searchPoptipModal = true;
+        return;
+      }
+      if (limitStrLength(rid, 3)) {
+        this.$Message.error('RID查询条件超出最大长度3!');
+        this.searchPoptipModal = true;
+        return;
+      }
       this.tableConfig.loading = true;
       const obj = {
         orderField: "panel", // 排序字段
@@ -148,11 +158,12 @@ export default {
           unitId: commaSplitString(unitId).join(),
           stepName,
           workOrder,
-          rid, 
-          lotCode, 
-          tfencode, 
+          rid,
+          lotCode,
+          tfencode,
         },
       };
+
       getpagelistReq(obj).then((res) => {
         this.tableConfig.loading = false;
         if (res.code === 200) {
@@ -164,6 +175,7 @@ export default {
           this.req.totalPage = data.totalPage;
         }
       }).catch(() => (this.tableConfig.loading = false));
+      this.searchPoptipModal = false;
     },
     searchClick () {
       this.req.pageIndex = 1;
@@ -183,14 +195,22 @@ export default {
     exportClick () {
       let { panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req;
       if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error('请输入查询条件')
+      if (limitStrLength(panel) || limitStrLength(unitId) || limitStrLength(lotCode) || limitStrLength(tfencode)) {
+        this.$Message.error('查询条件超出最大长度2000!');
+        return;
+      }
+      if (limitStrLength(rid, 3)) {
+        this.$Message.error('RID查询条件超出最大长度3!');
+        return;
+      }
       const obj = {
         panel: commaSplitString(panel).join(),
         unitId: commaSplitString(unitId).join(),
         stepName,
         workOrder,
-        rid, 
-        lotCode, 
-        tfencode, 
+        rid,
+        lotCode,
+        tfencode,
       };
       exportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });

@@ -68,6 +68,7 @@ import {
   exportFile,
   commaSplitString,
   renderDate,
+  limitStrLength
 } from "@/libs/tools";
 export default {
   name: "material-traceability",
@@ -129,8 +130,18 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      let { panel, unitId, workOrder,ReelId } = this.req;
+      let { panel, unitId, workOrder, ReelId } = this.req;
       if (panel || unitId || workOrder || ReelId) {
+        if (limitStrLength(panel) || limitStrLength(unitId)) {
+          this.$Message.error('查询条件超出最大长度2000!');
+          this.searchPoptipModal = true;
+          return;
+        }
+        if (limitStrLength(ReelId, 3)) {
+          this.$Message.error('ReelId查询条件超出最大长度3!');
+          this.searchPoptipModal = true;
+          return;
+        }
         this.tableConfig.loading = true;
         let obj = {
           orderField: "PCBID", // 排序字段
@@ -154,20 +165,30 @@ export default {
             }
           })
           .catch(() => (this.tableConfig.loading = false));
+        this.searchPoptipModal = false;
       } else {
         this.$Message.warning(this.$t("pleaseEnter") + this.$t("selectQuery"));
       }
     },
     // 导出
     exportClick () {
-      let { panel, unitId, workOrder,ReelId } = this.req;
+      let { panel, unitId, workOrder, ReelId } = this.req;
       if (panel || unitId || workOrder || ReelId) {
+        if (limitStrLength(panel) || limitStrLength(unitId)) {
+          this.$Message.error('查询条件超出最大长度2000!');
+          return;
+        }
+        if (limitStrLength(ReelId, 3)) {
+          this.$Message.error('ReelId查询条件超出最大长度3!');
+          return;
+        }
         const obj = {
           panel: commaSplitString(this.req.panel).join(),
           unitId: commaSplitString(this.req.unitId).join(),
           workOrder: this.req.workOrder,
           ReelId: commaSplitString(this.req.ReelId).join(),
         };
+
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
           const fileName = `${this.$t("material-traceability")}${formatDate(new Date())}.xlsx`; // 自定义文件名

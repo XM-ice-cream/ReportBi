@@ -587,7 +587,7 @@ export const renderIsEnabled = (h, params) => {
             style: {
                 color: type === 1 ? "#6db44b" : '#ec7050',
                 backgroundColor: type === 1 ? "#eefde3" : "#fde3e6",
-                border:type === 1 ? "1px solid #8cd867" : "1px solid #ec7050",
+                border: type === 1 ? "1px solid #8cd867" : "1px solid #ec7050",
                 padding: "1px 10px",
                 margin: "3px 0",
                 borderRadius: "3px",
@@ -958,6 +958,17 @@ export const commaSplitString = (str = "") => {
     });
     return [...new Set(arr)];
 };
+/**
+ * 限制多选个数
+ * @param str 字符串
+ * @param limitLength 字符串长度,默认2000
+ */
+export const limitStrLength = (str = "", limitLength = 2000) => {
+    const strLength = commaSplitString(str).join().split(",").length;
+    console.log(str, strLength, limitLength, strLength > limitLength);
+    return strLength > limitLength;
+};
+
 
 /**
  * 获取文件下载地址

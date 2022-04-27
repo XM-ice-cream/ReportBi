@@ -7,30 +7,12 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip
-                v-model="searchPoptipModal"
-                class="poptip-style"
-                placement="right-start"
-                width="500"
-                trigger="manual"
-                transfer
-              >
-                <Button
-                  type="primary"
-                  icon="ios-search"
-                  @click.stop="searchPoptipModal = !searchPoptipModal"
-                >
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="500" trigger="manual" transfer>
+                <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form
-                    ref="searchReq"
-                    :model="req"
-                    :label-width="80"
-                    :label-colon="true"
-                    @submit.native.prevent
-                    @keyup.native.enter="searchClick"
-                  >
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <FormItem :label="$t('type')" prop="isHistory">
                       <RadioGroup v-model="req.isHistory">
                         <Radio :label="false">在线信息</Radio>
@@ -39,46 +21,23 @@
                     </FormItem>
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
-                      <DatePicker
-                        transfer
-                        type="datetime"
-                        :placeholder="$t('pleaseSelect') + $t('startTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
-                        :options="$config.datetimeOptions"
-                        v-model="req.startTime"
-                      ></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
-                      <DatePicker
-                        transfer
-                        type="datetime"
-                        :placeholder="$t('pleaseSelect') + $t('endTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
-                        :options="$config.datetimeOptions"
-                        v-model="req.endTime"
-                      ></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
                     <!-- 大板序号 -->
                     <FormItem :label="$t('panelNo')">
-                      <Input
-                        v-model.trim="req.panelNo"
-                        :placeholder="$t('pleaseEnter') + $t('panelNo') + $t('multiple,separated')"
-                      ></Input>
+                      <Input v-model.trim="req.panelNo" :placeholder="$t('pleaseEnter') + $t('panelNo') + $t('multiple,separated')"></Input>
                     </FormItem>
                     <!-- UnitId -->
                     <FormItem label="UnitId" prop="unitId">
-                      <Input
-                        v-model.trim="req.unitId"
-                        :placeholder="$t('pleaseEnter') + 'UnitId' + $t('multiple,separated')"
-                      />
+                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + 'UnitId' + $t('multiple,separated')" />
                     </FormItem>
                     <!-- 线别 -->
                     <FormItem label="线别" prop="lineName">
-                      <Input
-                        v-model.trim="req.lineName"
-                        :placeholder="$t('pleaseEnter') + '线别'"
-                      />
+                      <Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + '线别'" />
                     </FormItem>
                     <!-- 料号 -->
                     <FormItem :label="$t('pn')" prop="pn">
@@ -86,29 +45,17 @@
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="wo">
-                      <Input
-                        v-model.trim="req.wo"
-                        :placeholder="$t('pleaseEnter') + $t('workOrder')"
-                      />
+                      <Input v-model.trim="req.wo" :placeholder="$t('pleaseEnter') + $t('workOrder')" />
                     </FormItem>
                     <!-- unitId56 -->
                     <FormItem label="UnitId56" prop="unitId56">
-                      <Input
-                        v-model.trim="req.unitId56"
-                        :placeholder="$t('pleaseEnter') + 'UnitId56'"
-                      />
+                      <Input v-model.trim="req.unitId56" :placeholder="$t('pleaseEnter') + 'UnitId56'" />
                     </FormItem>
                     <FormItem label="BuildConfig" prop="buildConfig">
-                      <Input
-                        v-model.trim="req.buildConfig"
-                        :placeholder="$t('pleaseEnter') + 'BuildConfig'"
-                      />
+                      <Input v-model.trim="req.buildConfig" :placeholder="$t('pleaseEnter') + 'BuildConfig'" />
                     </FormItem>
                     <FormItem :label="$t('stepName')" prop="curprocessname">
-                      <Input
-                        v-model.trim="req.curprocessname"
-                        :placeholder="$t('pleaseEnter') + $t('stepName')"
-                      />
+                      <Input v-model.trim="req.curprocessname" :placeholder="$t('pleaseEnter') + $t('stepName')" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -123,23 +70,9 @@
             </i-col>
           </Row>
         </div>
-        <Table
-          :border="tableConfig.border"
-          :highlight-row="tableConfig.highlightRow"
-          :height="tableConfig.height"
-          :loading="tableConfig.loading"
-          :columns="columns"
-          :data="data"
-        >
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
         </Table>
-        <page-custom
-          :total="req.total"
-          :totalPage="req.totalPage"
-          :pageIndex="req.pageIndex"
-          :page-size="req.pageSize"
-          @on-change="pageChange"
-          @on-page-size-change="pageSizeChange"
-        />
+        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>
@@ -147,10 +80,10 @@
 
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/sn-query";
-import { getButtonBoolean, formatDate, exportFile, commaSplitString } from "@/libs/tools";
+import { getButtonBoolean, formatDate, exportFile, commaSplitString, limitStrLength } from "@/libs/tools";
 export default {
   name: "sn-query",
-  data() {
+  data () {
     return {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
@@ -201,7 +134,7 @@ export default {
           width: 100,
           tooltip: true,
         },
-         {
+        {
           title: "UnitId56",
           key: "unitId56",
           align: "center",
@@ -237,28 +170,28 @@ export default {
       ], // 表格数据
     };
   },
-  activated() {
+  activated () {
     this.pageLoad();
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
   },
   // 导航离开该组件的对应路由时调用
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave (to, from, next) {
     this.searchPoptipModal = false;
     next();
   },
   methods: {
-    imgClick(url) {
+    imgClick (url) {
       window.open(url, "_blank");
     },
     // 点击搜索按钮触发
-    searchClick() {
+    searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
     },
     // 获取分页列表数据
-    pageLoad() {
+    pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
       let {
@@ -287,6 +220,11 @@ export default {
       ) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
+            if (limitStrLength(panelNo) || limitStrLength(unitId) || limitStrLength(unitId56)) {
+              this.$Message.error('查询条件超出最大长度2000!');
+              this.searchPoptipModal = true;
+              return;
+            }
             this.tableConfig.loading = true;
             let obj = {
               orderField: "unitId", // 排序字段
@@ -318,6 +256,7 @@ export default {
                 }
               })
               .catch(() => (this.tableConfig.loading = false));
+            this.searchPoptipModal = false;
           }
         });
       } else {
@@ -325,7 +264,7 @@ export default {
       }
     },
     // 导出
-    exportClick() {
+    exportClick () {
       let {
         startTime,
         endTime,
@@ -350,6 +289,10 @@ export default {
         buildConfig ||
         curprocessname
       ) {
+        if (limitStrLength(panelNo) || limitStrLength(unitId) || limitStrLength(unitId56)) {
+          this.$Message.error('查询条件超出最大长度2000!');
+          return;
+        }
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
@@ -373,20 +316,20 @@ export default {
       }
     },
     // 点击重置按钮触发
-    resetClick() {
+    resetClick () {
       this.$refs.searchReq.resetFields();
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 120 - 60;
     },
     // 选择第几页
-    pageChange(index) {
+    pageChange (index) {
       this.req.pageIndex = index;
       this.pageLoad();
     },
     // 选择一页有条数据
-    pageSizeChange(index) {
+    pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
       this.pageLoad();

@@ -74,7 +74,7 @@
 
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/bom-report";
-import { getButtonBoolean, formatDate, exportFile } from "@/libs/tools";
+import { getButtonBoolean, formatDate, exportFile, limitStrLength, commaSplitString } from "@/libs/tools";
 import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 
 export default {
@@ -145,6 +145,11 @@ export default {
       this.data = [];
       this.tableConfig.loading = false;
       let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category } = this.req;
+      if (limitStrLength(panel)) {
+        this.$Message.error('查询条件超出最大长度2000!');
+        this.searchPoptipModal = true;
+        return;
+      }
       if (startTime && endTime) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -158,7 +163,7 @@ export default {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
                 workOrder,
-                panel,
+                panel: commaSplitString(panel).join(),
                 unitId,
                 dateCode,
                 lotCode,
@@ -166,6 +171,7 @@ export default {
                 category,
               },
             };
+
             getpagelistReq(obj).then((res) => {
               this.tableConfig.loading = false;
               if (res.code === 200) {
@@ -186,6 +192,10 @@ export default {
     exportClick () {
       let { startTime, endTime, workOrder, panel, unitId, dateCode, lotCode, reelId, category } = this.req;
       if (startTime && endTime) {
+        if (limitStrLength(panel)) {
+          this.$Message.error('查询条件超出最大长度2000!');
+          return;
+        }
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
