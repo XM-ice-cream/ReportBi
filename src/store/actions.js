@@ -18,6 +18,7 @@ import {
 import {
     resetRouter
 } from "@/router";
+import store from '@/store'
 
 export default {
     // 退出登录
@@ -43,7 +44,19 @@ export default {
     }) {
         return new Promise((resolve => {
             getlisttreecurrentuserReq().then(res => {
-                let menuList = initNode(res.result.filter(o => o.name === 'bill-manage' || o.name === 'bill-design-manage'))
+                let menuList = initNode(res.result.filter(o => o.name === 'bill-manage' || o.name === 'bill-design-manage'));
+
+                //对报表管理列作特殊处理--对于不是以下人员隐藏模拟数据页面 -analog-data
+                if (["陈新明", "石厚华", "李祥祥", "祝斌"].includes(store.state.userName)) {
+                    //报表管理索引
+                    let billIndex = menuList.map(item => item.name).indexOf('bill-manage');
+                    //去除模拟数据页面
+                    let filterMenuList = menuList[billIndex].children.filter(o => o.name !== "analog-data");
+                    // 重新赋值
+                    menuList[billIndex].children = filterMenuList;
+                }
+
+
                 menuList.push(...errorRouter);
                 commit('updateAppRouter', menuList)
                 commit('updateHasGetMenuInfo', true)

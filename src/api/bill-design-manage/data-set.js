@@ -6,7 +6,7 @@ import {
 export const getpagelistReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datacollect/getpagelist',
         method: 'post',
         data
@@ -16,7 +16,7 @@ export const getpagelistReq = data => {
 export const insertDatacollectReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datacollect/insert',
         method: 'post',
         data
@@ -26,7 +26,7 @@ export const insertDatacollectReq = data => {
 export const deleteDatacollectReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datacollect/delete',
         method: 'post',
         data
@@ -36,7 +36,7 @@ export const deleteDatacollectReq = data => {
 export const modifyDatacollectReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datacollect/modify',
         method: 'post',
         data
@@ -46,7 +46,7 @@ export const modifyDatacollectReq = data => {
 export const testTransformSet = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datacollect/testtransform',
         method: 'post',
         data
@@ -56,7 +56,7 @@ export const testTransformSet = data => {
 export const getAllDatasourceReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datacollect/queryalldatasource',
         method: 'post',
         data
@@ -66,7 +66,7 @@ export const getAllDatasourceReq = data => {
 export const getDeatilByIdReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: 'http://10.191.21.54:8700' || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datacollect/getdetailbysetcode',
         method: 'post',
         data
