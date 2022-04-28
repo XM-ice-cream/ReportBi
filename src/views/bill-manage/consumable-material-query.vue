@@ -27,7 +27,7 @@
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')">
-                      <v-selectpage v-if="searchPoptipModal" ref="workOrder" class="select-page-style" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
+                      <v-selectpage v-if="searchPoptipModal" ref="workOrder" class="select-page-style" key-field="workOrder" show-field="workOrder" disabled :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
                           (res) => {
                             return {
                               totalRow: res.total,
@@ -39,15 +39,15 @@
                     </FormItem>
                     <!-- rid -->
                     <FormItem :label="$t('rId')">
-                      <Input type="text" v-model="req.rid" :placeholder="$t('pleaseEnter') + $t('rId') + $t('multiple,separated')"></Input>
+                      <Input type="text" disabled v-model="req.rid" :placeholder="$t('pleaseEnter') + $t('rId') + $t('multiple,separated')"></Input>
                     </FormItem>
                     <!-- lotCode -->
                     <FormItem :label="$t('lotCode')">
-                      <Input type="text" v-model="req.lotCode" :placeholder="$t('pleaseEnter') + $t('lotCode') + $t('multiple,separated')"></Input>
+                      <Input type="text" disabled v-model="req.lotCode" :placeholder="$t('pleaseEnter') + $t('lotCode') + $t('multiple,separated')"></Input>
                     </FormItem>
                     <!-- tfencode -->
                     <FormItem :label="$t('tfencode')">
-                      <Input type="text" v-model="req.tfencode" :placeholder="$t('pleaseEnter') + $t('tfencode') + $t('multiple,separated')"></Input>
+                      <Input type="text" disabled v-model="req.tfencode" :placeholder="$t('pleaseEnter') + $t('tfencode') + $t('multiple,separated')"></Input>
                     </FormItem>
                     <div class="poptip-style-button">
                       <Button @click="resetClick">{{ $t("reset") }}</Button>

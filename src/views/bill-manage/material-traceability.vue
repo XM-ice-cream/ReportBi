@@ -15,7 +15,7 @@
                   <Form ref="searchReq" :model="req" :label-width="50" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
-                      <v-selectpage v-if="searchPoptipModal" class="select-page-style" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
+                      <v-selectpage v-if="searchPoptipModal" class="select-page-style" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" disabled v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
                           (res) => {
                             return {
                               totalRow: res.total,
