@@ -81,16 +81,17 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: 'UnitID', key: "unitID", align: "center", width: 140, tooltip: true, fixed: 'left' },
-        { title: 'WorkOrder', key: "workOrder", align: "center", width: 140, tooltip: true },
-        { title: 'S_FLEX', key: "s_FLEX", align: "center", width: 140, tooltip: true },
-        { title: 'D_HINGE_FLEX', key: "d_HINGE_FLEX", align: "center", width: 140, tooltip: true },
-        { title: 'T_HINGE_FLEX', key: "t_HINGE_FLEX", align: "center", width: 140, tooltip: true },
-        { title: 'SIP', key: "sip", align: "center", width: 140, tooltip: true },
+        { title: 'UnitID', key: "unitID", align: "center", minWidth: 140, tooltip: true, fixed: 'left' },
+        { title: 'WorkOrder', key: "workOrder", align: "center", minWidth: 140, tooltip: true },
+        { title: 'S_FLEX', key: "s_FLEX", align: "center", minWidth: 140, tooltip: true },
+        { title: 'D_HINGE_FLEX', key: "d_HINGE_FLEX", align: "center", minWidth: 140, tooltip: true },
+        { title: 'T_HINGE_FLEX', key: "t_HINGE_FLEX", align: "center", minWidth: 140, tooltip: true },
+        { title: 'SIP', key: "sip", align: "center", minWidth: 140, tooltip: true },
       ], // 表格数据
     };
   },
   activated () {
+    this.tableConfig.loading = false;
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
