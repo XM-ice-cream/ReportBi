@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { getOp20Req, getOp25Req, getOp30Req, exportOp20Req, exportOp25Req, exportOp30Req } from "@/api/bill-manage/serinop-report";
+import { getOp15Req, getOp20Req, getOp25Req, getOp30Req, exportOp15Req, exportOp20Req, exportOp25Req, exportOp30Req } from "@/api/bill-manage/serinop-report";
 import { renderDate, formatDate, getButtonBoolean, exportFile, commaSplitString } from "@/libs/tools";
 
 export default {
@@ -61,6 +61,40 @@ export default {
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [],
+      OP15columns: [
+        {
+          type: "index", fixed: "left", width: 50, align: "center",
+          indexMethod: (row) => {
+            return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
+          },
+        },
+        { title: 'BarCode', key: "barCode", align: "center", minWidth: 100 },
+        { title: 'StartTime', key: "StartTime", align: "center", render: renderDate, minWidth: 150 },
+        { title: 'StationType', key: "station_Type", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Areap', key: "area_p", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Area', key: "area", align: "center", minWidth: 100 },
+        { title: 'HeightP', key: "height_P", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Height', key: "height", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'VolumeP', key: "volume_P", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Volume', key: "volume", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Xoffset', key: "xoffset", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Yoffset', key: "yoffset", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'PadSizeX', key: "padsizE_X", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'PadSizeY', key: "padsizE_Y", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Result', key: "result", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'PinNUM', key: "piN_NUM", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'DateYMD', key: "datE_YMD", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'TimeHMS', key: "timE_HMS", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Board', key: "board", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'HeightStandard', key: "heighT_STANDARD", align: "center", tooltip: true, minWidth: 120 },
+        { title: 'AreaStandard', key: "areA_STANDARD", align: "center", tooltip: true, minWidth: 120 },
+        { title: 'VolumeStandard', key: "volumE_STANDARD", align: "center", tooltip: true, minWidth: 120 },
+        { title: 'ModelName', key: "modeL_NAME", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Lotno', key: "lotno", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'StationId', key: "stationid", align: "center", tooltip: true, minWidth: 100 },
+        { title: 'Status', key: "status", align: "center", tooltip: true, minWidth: 100 },
+
+      ], // 表格数据
       OP20columns: [
         {
           type: "index", fixed: "left", width: 50, align: "center",
@@ -141,7 +175,7 @@ export default {
       ], // 表格数据
       data: [], // 表格数据
       btnData: [],
-      stationTypeList: ['OP20', 'OP25', 'OP30'], // 线体数据
+      stationTypeList: ['OP15', 'OP20', 'OP25', 'OP30'], // 线体数据
       ruleValiadate: {
         stationType: [
           {
@@ -198,7 +232,7 @@ export default {
             },
           };
           const getpagelistReq = this.getRequest('get' + stationType);
-          this.columns = stationType === 'OP20' ? this.OP20columns : (stationType === 'OP25' ? this.OP25columns : this.OP30columns)
+          this.columns = stationType === 'OP20' ? this.OP20columns : (stationType === 'OP25' ? this.OP25columns : (stationType === 'OP30' ? this.OP30columns : this.OP15columns))
           console.log(getpagelistReq);
           getpagelistReq(obj).then((res) => {
             this.tableConfig.loading = false;
@@ -232,9 +266,11 @@ export default {
     },
     getRequest (key) {
       const obj = {
+        getOP15: getOp15Req,
         getOP20: getOp20Req,
         getOP25: getOp25Req,
         getOP30: getOp30Req,
+        exportOP15: exportOp15Req,
         exportOP20: exportOp20Req,
         exportOP25: exportOp25Req,
         exportOP30: exportOp30Req,
