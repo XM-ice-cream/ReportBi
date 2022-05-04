@@ -1,7 +1,7 @@
 <template>
   <div>
     <Modal :title="dialogFormVisibleTitle" :mask-closable="false" :closable="true" v-model="visib" fullscreen :before-close="closeDialog">
-      <Form ref="form" :model="formData" :rules="ruleValidate" :label-width="130">
+      <Form ref="form" :model="formData" :rules="ruleValidate" :label-width="130" style="height:100%">
         <Row :gutter="10">
           <Col :xs="24" :sm="20" :md="8" :lg="8" :xl="8">
           <FormItem label="数据源" prop="sourceCode">
@@ -61,7 +61,7 @@
               <TabPane label="查询参数" name="first">
                 <Button type="primary" v-if="tableData.length == 0" size="small" @click="addRow()">添加
                 </Button>
-                <Table :data="tableData" border :columns="columns" :max-height="250" style="width: 100%">
+                <Table :data="tableData" border :columns="columns" :max-height="350" style="width: 100%">
                   <template slot-scope="{index}" slot="paramName">
                     <Input v-model.trim="tableData[index].paramName" clearable />
                   </template>
@@ -90,7 +90,7 @@
                 </Table>
               </TabPane>
               <TabPane label="测试预览" name="third">
-                <div style="max-height: 400px; overflow: auto">
+                <div style=" overflow: auto">
                   <vue-json-editor v-model="cols" :show-btns="false" :mode="'code'" lang="zh" />
                 </div>
               </TabPane>
@@ -335,6 +335,7 @@ export default {
               dataSetParamDtoList: this.tableData,
               dataSetTransformDtoList: [],
               setType: this.setType,
+              setDesc: this.formData.setDesc
             };
             const { code, message } = await testTransformSet(params);
             if (code != 200) {

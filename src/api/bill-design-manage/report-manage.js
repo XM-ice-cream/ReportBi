@@ -6,7 +6,7 @@ import {
 export const getpagelistReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/getpagelist',
         method: 'post',
         data
@@ -16,7 +16,7 @@ export const getpagelistReq = data => {
 export const insertReportReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/insert',
         method: 'post',
         data
@@ -26,7 +26,7 @@ export const insertReportReq = data => {
 export const deleteReportReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/batchdelete',
         method: 'post',
         data
@@ -36,7 +36,7 @@ export const deleteReportReq = data => {
 export const modifyReportReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/modify',
         method: 'post',
         data
@@ -46,7 +46,7 @@ export const modifyReportReq = data => {
 export const insertExcelReportReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/insert',
         method: 'post',
         data
@@ -56,7 +56,7 @@ export const insertExcelReportReq = data => {
 export const modifyExcelReportReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/modify',
         method: 'post',
         data
@@ -66,7 +66,7 @@ export const modifyExcelReportReq = data => {
 export const getExcelByReportcodeReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/detailbyreportcode',
         method: 'get',
         params: data
@@ -76,7 +76,7 @@ export const getExcelByReportcodeReq = data => {
 export const getExcelPreviewReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/preview',
         method: 'post',
         data
@@ -86,7 +86,7 @@ export const getExcelPreviewReq = data => {
 export const uploadImageReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/v1/ftpfile/uploadimage',
         method: 'post',
         data,
@@ -96,7 +96,7 @@ export const uploadImageReq = data => {
 export const addScreenReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportdashboard/insert',
         method: 'post',
         data,
@@ -106,7 +106,7 @@ export const addScreenReq = data => {
 export const previewScreenReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportdashboard/preview',
         method: 'get',
         params: data,
@@ -116,7 +116,7 @@ export const previewScreenReq = data => {
 export const getDataReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportdashboard/getdata',
         method: 'post',
         data,
@@ -126,7 +126,7 @@ export const getDataReq = data => {
 export const getDictReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datadicts/getpagelist',
         method: 'post',
         data,
@@ -137,7 +137,7 @@ export const exportReq = data => {
     return requestCenter({
         timeout: 1000 * 60 * 5, //最长等待五分钟
         loading: true,
-        baseUrl: window.localStorage.getItem("reportDesignIp"),
+        baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/export',
         method: 'post',
         responseType: 'arraybuffer',
@@ -145,4 +145,4 @@ export const exportReq = data => {
     })
 }
 //大屏默认背景图片
-export const baseImgUrl = `${window.localStorage.getItem("reportDesignIp")}'/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_302730907880656896.png'`
+export const baseImgUrl = `"http://10.191.19.111:8700"||${window.localStorage.getItem("reportDesignIp")}'/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_302730907880656896.png'`

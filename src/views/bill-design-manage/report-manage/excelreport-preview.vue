@@ -13,9 +13,25 @@
                 <span class="title" :key="index">{{item.name}}</span>
                 <template v-for="(subitem,subindex) in item.children">
                   <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
-                    <Input type="text" v-model.trim="subitem.value" v-if="subitem.type==='String'" clearable />
-                    <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" v-else-if="subitem.type==='Array'" clearable />
-                    <DatePicker v-else v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+                    <!-- 字符串 -->
+                    <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable />
+                    <!-- 布尔 true/false/0/1-->
+                    <RadioGroup v-else-if="subitem.type==='Boolean'&&['true','false','0','1'].includes(subitem.value)" v-model="subitem.value">
+                      <template v-if="['true','false'].includes(subitem.value)">
+                        <Radio label="true">true</Radio>
+                        <Radio label="false">false</Radio>
+                      </template>
+                      <template v-if="['0','1'].includes(subitem.value)">
+                        <Radio label="0">0</Radio>
+                        <Radio label="1">1</Radio>
+                      </template>
+                    </RadioGroup>
+                    <!-- 数组 -->
+                    <Input v-else-if="subitem.type==='Array'" type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" clearable />
+                    <!-- 时间 -->
+                    <DatePicker v-else-if="subitem.type==='DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+                    <!-- 其余类型 -->
+                    <Input v-else v-model.trim="subitem.value" type="text" clearable />
                   </FormItem>
                 </template>
               </template>
@@ -147,6 +163,7 @@ export default {
         }
         extendArry.push({ name: i, children: children });
       }
+      console.log('extendArry', extendArry);
       return extendArry;
     },
     // Excel导出

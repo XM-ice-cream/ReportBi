@@ -308,4 +308,7 @@ export default {
   font-size: 12px;
   line-height: 0.5;
 }
+.ace-jsoneditor.ace_editor {
+  min-height: 21rem;
+}
 </style>
