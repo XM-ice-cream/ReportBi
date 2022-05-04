@@ -109,6 +109,7 @@ export default {
         { title: "BoxNo", key: "boxNo", align: "center", width: 160, tooltip: true },
         { title: "CartonNo", key: "cartonNo", align: "center", width: 160, tooltip: true },
         { title: "PalletNo", key: "palletNo", align: "center", tooltip: true },
+        { title: this.$t("shipAddress"), key: "shiptoName", align: "center", width: 150, tooltip: true },
         { title: this.$t("status"), key: "currentStatus", align: "center", width: 60, tooltip: true },
         { title: this.$t("OutProcessTime"), key: "outProcessTime", align: "center", width: 130, tooltip: true, render: renderDate },
         { title: this.$t("createUser"), key: "createUserId", align: "center", width: 70, tooltip: true },
