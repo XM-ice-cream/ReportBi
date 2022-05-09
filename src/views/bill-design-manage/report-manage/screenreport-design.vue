@@ -68,16 +68,35 @@
               <dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="val => widgetValueChanged('setup', val)" />
             </TabPane>
             <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据" :index='2'>
-              <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" />
+              <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" @getSetParamsList="getSetParamsList" />
+
+              <!-- <data-design ref="dataDesign" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" /> -->
             </TabPane>
             <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标" :index='3'>
               <dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="val => widgetValueChanged('position', val)" />
             </TabPane>
           </Tabs>
+
         </Sider>
       </Layout>
     </div>
     <content-menu :visible.sync="visibleContentMenu" :style-obj="styleObj" @deletelayer="deletelayer" @copylayer="copylayer" @istopLayer="istopLayer" @setlowLayer="setlowLayer" @moveupLayer="moveupLayer" @movedownLayer="movedownLayer" />
+
+    <!-- 表字段 -->
+    <div class="field">
+      <div class="field-drag" v-if="isShowParamList">
+        <!-- ,put:false -->
+        <draggable v-model="setParamListC" :group="{name:'site',pull:'clone'}" style="height:99%">
+          <div class="field-item" v-for="(item) in setParamListC" :key="item" @end="evt => paramOnDragged(evt,item)">{{item}}</div>
+        </draggable>
+      </div>
+      <div class="dot" @click="isShowParamList=!isShowParamList">
+        <Icon type="md-arrow-dropleft" />
+      </div>
+      <!-- <draggable>
+        <div class="field-item" :key="index">{{item}}</div>
+      </draggable> -->
+    </div>
   </div>
 </template>
 <script>
@@ -100,9 +119,19 @@ export default {
         this.handlerLayerWidget(val);
       },
       deep: true
-    }
+    },
   },
   computed: {
+    /* 报错信息：
+      Computed property "setParamListC" was assigned to but it has no setter.
+      解决方案：是因为使用了v-model进行了数据修改，所以需要添加set方法
+    */
+    setParamListC: {
+      get () {
+        return [...new Set(this.setParamList)]
+      },
+      set () { }
+    },
     step () {
       return Number(100 / (this.bigscreenScaleInWorkbench * 100));
     },
@@ -210,10 +239,22 @@ export default {
       visibleContentMenu: false,
       rightClickIndex: -1,
       activeName: "first",
-      reportCode: ''
+      reportCode: '',
+      setParamList: [],//数据集字段
+      isShowParamList: false,//显示参数列
+
     };
   },
   methods: {
+    getSetParamsList (setParamList) {
+      console.log('setParamList', setParamList);
+      this.setParamList = setParamList;
+      this.isShowParamList = true;
+    },
+    //表字段拖拽到右侧行列里
+    paramOnDragged (evt, param) {
+      console.log(evt, param);
+    },
 
     // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
     widgetOnDragged (evt, widgetCode) {
@@ -995,6 +1036,55 @@ export default {
   /deep/.ivu-input-group-append {
     background-color: transparent;
     border: none;
+  }
+}
+// 字段
+.field {
+  position: absolute;
+  right: 300px;
+  top: 47px;
+  height: calc(100% - 47px);
+  width: 15rem;
+  z-index: 999;
+  overflow: hidden;
+  .field-drag {
+    height: 99%;
+    background: #000d18b8;
+    overflow-y: auto;
+    overflow-x: hidden;
+    span {
+      display: block;
+      height: 100%;
+    }
+  }
+  .field-item {
+    width: 90%;
+    padding: 0.4rem;
+    margin: 0.3rem 0.5rem;
+    /* font-size: 0.84rem; */
+    background: #51afff;
+    border-radius: 10px;
+    color: #fff;
+    text-align: center;
+  }
+  .dot {
+    position: absolute;
+    width: 2rem;
+    height: 3rem;
+    top: 40%;
+    background: #2088e129;
+    right: 0;
+    border-radius: 10px 0 0 10px;
+    color: #05f9d7;
+    font-size: 2.8rem;
+    text-align: center;
+    border: 2px solid #05f9d7;
+    border-right: none;
+    line-height: 2.3rem;
+  }
+  .dot:hover {
+    background: #48b9f18f;
+    cursor: pointer;
   }
 }
 

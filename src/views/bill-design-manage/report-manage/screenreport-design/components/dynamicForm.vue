@@ -40,7 +40,7 @@
               </span>
             </Modal>
           </FormItem>
-          <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @change="changed($event, item.name)" />
+          <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @change="changed($event, item.name)" @getSetParamsList="getSetParamsList" />
           <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @change="changed($event, item.name)" />
         </div>
         <div v-else-if="isShowForm(item, '[object Array]')" :key="'a-' + index" class="screenCollapse">
@@ -80,6 +80,7 @@
         </div>
       </template>
     </Form>
+
   </div>
 </template>
 
@@ -168,6 +169,10 @@ export default {
       this.$emit("onChanged", this.formData);
       this.dialogVisibleStaticData = false;
     },
+    //获取字段
+    getSetParamsList (setParamList) {
+      this.$emit("getSetParamsList", setParamList);
+    },
     // 静态数据
     addStaticData () {
       this.dialogVisibleStaticData = true;
@@ -228,6 +233,7 @@ export default {
   border-radius: 3px;
   border: none !important;
 }
+
 /deep/.screenCollapse {
   .ivu-collapse-content {
     color: #ffffff;

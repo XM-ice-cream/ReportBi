@@ -1944,6 +1944,7 @@ export default {
     'serinop-report': 'SerinOp报表',
     'packagewight-report': '包装报表',
     'quality-yield-lake-report': 'K01&K10 Yield Report',
+    'PreBack': 'PreBack报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

@@ -12,8 +12,53 @@
         <DatePicker v-else v-model="item.sampleItem" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable size="small"></DatePicker>
         <!-- <Input v-model.trim="item.sampleItem" size="small" /> -->
       </FormItem>
-      <FormItem v-for="item in setParamList" :key="item" :label="item">
-        <Dictionary v-model="params[item]" :dict-key="getDictKey()" @input="selectParams($event, item)" />
+      <FormItem label="行">
+        <div class="row">
+          <draggable group="site" v-model="rowParamList" class="site-flex" chosenClass="item">
+            <Dropdown v-for="(item,index) in rowParamList" :key="`${item}${index}`" transfer trigger="click" @on-click="name=>dropDownClick(name,index,'row')">
+              <div class="item">
+                <Icon type="ios-arrow-down"></Icon>
+                {{item}}
+              </div>
+              <DropdownMenu slot="list">
+                <Dropdown placement="left-start" transfer>
+                  <DropdownItem>
+                    <Icon type="ios-arrow-forward"></Icon>
+                    度量
+                  </DropdownItem>
+                  <DropdownMenu slot="list">
+                    <DropdownItem :name="`${item}`">原值</DropdownItem>
+                    <DropdownItem :name="`Count(${item})`">计数</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </DropdownMenu>
+            </Dropdown>
+          </draggable>
+        </div>
+      </FormItem>
+      <FormItem label="列">
+        <div class="columns">
+          <draggable group="site" v-model="columnsParamList" class="site-flex" chosenClass="item">
+            <Dropdown v-for="(item,index) in columnsParamList" :key="`${item}${index}`" transfer trigger="click" @on-click="name=>dropDownClick(name,index,'column')">
+              <div class="item">
+                {{item}}
+                <Icon type="ios-arrow-down"></Icon>
+              </div>
+              <DropdownMenu slot="list">
+                <Dropdown placement="left-start" transfer>
+                  <DropdownItem>
+                    度量
+                    <Icon type="ios-arrow-forward"></Icon>
+                  </DropdownItem>
+                  <DropdownMenu slot="list">
+                    <DropdownItem :name="`${item}`">原值</DropdownItem>
+                    <DropdownItem :name="`Count(${item})`">计数</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </DropdownMenu>
+            </Dropdown>
+          </draggable>
+        </div>
       </FormItem>
       <Button style="width: 100%" type="primary" plain size="small" @click="saveDataBtn">刷新</Button>
     </Form>
@@ -24,11 +69,12 @@
 import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 // import { getDataReq } from '@/api/bill-design-manage/report-manage.js'
 import Dictionary from "@/components/dictionary/index";
-
+import draggable from "vuedraggable";
 export default {
   name: "DynamicComponents",
   components: {
-    Dictionary
+    Dictionary,
+    draggable
   },
   model: {
     prop: "formData",
@@ -46,7 +92,9 @@ export default {
       userNameList: [], // 用户
       setParamList: [], // 对应的不同的图形数据参数
       params: {},
-      chartProperties: {}
+      chartProperties: {},
+      rowParamList: [],//行
+      columnsParamList: [],//列
     };
   },
   watch: {
@@ -73,6 +121,12 @@ export default {
     this.echoDataSet(this.formData);
   },
   methods: {
+    //参数下拉
+    dropDownClick (name, index, type) {
+      if (type === "row") this.rowParamList[index] = name;
+      if (type === "column") this.columnsParamList[index] = name;
+      this.$forceUpdate();
+    },
     //获取全部数据集
     async loadDataSet () {
       let obj = {
@@ -91,6 +145,7 @@ export default {
       const { code, result } = await getDeatilByIdReq({ setCode: this.dataSetValue });
       this.userNameList = result.dataSetParamDtoList;
       this.setParamList = result.setParamList;
+      this.$emit("getSetParamsList", this.setParamList);
       if (code != 200) return;
     },
     async saveDataBtn () {
@@ -142,3 +197,35 @@ export default {
   }
 };
 </script>
+<style lang="less" scoped>
+.row,
+.columns {
+  width: 100%;
+  height: 100px;
+  max-height: 15rem;
+  border: 1px solid #036595;
+  min-height: 10rem;
+  border-radius: 10px;
+  overflow-y: auto;
+  .site-flex {
+    height: 100%;
+  }
+  span {
+    display: flex;
+    max-height: 5rem;
+    min-height: 3rem;
+    flex-wrap: wrap;
+  }
+  /deep/.ivu-dropdown {
+    margin: 0.3rem 0.3rem;
+    padding: 0px 0.6rem;
+    background: #51afff;
+    border-radius: 10px;
+    color: #fff;
+    text-align: center;
+    height: 1.6rem;
+    width: auto;
+    flex-basis: auto;
+  }
+}
+</style>
