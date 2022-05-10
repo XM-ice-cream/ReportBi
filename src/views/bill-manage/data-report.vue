@@ -278,7 +278,7 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: "不良时间", key: "repassDefectCreateDate", width: 125, render: renderDate },
+        { title: "不良时间", key: "defectDate", width: 125, render: renderDate },
         { title: "维修时间", key: "createDate", width: 125, render: renderDate },
         { title: "班别", key: "shiftDay", align: "center", width: 60 },
         { title: this.$t("model"), key: "model", align: "center", width: 140 },
