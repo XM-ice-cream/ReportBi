@@ -7,7 +7,7 @@ import {
 export const getpagelistReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: "http://10.191.19.55:5700" || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/anonymous/v1/preback/getpreback',
         method: 'post',
         data
@@ -18,7 +18,7 @@ export const getpagelistReq = data => {
 export const exportReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl: "http://10.191.19.55:5700" || window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         loading: true,
         url: '/api/reportcenter/anonymous/v1/preback/export',
         method: 'post',
