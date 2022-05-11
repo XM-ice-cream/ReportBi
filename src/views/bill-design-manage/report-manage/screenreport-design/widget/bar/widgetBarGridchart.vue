@@ -1,3 +1,4 @@
+/**多行 至少有一个计算属性 */
 <template>
   <div :style="styleObj">
     <v-chart :options="options" autoresize />
@@ -6,7 +7,7 @@
 
 <script>
 export default {
-  name: "WidgetBarlinechart",
+  name: "widgetBarGridchart",
   components: {},
   props: {
     value: Object,
@@ -17,13 +18,16 @@ export default {
     return {
       options: {
         color: [],
-        grid: {
-          bottom: 50,
-          containLabel: true,
-          left: 10,
-          right: 40,
-          top: 50,
-        },
+        grid: [{
+          left: '20%',
+          right: 50,
+          height: '35%'
+        }, {
+          left: '20%',
+          right: 50,
+          top: '55%',
+          height: '35%'
+        }],
         title: {
           text: "",
           textStyle: {
@@ -51,7 +55,8 @@ export default {
         xAxis: [
           {
             type: "category",
-            data: [],
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            gridIndex: 0,
             axisLabel: {
               show: false,
               textStyle: {
@@ -61,7 +66,8 @@ export default {
 
           }, {
             type: "category",
-            data: [],
+            gridIndex: 1,
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             axisLabel: {
               show: false,
               textStyle: {
@@ -74,48 +80,48 @@ export default {
         yAxis: [
           {
             type: "value",
-            name: "",
-            min: 0,
-            max: 250,
-            interval: 50,
+            name: "0",
             axisLabel: {
               show: true,
               textStyle: {
                 color: "#fff"
               }
-            }
+            },
+            gridIndex: 0,
           },
           {
             type: "value",
-            name: "",
-            min: 0,
-            max: 25,
-            interval: 5,
+            name: "1",
             axisLabel: {
               show: true,
               textStyle: {
                 color: "#fff"
               }
-            }
+            },
+            gridIndex: 1,
           }
         ],
         series: [
           {
-            name: "",
+            name: "SERIES0",
             type: "bar",
             yAxisIndex: 0,
-            data: [],
+            gridIndex: 0,
+            data: [120, 200, 150, 80, 70, 110, 130],
             itemStyle: {
               barBorderRadius: null
             }
           },
           {
-            name: "",
-            type: "line",
+            name: "SERIES1",
+            type: "bar",
             yAxisIndex: 1,
-            data: [],
-            itemStyle: {}
-          }
+            gridIndex: 1,
+            data: [120, 200, 150, 80, 70, 110, 130],
+            itemStyle: {
+              barBorderRadius: null
+            }
+          },
         ]
       },
       optionsStyle: {}, // 样式
@@ -143,7 +149,7 @@ export default {
         this.optionsData = val.data;
         this.optionsCollapse = val.collapse;
         this.optionsSetup = val.setup;
-        this.editorOptions();
+        // this.editorOptions();
       },
       deep: true
     },
@@ -158,7 +164,7 @@ export default {
     this.optionsData = this.value.data;
     this.optionsCollapse = this.value.collapse;
     this.optionsSetup = this.value.setup;
-    this.editorOptions();
+    // this.editorOptions();
   },
   methods: {
     // 修改图标options属性

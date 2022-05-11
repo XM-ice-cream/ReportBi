@@ -33,7 +33,7 @@ import widgetLineCompareChart from "./line/widgetLineCompareChart";
 import widgetDecoratePieChart from "./decorate/widgetDecoratePieChart";
 import widgetMoreBarLineChart from "./bar/widgetMoreBarLineChart";
 import widgetWordCloud from "./wordcloud/widgetWordCloud";
-
+import widgetBarGridchart from "./bar/widgetBarGridchart"; // 多行 一列 多Grid
 export default {
   name: "Widget",
   components: {
@@ -63,7 +63,8 @@ export default {
     widgetLineCompareChart,
     widgetDecoratePieChart,
     widgetMoreBarLineChart,
-    widgetWordCloud
+    widgetWordCloud,
+    widgetBarGridchart
   },
   model: {
     prop: "value",

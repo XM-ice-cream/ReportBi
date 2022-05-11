@@ -302,7 +302,7 @@ export default {
       const layerWidgetArr = [];
       for (let i = 0; i < val.length; i++) {
         const obj = {};
-        obj.icon = getToolByCode(val[i].type).icon;
+        // obj.icon = getToolByCode(val[i].type).icon;
         const options = val[i].options["setup"];
         options.forEach((el) => {
           if (el.name == "layerName") {
@@ -454,6 +454,9 @@ export default {
 
     // 对组件默认值处理
     handleDefaultValue (widgetJson) {
+
+      widgetJson.type = "widget-bar-gridchart";
+      console.log(widgetJson);
       for (const key in widgetJson) {
         if (key == "options") {
           // collapse、data、position、setup
@@ -989,18 +992,23 @@ export default {
     color: #17cbdd;
   }
   /deep/ .ivu-select-item {
-    color: #cee8eb;
+    color: #fff;
   }
   /deep/ .ivu-select-item-selected:hover {
-    color: #17cbdd;
+    color: #fff;
+    background: #51afff;
   }
   /deep/ .ivu-select-item:hover {
-    color: #17cbdd;
+    color: #fff;
+    background: #51afff;
+  }
+  /deep/.ivu-select-item-focus {
+    background: #51afff;
   }
   /deep/.ivu-select-small.ivu-select-single .ivu-select-selection {
     border: 1px solid #036595;
     border-radius: 10px !important;
-    color: #17cbdd;
+    color: #fff;
     background-color: #072a4f;
   }
   /deep/.ivu-modal .ivu-select-dropdown {
@@ -1066,6 +1074,7 @@ export default {
     border-radius: 10px;
     color: #fff;
     text-align: center;
+    cursor: pointer;
   }
   .dot {
     position: absolute;

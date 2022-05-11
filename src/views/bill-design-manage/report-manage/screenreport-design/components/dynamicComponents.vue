@@ -23,12 +23,12 @@
               <DropdownMenu slot="list">
                 <Dropdown placement="left-start" transfer>
                   <DropdownItem>
-                    <Icon type="ios-arrow-forward"></Icon>
+                    <Icon type="ios-arrow-back" />
                     度量
                   </DropdownItem>
                   <DropdownMenu slot="list">
-                    <DropdownItem :name="`${item}`">原值</DropdownItem>
-                    <DropdownItem :name="`Count(${item})`">计数</DropdownItem>
+                    <DropdownItem name="">原值</DropdownItem>
+                    <DropdownItem name="Count">计数</DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               </DropdownMenu>
@@ -41,18 +41,18 @@
           <draggable group="site" v-model="columnsParamList" class="site-flex" chosenClass="item">
             <Dropdown v-for="(item,index) in columnsParamList" :key="`${item}${index}`" transfer trigger="click" @on-click="name=>dropDownClick(name,index,'column')">
               <div class="item">
-                {{item}}
                 <Icon type="ios-arrow-down"></Icon>
+                {{item}}
               </div>
               <DropdownMenu slot="list">
                 <Dropdown placement="left-start" transfer>
                   <DropdownItem>
+                    <Icon type="ios-arrow-back" />
                     度量
-                    <Icon type="ios-arrow-forward"></Icon>
                   </DropdownItem>
                   <DropdownMenu slot="list">
-                    <DropdownItem :name="`${item}`">原值</DropdownItem>
-                    <DropdownItem :name="`Count(${item})`">计数</DropdownItem>
+                    <DropdownItem name="">原值</DropdownItem>
+                    <DropdownItem name="Count">计数</DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               </DropdownMenu>
@@ -123,10 +123,25 @@ export default {
   methods: {
     //参数下拉
     dropDownClick (name, index, type) {
-      if (type === "row") this.rowParamList[index] = name;
-      if (type === "column") this.columnsParamList[index] = name;
+      if (type === "row") this.rowParamList[index] = this.removeReg(this.rowParamList[index], name);
+      if (type === "column") this.columnsParamList[index] = this.removeReg(this.columnsParamList[index], name);
       this.$forceUpdate();
     },
+    //
+    removeReg (params, name) {
+      let result = "";
+      let data = params;
+      let reg = /\((.+?)\)/gi;//取括号内部文字
+      if (data.match(reg)) {
+        data = data.match(reg)[0].replace(/^\(/, "").replace(/\)/, "");
+      }
+      if (name) {
+        result = `${name}(${data})`
+      }
+      else result = data;
+      return result;
+    },
+
     //获取全部数据集
     async loadDataSet () {
       let obj = {
@@ -209,6 +224,7 @@ export default {
   overflow-y: auto;
   .site-flex {
     height: 100%;
+    cursor: pointer;
   }
   span {
     display: flex;
@@ -227,5 +243,16 @@ export default {
     width: auto;
     flex-basis: auto;
   }
+}
+/deep/.ivu-dropdown {
+  display: inline-block;
+  width: 100%;
+}
+/deep/.ivu-dropdown-item:hover {
+  background: #51afff;
+  color: #fff;
+}
+/deep/.ivu-dropdown-item {
+  color: #14adc2;
 }
 </style>

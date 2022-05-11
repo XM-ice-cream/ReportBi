@@ -51,7 +51,11 @@
                     </FormItem>
                     <!-- 线体名称 -->
                     <FormItem :label="$t('lineName')" prop="lineName">
-                      <Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + $t('lineName')+ $t('multiple,separated')" />
+                      <Select v-model="req.lineName" clearable transfer filterable label-in-value multiple @on-select="lineSelect" :placeholder="`${$t('pleaseSelect')}${$t('line')}`" :max-tag-count="1">
+                        <Option v-for="(item, i) in lineList" :value="item.name" :key="i">{{
+                          item.name
+                        }}</Option>
+                      </Select>
                     </FormItem>
                     <!-- 机种名称 -->
                     <FormItem :label="$t('modelName')" prop="modelName">
@@ -77,15 +81,6 @@
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
           <template slot-scope="{ row }" slot="image">
             <Button style="height:16px" v-if="row.pictures" type="primary" size="small" @click="previewImage(row.pictures)">{{ $t("preview") }}</Button>
-            <!-- <Button
-              style="height:16px;margin-left:5px"
-              v-if="row.pictures"
-              type="primary"
-              size="small"
-              @click="downloadImage(row.pictures)"
-              >{{ $t("download") }}
-            </Button
-            > -->
           </template>
         </Table>
         <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
@@ -101,6 +96,7 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/scrap-report";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
+import { getAreaFloorLineListReq } from "@/api/basis-info/area-floor";
 import { formatDate, getButtonBoolean, exportFile, commaSplitString } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { Spin } from "view-design";
@@ -158,12 +154,14 @@ export default {
         { title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true },
         // { title: this.$t("image"), slot: "image", align: "center", width: 80 },
       ], // 表格数据
+      lineList: [],//线体集合
     };
   },
   activated () {
     this.getDataItemData();
     this.pageLoad();
     this.autoSize();
+    this.getLineList();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
   },
@@ -219,6 +217,19 @@ export default {
       });
       return arr;
     },
+    // 获取线体数据
+    async getLineList () {
+      const obj = {
+        category: 4,
+        systemFlag: this.$store.state.systemFlag,
+        enabled: 1,
+      };
+      await getAreaFloorLineListReq(obj).then(async (res) => {
+        if (res.code === 200) {
+          this.lineList = res.result || [];
+        }
+      });
+    },
     // 点击搜索按钮触发
     searchClick () {
       this.req.pageIndex = 1;
@@ -239,7 +250,7 @@ export default {
           startTime: formatDate(startTime), endTime: formatDate(endTime), workOrder,
           unitId: commaSplitString(unitId).join(),
           panelNo: commaSplitString(panelNo).join(),
-          lineName: commaSplitString(lineName).join(),
+          lineName: lineName.toString(),
           modelName: commaSplitString(modelName).join(), remark
         },
       };
