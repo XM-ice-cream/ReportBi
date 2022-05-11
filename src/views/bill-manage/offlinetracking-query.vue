@@ -266,7 +266,7 @@ export default {
       } = this.req;
       let obj = {
         workOrder, // 工单
-        lineName, // 线体名称
+        lineName: lineName.toString(), // 线体名称
         panelNo,
         sn,
         eqpId,
