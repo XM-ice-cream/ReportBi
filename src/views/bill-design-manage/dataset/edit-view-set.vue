@@ -329,7 +329,7 @@ export default {
         this.cols = [];
         this.$refs.form.validate(async (valid) => {
           if (valid) {
-            const params = {
+            let params = {
               sourceCode: this.formData.sourceCode,
               dynSentence: this.formData.dynSentence,
               dataSetParamDtoList: this.tableData,
@@ -337,6 +337,12 @@ export default {
               setType: this.setType,
               setDesc: this.formData.setDesc
             };
+            params.dataSetParamDtoList = params.dataSetParamDtoList.map(item => {
+              if (item.paramType == 'DateTime') {
+                item.sampleItem = formatDate(item.sampleItem)
+              }
+              return { ...item }
+            });
             const { code, message } = await testTransformSet(params);
             if (code != 200) {
               this.$Message.error(message);
