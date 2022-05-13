@@ -51,7 +51,7 @@
                     </FormItem>
                     <!-- 线体名称 -->
                     <FormItem :label="$t('lineName')" prop="lineName">
-                      <Select v-model="req.lineName" clearable transfer filterable label-in-value multiple @on-select="lineSelect" :placeholder="`${$t('pleaseSelect')}${$t('line')}`" :max-tag-count="1">
+                      <Select v-model="req.lineName" clearable transfer filterable label-in-value multiple :placeholder="`${$t('pleaseSelect')}${$t('line')}`" :max-tag-count="1">
                         <Option v-for="(item, i) in lineList" :value="item.name" :key="i">{{
                           item.name
                         }}</Option>
@@ -239,7 +239,7 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      let { startTime, endTime, workOrder, unitId, panelNo, lineName, modelName, remark } = this.req;
+      let { startTime, endTime, workOrder, unitId, panelNo, lineName, modelName, remark, previewServerIP } = this.req;
       this.tableConfig.loading = true;
       let obj = {
         orderField: 'INPROCESSTIME', // 排序字段
@@ -251,7 +251,8 @@ export default {
           unitId: commaSplitString(unitId).join(),
           panelNo: commaSplitString(panelNo).join(),
           lineName: lineName.toString(),
-          modelName: commaSplitString(modelName).join(), remark
+          modelName: commaSplitString(modelName).join(), remark,
+          previewServerIP
         },
       };
       getpagelistReq(obj)
@@ -268,7 +269,14 @@ export default {
     // 导出
     exportClick () {
       let { startTime, endTime, workOrder, unitId, panelNo, lineName, modelName, remark, previewServerIP } = this.req;
-      exportReq({ startTime: formatDate(startTime), endTime: formatDate(endTime), workOrder, unitId, panelNo, lineName, modelName, remark, previewServerIP }).then(
+      exportReq({
+        startTime: formatDate(startTime), endTime: formatDate(endTime), workOrder,
+        unitId: commaSplitString(unitId).join(),
+        panelNo: commaSplitString(panelNo).join(),
+        lineName: lineName.toString(),
+        modelName: commaSplitString(modelName).join(), remark,
+        previewServerIP,
+      }).then(
         (res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
           const fileName = `${this.$t("scrap-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名

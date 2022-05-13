@@ -48,7 +48,7 @@ let queryform = {
                     result
                 } = await getDataReq(params);
                 if (code != 200) return;
-                result = JSON.parse(result);
+                // result = JSON.parse(result);
                 const analysisData = this.analysisChartsData(params, result);
                 resolve(analysisData)
             })
@@ -66,7 +66,7 @@ let queryform = {
                 chartType == "widget-linechart" ||
                 chartType == "widget-barlinechart"
             ) {
-                return this.barOrLineChartFn(params.chartProperties, data);
+                return this.barOrLineChartFn(data.chartProperties, data.data);
             } else if (
                 chartType == "widget-piechart" ||
                 chartType == "widget-funnel"
@@ -82,31 +82,61 @@ let queryform = {
         },
         // 柱状图、折线图、柱线图
         barOrLineChartFn(chartProperties, data) {
+            // console.log('data', data, chartProperties);
             const ananysicData = {};
-            const xAxisList = [];
+            const xAxisList = []; //x轴
             const series = [];
-            for (const key in chartProperties) {
-                const obj = {};
-                const seriesData = [];
-                const value = chartProperties[key];
-                obj["type"] = value;
-                obj["name"] = key;
-                for (let i = 0; i < data.length; i++) {
-                    if (value.startsWith("xAxis")) {
-                        // 代表为x轴
-                        xAxisList[i] = data[i][key];
-                    } else {
-                        // 其他的均为series展示数据
-                        seriesData[i] = data[i][key];
-                    }
-                }
-                obj["data"] = seriesData;
-                if (!obj["type"].startsWith("xAxis")) {
-                    series.push(obj);
-                }
-            }
+            let legend = [];
+            let obj = {}; //临时存储series
+            Object.keys(chartProperties).forEach((key) => {
+                chartProperties[key].forEach((iitem, iIndex) => {
+                    if (key === "columns") {
+                        legend = chartProperties[key];
+                        obj = {};
+                        obj.name = chartProperties[key][iIndex]
+                        obj.type = "bar";
+                    };
+                    data.forEach((item, index) => {
+                        // console.log(key, iitem, item[iitem]);
+                        //行
+                        if (key === "rows") {
+                            if (!xAxisList[iIndex]) xAxisList[iIndex] = [];
+                            xAxisList[iIndex][index] = item[iitem];
+                            //   console.log(123, item[iitem], iIndex, index, xAxisList[iIndex][index]);
+                        } else {
+                            //列
+                            if (!obj["data"]) obj["data"] = []
+                            obj["data"][index] = item[iitem];
+                        }
+                    })
+                    if (!(JSON.stringify(obj) === '{}')) series.push(obj)
+                })
+
+            })
+            // for (const key in chartProperties) {
+            //     const obj = {};
+            //     const seriesData = [];
+            //     const value = chartProperties[key];
+            //     obj["type"] = value;
+            //     obj["name"] = key;
+            //     for (let i = 0; i < data.length; i++) {
+            //         if (value.startsWith("xAxis")) {
+            //             // 代表为x轴
+            //             xAxisList[i] = data[i][key];
+            //         } else {
+            //             // 其他的均为series展示数据
+            //             seriesData[i] = data[i][key];
+            //         }
+            //     }
+            //     obj["data"] = seriesData;
+            //     if (!obj["type"].startsWith("xAxis")) {
+            //         series.push(obj);
+            //     }
+            // }
             ananysicData["xAxis"] = xAxisList;
             ananysicData["series"] = series;
+            ananysicData["legend"] = legend;
+            //  console.log(series, xAxisList, legend);
             return ananysicData;
         },
         //堆叠图

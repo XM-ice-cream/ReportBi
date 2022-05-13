@@ -19,7 +19,7 @@ export const widgetBarchart = {
                 name: 'verticalShow',
                 required: false,
                 placeholder: '',
-                value: false,
+                value: true,
             },
             {
                 type: 'vue-color',
@@ -28,6 +28,13 @@ export const widgetBarchart = {
                 required: false,
                 placeholder: '',
                 value: ''
+            }, {
+                type: 'Slider',
+                label: '滚动条显示百分比',
+                name: 'dataZoomEnd',
+                require: false,
+                placeholder: '',
+                value: 50,
             },
             [{
                     name: '柱体设置',
@@ -385,6 +392,13 @@ export const widgetBarchart = {
                             placeholder: '',
                             value: '#fff',
 
+                        }, {
+                            type: 'InputNumber',
+                            label: '多轴间距',
+                            name: 'spaceX',
+                            required: false,
+                            placeholder: '',
+                            value: 20,
                         }
                     ],
                 },
@@ -492,7 +506,14 @@ export const widgetBarchart = {
                             placeholder: '',
                             value: '#fff',
 
-                        }
+                        }, {
+                            type: 'InputNumber',
+                            label: '多轴间距',
+                            name: 'spaceY',
+                            required: false,
+                            placeholder: '',
+                            value: 100,
+                        },
                     ],
                 },
                 {

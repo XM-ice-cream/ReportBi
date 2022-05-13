@@ -1,6 +1,6 @@
 <template>
   <div :style="styleObj">
-    <v-chart :options="options" autoresize />
+    <v-chart :options="options" autoresize v-if="isShow" />
   </div>
 </template>
 
@@ -22,6 +22,13 @@ export default {
             color: "#fff"
           }
         },
+        dataZoom: [
+          {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'none'
+          }
+        ],
         xAxis: {
           type: "category",
           data: [],
@@ -46,9 +53,13 @@ export default {
           {
             data: [],
             type: "bar",
-            barGap: "0%",
+            barGap: "30%",
             itemStyle: {
               borderRadius: null
+            },
+            label: {
+              show: true,
+              position: "top"
             }
           }
         ]
@@ -56,7 +67,8 @@ export default {
       optionsStyle: {}, // 样式
       optionsData: {}, // 数据
       optionsSetup: {},
-      flagInter: null
+      flagInter: null,
+      isShow: false,//是否显示图表
     };
   },
   computed: {
@@ -98,15 +110,17 @@ export default {
   methods: {
     // 修改图标options属性
     editorOptions () {
+      this.isShow = false;
+      this.setOptionsData();
       this.setOptionsTitle();
-      this.setOptionsX();
-      this.setOptionsY();
-      this.setOptionsTop();
       this.setOptionsTooltip();
       this.setOptionsMargin();
       this.setOptionsLegend();
       this.setOptionsColor();
-      this.setOptionsData();
+      this.$nextTick(() => {
+        this.isShow = true;
+      })
+
     },
     // 标题修改
     setOptionsTitle () {
@@ -130,87 +144,109 @@ export default {
       this.options.title = title;
     },
     // X轴设置
-    setOptionsX () {
+    setOptionsX (xAxis) {
       const optionsSetup = this.optionsSetup;
-      const xAxis = {
-        type: "category",
-        show: optionsSetup.hideX, // 坐标轴是否显示
-        name: optionsSetup.xName, // 坐标轴名称
-        nameTextStyle: {
-          color: optionsSetup.xNameColor,
-          fontSize: optionsSetup.xNameFontSize
-        },
-        nameRotate: optionsSetup.textAngle, // 文字角度
-        inverse: optionsSetup.reversalX, // 轴反转
-        axisLabel: {
-          show: true,
-          interval: optionsSetup.textInterval, // 文字角度
-          rotate: optionsSetup.textAngle, // 文字角度
-          textStyle: {
-            color: optionsSetup.Xcolor, // x轴 坐标文字颜色
-            fontSize: optionsSetup.fontSizeX
-          }
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: optionsSetup.lineColorX
-          }
-        },
-        splitLine: {
-          show: optionsSetup.isShowSplitLineX,
-          lineStyle: {
-            color: optionsSetup.splitLineColorX
-          }
-        }
-      };
-      this.options.xAxis = xAxis;
+      let xAxisData = [];
+      let offset = 0;
+      //  console.log(xAxis);
+
+      xAxis?.forEach(item => {
+        xAxisData.push({
+          type: "category",
+          show: optionsSetup.hideX, // 坐标轴是否显示
+          name: optionsSetup.xName, // 坐标轴名称
+          data: item,
+          nameTextStyle: {
+            color: optionsSetup.xNameColor,
+            fontSize: optionsSetup.xNameFontSize
+          },
+          nameRotate: optionsSetup.textAngle, // 文字角度
+          inverse: optionsSetup.reversalX, // 轴反转
+          axisLabel: {
+            show: true,
+            interval: optionsSetup.textInterval, // 文字角度
+            rotate: optionsSetup.textAngle, // 文字角度
+            textStyle: {
+              color: optionsSetup.Xcolor, // x轴 坐标文字颜色
+              fontSize: optionsSetup.fontSizeX
+            }
+          },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: optionsSetup.lineColorX
+            }
+          },
+          splitLine: {
+            show: optionsSetup.isShowSplitLineX,
+            lineStyle: {
+              color: optionsSetup.splitLineColorX
+            }
+          },
+          position: "bottom",
+          offset
+        })
+        offset = offset + optionsSetup.spaceX;
+      })
+      this.options.xAxis = xAxisData;
+      // console.log("this.options.xAxis", this.options.xAxis);
     },
     // Y轴设置
-    setOptionsY () {
+    setOptionsY (yAxis) {
       const optionsSetup = this.optionsSetup;
-      const yAxis = {
-        type: "value",
-        scale: optionsSetup.scale,
-        splitNumber: optionsSetup.splitNumber,// 均分
-        show: optionsSetup.isShowY, // 坐标轴是否显示
-        name: optionsSetup.textNameY, // 坐标轴名称
-        nameTextStyle: {
-          color: optionsSetup.nameColorY,
-          fontSize: optionsSetup.nameFontSizeY
-        },
-        inverse: optionsSetup.reversalY, // 轴反转
-        axisLabel: {
-          show: true,
-          rotate: optionsSetup.ytextAngle, // 文字角度
-          textStyle: {
-            color: optionsSetup.colorY, // x轴 坐标文字颜色
-            fontSize: optionsSetup.fontSizeY
+      let yAxisData = [];
+      let offset = 0;
+      yAxis.forEach(item => {
+        yAxisData.push(
+          {
+            type: "value",
+            scale: optionsSetup.scale,
+            splitNumber: optionsSetup.splitNumber,// 均分
+            show: optionsSetup.isShowY, // 坐标轴是否显示
+            name: optionsSetup.textNameY, // 坐标轴名称
+            data: item,
+            nameTextStyle: {
+              color: optionsSetup.nameColorY,
+              fontSize: optionsSetup.nameFontSizeY
+            },
+            inverse: optionsSetup.reversalY, // 轴反转
+            axisLabel: {
+              show: true,
+              rotate: optionsSetup.ytextAngle, // 文字角度
+              textStyle: {
+                color: optionsSetup.colorY, // x轴 坐标文字颜色
+                fontSize: optionsSetup.fontSizeY
+              }
+            },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: optionsSetup.lineColorY
+              }
+            },
+            splitLine: {
+              show: optionsSetup.isShowSplitLineY,
+              lineStyle: {
+                color: optionsSetup.splitLineColorY
+              }
+            },
+            position: "left",
+            offset,
           }
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: optionsSetup.lineColorY
-          }
-        },
-        splitLine: {
-          show: optionsSetup.isShowSplitLineY,
-          lineStyle: {
-            color: optionsSetup.splitLineColorY
-          }
-        }
-      };
+        )
+        offset = offset + optionsSetup.spaceY;;
+      })
 
-      this.options.yAxis = yAxis;
+      this.options.yAxis = yAxisData;
     },
     // 数值设定 or 柱体设置
     setOptionsTop () {
       const optionsSetup = this.optionsSetup;
       const series = this.options.series;
-      if (series[0].type == "bar") {
+      //  console.log(this.options.series);
+      series.forEach((item, index) => {
         if (optionsSetup.verticalShow) {
-          series[0].label = {
+          series[index].label = {
             show: optionsSetup.isShow,
             position: 'right',
             distance: optionsSetup.distance,
@@ -221,7 +257,7 @@ export default {
             }
           }
         } else {
-          series[0].label = {
+          series[index].label = {
             show: optionsSetup.isShow,
             position: "top",
             distance: optionsSetup.distance,
@@ -229,10 +265,12 @@ export default {
             color: optionsSetup.subTextColor,
             fontWeight: optionsSetup.fontWeight
           }
+
         }
-      }
-      series[0].barWidth = optionsSetup.maxWidth;
-      series[0].barMinHeight = optionsSetup.minHeight;
+        series[index].barWidth = optionsSetup.maxWidth;
+        series[index].barMinHeight = optionsSetup.minHeight;
+      })
+      //  console.log(this.options.series);
     },
     // tooltip 设置
     setOptionsTooltip () {
@@ -301,23 +339,24 @@ export default {
       const customColor = optionsSetup.customColor;
       if (!customColor) return;
       const arrColor = [];
-      for (let i = 0; i < customColor.length; i++) {
-        arrColor.push(customColor[i].color);
-      }
-      const itemStyle = {
-        normal: {
-          color: params => {
-            return arrColor[params.dataIndex];
-          },
-          barBorderRadius: optionsSetup.radius
-        }
-      };
-      for (const key in this.options.series) {
-        if (this.options.series[key].type == "bar") {
-          this.options.series[key].itemStyle = itemStyle;
-        }
-      }
-      this.options = Object.assign({}, this.options);
+      customColor.forEach((item) => {
+        arrColor.push(item.color);
+      })
+      //   const itemStyle = {
+      //     normal: {
+      //       color: params => {
+      //         return arrColor[params.dataIndex];
+      //       },
+      //       barBorderRadius: optionsSetup.radius
+      //     }
+      //   };
+      //   for (const key in this.options.series) {
+      //     if (this.options.series[key].type == "bar") {
+      //       this.options.series[key].itemStyle = itemStyle;
+      //     }
+      //   }
+      //   this.options = Object.assign({}, this.options);
+      this.options.color = arrColor;
     },
     // 数据解析
     setOptionsData () {
@@ -330,6 +369,7 @@ export default {
           optionsData.refreshTime,
           optionsSetup
         );
+      //  console.log('optionsData.staticData', optionsData.staticData, optionsData.dynamicData);
     },
     // 静态数据
     staticDataFn (val) {
@@ -375,35 +415,74 @@ export default {
     },
     getEchartData (val, optionsSetup) {
       const data = this.queryEchartsData(val);
+      // console.log(data);
       data.then(res => {
+        // console.log(res);
         this.renderingFn(optionsSetup, res);
       });
     },
     renderingFn (optionsSetup, val) {
+      //  console.log('(optionsSetup.verticalShow', optionsSetup.verticalShow);
+      //还原x轴，y轴数据
+      this.options = {
+        ...this.options, xAxis: {
+          type: "value",
+          data: [],
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: "#fff"
+            }
+          }
+        },
+        yAxis: {
+          type: "value",
+          data: [],
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: "#fff"
+            }
+          }
+        }
+      }
       // x轴
       if (optionsSetup.verticalShow) {
-        this.options.xAxis.data = [];
-        this.options.yAxis.data = val.xAxis;
-        this.options.xAxis.type = "value";
-        this.options.yAxis.type = "category";
+        this.setOptionsY(val.xAxis);
+        val.xAxis.forEach((item, index) => {
+          this.options.yAxis[index].type = "category";
+        });
+        this.options.series = val.series;
+        this.options.dataZoom = [
+          {
+            type: 'slider',
+            yAxisIndex: 0,
+            filterMode: 'none',
+            start: 0,
+            end: optionsSetup.dataZoomEnd
+          }
+        ];
       } else {
-        this.options.xAxis.data = val.xAxis;
-        this.options.yAxis.data = [];
-        this.options.xAxis.type = "category";
-        this.options.yAxis.type = "value";
+        this.setOptionsX(val.xAxis);
+        val.xAxis.forEach((item, index) => {
+          this.options.xAxis[index].type = "category";
+        })
+        this.options.series = val.series;
+        this.options.dataZoom = [
+          {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'none',
+            start: 0,
+            end: optionsSetup.dataZoomEnd
+          }
+        ];
       }
-      // series
-      const series = this.options.series;
-      const legendName = [];
-      for (const i in series) {
-        if (series[i].type == "bar") {
-          series[i].name = val.series[i].name;
-          series[i].data = val.series[i].data;
-        }
-        legendName.push(val.series[i].name);
-      }
-      this.options.legend['data'] = legendName;
-      this.setOptionsLegendName(legendName);
+      //图例值
+      this.options.legend['data'] = val.legend;
+      // 数值设定 or 柱体设置
+      this.setOptionsTop();
+      console.log(this.options);
     }
   }
 };

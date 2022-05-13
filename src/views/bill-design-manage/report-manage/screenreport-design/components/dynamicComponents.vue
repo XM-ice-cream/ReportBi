@@ -163,24 +163,36 @@ export default {
       this.$emit("getSetParamsList", this.setParamList);
       if (code != 200) return;
     },
+    //刷新
     async saveDataBtn () {
       const contextData = {};
       for (let i = 0; i < this.userNameList.length; i++) {
         contextData[this.userNameList[i].paramName] = this.userNameList[
           i
         ].sampleItem;
-      }
+      };
+      let data = { rows: [], columns: [] };
+      //行
+      [this.rowParamList, this.columnsParamList].forEach((paramList, paramIndex) => {
+        const key = paramIndex === 0 ? "rows" : "columns"
+        paramList.forEach((item, index) => {
+          data[key][index] = { name: "", function: "" }
+          //取括号内部的字段名
+          data[key][index]["name"] = this.removeReg(item, "");
+          //取计算属性
+          data[key][index]["function"] = item.substr(0, item.indexOf('('));
+        })
+      })
       const params = {
         chartType: this.chartType,
         setCode: this.setCode,
         chartProperties: this.chartProperties,
-        contextData
+        contextData,
+        autoTurn: data
       };
+      //  console.log('params', params);
       this.$emit("input", params);
       this.$emit("change", params);
-    },
-    selectParams (val, key) {
-      this.chartProperties[key] = val;
     },
     getDictKey () {
       return this.dictKey == null ? "CHART_PROPERTIES" : this.dictKey;

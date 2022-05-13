@@ -247,13 +247,13 @@ export default {
   },
   methods: {
     getSetParamsList (setParamList) {
-      console.log('setParamList', setParamList);
+     // console.log('setParamList', setParamList);
       this.setParamList = setParamList;
       this.isShowParamList = true;
     },
     //表字段拖拽到右侧行列里
     paramOnDragged (evt, param) {
-      console.log(evt, param);
+     // console.log(evt, param);
     },
 
     // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
@@ -454,9 +454,7 @@ export default {
 
     // 对组件默认值处理
     handleDefaultValue (widgetJson) {
-
-      widgetJson.type = "widget-bar-gridchart";
-      console.log(widgetJson);
+    //  console.log(widgetJson);
       for (const key in widgetJson) {
         if (key == "options") {
           // collapse、data、position、setup
