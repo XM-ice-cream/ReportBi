@@ -18,13 +18,13 @@
                       <!-- <Input :placeholder="
                               请上传固定格式的excel档
                             " type="file" @on-change="changeFile" /> -->
-                        <Input clearable v-model.trim="uploadImgUrl" size="small" @on-change="changeInput">
-                          <template slot="append">
-                            <!-- <i class="iconfont iconfolder-o"></i> -->
-                            <Icon type="md-image" class="icon-image" />
-                            <input type="file" class="file" ref="files" @change="getImages" />
-                          </template>
-                        </Input>
+                      <Input clearable v-model.trim="uploadImgUrl" size="small" @on-change="changeInput">
+                      <template slot="append">
+                        <!-- <i class="iconfont iconfolder-o"></i> -->
+                        <Icon type="md-image" class="icon-image" />
+                        <input type="file" class="file" ref="files" @change="getImages" />
+                      </template>
+                      </Input>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -39,8 +39,7 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
-
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" :span-method="handleSpan">
           <!-- 工单 -->
           <template slot-scope="{ row }" slot="moNumber">
             <div style="white-space:pre">{{ row.moNumber}}</div>
@@ -48,6 +47,26 @@
           <!-- 工单数量 -->
           <template slot-scope="{ row }" slot="moQty">
             <div style="white-space:pre">{{ row.moQty }}</div>
+          </template>
+          <!-- OP40 -->
+          <template slot-scope="{ row }" slot="step3">
+            <span v-if="row.category==='wip'" class="green">{{ row.step3 }}</span>
+            <span v-else> {{ row.step3 }}</span>
+          </template>
+          <!-- Prebake -->
+          <template slot-scope="{ row }" slot="step5">
+            <span v-if="row.category==='wip'" class="green">{{ row.step5 }}</span>
+            <span v-else> {{ row.step5 }}</span>
+          </template>
+          <!-- AttachIPPF -->
+          <template slot-scope="{ row }" slot="step8">
+            <span v-if="row.category==='wip'" class="green">{{ row.step8 }}</span>
+            <span v-else> {{ row.step8 }}</span>
+          </template>
+          <!-- Packing2 -->
+          <template slot-scope="{ row }" slot="step14">
+            <span v-if="row.category==='wip'" class="red">{{ row.step14 }}</span>
+            <span v-else> {{ row.step8 }}</span>
           </template>
 
         </Table>
@@ -67,12 +86,12 @@ export default {
   name: "led-wip-report",
   data () {
     return {
-      uploadImgUrl : "",
+      uploadImgUrl: "",
       data: [], // 表格数据
       btnData: [],
       searchPoptipModal: false,
       req: {
-        
+
         workOrderInfo: "", //workOrderInfo
         // ...this.$config.pageConfig,
       }, //查询数据
@@ -88,7 +107,7 @@ export default {
           },
         },
         {
-          title: "line",
+          title: "Line",
           key: "line",
           minWidth: 80,
           ellipsis: true,
@@ -96,31 +115,31 @@ export default {
           align: "center",
         },
         {
-          title: "mode",
+          title: "Mode",
           minWidth: 80,
           align: "center",
           key: "mode",
         },
         {
-          title: "moType",
+          title: "MoType",
           minWidth: 80,
           align: "center",
           key: "moType",
         },
         {
-          title: "moNumber",
+          title: "MoNumber",
           minWidth: 100,
           align: "center",
           slot: "moNumber",
         },
         {
-          title: "moQty",
+          title: "MoQty",
           minWidth: 80,
           align: "center",
           slot: "moQty",
         },
         {
-          title: "category",
+          title: "Category",
           minWidth: 80,
           align: "center",
           key: "category",
@@ -141,19 +160,13 @@ export default {
           title: "OP40",
           minWidth: 80,
           align: "center",
-          key: "step3",
-        },
-        {
-          title: 'AutoOnOff',
-          minWidth: 80,
-          align: "center",
-          key: "step4",
+          slot: "step3",
         },
         {
           title: 'PreBake',
           minWidth: 80,
           align: "center",
-          key: "step5",
+          slot: "step5",
         },
         {
           title: 'DamDispense',
@@ -171,7 +184,7 @@ export default {
           title: 'AttachIPPF',
           minWidth: 80,
           align: "center",
-          key: "step8",
+          slot: "step8",
         },
         {
           title: 'TapePeeling',
@@ -207,7 +220,7 @@ export default {
           title: 'Packing2',
           minWidth: 80,
           align: "center",
-          key: "step14",
+          slot: "step14",
         }
       ],
       tableConfig: { ...this.$config.tableConfig }, // table配置
@@ -223,10 +236,8 @@ export default {
   },
   methods: {
     getImages (el) {
-      console.log("执行了getImages方法");
       let file = el.target.files[0];
       let type = file.name.split(".")[1];
-      console.log(type.toLowerCase());
       if (type.toLowerCase() === "xlsx") {
         this.uploadImgUrl = file.name;
         this.pageLoad(file);
@@ -235,7 +246,6 @@ export default {
       }
     },
     changeInput (e) {
-      console.log("执行");
       if (e) {
         this.uploadImgUrl = e;
       } else {
@@ -257,7 +267,7 @@ export default {
           if (res.code === 200) {
             this.data = res.result || [];
             this.searchPoptipModal = false;
-          }else{
+          } else {
             this.$Message.warning(res.message);
           }
         })
@@ -279,13 +289,28 @@ export default {
         this.$Message.warning("请完善查询条件");
       }
     },
+    //合并单元格
+    handleSpan ({ row, column, rowIndex, columnIndex }) {
+      if (rowIndex % 2 === 0 && (columnIndex === 1 || columnIndex === 2)) {
+        return {
+          rowspan: 2,
+          colspan: 1
+        };
+      }
+      if (rowIndex % 2 != 0 && (columnIndex === 1 || columnIndex === 2)) {
+        return {
+          rowspan: 0,
+          colspan: 0
+        };
+      }
+    },
     autoSize () {
       this.tableConfig.height = document.body.clientHeight - 180;
     },
     // 点击重置按钮触发
     resetClick () {
-        this.$refs.files.value = "";
-        this.uploadImgUrl = "";
+      this.$refs.files.value = "";
+      this.uploadImgUrl = "";
     },
     // 点击搜索按钮触发
     searchClick () {
@@ -305,5 +330,39 @@ export default {
   right: 0;
   top: 0;
   opacity: 0;
+}
+.green {
+  color: #00ff66;
+  background-color: #4b997240;
+  padding: 4px 18px;
+  margin: 3px 0px;
+  border-radius: 3px;
+  cursor: default;
+  font-weight: bold;
+}
+.red {
+  color: #ff0404;
+  background-color: #cf676747;
+  padding: 4px 18px;
+  margin: 3px 0px;
+  border-radius: 3px;
+  cursor: default;
+  font-weight: bold;
+}
+/deep/.ivu-table .ivu-table-header th,
+/deep/.ivu-table .ivu-table-body th,
+/deep/.ivu-table .ivu-table-fixed-header th,
+/deep/.ivu-table .ivu-table-fixed-body th,
+/deep/.ivu-table .ivu-table-header td,
+/deep/.ivu-table .ivu-table-body td,
+/deep/.ivu-table .ivu-table-fixed-header td,
+/deep/.ivu-table .ivu-table-fixed-body td {
+  height: 40px !important;
+  padding: 0;
+  background: #020c16d4;
+  color: #fff;
+}
+/deep/.ivu-table {
+  background-color: #050f16;
 }
 </style>

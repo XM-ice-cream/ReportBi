@@ -70,6 +70,8 @@ import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-
 // import { getDataReq } from '@/api/bill-design-manage/report-manage.js'
 import Dictionary from "@/components/dictionary/index";
 import draggable from "vuedraggable";
+import { formatDate } from "@/libs/tools";
+
 export default {
   name: "DynamicComponents",
   components: {
@@ -158,6 +160,7 @@ export default {
     // 获取选中数据集具体数据
     async selectDataSet () {
       const { code, result } = await getDeatilByIdReq({ setCode: this.dataSetValue });
+      console.log("获取选中数据集具体数据", result);
       this.userNameList = result.dataSetParamDtoList;
       this.setParamList = result.setParamList;
       this.$emit("getSetParamsList", this.setParamList);
@@ -167,10 +170,11 @@ export default {
     async saveDataBtn () {
       const contextData = {};
       for (let i = 0; i < this.userNameList.length; i++) {
-        contextData[this.userNameList[i].paramName] = this.userNameList[
-          i
-        ].sampleItem;
+        let sampleItem = this.userNameList[i].sampleItem;
+        if (sampleItem instanceof Date) sampleItem = formatDate(sampleItem)
+        contextData[this.userNameList[i].paramName] = sampleItem;
       };
+      console.log("刷新", contextData);
       let data = { rows: [], columns: [] };
       //行
       [this.rowParamList, this.columnsParamList].forEach((paramList, paramIndex) => {

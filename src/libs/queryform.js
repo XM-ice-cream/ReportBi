@@ -136,7 +136,7 @@ let queryform = {
             ananysicData["xAxis"] = xAxisList;
             ananysicData["series"] = series;
             ananysicData["legend"] = legend;
-            //  console.log(series, xAxisList, legend);
+            console.log(ananysicData);
             return ananysicData;
         },
         //堆叠图

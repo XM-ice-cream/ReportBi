@@ -148,7 +148,7 @@ export default {
       const optionsSetup = this.optionsSetup;
       let xAxisData = [];
       let offset = 0;
-      //  console.log(xAxis);
+      console.log(xAxis);
 
       xAxis?.forEach(item => {
         xAxisData.push({
@@ -189,7 +189,7 @@ export default {
         offset = offset + optionsSetup.spaceX;
       })
       this.options.xAxis = xAxisData;
-      // console.log("this.options.xAxis", this.options.xAxis);
+      console.log("this.options.xAxis", this.options.xAxis);
     },
     // Y轴设置
     setOptionsY (yAxis) {
@@ -422,7 +422,7 @@ export default {
       });
     },
     renderingFn (optionsSetup, val) {
-      //  console.log('(optionsSetup.verticalShow', optionsSetup.verticalShow);
+      console.log('(optionsSetup.verticalShow', optionsSetup.verticalShow);
       //还原x轴，y轴数据
       this.options = {
         ...this.options, xAxis: {
@@ -446,17 +446,18 @@ export default {
           }
         }
       }
-      // x轴
+      // x轴 
       if (optionsSetup.verticalShow) {
         this.setOptionsY(val.xAxis);
         val.xAxis.forEach((item, index) => {
           this.options.yAxis[index].type = "category";
         });
         this.options.series = val.series;
+        console.log(this.options, "X轴");
         this.options.dataZoom = [
           {
             type: 'slider',
-            yAxisIndex: 0,
+            yAxisIndex: this.options.yAxis.map((item, index) => index),
             filterMode: 'none',
             start: 0,
             end: optionsSetup.dataZoomEnd
@@ -464,20 +465,23 @@ export default {
         ];
       } else {
         this.setOptionsX(val.xAxis);
+        console.log(val.yAxis);
         val.xAxis.forEach((item, index) => {
           this.options.xAxis[index].type = "category";
         })
         this.options.series = val.series;
+        console.log(this.options, "Y轴");
         this.options.dataZoom = [
           {
             type: 'slider',
-            xAxisIndex: 0,
+            xAxisIndex: this.options.xAxis.map((item, index) => index),
             filterMode: 'none',
             start: 0,
             end: optionsSetup.dataZoomEnd
           }
         ];
       }
+      console.log(this.isShow);
       //图例值
       this.options.legend['data'] = val.legend;
       // 数值设定 or 柱体设置
