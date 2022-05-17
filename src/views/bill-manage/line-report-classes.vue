@@ -37,7 +37,7 @@
           </Row>
         </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>
@@ -129,7 +129,7 @@ export default {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
           const pageData = data || [];
           this.data = pageData.map(item => { return { ...item, total: this.getTotal(item) } })
-          this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+          this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
           this.searchPoptipModal = false;
         }
       }).catch(() => (this.tableConfig.loading = false));

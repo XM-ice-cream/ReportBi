@@ -76,8 +76,17 @@
 
     <!-- 数据集管理弹框--表格 -->
     <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='902'>
-      <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='500' tooltip-effect="dark" @on-selection-change="handleSelectionChange"></Table>
-      <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+      <div class="tableTabs">
+        <Tabs>
+          <TabPane label="数据集">
+
+          </TabPane>
+          <!-- <TabPane label="Windows">标签二的内容</TabPane>
+          <TabPane label="Linux">标签三的内容</TabPane> -->
+        </Tabs>
+      </div>
+      <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='300' tooltip-effect="dark" @on-selection-change="handleSelectionChange" draggable="true" @on-drag-drop="onDragDrop"></Table>
+      <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       <div slot="footer" class="dialog-footer">
         <Button @click="outerVisible = false">取 消</Button>
         <Button type="primary" @click="checkDataSet">确定 </Button>
@@ -266,6 +275,10 @@ export default {
       let fieldLabel = evt.item.innerText; // 列名称
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
     },
+    //表格拖拽
+    onDragDrop () {
+
+    },
     autoChangeFunc (auto) {
       if (auto) {
         luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "1" })
@@ -287,7 +300,7 @@ export default {
         if (res.code === 200) {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
           this.dataSetData = data || [];
-          this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+          this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
         }
       })
     },
@@ -529,7 +542,11 @@ export default {
 }
 .tableModal {
   /deep/ .ivu-modal {
-    width: 600px !important;
+    width: 60% !important;
+  }
+  .tableTabs {
+    min-height: 200px;
+    margin-bottom: 0.5rem;
   }
 }
 /deep/ #luckysheet-row-count-show {

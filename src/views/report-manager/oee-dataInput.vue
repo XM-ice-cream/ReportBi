@@ -3,7 +3,7 @@
     <!-- 设备名称页面弹窗 -->
     <Modal fullscreen footer-hide v-model="modalFlag" width="1000" title=" " :mask-closable="false" :scrollable="true" @on-cancel="modalCancel">
       <Table border :height="modalTableHeight" :columns="columnsDetails" :data="dataDetails"></Table>
-      <page-custom :total="req.modalTotal" :totalPage="req.modalTotalPage" :pageIndex="req.modalPageIndex" :page-size="req.modalPageSize" @on-change="pageChangeModal" @on-page-size-change="pageSizeChangeModal" />
+      <page-custom :elapsedMilliseconds='req.elapsedMilliseconds' :total="req.modalTotal" :totalPage="req.modalTotalPage" :pageIndex="req.modalPageIndex" :page-size="req.modalPageSize" @on-change="pageChangeModal" @on-page-size-change="pageSizeChangeModal" />
     </Modal>
     <!-- 左侧抽屉 -->
     <Drawer v-model="drawerFlag" :title="drawerTitle" width="520" :mask-closable="false" @on-close="cancelClick">
@@ -57,7 +57,7 @@
 
       <Card :bordered="false" dis-hover class="card-style">
         <Table border size="large" :height="tableHeight" :loading="tableLoading" :columns="columns" :data="data" highlight-row @on-current-change="currentClick" :row-class-name="tableRowClassName" @on-row-dblclick="dblClickRow"></Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>

@@ -42,7 +42,7 @@
       </Row>
       <Row type="flex" justify="space-around" class-name="info-card">
         <i-col span="23">
-          <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+          <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
         </i-col>
       </Row>
     </div>
@@ -127,6 +127,7 @@ export default {
             this.data = data.data ? data.data : [];
             this.req.total = data.total;
             this.req.totalPage = data.totalPage;
+            this.req.elapsedMilliseconds = res.elapsedMilliseconds;
             this.$nextTick(() => {
               for (let index = 0; index < this.data.length; index++) {
                 this.$refs["oeePie" + index][0].initChart();

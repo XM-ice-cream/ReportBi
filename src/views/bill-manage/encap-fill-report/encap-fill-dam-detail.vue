@@ -2,7 +2,7 @@
 <template>
   <Modal draggable v-model="modalFlag" width="1250" title="Encap明细" :styles="{ top: '20px' }" :closable="false">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
-    <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+    <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
     <div slot="footer">
       <Button @click="modalCancel">{{ $t("cancel") }}</Button>
     </div>
@@ -80,7 +80,7 @@ export default {
         if (res.code === 200) {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
           this.data = data || []
-          this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+          this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
         }
       })
       //   .catch(() => (this.tableConfig.loading = false));
@@ -100,13 +100,13 @@ export default {
     // 选择第几页
     pageChange (index) {
       this.req.pageIndex = index;
-      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.stepName)
+      this.pageLoad(this.paramData.startTime, this.paramData.endTime, this.paramData.lineName, this.paramData.stepName)
     },
     // 选择一页有条数据
     pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
-      this.pageLoad(this.paramData.startTime,this.paramData.endTime,this.paramData.lineName,this.paramData.stepName)
+      this.pageLoad(this.paramData.startTime, this.paramData.endTime, this.paramData.lineName, this.paramData.stepName)
     },
   }
 };

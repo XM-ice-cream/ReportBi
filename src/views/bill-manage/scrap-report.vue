@@ -83,7 +83,7 @@
             <Button style="height:16px" v-if="row.pictures" type="primary" size="small" @click="previewImage(row.pictures)">{{ $t("preview") }}</Button>
           </template>
         </Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
     <Modal draggable v-model="visible" :closable="false">
@@ -261,7 +261,7 @@ export default {
           if (res.code === 200) {
             let { data, pageSize, pageIndex, total, totalPage } = res.result;
             this.data = data || [];
-            this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+            this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
           }
         })
         .catch(() => (this.tableConfig.loading = false));

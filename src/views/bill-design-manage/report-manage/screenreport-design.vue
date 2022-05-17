@@ -247,13 +247,13 @@ export default {
   },
   methods: {
     getSetParamsList (setParamList) {
-     // console.log('setParamList', setParamList);
+      // console.log('setParamList', setParamList);
       this.setParamList = setParamList;
       this.isShowParamList = true;
     },
     //表字段拖拽到右侧行列里
     paramOnDragged (evt, param) {
-     // console.log(evt, param);
+      // console.log(evt, param);
     },
 
     // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
@@ -454,7 +454,7 @@ export default {
 
     // 对组件默认值处理
     handleDefaultValue (widgetJson) {
-    //  console.log(widgetJson);
+      //  console.log(widgetJson);
       for (const key in widgetJson) {
         if (key == "options") {
           // collapse、data、position、setup
@@ -1138,5 +1138,12 @@ export default {
 /deep/.ivu-tabs-nav {
   background: #072a4f;
   color: #14b5c7;
+}
+/deep/.ivu-select-dropdown {
+  width: auto !important;
+  border: 1px solid #036595;
+  border-radius: 10px !important;
+  color: #17cbdd;
+  background-color: #072a4f;
 }
 </style>

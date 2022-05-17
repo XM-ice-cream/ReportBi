@@ -7,18 +7,15 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="800"
-                      trigger="manual" transfer>
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="800" trigger="manual" transfer>
                 <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent
-                        @keyup.native.enter="searchClick">
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 箱号 -->
                     <FormItem :label="$t('cartonCode')" prop="boxCode">
-                      <Input v-model="req.boxCode" :placeholder="$t('pleaseEnter') + $t('cartonCode')"
-                             type="textarea" :autosize="{minRows: 1,maxRows: 20}" @on-search="searchClick"/>
+                      <Input v-model="req.boxCode" :placeholder="$t('pleaseEnter') + $t('cartonCode')" type="textarea" :autosize="{minRows: 1,maxRows: 20}" @on-search="searchClick" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -33,26 +30,24 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height"
-               :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize"
-                     @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/boxcode-query";
-import {getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
+import { getpagelistReq, exportReq } from "@/api/bill-manage/boxcode-query";
+import { getButtonBoolean, formatDate, exportFile } from "@/libs/tools";
 
 export default {
   name: "boxcode-query",
-  data() {
+  data () {
     return {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
-      tableConfig: {...this.$config.tableConfig}, // table配置
+      tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
       btnData: [],
       req: {
@@ -66,13 +61,13 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: 'PW', key: "pw", align: "center", width: 120, tooltip: true, fixed: 'left'},
-        {title: this.$t("cartonCode"), key: "boxNo", align: "center", width: 140, tooltip: true},
-        {title: 'SubUnitId', key: "subUnitid", align: "center", width: 200, tooltip: true},
+        { title: 'PW', key: "pw", align: "center", width: 120, tooltip: true, fixed: 'left' },
+        { title: this.$t("cartonCode"), key: "boxNo", align: "center", width: 140, tooltip: true },
+        { title: 'SubUnitId', key: "subUnitid", align: "center", width: 200, tooltip: true },
       ], // 表格数据
     };
   },
-  activated() {
+  activated () {
     this.pageLoad();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
@@ -80,21 +75,21 @@ export default {
     this.getDataItemData();
   },
   // 导航离开该组件的对应路由时调用
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave (to, from, next) {
     this.searchPoptipModal = false;
     next();
   },
   methods: {
     // 点击搜索按钮触发
-    searchClick() {
+    searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
     },
     // 获取分页列表数据
-    pageLoad() {
+    pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let {boxCode} = this.req;
+      let { boxCode } = this.req;
       if (boxCode) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -111,9 +106,9 @@ export default {
             getpagelistReq(obj).then((res) => {
               this.tableConfig.loading = false;
               if (res.code === 200) {
-                let {data, pageSize, pageIndex, total, totalPage} = res.result;
+                let { data, pageSize, pageIndex, total, totalPage } = res.result;
                 this.data = data || [];
-                this.req = {...this.req, pageSize, pageIndex, total, totalPage};
+                this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
               }
             })
               .catch(() => (this.tableConfig.loading = false));
@@ -125,14 +120,14 @@ export default {
       }
     },
     // 导出
-    exportClick() {
-      let {boxCode} = this.req;
+    exportClick () {
+      let { boxCode } = this.req;
       if (boxCode) {
         let obj = {
-            boxCode,
+          boxCode,
         };
         exportReq(obj).then((res) => {
-          let blob = new Blob([res], {type: "application/vnd.ms-excel"});
+          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
           const fileName = `${this.$t("boxcode-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名
           exportFile(blob, fileName);
         });
@@ -141,20 +136,20 @@ export default {
       }
     },
     // 点击重置按钮触发
-    resetClick() {
+    resetClick () {
       this.$refs.searchReq.resetFields();
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 120 - 60;
     },
     // 选择第几页
-    pageChange(index) {
+    pageChange (index) {
       this.req.pageIndex = index;
       this.pageLoad();
     },
     // 选择一页有条数据
-    pageSizeChange(index) {
+    pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
       this.pageLoad();

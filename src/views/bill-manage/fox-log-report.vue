@@ -7,35 +7,27 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400"
-                      trigger="manual" transfer>
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
                 <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent
-                        @keyup.native.enter="searchClick">
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
-                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')"
-                                  format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"
-                                  v-model="req.startTime"></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
-                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')"
-                                  format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"
-                                  v-model="req.endTime"></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
                     <!-- 小条码 -->
                     <FormItem :label="$t('smallBoardCode')" prop="unitID">
-                      <Input v-model.trim="req.unitID" placeholder="请输入小条码,多个以英文逗号或空格分隔"
-                             @on-search="searchClick"/>
+                      <Input v-model.trim="req.unitID" placeholder="请输入小条码,多个以英文逗号或空格分隔" @on-search="searchClick" />
                     </FormItem>
                     <!-- 站点 -->
                     <FormItem :label="$t('station')" prop="station">
-                      <Input v-model.trim="req.station" :placeholder="$t('pleaseEnter') + $t('station')"
-                             @on-search="searchClick"/>
+                      <Input v-model.trim="req.station" :placeholder="$t('pleaseEnter') + $t('station')" @on-search="searchClick" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -50,26 +42,24 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height"
-               :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize"
-                     @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/fox-log-report";
-import {getButtonBoolean, formatDate, exportFile, renderDate, commaSplitString} from "@/libs/tools";
+import { getpagelistReq, exportReq } from "@/api/bill-manage/fox-log-report";
+import { getButtonBoolean, formatDate, exportFile, renderDate, commaSplitString } from "@/libs/tools";
 
 export default {
   name: "fox-log-report",
-  data() {
+  data () {
     return {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
-      tableConfig: {...this.$config.tableConfig}, // table配置
+      tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
       btnData: [],
       categoryList: [],// 类别下拉框
@@ -87,39 +77,39 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: this.$t("smallBoardCode"), key: "barcode", align: "center", width: 150, tooltip: true, fixed: 'left'},
-        {title: this.$t("station"), key: "station", align: "center", width: 150, tooltip: true},
-        {title: this.$t("fileName"), key: "fileName", align: "center", width: 350, tooltip: true},
-        {title: "上传状态", key: "uploadStatus", align: "center", width: 60, tooltip: true},
-        {title: "文件状态", key: "fileStatu", align: "center", width: 60, tooltip: true},
-        {title: "创建时间", key: "jsonCreatetime", align: "center", width: 130, render: renderDate,},
-        {title: "上传时间", key: "uploadTime", align: "center", width: 130, render: renderDate,},
-        {title: "反馈信息", key: "feedBackMsg", align: "center", width: 300, tooltip: true},
+        { title: this.$t("smallBoardCode"), key: "barcode", align: "center", width: 150, tooltip: true, fixed: 'left' },
+        { title: this.$t("station"), key: "station", align: "center", width: 150, tooltip: true },
+        { title: this.$t("fileName"), key: "fileName", align: "center", width: 350, tooltip: true },
+        { title: "上传状态", key: "uploadStatus", align: "center", width: 60, tooltip: true },
+        { title: "文件状态", key: "fileStatu", align: "center", width: 60, tooltip: true },
+        { title: "创建时间", key: "jsonCreatetime", align: "center", width: 130, render: renderDate, },
+        { title: "上传时间", key: "uploadTime", align: "center", width: 130, render: renderDate, },
+        { title: "反馈信息", key: "feedBackMsg", align: "center", width: 300, tooltip: true },
       ], // 表格数据
     };
   },
-  activated() {
+  activated () {
     this.pageLoad();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
   },
   // 导航离开该组件的对应路由时调用
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave (to, from, next) {
     this.searchPoptipModal = false;
     next();
   },
   methods: {
     // 点击搜索按钮触发
-    searchClick() {
+    searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
     },
     // 获取分页列表数据
-    pageLoad() {
+    pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let {startTime, endTime, unitID, station} = this.req;
+      let { startTime, endTime, unitID, station } = this.req;
       if ((startTime && endTime) || unitID || station) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -139,9 +129,9 @@ export default {
             getpagelistReq(obj).then((res) => {
               this.tableConfig.loading = false;
               if (res.code === 200) {
-                let {data, pageSize, pageIndex, total, totalPage} = res.result;
+                let { data, pageSize, pageIndex, total, totalPage } = res.result;
                 this.data = data || [];
-                this.req = {...this.req, pageSize, pageIndex, total, totalPage};
+                this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
               }
             })
               .catch(() => (this.tableConfig.loading = false));
@@ -153,8 +143,8 @@ export default {
       }
     },
     // 导出
-    exportClick() {
-      let {startTime, endTime, unitID, station} = this.req;
+    exportClick () {
+      let { startTime, endTime, unitID, station } = this.req;
       if ((startTime && endTime) || unitID || station) {
         let obj = {
           startTime: formatDate(startTime),
@@ -163,7 +153,7 @@ export default {
           station,
         };
         exportReq(obj).then((res) => {
-          let blob = new Blob([res], {type: "application/vnd.ms-excel"});
+          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
           const fileName = `${this.$t("fox-log-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
           exportFile(blob, fileName);
         });
@@ -172,20 +162,20 @@ export default {
       }
     },
     // 点击重置按钮触发
-    resetClick() {
+    resetClick () {
       this.$refs.searchReq.resetFields();
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 120 - 60;
     },
     // 选择第几页
-    pageChange(index) {
+    pageChange (index) {
       this.req.pageIndex = index;
       this.pageLoad();
     },
     // 选择一页有条数据
-    pageSizeChange(index) {
+    pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
       this.pageLoad();

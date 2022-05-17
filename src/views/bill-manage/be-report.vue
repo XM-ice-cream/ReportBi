@@ -7,45 +7,35 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400"
-                      trigger="manual" transfer>
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
                 <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent
-                        @keyup.native.enter="searchClick">
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
-                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')"
-                                  format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"
-                                  v-model="req.startTime"></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
-                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')"
-                                  format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"
-                                  v-model="req.endTime"></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
-                      <Input v-model="req.workOrder" :placeholder="$t('pleaseEnter') + $t('workOrder')"
-                             @on-search="searchClick"/>
+                      <Input v-model="req.workOrder" :placeholder="$t('pleaseEnter') + $t('workOrder')" @on-search="searchClick" />
                     </FormItem>
                     <!-- 大条码 -->
                     <FormItem :label="$t('panelNo')" prop="panelNo">
-                      <Input v-model.trim="req.panelNo" placeholder="请输入大板码号,多个以英文逗号或空格分隔"
-                             @on-search="searchClick"/>
+                      <Input v-model.trim="req.panelNo" placeholder="请输入大板码号,多个以英文逗号或空格分隔" @on-search="searchClick" />
                     </FormItem>
                     <!-- 小条码 -->
                     <FormItem :label="$t('smallBoardCode')" prop="unitId">
-                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode')"
-                             @on-search="searchClick"/>
+                      <Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode')" @on-search="searchClick" />
                     </FormItem>
                     <!-- 类别 -->
                     <FormItem :label="$t('status')" prop="status">
-                      <Select v-model="req.status" clearable :placeholder="$t('pleaseSelect') + $t('status')"
-                              transfer>
+                      <Select v-model="req.status" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
                         <Option v-for="(item, i) in categoryList" :value="item.detailName" :key="i">
                           {{ item.detailName }}
                         </Option>
@@ -53,8 +43,7 @@
                     </FormItem>
                     <!-- 类别 -->
                     <FormItem :label="$t('stepName')" prop="stepName">
-                      <Select v-model="req.stepName" :placeholder="$t('pleaseSelect') + $t('stepName')"
-                              transfer>
+                      <Select v-model="req.stepName" :placeholder="$t('pleaseSelect') + $t('stepName')" transfer>
                         <Option v-for="(item, i) in stepList" :value="item.detailName" :key="i">
                           {{ item.detailName }}
                         </Option>
@@ -73,27 +62,25 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height"
-               :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize"
-                     @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>
 </template>
 
 <script>
-import {getpagelistReq, exportReq} from "@/api/bill-manage/be-report";
-import {getButtonBoolean, formatDate, exportFile, renderDate} from "@/libs/tools";
-import {getlistReq as getDataItemReq} from '@/api/system-manager/data-item'
+import { getpagelistReq, exportReq } from "@/api/bill-manage/be-report";
+import { getButtonBoolean, formatDate, exportFile, renderDate } from "@/libs/tools";
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 
 export default {
   name: "be-report",
-  data() {
+  data () {
     return {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
-      tableConfig: {...this.$config.tableConfig}, // table配置
+      tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
       btnData: [],
       categoryList: [],// 类别下拉框
@@ -115,22 +102,22 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        {title: this.$t("workOrder"), key: "workorder", align: "center", width: 140, tooltip: true, fixed: 'left'},
-        {title: this.$t("smallBoardCode"), key: "unitid", align: "center", width: 140, tooltip: true},
-        {title: this.$t("panelNo"), key: "panelno", align: "center", width: 140, tooltip: true},
-        {title: this.$t("pn"), key: "pn", align: "center", width: 90, tooltip: true},
-        {title: this.$t("lineName"), key: "linename", align: "center", width: 120, tooltip: true},
-        {title: this.$t("stepName"), key: "stepname", align: "center", width: 90, tooltip: true},
-        {title: this.$t("status"), key: "status", align: "center", width: 90, tooltip: true},
-        {title: this.$t("defectCode"), key: "defectcode", align: "center", width: 120, tooltip: true},
-        {title: this.$t("defectDate"), key: "defectdate", align: "center", render: renderDate, width: 120, tooltip: true},
-        {title: this.$t("badDescription"), key: "description", align: "center", width: 120, tooltip: true},
-        {title: 'BUILDCONFIG', key: "buildconfig", align: "center", width: 120, tooltip: true},
-        {title: this.$t("eqpCode"), key: "eqP_ID", align: "center", width: 120, tooltip: true},
+        { title: this.$t("workOrder"), key: "workorder", align: "center", width: 140, tooltip: true, fixed: 'left' },
+        { title: this.$t("smallBoardCode"), key: "unitid", align: "center", width: 140, tooltip: true },
+        { title: this.$t("panelNo"), key: "panelno", align: "center", width: 140, tooltip: true },
+        { title: this.$t("pn"), key: "pn", align: "center", width: 90, tooltip: true },
+        { title: this.$t("lineName"), key: "linename", align: "center", width: 120, tooltip: true },
+        { title: this.$t("stepName"), key: "stepname", align: "center", width: 90, tooltip: true },
+        { title: this.$t("status"), key: "status", align: "center", width: 90, tooltip: true },
+        { title: this.$t("defectCode"), key: "defectcode", align: "center", width: 120, tooltip: true },
+        { title: this.$t("defectDate"), key: "defectdate", align: "center", render: renderDate, width: 120, tooltip: true },
+        { title: this.$t("badDescription"), key: "description", align: "center", width: 120, tooltip: true },
+        { title: 'BUILDCONFIG', key: "buildconfig", align: "center", width: 120, tooltip: true },
+        { title: this.$t("eqpCode"), key: "eqP_ID", align: "center", width: 120, tooltip: true },
       ], // 表格数据
     };
   },
-  activated() {
+  activated () {
     this.pageLoad();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
@@ -138,21 +125,21 @@ export default {
     this.getDataItemData();
   },
   // 导航离开该组件的对应路由时调用
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave (to, from, next) {
     this.searchPoptipModal = false;
     next();
   },
   methods: {
     // 点击搜索按钮触发
-    searchClick() {
+    searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
     },
     // 获取分页列表数据
-    pageLoad() {
+    pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let {startTime, endTime, workOrder, panelNo, unitId, status, stepName} = this.req;
+      let { startTime, endTime, workOrder, panelNo, unitId, status, stepName } = this.req;
       if (startTime && endTime) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -175,9 +162,9 @@ export default {
             getpagelistReq(obj).then((res) => {
               this.tableConfig.loading = false;
               if (res.code === 200) {
-                let {data, pageSize, pageIndex, total, totalPage} = res.result;
+                let { data, pageSize, pageIndex, total, totalPage } = res.result;
                 this.data = data || [];
-                this.req = {...this.req, pageSize, pageIndex, total, totalPage};
+                this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
               }
             })
               .catch(() => (this.tableConfig.loading = false));
@@ -189,8 +176,8 @@ export default {
       }
     },
     // 导出
-    exportClick() {
-      let {startTime, endTime, workOrder, panelNo, unitId, status, stepName} = this.req;
+    exportClick () {
+      let { startTime, endTime, workOrder, panelNo, unitId, status, stepName } = this.req;
       if (startTime && endTime) {
         let obj = {
           startTime: formatDate(startTime),
@@ -202,7 +189,7 @@ export default {
           stepName,
         };
         exportReq(obj).then((res) => {
-          let blob = new Blob([res], {type: "application/vnd.ms-excel"});
+          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
           const fileName = `${this.$t("be-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
           exportFile(blob, fileName);
         });
@@ -226,20 +213,20 @@ export default {
       return arr;
     },
     // 点击重置按钮触发
-    resetClick() {
+    resetClick () {
       this.$refs.searchReq.resetFields();
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 120 - 60;
     },
     // 选择第几页
-    pageChange(index) {
+    pageChange (index) {
       this.req.pageIndex = index;
       this.pageLoad();
     },
     // 选择一页有条数据
-    pageSizeChange(index) {
+    pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
       this.pageLoad();

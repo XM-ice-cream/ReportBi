@@ -57,13 +57,3 @@ export default {
   height: 23px;
 }
 </style>
-<style>
-.ivu-select-dropdown {
-  width: auto !important;
-  border: 1px solid #036595;
-  border-radius: 10px !important;
-  color: #17cbdd;
-  background-color: #072a4f;
-  /* right: 2px !important; */
-}
-</style>

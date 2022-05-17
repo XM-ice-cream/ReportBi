@@ -165,7 +165,7 @@
             <img class="img_item" @click="imgClick('data:image/bmp;base64,' + item)" :src="'data:image/bmp;base64,' + item" v-for="(item, index) in row.op40Image && row.op40Image.split(',')" :key="index" />
           </template>
         </Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
         <Modal draggable v-model="visible" :closable="false"><img class="img-style" :src="imgBase64" /></Modal>
       </Card>
     </div>
@@ -424,7 +424,7 @@ export default {
                     return element.cc === null;
                   }) || [];
                 this.cc = data[0].cc || [];
-                this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+                this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
                 this.poptipModal = false;
               }
             })

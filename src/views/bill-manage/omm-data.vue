@@ -7,51 +7,19 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip
-                v-model="searchPoptipModal"
-                class="poptip-style"
-                placement="right-start"
-                width="500"
-                trigger="manual"
-                transfer
-              >
-                <Button
-                  type="primary"
-                  icon="ios-search"
-                  @click.stop="searchPoptipModal = !searchPoptipModal"
-                >
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="500" trigger="manual" transfer>
+                <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form
-                    ref="searchReq"
-                    :model="req"
-                    :label-width="80"
-                    :label-colon="true"
-                    @submit.native.prevent
-                    @keyup.native.enter="searchClick"
-                  >
+                  <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
-                      <DatePicker
-                        transfer
-                        type="datetime"
-                        :placeholder="$t('pleaseSelect') + $t('startTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
-                        :options="$config.datetimeOptions"
-                        v-model="req.startTime"
-                      ></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
-                      <DatePicker
-                        transfer
-                        type="datetime"
-                        :placeholder="$t('pleaseSelect') + $t('endTime')"
-                        format="yyyy-MM-dd HH:mm:ss"
-                        :options="$config.datetimeOptions"
-                        v-model="req.endTime"
-                      ></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
                     <!-- 站点 -->
                     <FormItem label="站点" prop="stationType">
@@ -78,23 +46,9 @@
             </i-col>
           </Row>
         </div>
-        <Table
-          :border="tableConfig.border"
-          :highlight-row="tableConfig.highlightRow"
-          :height="tableConfig.height"
-          :loading="tableConfig.loading"
-          :columns="columns"
-          :data="data"
-        >
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
         </Table>
-        <page-custom
-          :total="req.total"
-          :totalPage="req.totalPage"
-          :pageIndex="req.pageIndex"
-          :page-size="req.pageSize"
-          @on-change="pageChange"
-          @on-page-size-change="pageSizeChange"
-        />
+        <page-custom :elapsedMilliseconds='req.elapsedMilliseconds' :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>
@@ -103,10 +57,10 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/omm-data";
 import { getButtonBoolean, formatDate, exportFile, renderDate } from "@/libs/tools";
-import {getlistReq as getdataitemlistReq} from "@/api/system-manager/data-item";
+import { getlistReq as getdataitemlistReq } from "@/api/system-manager/data-item";
 export default {
   name: "omm-data",
-  data() {
+  data () {
     return {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
@@ -137,7 +91,7 @@ export default {
         { title: "Barcode", key: "barcode", align: "center", width: 150, tooltip: true },
         { title: "编号", key: "faicode", align: "center", tooltip: true },
         { title: "测量值", key: "measuredvalue", align: "center", tooltip: true },
-        { title: "标准值", key: "standardvalue", align: "center" , tooltip: true},
+        { title: "标准值", key: "standardvalue", align: "center", tooltip: true },
         { title: "上公差", key: "tolerancE_UPPER", align: "center", tooltip: true },
         { title: "下公差", key: "tolerancE_LOWER", align: "center", tooltip: true },
         { title: "超标值", key: "exceedstandardvalue", align: "center", tooltip: true },
@@ -146,7 +100,7 @@ export default {
       ], // 表格数据
     };
   },
-  activated() {
+  activated () {
     this.pageLoad();
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
@@ -154,21 +108,21 @@ export default {
     this.getDataItemData()
   },
   // 导航离开该组件的对应路由时调用
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave (to, from, next) {
     this.searchPoptipModal = false;
     next();
   },
   methods: {
     // 点击搜索按钮触发
-    searchClick() {
+    searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
     },
     // 获取分页列表数据
-    pageLoad() {
+    pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, stationType,category } = this.req;
+      let { startTime, endTime, stationType, category } = this.req;
       if (stationType) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -191,7 +145,7 @@ export default {
                 if (res.code === 200) {
                   let { data, pageSize, pageIndex, total, totalPage } = res.result;
                   this.data = data || [];
-                  this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+                  this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
                   this.searchPoptipModal = false;
                 }
               })
@@ -203,8 +157,8 @@ export default {
       }
     },
     // 导出
-    exportClick() {
-      let { startTime, endTime, stationType,category } = this.req;
+    exportClick () {
+      let { startTime, endTime, stationType, category } = this.req;
       if (stationType) {
         let obj = {
           startTime: formatDate(startTime),
@@ -222,11 +176,11 @@ export default {
       }
     },
     // 点击编码规则中的加号按钮触发
-    async getDataItemData() {
+    async getDataItemData () {
       this.stationList = await this.getDataItemDetailList("OMMStation");
     },
-    async getDataItemDetailList(itemCode) {
-      const obj = {itemCode, enabled: 1, oderType: 0,};
+    async getDataItemDetailList (itemCode) {
+      const obj = { itemCode, enabled: 1, oderType: 0, };
       let arr = [];
       await getdataitemlistReq(obj).then((res) => {
         if (res.code === 200) arr = res.result || [];
@@ -234,20 +188,20 @@ export default {
       return arr;
     },
     // 点击重置按钮触发
-    resetClick() {
+    resetClick () {
       this.$refs.searchReq.resetFields();
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 120 - 60;
     },
     // 选择第几页
-    pageChange(index) {
+    pageChange (index) {
       this.req.pageIndex = index;
       this.pageLoad();
     },
     // 选择一页有条数据
-    pageSizeChange(index) {
+    pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
       this.pageLoad();

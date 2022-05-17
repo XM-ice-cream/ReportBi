@@ -13,7 +13,7 @@
         </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" :span-method="handleSpan">
         </Table>
-        <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+        <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
         <Modal draggable v-model="visible" :closable="false"><img class="img-style" :src="imgBase64" /></Modal>
       </Card>
     </div>
@@ -99,7 +99,7 @@ export default {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
           this.data = data.filter((element) => { return element.cc === null }) || [];
           this.cc = data[0].cc || [];
-          this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+          this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
           this.poptipModal = false;
         }
       }).catch(() => (this.tableConfig.loading = false));

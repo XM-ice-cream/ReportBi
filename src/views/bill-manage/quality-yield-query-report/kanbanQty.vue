@@ -173,7 +173,7 @@ export default {
           this.tableConfig.loading = false;
           if (res.code === 200) {
             let { data, pageSize, pageIndex, total, totalPage } = res.result;
-            this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+            this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
             this.data = data || [];
           }
         })

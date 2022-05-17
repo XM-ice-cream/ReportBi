@@ -7,59 +7,27 @@
         <div slot="title">
           <Row>
             <i-col span="6">
-              <Poptip
-                v-model="searchPoptipModal"
-                class="poptip-style"
-                placement="right-start"
-                width="350"
-                trigger="manual"
-                transfer
-              >
-                <Button
-                  type="primary"
-                  icon="ios-search"
-                  @click.stop="searchPoptipModal = !searchPoptipModal"
-                >
+              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="350" trigger="manual" transfer>
+                <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form
-                    ref="searchReq"
-                    :model="req"
-                    :label-width="60"
-                    :label-colon="true"
-                    @submit.native.prevent
-                  >
+                  <Form ref="searchReq" :model="req" :label-width="60" :label-colon="true" @submit.native.prevent>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
-                      <v-selectpage
-                        class="select-page-style"
-                        v-if="searchPoptipModal"
-                        key-field="workOrder"
-                        show-field="workOrder"
-                        :data="workerPageListUrl"
-                        v-model="req.workOrder"
-                        :placeholder="$t('pleaseSelect') + $t('workOrder')"
-                        :result-format="
+                      <v-selectpage class="select-page-style" v-if="searchPoptipModal" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
                           (res) => {
                             return {
                               totalRow: res.total,
                               list: res.data || [],
                             };
                           }
-                        "
-                      >
+                        ">
                       </v-selectpage>
                     </FormItem>
                     <!-- 线体 -->
                     <FormItem :label="$t('line')" prop="lineName">
-                      <Select
-                        v-model="req.lineName"
-                        clearable
-                        filterable
-                        transfer
-                        :placeholder="`${$t('pleaseSelect')}${$t('line')}`"
-                      >
+                      <Select v-model="req.lineName" clearable filterable transfer :placeholder="`${$t('pleaseSelect')}${$t('line')}`">
                         <Option v-for="(item, i) in lineList" :value="item.name" :key="i">{{
                           item.name
                         }}</Option>
@@ -67,49 +35,23 @@
                     </FormItem>
                     <!-- 报废时间 -->
                     <FormItem :label="$t('scrapDate')" prop="createDate">
-                      <DatePicker
-                        transfer
-                        type="date"
-                        :placeholder="$t('pleaseSelect') + $t('scrapDate')"
-                        format="yyyy-MM-dd"
-                        :options="$config.datetimeOptions"
-                        v-model="req.createDate"
-                      ></DatePicker>
+                      <DatePicker transfer type="date" :placeholder="$t('pleaseSelect') + $t('scrapDate')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.createDate"></DatePicker>
                     </FormItem>
                     <!-- 报废时间 -->
                     <FormItem :label="$t('freezeDate')" prop="stockDate">
-                      <DatePicker
-                        transfer
-                        type="date"
-                        :placeholder="$t('pleaseSelect') + $t('freezeDate')"
-                        format="yyyy-MM-dd"
-                        :options="$config.datetimeOptions"
-                        v-model="req.stockDate"
-                      ></DatePicker>
+                      <DatePicker transfer type="date" :placeholder="$t('pleaseSelect') + $t('freezeDate')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.stockDate"></DatePicker>
                     </FormItem>
                     <!-- unitId -->
                     <FormItem label="unitId" prop="unitId">
-                      <Input
-                        v-model="req.unitId"
-                        :placeholder="$t('pleaseEnter') + 'unitId'"
-                        @keyup.enter.native="searchClick"
-                      />
+                      <Input v-model="req.unitId" :placeholder="$t('pleaseEnter') + 'unitId'" @keyup.enter.native="searchClick" />
                     </FormItem>
                     <!-- 大半码号 -->
                     <FormItem :label="$t('panelNo')" prop="panelNo">
-                      <Input
-                        v-model="req.panelNo"
-                        :placeholder="$t('pleaseEnter') + $t('panelNo')"
-                        @keyup.enter.native="searchClick"
-                      />
+                      <Input v-model="req.panelNo" :placeholder="$t('pleaseEnter') + $t('panelNo')" @keyup.enter.native="searchClick" />
                     </FormItem>
                     <!-- unitId56 -->
                     <FormItem label="unitId56" prop="unitId56">
-                      <Input
-                        v-model="req.unitId56"
-                        :placeholder="$t('pleaseEnter') + 'unitId56'"
-                        @keyup.enter.native="searchClick"
-                      />
+                      <Input v-model="req.unitId56" :placeholder="$t('pleaseEnter') + 'unitId56'" @keyup.enter.native="searchClick" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -124,22 +66,8 @@
             </i-col>
           </Row>
         </div>
-        <Table
-          :border="tableConfig.border"
-          :highlight-row="tableConfig.highlightRow"
-          :height="tableConfig.height"
-          :loading="tableConfig.loading"
-          :columns="columns"
-          :data="data"
-        ></Table>
-        <page-custom
-          :total="req.total"
-          :totalPage="req.totalPage"
-          :pageIndex="req.pageIndex"
-          :page-size="req.pageSize"
-          @on-change="pageChange"
-          @on-page-size-change="pageSizeChange"
-        />
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
+        <page-custom :elapsedMilliseconds='req.elapsedMilliseconds' :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
   </div>
@@ -160,7 +88,7 @@ import { workerPageListUrl } from "@/api/material-manager/order-info";
 
 export default {
   name: "scrap-warehouse",
-  data() {
+  data () {
     return {
       workerPageListUrl: workerPageListUrl(),
       searchPoptipModal: false,
@@ -233,10 +161,10 @@ export default {
       lineList: [], // 线体列表
     };
   },
-  mounted() {
+  mounted () {
     this.pageLoad();
   },
-  async activated() {
+  async activated () {
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
@@ -244,13 +172,13 @@ export default {
     this.req.orderField = "id";
   },
   // 导航离开该组件的对应路由时调用
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave (to, from, next) {
     this.searchPoptipModal = false;
     next();
   },
   methods: {
     // 获取分页列表数据
-    pageLoad() {
+    pageLoad () {
       this.tableConfig.loading = true;
       const { workOrder, lineName, createDate, stockDate, unitId, unitId56, panelNo } = this.req;
       let obj = {
@@ -274,14 +202,14 @@ export default {
           if (res.code === 200) {
             let { data, pageSize, pageIndex, total, totalPage } = res.result;
             this.data = data || [];
-            this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+            this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
             this.searchPoptipModal = false;
           }
         })
         .catch(() => (this.tableConfig.loading = false));
     },
     // 获取合计数
-    getTotal(item) {
+    getTotal (item) {
       let total = 0;
       for (let key of Object.keys(item)) {
         if (key.includes("time") && !isNaN(Number(item[key]))) total += Number(item[key]);
@@ -289,7 +217,7 @@ export default {
       return total;
     },
     // 获取线体数据
-    async getLineList() {
+    async getLineList () {
       const obj = {
         userId: this.$store.state.id,
         systemFlag: this.$store.state.systemFlag,
@@ -304,16 +232,16 @@ export default {
       });
     },
     // 点击重置按钮触发
-    resetClick() {
+    resetClick () {
       this.$refs.searchReq.resetFields();
     },
     // 点击搜索按钮触发
-    searchClick() {
+    searchClick () {
       this.req.pageIndex = 1;
       this.pageLoad();
     },
     // 导出
-    exportClick() {
+    exportClick () {
       const { workOrder, lineName, createDate, stockDate, unitId, unitId56, panelNo } = this.req;
       let obj = {
         workOrder, // 工单
@@ -331,16 +259,16 @@ export default {
       });
     },
     // 自动改变表格高度
-    autoSize() {
+    autoSize () {
       this.tableConfig.height = document.body.clientHeight - 120 - 60;
     },
     // 选择第几页
-    pageChange(index) {
+    pageChange (index) {
       this.req.pageIndex = index;
       this.pageLoad();
     },
     // 选择一页有条数据
-    pageSizeChange(index) {
+    pageSizeChange (index) {
       this.req.pageIndex = 1;
       this.req.pageSize = index;
       this.pageLoad();

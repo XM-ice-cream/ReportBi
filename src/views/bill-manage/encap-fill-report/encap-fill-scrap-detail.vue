@@ -2,7 +2,7 @@
 <template>
   <Modal draggable v-model="modalFlag" width="1250" title="EncapScrap明细" :styles="{ top: '20px' }" :closable="true">
     <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columns" :data="data"></Table>
-    <page-custom :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+    <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
     <BarEncapFill ref="barEncapFill" style="width: 900px; height: 420px" :data="barData" index="eqpEncapFill" />
     <div slot="footer">
       <Button @click="modalCancel">{{ $t("cancel") }}</Button>
@@ -92,7 +92,7 @@ export default {
         if (res.code === 200) {
           let { data, pageSize, pageIndex, total, totalPage } = res.result;
           this.data = data || []
-          this.req = { ...this.req, pageSize, pageIndex, total, totalPage };
+          this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
         }
       })
       getpagelistDamRateReq(obj.data).then((res) => {
