@@ -48,6 +48,11 @@
           <template slot-scope="{ row }" slot="moQty">
             <div style="white-space:pre">{{ row.moQty }}</div>
           </template>
+          <!-- category -->
+          <template slot-scope="{ row }" slot="category">
+            <div v-if="row.category==='wip'">{{ row.category.toUpperCase() }}</div>
+            <div v-else>{{ row.category}}</div>
+          </template>
           <!-- OP40 -->
           <template slot-scope="{ row }" slot="step3">
             <span v-if="row.category==='wip'" class="green">{{ row.step3 }}</span>
@@ -98,24 +103,16 @@ export default {
       searchObj: {},
       columns: [
         {
-          type: "index",
-          fixed: "left",
-          width: 50,
-          align: "center",
-          indexMethod: (row) => {
-            return row._index + 1;
-          },
-        },
-        {
           title: "Line",
           key: "line",
+          fixed: "left",
           minWidth: 80,
           ellipsis: true,
           tooltip: true,
           align: "center",
         },
         {
-          title: "Mode",
+          title: "Model",
           minWidth: 80,
           align: "center",
           key: "mode",
@@ -142,7 +139,7 @@ export default {
           title: "Category",
           minWidth: 80,
           align: "center",
-          key: "category",
+          slot: "category",
         },
         {
           title: "AutoTape",
@@ -291,13 +288,13 @@ export default {
     },
     //合并单元格
     handleSpan ({ row, column, rowIndex, columnIndex }) {
-      if (rowIndex % 2 === 0 && (columnIndex === 1 || columnIndex === 2)) {
+      if (rowIndex % 2 === 0 && (columnIndex === 0 || columnIndex === 1)) {
         return {
           rowspan: 2,
           colspan: 1
         };
       }
-      if (rowIndex % 2 != 0 && (columnIndex === 1 || columnIndex === 2)) {
+      if (rowIndex % 2 != 0 && (columnIndex === 0 || columnIndex === 1)) {
         return {
           rowspan: 0,
           colspan: 0
