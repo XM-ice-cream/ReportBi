@@ -47,10 +47,7 @@ export default {
         title: '是否删除所选图层?',
         onOk: () => {
           this.$emit("deletelayer");
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
+          this.$Message.success("删除成功!");
         }
       })
     },

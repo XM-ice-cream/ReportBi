@@ -174,7 +174,7 @@ export default {
         if (sampleItem instanceof Date) sampleItem = formatDate(sampleItem)
         contextData[this.userNameList[i].paramName] = sampleItem;
       };
-      console.log("刷新", contextData);
+      console.log("刷新", contextData, this.rowParamList, this.columnsParamList);
       let data = { rows: [], columns: [] };
       //行
       [this.rowParamList, this.columnsParamList].forEach((paramList, paramIndex) => {

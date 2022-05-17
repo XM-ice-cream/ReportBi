@@ -48,13 +48,23 @@ let queryform = {
                     result
                 } = await getDataReq(params);
                 if (code != 200) return;
-                // result = JSON.parse(result);
-                const analysisData = this.analysisChartsData(params, result);
+                const {
+                    rows,
+                    columns
+                } = result;
+                let isFuntion = ""; //获取哪一个有计算属性
+                // [rows, columns].forEach((item, index) => {
+                //     console.log(index, item);
+                //     if (item.filter(x => x.function).length > 0) {
+                //         isFuntion = index === 0 ? "rows" : "columns";
+                //     }
+                // })
+                const analysisData = this.analysisChartsData(params, result, isFuntion);
                 resolve(analysisData)
             })
         },
         // 解析不同图标的数据
-        analysisChartsData(params, data) {
+        analysisChartsData(params, data, isFuntion) {
             // widget-barchart 柱线图、widget-linechart 折线图、 widget-barlinechart 柱线图
             // widget-piechart 饼图、widget-funnel 漏斗图
             // widget-text 文本框
@@ -66,7 +76,7 @@ let queryform = {
                 chartType == "widget-linechart" ||
                 chartType == "widget-barlinechart"
             ) {
-                return this.barOrLineChartFn(data.chartProperties, data.data);
+                return this.barOrLineChartFn(data.chartProperties, data.data, isFuntion);
             } else if (
                 chartType == "widget-piechart" ||
                 chartType == "widget-funnel"
@@ -81,9 +91,15 @@ let queryform = {
             }
         },
         // 柱状图、折线图、柱线图
-        barOrLineChartFn(chartProperties, data) {
+        barOrLineChartFn(chartProperties, data, isFuntion) {
             // console.log('data', data, chartProperties);
             const ananysicData = {};
+            // if (!isFuntion) {
+            //     console.log("无计数");
+            //     ananysicData["value"] = data;
+            //     return ananysicData
+            // }
+
             const xAxisList = []; //x轴
             const series = [];
             let legend = [];
@@ -113,26 +129,6 @@ let queryform = {
                 })
 
             })
-            // for (const key in chartProperties) {
-            //     const obj = {};
-            //     const seriesData = [];
-            //     const value = chartProperties[key];
-            //     obj["type"] = value;
-            //     obj["name"] = key;
-            //     for (let i = 0; i < data.length; i++) {
-            //         if (value.startsWith("xAxis")) {
-            //             // 代表为x轴
-            //             xAxisList[i] = data[i][key];
-            //         } else {
-            //             // 其他的均为series展示数据
-            //             seriesData[i] = data[i][key];
-            //         }
-            //     }
-            //     obj["data"] = seriesData;
-            //     if (!obj["type"].startsWith("xAxis")) {
-            //         series.push(obj);
-            //     }
-            // }
             ananysicData["xAxis"] = xAxisList;
             ananysicData["series"] = series;
             ananysicData["legend"] = legend;

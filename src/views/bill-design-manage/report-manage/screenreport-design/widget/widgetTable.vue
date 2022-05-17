@@ -124,7 +124,6 @@ export default {
   methods: {
     initData () {
       this.handlerRollFn();
-      this.handlerHead();
       this.handlerData();
       this.visConfig();
     },
@@ -142,9 +141,29 @@ export default {
       this.options = options;
       this.hackResetFun();
     },
+    //修改title
     handlerHead () {
       const head = this.optionsSetUp.dynamicAddTable;
+      console.log(head, "head");
       this.header = head;
+    },
+    //初始化title
+    setHead () {
+      if (this.list.length > 0) {
+        const head = this.optionsSetUp.dynamicAddTable;
+        console.log(head, "head");
+        this.header = head;
+        Object.keys(this.list[0]).forEach(item => {
+          this.header.push({
+            key: item,
+            name: item,
+            width: "200",
+          })
+        })
+        // const head = this.header;
+        // this.optionsSetUp.dynamicAddTable = head;
+
+      }
     },
     handlerData () {
       const tableData = this.optionsData;
@@ -153,6 +172,7 @@ export default {
         : this.handlerDynamicData(tableData.dynamicData, tableData.refreshTime);
     },
     handlerStaticData (data) {
+      this.handlerHead();
       this.list = data;
     },
     handlerDynamicData (data, refreshTime) {
@@ -169,7 +189,9 @@ export default {
     getEchartData (val) {
       const data = this.queryEchartsData(val);
       data.then(res => {
+        console.log("表格数据", res);
         this.list = res;
+        this.setHead(); //设定头部
         this.hackResetFun();
       });
     },
@@ -203,9 +225,9 @@ export default {
     },
     tableFiledWidth (index) {
       let styleJson = {};
-      const tableWidth = this.optionsSetUp.dynamicAddTable[index].width;
+      const tableWidth = this.header[index].width;
       if (tableWidth) {
-        styleJson["width"] = !tableWidth.includes('%') ? tableWidth + 'px' : tableWidth;
+        styleJson["width"] = tableWidth.indexOf('%') < 0 ? tableWidth + 'px' : tableWidth;
       }
       return styleJson;
     }

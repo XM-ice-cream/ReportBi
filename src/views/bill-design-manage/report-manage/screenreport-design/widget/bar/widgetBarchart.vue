@@ -342,20 +342,6 @@ export default {
       customColor.forEach((item) => {
         arrColor.push(item.color);
       })
-      //   const itemStyle = {
-      //     normal: {
-      //       color: params => {
-      //         return arrColor[params.dataIndex];
-      //       },
-      //       barBorderRadius: optionsSetup.radius
-      //     }
-      //   };
-      //   for (const key in this.options.series) {
-      //     if (this.options.series[key].type == "bar") {
-      //       this.options.series[key].itemStyle = itemStyle;
-      //     }
-      //   }
-      //   this.options = Object.assign({}, this.options);
       this.options.color = arrColor;
     },
     // 数据解析
@@ -422,7 +408,10 @@ export default {
       });
     },
     renderingFn (optionsSetup, val) {
-      console.log('(optionsSetup.verticalShow', optionsSetup.verticalShow);
+      //如果均为字符串，显示表格
+      //   if (val.value) {
+      //     return;
+      //   }
       //还原x轴，y轴数据
       this.options = {
         ...this.options, xAxis: {
