@@ -12,14 +12,13 @@
           </div>
           <!-- DBlist -->
           <div class="dblist">
-            <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs" v-model="activeNames">
+            <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs">
               <Panel :name="item.setCode">
                 {{item.setName}}
                 <div slot="content">
                   <div class="deletePop">
                     <Icon type="md-trash" @click="del(item)" />
                   </div>
-
                   <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
                     <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
                   </draggable>
@@ -48,7 +47,7 @@
         </Content>
         <!-- 右侧基础配置 -->
         <Sider hide-trigger class="sider" style="right:0;position:absolute">
-          <Tabs v-model="activeName">
+          <Tabs>
             <TabPane label="基础配置" name="first">
               <Form ref="rightForm" :model="rightForm" :label-width="60" style="padding: 0 0.5rem">
                 <FormItem label="坐标">
@@ -78,15 +77,98 @@
     <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='902'>
       <div class="tableTabs">
         <Tabs>
-          <TabPane label="数据集">
-
+          <TabPane label="数据集" :index="1">
+            <Form :label-width="150" :label-colon="true" inline @keyup.enter.native="queryAllDataSet">
+              <FormItem label="数据集名称">
+                <Input type="text" v-model="req.setName" cleabler />
+              </FormItem>
+              <FormItem label="数据集编码">
+                <Input type="text" v-model="req.setCode" cleabler />
+              </FormItem>
+              <FormItem label="数据源编码">
+                <Input type="text" v-model="req.sourceCode" cleabler />
+              </FormItem>
+            </Form>
+            <!-- 数据集表格 -->
+            <div class="dataset-table">
+              <ul>
+                <draggable v-model="setParamListC" :group="{name:'dataset',pull:'clone'}">
+                  <li :key="index" v-for="(item,index) in setParamListC">{{item.setName}}</li>
+                </draggable>
+              </ul>
+              <Spin size="large" class="loading" v-if="setParamListC.length==0"></Spin>
+              <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+            </div>
+            <!-- 数据集拖拽显示的列 -->
+            <div class="dataset-draggable">
+              <draggable :group="{name:'dataset'}" class="dataset-item" v-model="dataBaseList" chosenClass="item">
+                <div v-for="(item,index) in dataBaseList" :key="index">{{item.setName}}</div>
+              </draggable>
+            </div>
           </TabPane>
-          <!-- <TabPane label="Windows">标签二的内容</TabPane>
-          <TabPane label="Linux">标签三的内容</TabPane> -->
+          <TabPane label="对应关系" :index="2">
+            <template v-for="(item,index) in dataSetDataList">
+              <Form :label-width="80" :label-colon="true" :key="index" inline>
+                <FormItem label="数据集1">
+                  <Select v-model="dataSetDataList[index].setName" clearable filterable transfer @on-change="setCodeChange(index)">
+                    <Option v-for="(dataBaseItem, dataBaseIndex) in dataBaseList" :value="dataBaseItem.setName" :key="dataBaseIndex">
+                      {{dataBaseItem.setName}}
+                    </Option>
+                  </Select>
+                </FormItem>
+                <FormItem label="类型" :label-width="50">
+                  <Select v-model="dataSetDataList[index].type" clearable filterable transfer>
+                    <Option v-for="(item, i) in typeList" :value="item.detailName" :key="i">
+                      {{ item.detailName }}
+                    </Option>
+                  </Select>
+                </FormItem>
+                <FormItem label="数据集2">
+                  <Input v-model="dataSetDataList[index].setName2" />
+                </FormItem>
+                <!-- <span style="display:none">{{index = index +2}}</span> -->
+              </Form>
+            </template>
+          </TabPane>
+          <TabPane label="关联参数" :index="3">
+            <template v-for="(item,itemIndex) in dataSetDataList">
+              <table :key="itemIndex" style="width: 100%;" class="connection-table">
+                <tr>
+                  <th>{{item.setName}}</th>
+                  <th>操作符</th>
+                  <th>{{item.setName2}}</th>
+                  <th></th>
+                </tr>
+                <tr v-for="(fieldItem,fieldIndex) in item.field" :key="fieldIndex">
+                  <td>
+                    <Select v-model="dataSetDataList[itemIndex].field[fieldIndex].field1" clearable filterable transfer>
+                      <Option v-for="(item, i) in item.setCodeList" :value="item" :key="i">{{item}}</Option>
+                    </Select>
+                  </td>
+                  <td>
+                    <Select v-model="dataSetDataList[itemIndex].field[fieldIndex].operator" clearable filterable transfer>
+                      <Option v-for="(item, i) in selectList" :value="item.detailName" :key="i">
+                        {{ item.detailName }}
+                      </Option>
+                    </Select>
+                  </td>
+                  <td>
+                    <Select v-model="dataSetDataList[itemIndex].field[fieldIndex].field2" clearable filterable transfer>
+                      <Option v-for="(item, i) in item.setCode2List" :value="item" :key="i">{{item}}</Option>
+                    </Select>
+                  </td>
+                  <td>
+                    <Button type="primary" @click.native="addData(itemIndex)" :key="itemIndex+fieldIndex+'B'"> 添加</Button>
+                    &nbsp;&nbsp;
+                    <Button type="error" @click.native="deleteData(itemIndex,fieldIndex)" :key="itemIndex+fieldIndex+'D'"> 删除</Button>
+                  </td>
+                </tr>
+              </table>
+            </template>
+          </TabPane>
         </Tabs>
       </div>
-      <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='300' tooltip-effect="dark" @on-selection-change="handleSelectionChange" draggable="true" @on-drag-drop="onDragDrop"></Table>
-      <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+
       <div slot="footer" class="dialog-footer">
         <Button @click="outerVisible = false">取 消</Button>
         <Button type="primary" @click="checkDataSet">确定 </Button>
@@ -100,26 +182,22 @@
 import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 import { getExcelByReportcodeReq, insertExcelReportReq, modifyExcelReportReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
+
 export default {
   name: "excelreport-design",
   components: { draggable },
   data () {
     return {
-
-      dialogFormVisibleTitle: '报表EXCEL 设计',
-      formData: {},
       dataSet: [],
-      activeNames: ["1"],
-      activeName: "first",
+      setCode: "",
       outerVisible: false,
-      dataSetData: [],
-      setCode: '',
       reportCode: '',
-      selectArr: [],
       draggableFieldLabel: '',//拖拽的文本内容
       sheetData: '',
       tableConfig: { ...this.$config.tableConfig }, // table配置
       req: {
+        sourceCode: "", setCode: "", setName: "",
         ...this.$config.pageConfig,
       },
       rightForm: {
@@ -130,19 +208,6 @@ export default {
         auto: false,
         autoIsShow: false
       },
-      columns: [
-        {
-          type: 'selection',
-          width: 60,
-          align: 'center',
-        },
-        {
-          type: "index", width: 50, align: "center",
-        },
-        { title: '数据集名称', key: "setName", align: "center", tooltip: true, width: '120' },
-        { title: '数据集描述', key: "setDesc", align: "center", tooltip: true, width: '180' },
-        { title: '数据集编码', key: "setCode", align: "center", tooltip: true }
-      ],
       reportExcelDto: {
         id: null,
         jsonStr: "",
@@ -150,18 +215,86 @@ export default {
         setParam: "",
         reportCode: ""
       },
+      dataBaseList: [],//选中数据集列
+      dataSetDataList: [],//选中数据集结果集
+      dataSetData: [],//数据集
+      selectList: [],//操作符下拉
+      typeList: [],//连接类型下拉
 
     };
   },
+  watch: {
+    dataBaseList () {
+      this.dataSetDataList = [];
+      this.dataBaseList.forEach((item, index) => {
+        if (index + 1 !== this.dataBaseList.length) {
+          const { setName, setCode } = this.dataBaseList[index + 1];
+          Promise.all([this.detail(item.setCode), this.detail(setCode)]).then(res => {
+            console.log(res);
+            const obj = {
+              setCode: item.setCode,
+              setName: item.setName,
+              setName2: setName,
+              setCode2: setCode,
+              setCodeList: res[0].setParamList,
+              setCode2List: res[1].setParamList,
+              field: !(item?.field || 0) ? [{ field1: "", field2: "", operator: "=" }] : item.field
+            }
+            this.dataSetDataList[index] = { ...obj };
+            this.$nextTick(() => {
+              this.dataSetDataList = JSON.parse(JSON.stringify(this.dataSetDataList));
+              console.log(this.dataSetDataList, this.dataBaseList);
+            })
+          })
+        }
+      })
+
+    },
+  },
+  computed: {
+    setParamListC: {
+      get () {
+        return [...new Set(this.dataSetData)]
+      },
+      set () { }
+    },
+  },
   methods: {
+    //拖拽选择的数据集
+    addData (index) {
+      this.dataSetDataList[index].field.push({ field1: "", field2: "", operator: "=" });
+      this.$forceUpdate();
+    },
+    //删除数据集
+    deleteData (index, fieldIndex) {
+      //至少要有一个关联数据
+      if (this.dataSetDataList[index].field.length == 1) {
+        this.$Message.error("至少有一个关联字段，不可删除！");
+        return;
+      }
+      //删除指定索引数据集字段
+      this.dataSetDataList[index].field.splice(fieldIndex, 1)
+    },
+    //修改setCode,setCodeList
+    setCodeChange (index) {
+      //获取setName 对应的setCode
+      const setCode = this.dataBaseList.filter(item => item.setName === this.dataSetDataList[index].setName)[0].setCode;
+      this.dataSetDataList[index].setCode = setCode;
+      //修改setCode 对应的字段集合
+      this.detail(setCode).then(res => {
+        this.dataSetDataList[index].setCodeList = res.setParamList;
+        this.$nextTick(() => {
+          this.dataSetDataList = JSON.parse(JSON.stringify(this.dataSetDataList));
+        })
+      })
+    },
+
     //初始化显示第一条
     design () {
       // 根据reportCode获取单条报表
       getExcelByReportcodeReq({ reportCode: this.reportCode }).then(res => {
         if (res.code === 200) {
-
           const { result } = res;
-
           if (result != null) {
             this.reportId = result.reportCode;
           }
@@ -275,10 +408,6 @@ export default {
       let fieldLabel = evt.item.innerText; // 列名称
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
     },
-    //表格拖拽
-    onDragDrop () {
-
-    },
     autoChangeFunc (auto) {
       if (auto) {
         luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "1" })
@@ -289,12 +418,13 @@ export default {
     //查看所有数据集
     queryAllDataSet () {
       this.outerVisible = true;
+      const { sourceCode, setCode, setName } = this.req;
       let obj = {
         orderField: "setCode", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
-        data: { sourceCode: "", setCode: "", setName: "" },
+        data: { sourceCode, setCode, setName },
       };
       getpagelistReq(obj).then(res => {
         if (res.code === 200) {
@@ -305,24 +435,43 @@ export default {
       })
     },
     //选择选中的数据集
-    checkDataSet () {
-      this.outerVisible = false;
-      if (this.selectArr.length > 1) {
-        this.$Message.warning("一次最多勾选一个数据集");
-        this.outerVisible = true;
-      } else {
-        this.detail(this.selectArr[0].setCode);
-      }
+    async checkDataSet () {
+      //   this.outerVisible = false;
+      //   if (this.dataBaseList.length > 1) {
+      //     this.$Message.warning("一次最多选择一个数据集");
+      //     this.outerVisible = true;
+      //   } else {
+      //     const setCode = this.dataBaseList[0].setCode;
+      //     let data = await this.detail(setCode);
+      //     this.dataSet.push(data);
+      //   }
+      console.log(this.dataSetDataList);
     },
-    detail (setCode) {
+    async detail (setCode) {
       const obj = { setCode: setCode };
-      getDeatilByIdReq(obj).then(res => {
+      return await getDeatilByIdReq(obj).then((res) => {
         if (res.code === 200) {
           const data = res.result;
-          this.dataSet.push(data);
+          //console.log("this.dataSet", data);
+          return data;
         }
       });
+    },
 
+    // 获取业务数据
+    async getDataItemData () {
+      this.selectList = await this.getDataItemDetailList("dataSetSymbol"); // 操作符
+      this.typeList = await this.getDataItemDetailList("dataSetRelationship"); // 获取站点数据
+    },
+    // 获取数据字典数据
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) {
+          arr = res.result || [];
+        }
+      });
+      return arr;
     },
     //预览
     preview () {
@@ -379,10 +528,6 @@ export default {
         this.closeDialog();
       }
     },
-    //删除多选
-    handleSelectionChange (val) {
-      this.selectArr = val;
-    },
     //删除数据集数据
     del (val) {
       this.$Modal.confirm({
@@ -418,14 +563,12 @@ export default {
     },
   },
   mounted () {
+    this.getDataItemData();
     this.$nextTick(() => {
       this.reportCode = this.$route.query.reportCode
       this.design();
-      //   window.jQuery.noConflict();
-      //  console.log(window);
     })
-
-  }
+  },
 };
 </script>
  <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
@@ -544,9 +687,68 @@ export default {
   /deep/ .ivu-modal {
     width: 60% !important;
   }
+  /deep/.ivu-tabs .ivu-tabs-tabpane {
+    overflow: auto;
+  }
   .tableTabs {
-    min-height: 200px;
+    min-height: 500px;
     margin-bottom: 0.5rem;
+    height: 500px;
+    overflow-y: auto;
+    .ivu-tabs {
+      height: 100%;
+    }
+    /deep/ .ivu-tabs .ivu-tabs-content-animated {
+      height: calc(100% - 2.5rem);
+    }
+    .dataset-table,
+    .dataset-draggable {
+      width: 50%;
+      display: inline-block;
+      float: left;
+      height: 90%;
+      ul {
+        height: calc(100% - 2rem);
+        overflow-y: auto;
+        li {
+          background: #32dd951f;
+          padding: 0.5rem;
+          width: 90%;
+          margin: 0 auto;
+          //   color: #1ec0d1;
+          margin-bottom: 0.3rem;
+        }
+      }
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 20%;
+      }
+    }
+  }
+  .dataset-item {
+    height: 100%;
+    background: #32dd951f;
+    border-radius: 10px;
+    margin-left: 1.5rem;
+    div {
+      padding: 0.3rem 0.5rem;
+      text-align: center;
+      line-height: 2rem;
+      border: 1px solid #27ce88;
+      border-radius: 1rem;
+      display: inline-block;
+      margin: 0.5rem;
+    }
+  }
+  .connection-table {
+    margin: 1rem 0;
+    tr {
+      margin: 1rem 0;
+    }
+  }
+  tr .ivu-select {
+    padding: 0.5rem;
   }
 }
 /deep/ #luckysheet-row-count-show {
