@@ -1,73 +1,71 @@
 <template>
   <div style="height:100%">
-    <div class="layout">
-      <Layout>
-        <!-- 左侧 -->
-        <Sider hide-trigger class="sider">
-          <!-- 数据集管理 -->
-          <div class="title">数据集管理</div>
-          <!-- 添加图表 -->
-          <div class="icon" @click="queryAllDataSet">
-            <Icon type="md-add" />
-          </div>
-          <!-- DBlist -->
-          <div class="dblist">
-            <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs">
-              <Panel :name="item.setCode">
-                {{item.setName}}
-                <div slot="content">
-                  <div class="deletePop">
-                    <Icon type="md-trash" @click="del(item)" />
-                  </div>
-                  <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
-                    <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
-                  </draggable>
+    <Layout class="layout">
+      <!-- 左侧 -->
+      <Sider hide-trigger class="sider">
+        <!-- 数据集管理 -->
+        <div class="title">数据集管理</div>
+        <!-- 添加图表 -->
+        <div class="icon" @click="queryAllDataSet">
+          <Icon type="md-add" />
+        </div>
+        <!-- DBlist -->
+        <div class="dblist">
+          <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs">
+            <Panel :name="item.setCode">
+              {{item.setName}}
+              <div slot="content">
+                <div class="deletePop">
+                  <Icon type="md-trash" @click="del(item)" />
                 </div>
-              </Panel>
-            </Collapse>
-          </div>
-        </Sider>
-        <!-- 中间内容excel -->
-        <Content class="content">
-          <div class="push_btn">
-            <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
-              <Button type="text" @click="save(false)">
-                <Icon type="ios-folder" />
-              </Button>
-            </Tooltip>
-            <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
-              <Button type="text" @click="preview()">
-                <Icon type="md-eye" />
-              </Button>
-            </Tooltip>
+                <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
+                  <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
+                </draggable>
+              </div>
+            </Panel>
+          </Collapse>
+        </div>
+      </Sider>
+      <!-- 中间内容excel -->
+      <Content class="content">
+        <div class="push_btn">
+          <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
+            <Button type="text" @click="save(false)">
+              <Icon type="ios-folder" />
+            </Button>
+          </Tooltip>
+          <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
+            <Button type="text" @click="preview()">
+              <Icon type="md-eye" />
+            </Button>
+          </Tooltip>
 
-          </div>
-          <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
-          <div style="display:none"></div>
-        </Content>
-        <!-- 右侧基础配置 -->
-        <Sider hide-trigger class="sider" style="right:0;position:absolute">
-          <Tabs>
-            <TabPane label="基础配置" name="first">
-              <Form ref="rightForm" :model="rightForm" :label-width="60" style="padding: 0 0.5rem">
-                <FormItem label="坐标">
-                  <Input v-model="rightForm.coordinate" />
-                </FormItem>
-                <FormItem label="值">
-                  <Input v-model="rightForm.value" />
-                </FormItem>
-                <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
-                  <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event)" /> &nbsp;
-                  <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
-                    <i class="el-icon-question"> </i>
-                  </Tooltip>
-                </FormItem>
-              </Form>
-            </TabPane>
-          </Tabs>
-        </Sider>
-      </Layout>
-    </div>
+        </div>
+        <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
+        <div style="display:none"></div>
+      </Content>
+      <!-- 右侧基础配置 -->
+      <Sider hide-trigger class="sider" style="right:0;position:absolute">
+        <Tabs>
+          <TabPane label="基础配置" name="first">
+            <Form ref="rightForm" :model="rightForm" :label-width="60" style="padding: 0 0.5rem">
+              <FormItem label="坐标">
+                <Input v-model="rightForm.coordinate" />
+              </FormItem>
+              <FormItem label="值">
+                <Input v-model="rightForm.value" />
+              </FormItem>
+              <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
+                <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event)" /> &nbsp;
+                <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
+                  <i class="el-icon-question"> </i>
+                </Tooltip>
+              </FormItem>
+            </Form>
+          </TabPane>
+        </Tabs>
+      </Sider>
+    </Layout>
 
     <!-- 数据集管理弹框--表格 -->
     <Modal title="数据集管理" v-model="outerVisible" class="tableModal">
@@ -164,7 +162,6 @@
           </TabPane>
         </Tabs>
       </div>
-
       <div slot="footer" class="dialog-footer">
         <Button @click="outerVisible = false">取 消</Button>
         <Button type="primary" @click="checkDataSet">确定 </Button>
@@ -473,8 +470,13 @@ export default {
     },
     //预览
     preview () {
-      this.closeDialog();
-      this.$parent.previewVisib = true;
+      const { href } = this.$router.resolve({
+        path: '/bill-design-manage/excelreport-preview',
+        query: {
+          reportCode: this.reportCode
+        }
+      });
+      window.open(href, '_blank');
     },
     //保存
     async save (flag) {
