@@ -68,13 +68,9 @@
         </Sider>
       </Layout>
     </div>
-    <div slot="footer" class="dialog-footer">
-      <Button @click="closeDialog">取消</Button>
-      <Button type="primary" @click="save(true)">保存并关闭</Button>
-    </div>
 
     <!-- 数据集管理弹框--表格 -->
-    <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='902'>
+    <Modal title="数据集管理" v-model="outerVisible" class="tableModal">
       <div class="tableTabs">
         <Tabs>
           <TabPane label="数据集" :index="1">
@@ -268,10 +264,10 @@ export default {
     //删除数据集
     deleteData (index, fieldIndex) {
       //至少要有一个关联数据
-      if (this.dataSetDataList[index].field.length == 1) {
-        this.$Message.error("至少有一个关联字段，不可删除！");
-        return;
-      }
+      //   if (this.dataSetDataList[index].field.length == 1) {
+      //     this.$Message.error("至少有一个关联字段，不可删除！");
+      //     return;
+      //   }
       //删除指定索引数据集字段
       this.dataSetDataList[index].field.splice(fieldIndex, 1)
     },
@@ -304,7 +300,9 @@ export default {
             if (result.setCodes != null && result.setCodes !== "") {
               let dataSetList = result.setCodes.split("|");
               dataSetList.forEach(code => {
-                this.detail(code);
+                this.detail(code).then(res => {
+                  this.dataSet.push(res);
+                });
               });
             }
           }
@@ -436,15 +434,15 @@ export default {
     },
     //选择选中的数据集
     async checkDataSet () {
-      //   this.outerVisible = false;
-      //   if (this.dataBaseList.length > 1) {
-      //     this.$Message.warning("一次最多选择一个数据集");
-      //     this.outerVisible = true;
-      //   } else {
-      //     const setCode = this.dataBaseList[0].setCode;
-      //     let data = await this.detail(setCode);
-      //     this.dataSet.push(data);
-      //   }
+      this.outerVisible = false;
+      if (this.dataBaseList.length > 1) {
+        this.$Message.warning("一次最多选择一个数据集");
+        this.outerVisible = true;
+      } else {
+        const setCode = this.dataBaseList[0].setCode;
+        let data = await this.detail(setCode);
+        this.dataSet.push(data);
+      }
       console.log(this.dataSetDataList);
     },
     async detail (setCode) {
@@ -562,8 +560,9 @@ export default {
       this.queryAllDataSet();
     },
   },
-  mounted () {
+  created () {
     this.getDataItemData();
+    console.log("创建");
     this.$nextTick(() => {
       this.reportCode = this.$route.query.reportCode
       this.design();
@@ -573,9 +572,6 @@ export default {
 </script>
  <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
 <style>
-.luckysheet-input-box {
-  z-index: 1000;
-}
 </style>
 <style lang="less" scoped>
 .sider {
@@ -635,12 +631,12 @@ export default {
   transform: translate(-50%, -50%);
   margin-left: 0rem;
   padding: 1rem;
+  overflow-x: visible !important;
   .push_btn {
     position: absolute;
-    z-index: 100;
     top: 15px;
     right: 13%;
-
+    z-index: 99;
     i {
       color: #6c6666;
       font-size: 1.12rem;
