@@ -227,8 +227,8 @@ export default {
             }
             this.tableConfig.loading = true;
             let obj = {
-              orderField: "unitId", // 排序字段
-              ascending: true, // 是否升序
+              orderField: "INPROCESSTIME", // 排序字段
+              ascending: false, // 是否升序
               pageSize: this.req.pageSize, // 分页大小
               pageIndex: this.req.pageIndex, // 当前页码
               data: {

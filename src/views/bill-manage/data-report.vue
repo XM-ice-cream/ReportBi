@@ -69,6 +69,10 @@
                     <FormItem :label="$t('unitId')" prop="unitId">
                       <Input v-model="req.unitId" :placeholder="$t('pleaseEnter') + $t('unitId')" @keyup.native.enter="searchClick" />
                     </FormItem>
+                    <!-- 图片导出 -->
+                    <FormItem label="imageExport" prop="imageExport">
+                      <Input v-model.trim="req.imageExport" :placeholder="$t('pleaseEnter') + 'SN'" @keyup.native.enter="searchClick" />
+                    </FormItem>
                     <!-- panelNo -->
                     <FormItem :label="$t('panelNo')" prop="panelno">
                       <Input v-model="req.panelno" :placeholder="$t('pleaseEnter') + $t('panelNo')" @keyup.native.enter="searchClick" />
@@ -159,6 +163,7 @@ export default {
         eqpId: "", // 机台编号
         pcbBin: "", // pcbBin
         ledBin: "", // ledBin
+        imageExport: "failImages,passImages,afterCuringImages,xrayImages",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -244,6 +249,7 @@ export default {
         ledBin,
         startTime,
         endTime,
+        imageExport
       } = this.req;
       this.$refs.searchReq.validate((validate) => {
         if (validate) {
@@ -266,6 +272,7 @@ export default {
               ledBin,
               startTime: formatDate(startTime),
               endTime: formatDate(endTime),
+              imageExport
             },
           };
           getpagelistReq(obj)
@@ -296,6 +303,7 @@ export default {
         ledBin,
         startTime,
         endTime,
+        imageExport
       } = this.req;
       const obj = {
         workOrder,
@@ -310,6 +318,7 @@ export default {
         ledBin,
         startTime: formatDate(startTime),
         endTime: formatDate(endTime),
+        imageExport
       };
       exportReq(obj).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
