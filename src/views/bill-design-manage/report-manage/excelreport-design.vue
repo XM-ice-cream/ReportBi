@@ -12,7 +12,7 @@
         <!-- DBlist -->
         <div class="dblist">
           <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs">
-            <Panel :name="item.setCode">
+            <Panel :name="item.setCode" :title="item.setName">
               {{item.setName}}
               <div slot="content">
                 <div class="deletePop">
@@ -100,7 +100,7 @@
               </draggable>
             </div>
           </TabPane>
-          <TabPane label="对应关系" :index="2">
+          <TabPane label="对应关系" :index="2" v-if="dataSetDataList.length>0">
             <template v-for="(item,index) in dataSetDataList">
               <Form :label-width="80" :label-colon="true" :key="index" inline>
                 <FormItem label="数据集1">
@@ -124,7 +124,7 @@
               </Form>
             </template>
           </TabPane>
-          <TabPane label="关联参数" :index="3">
+          <TabPane label="关联参数" :index="3" v-if="dataSetDataList.length>0">
             <template v-for="(item,itemIndex) in dataSetDataList">
               <table :key="itemIndex" style="width: 100%;" class="connection-table">
                 <tr>
@@ -622,6 +622,10 @@ export default {
       }
     }
   }
+}
+/deep/ .ivu-collapse > .ivu-collapse-item > .ivu-collapse-header {
+  overflow: hidden;
+  padding-right: 0.5rem;
 }
 .content {
   width: calc(100% - 400px);
