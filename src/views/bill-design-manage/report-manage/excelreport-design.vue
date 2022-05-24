@@ -30,7 +30,7 @@
       <Content class="content">
         <div class="push_btn">
           <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
-            <Button type="text" @click="save(false)">
+            <Button type="text" @click="save()">
               <Icon type="ios-folder" />
             </Button>
           </Tooltip>
@@ -479,7 +479,7 @@ export default {
       window.open(href, '_blank');
     },
     //保存
-    async save (flag) {
+    async save () {
       const jsonData = luckysheet.getAllSheets();
       for (let i = 0; i < jsonData.length; i++) {
         //清空data数据，以celldata数据为主
@@ -516,7 +516,6 @@ export default {
           return;
         };
         this.$Message.success("保存成功");
-        if (flag) this.closeDialog();
       } else {
         this.reportExcelDto.id = this.reportId;
         const { code, message } = await modifyExcelReportReq(this.reportExcelDto);
@@ -525,7 +524,6 @@ export default {
           return;
         };
         this.$Message.success("更新成功");
-        this.closeDialog();
       }
     },
     //删除数据集数据
@@ -544,11 +542,6 @@ export default {
         },
       });
 
-    },
-    //关闭弹框
-    closeDialog () {
-      this.$emit('update:visib', false);
-      this.dataSet = [];
     },
     // 选择第几页
     pageChange (index) {
