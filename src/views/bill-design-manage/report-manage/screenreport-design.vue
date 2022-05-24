@@ -69,14 +69,11 @@
             </TabPane>
             <TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据" :index='2'>
               <dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" @getSetParamsList="getSetParamsList" />
-
-              <!-- <data-design ref="dataDesign" :options="widgetOptions.data" @onChanged="val => widgetValueChanged('data', val)" /> -->
             </TabPane>
             <TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标" :index='3'>
               <dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="val => widgetValueChanged('position', val)" />
             </TabPane>
           </Tabs>
-
         </Sider>
       </Layout>
     </div>
