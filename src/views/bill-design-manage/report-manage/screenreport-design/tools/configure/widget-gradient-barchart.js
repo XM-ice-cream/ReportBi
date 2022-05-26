@@ -28,6 +28,13 @@ export const widgetGradientBarchart = {
                 required: false,
                 placeholder: '',
                 value: ''
+            }, {
+                type: 'Slider',
+                label: '滚动条显示百分比',
+                name: 'dataZoomEnd',
+                require: false,
+                placeholder: '',
+                value: 100,
             },
             [{
                     name: '柱体设置',
@@ -376,6 +383,13 @@ export const widgetGradientBarchart = {
                             required: false,
                             placeholder: '',
                             value: '#fff',
+                        }, {
+                            type: 'InputNumber',
+                            label: '多轴间距',
+                            name: 'spaceX',
+                            required: false,
+                            placeholder: '',
+                            value: 20,
                         }
                     ],
                 },
@@ -483,7 +497,14 @@ export const widgetGradientBarchart = {
                             required: false,
                             placeholder: '',
                             value: '#fff',
-                        }
+                        }, {
+                            type: 'InputNumber',
+                            label: '多轴间距',
+                            name: 'spaceY',
+                            required: false,
+                            placeholder: '',
+                            value: 100,
+                        },
                     ],
                 },
                 {

@@ -70,7 +70,8 @@ let queryform = {
             // widget-text 文本框
             // widge-table 表格(数据不要转)
             // widget-stackchart 堆叠图
-            const chartType = params.chartType
+            const chartType = params.chartType;
+            console.log("chartType", chartType);
             if (
                 chartType == "widget-barchart" ||
                 chartType == "widget-linechart" ||

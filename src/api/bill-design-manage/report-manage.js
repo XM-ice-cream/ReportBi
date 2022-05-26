@@ -5,7 +5,6 @@ import {
 // 查询
 export const getpagelistReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/getpagelist',
         method: 'post',
@@ -15,7 +14,6 @@ export const getpagelistReq = data => {
 // 插入
 export const insertReportReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/insert',
         method: 'post',
@@ -25,7 +23,6 @@ export const insertReportReq = data => {
 // 删除
 export const deleteReportReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/batchdelete',
         method: 'post',
@@ -35,7 +32,6 @@ export const deleteReportReq = data => {
 // 修改
 export const modifyReportReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/report/modify',
         method: 'post',
@@ -45,7 +41,6 @@ export const modifyReportReq = data => {
 //Excel 插入
 export const insertExcelReportReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/insert',
         method: 'post',
@@ -55,7 +50,6 @@ export const insertExcelReportReq = data => {
 //Excel 修改
 export const modifyExcelReportReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/modify',
         method: 'post',
@@ -65,7 +59,7 @@ export const modifyExcelReportReq = data => {
 //Excel 查询明细byreportcode
 export const getExcelByReportcodeReq = data => {
     return requestCenter({
-        timeout: 0,
+        timeout: 1000 * 60 * 5, //最长等待五分钟
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/detailbyreportcode',
         method: 'get',
@@ -75,7 +69,7 @@ export const getExcelByReportcodeReq = data => {
 //Excel 预览
 export const getExcelPreviewReq = data => {
     return requestCenter({
-        timeout: 0,
+        timeout: 1000 * 60 * 5, //最长等待五分钟
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/preview',
         method: 'post',
@@ -85,7 +79,6 @@ export const getExcelPreviewReq = data => {
 //图片上传
 export const uploadImageReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/v1/ftpfile/uploadimage',
         method: 'post',
@@ -95,7 +88,7 @@ export const uploadImageReq = data => {
 //新增大屏
 export const addScreenReq = data => {
     return requestCenter({
-        timeout: 0,
+        timeout: 1000 * 60 * 5, //最长等待五分钟
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportdashboard/insert',
         method: 'post',
@@ -105,7 +98,7 @@ export const addScreenReq = data => {
 //预览大屏
 export const previewScreenReq = data => {
     return requestCenter({
-        timeout: 0,
+        timeout: 1000 * 60 * 5, //最长等待五分钟
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportdashboard/preview',
         method: 'get',
@@ -115,7 +108,7 @@ export const previewScreenReq = data => {
 //获取大屏数据
 export const getDataReq = data => {
     return requestCenter({
-        timeout: 0,
+        timeout: 1000 * 60 * 5, //最长等待五分钟
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportdashboard/getdata',
         method: 'post',
@@ -125,7 +118,6 @@ export const getDataReq = data => {
 //获取数据字典
 export const getDictReq = data => {
     return requestCenter({
-        timeout: 0,
         baseUrl: "http://10.191.19.111:8700" || window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/datadicts/getpagelist',
         method: 'post',
@@ -145,4 +137,6 @@ export const exportReq = data => {
     })
 }
 //大屏默认背景图片
-export const baseImgUrl = `"http://10.191.19.111:8700"||${window.localStorage.getItem("reportDesignIp")}'/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_302730907880656896.png'`
+// ||${window.localStorage.getItem("reportDesignIp")}
+
+export const baseImgUrl = `http://10.191.19.111:8700/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_317603302898536448.png`

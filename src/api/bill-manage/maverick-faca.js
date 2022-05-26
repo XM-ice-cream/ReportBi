@@ -8,7 +8,7 @@ import {
 export const getlistReq = data => {
     return requestCenter({
         baseUrl: "http://10.32.44.113:5700" || window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/anonymous/v1/maverick/getdetaildata?id=' + data.id,
+        url: '/api/reportcenter/anonymous/v1/maverick/getdetaildata',
         method: 'post',
         data
     })

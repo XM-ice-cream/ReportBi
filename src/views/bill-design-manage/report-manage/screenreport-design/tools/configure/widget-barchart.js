@@ -34,7 +34,7 @@ export const widgetBarchart = {
                 name: 'dataZoomEnd',
                 require: false,
                 placeholder: '',
-                value: 50,
+                value: 100,
             },
             [{
                     name: '柱体设置',

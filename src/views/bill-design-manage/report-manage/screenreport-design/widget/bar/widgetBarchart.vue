@@ -86,6 +86,7 @@ export default {
   watch: {
     value: {
       handler (val) {
+        console.log("type", "widget-bar-chart");
         this.optionsStyle = val.position;
         this.optionsData = val.data;
         this.optionsCollapse = val.setup;
@@ -413,36 +414,20 @@ export default {
       //     return;
       //   }
       //还原x轴，y轴数据
-      this.options = {
-        ...this.options, xAxis: {
-          type: "value",
-          data: [],
-          axisLabel: {
-            show: true,
-            textStyle: {
-              color: "#fff"
-            }
-          }
-        },
-        yAxis: {
-          type: "value",
-          data: [],
-          axisLabel: {
-            show: true,
-            textStyle: {
-              color: "#fff"
-            }
-          }
-        }
-      }
+      this.restore();
       // x轴 
       if (optionsSetup.verticalShow) {
+        // 动态列
         this.setOptionsY(val.xAxis);
+
+        //y轴数值--类目类型
         val.xAxis.forEach((item, index) => {
           this.options.yAxis[index].type = "category";
         });
+        //series 数据
         this.options.series = val.series;
-        console.log(this.options, "X轴");
+
+        // 设定滚动条
         this.options.dataZoom = [
           {
             type: 'slider',
@@ -476,6 +461,31 @@ export default {
       // 数值设定 or 柱体设置
       this.setOptionsTop();
       console.log(this.options);
+    },
+    //还原x轴，y轴数据
+    restore () {
+      this.options = {
+        ...this.options, xAxis: {
+          type: "value",
+          data: [],
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: "#fff"
+            }
+          }
+        },
+        yAxis: {
+          type: "value",
+          data: [],
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: "#fff"
+            }
+          }
+        }
+      }
     }
   }
 };

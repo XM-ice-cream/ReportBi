@@ -1,6 +1,6 @@
 <template>
   <div :style="styleObj">
-    <v-chart :options="options" autoresize />
+    <v-chart :options="options" autoresize v-if="isShow" />
   </div>
 </template>
 
@@ -31,6 +31,13 @@ export default {
             fontSize: "16"
           }
         },
+        dataZoom: [
+          {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'none'
+          }
+        ],
         tooltip: {
           trigger: "axis",
           axisPointer: {
@@ -49,7 +56,7 @@ export default {
           }
         },
         xAxis: {
-          type: "category",
+          type: "value",
           data: [],
           axisLine: {
             lineStyle: {
@@ -66,6 +73,8 @@ export default {
         },
         yAxis: {
           name: "",
+          type: "value",
+          data: [],
           axisLabel: {
             formatter: "{value}",
             color: "#e2e9ff"
@@ -127,7 +136,8 @@ export default {
       },
       optionsStyle: {}, // 样式
       optionsData: {}, // 数据
-      optionsSetup: {}
+      optionsSetup: {},
+      isShow: false,//是否显示图表
     };
   },
   computed: {
@@ -145,6 +155,7 @@ export default {
   watch: {
     value: {
       handler (val) {
+        console.log("type", "widget-gradient-color-chart");
         this.optionsStyle = val.position;
         this.optionsData = val.data;
         this.optionsCollapse = val.setup;
@@ -169,14 +180,14 @@ export default {
   methods: {
     // 修改图标options属性
     editorOptions () {
+      this.isShow = false;
       this.setOptionsTitle();
-      this.setOptionsX();
-      this.setOptionsY();
-      this.setOptionsTop();
       this.setOptionsLegend();
       this.setOptionsMargin();
-      this.setOptionsColor();
       this.setOptionsData();
+      this.$nextTick(() => {
+        this.isShow = true;
+      })
     },
     // 标题修改
     setOptionsTitle () {
@@ -200,105 +211,166 @@ export default {
       this.options.title = title;
     },
     // X轴设置
-    setOptionsX () {
+    setOptionsX (xAxis) {
       const optionsSetup = this.optionsSetup;
-      const xAxis = {
-        type: "category",
-        show: optionsSetup.hideX, // 坐标轴是否显示
-        name: optionsSetup.xName, // 坐标轴名称
-        nameTextStyle: {
-          color: optionsSetup.nameColorX,
-          fontSize: optionsSetup.nameFontSizeX
-        },
-        nameRotate: optionsSetup.textAngle, // 文字角度
-        inverse: optionsSetup.reversalX, // 轴反转
-        axisLabel: {
-          show: true,
-          interval: optionsSetup.textInterval, // 文字间隔
-          rotate: optionsSetup.textAngle, // 文字角度
-          textStyle: {
-            color: optionsSetup.Xcolor, // x轴 坐标文字颜色
-            fontSize: optionsSetup.fontSizeX
-          }
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: optionsSetup.lineColorX
-          }
-        },
-        splitLine: {
-          show: optionsSetup.isShowSplitLineX,
-          lineStyle: {
-            color: optionsSetup.splitLineColorX
-          }
-        }
-      };
-      this.options.xAxis = xAxis;
+      let xAxisData = [];
+      let offset = 0;
+      console.log(xAxis);
+
+      xAxis?.forEach(item => {
+        xAxisData.push({
+          type: "value",
+          show: optionsSetup.hideX, // 坐标轴是否显示
+          name: optionsSetup.xName, // 坐标轴名称
+          data: item,
+          nameTextStyle: {
+            color: optionsSetup.nameColorX,
+            fontSize: optionsSetup.nameFontSizeX
+          },
+          nameRotate: optionsSetup.textAngle, // 文字角度
+          inverse: optionsSetup.reversalX, // 轴反转
+          axisLabel: {
+            show: true,
+            interval: optionsSetup.textInterval, // 文字间隔
+            rotate: optionsSetup.textAngle, // 文字角度
+            textStyle: {
+              color: optionsSetup.Xcolor, // x轴 坐标文字颜色
+              fontSize: optionsSetup.fontSizeX
+            }
+          },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: optionsSetup.lineColorX
+            }
+          },
+          splitLine: {
+            show: optionsSetup.isShowSplitLineX,
+            lineStyle: {
+              color: optionsSetup.splitLineColorX
+            }
+          },
+          position: "bottom",
+          offset
+        })
+        offset = offset + optionsSetup.spaceX;
+      })
+      this.options.xAxis = xAxisData;
     },
     // Y轴设置
-    setOptionsY () {
+    setOptionsY (yAxis) {
       const optionsSetup = this.optionsSetup;
-      const yAxis = {
-        type: "value",
-        scale: optionsSetup.scale,
-        splitNumber: optionsSetup.splitNumber,// 均分
-        show: optionsSetup.isShowY, // 坐标轴是否显示
-        name: optionsSetup.textNameY, // 坐标轴名称
-        nameTextStyle: { // 别名
-          color: optionsSetup.nameColorY,
-          fontSize: optionsSetup.namefontSizeY
-        },
-        inverse: optionsSetup.reversalY, // 轴反转
-        axisLabel: {
-          show: true,
-          rotate: optionsSetup.ytextAngle, // 文字角度
-          textStyle: {
-            color: optionsSetup.colorY, // y轴 坐标文字颜色
-            fontSize: optionsSetup.fontSizeY
-          }
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: optionsSetup.lineColorY
-          }
-        },
-        splitLine: {
-          show: optionsSetup.isShowSplitLineY,
-          lineStyle: {
-            color: optionsSetup.splitLineColorY
-          }
-        }
-      };
-      this.options.yAxis = yAxis;
+      let yAxisData = [];
+      let offset = 0;
+      yAxis.forEach(item => {
+        yAxisData.push({
+          type: "value",
+          scale: optionsSetup.scale,
+          splitNumber: optionsSetup.splitNumber,// 均分
+          show: optionsSetup.isShowY, // 坐标轴是否显示
+          name: optionsSetup.textNameY, // 坐标轴名称
+          data: item,
+          nameTextStyle: { // 别名
+            color: optionsSetup.nameColorY,
+            fontSize: optionsSetup.namefontSizeY
+          },
+          inverse: optionsSetup.reversalY, // 轴反转
+          axisLabel: {
+            show: true,
+            rotate: optionsSetup.ytextAngle, // 文字角度
+            textStyle: {
+              color: optionsSetup.colorY, // y轴 坐标文字颜色
+              fontSize: optionsSetup.fontSizeY
+            }
+          },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: optionsSetup.lineColorY
+            }
+          },
+          splitLine: {
+            show: optionsSetup.isShowSplitLineY,
+            lineStyle: {
+              color: optionsSetup.splitLineColorY
+            }
+          },
+          position: "left",
+          offset,
+        })
+        offset = offset + optionsSetup.spaceY;;
+      })
+      this.options.yAxis = yAxisData;
     },
     // 数值设定 or 柱体设置
     setOptionsTop () {
       const optionsSetup = this.optionsSetup;
       const series = this.options.series;
-      if (series[0].type == "bar") {
-        if (optionsSetup.verticalShow) {
-          series[0].label = {
-            show: optionsSetup.isShow,
-            position: "right",
-            distance: optionsSetup.distance,
-            fontSize: optionsSetup.fontSize,
-            color: optionsSetup.subTextColor,
-            fontWeight: optionsSetup.fontWeight
+      series.forEach((item, index) => {
+        if (series[index].type == "bar") {
+          if (optionsSetup.verticalShow) {
+            console.log("postion-right");
+            series[index].label = {
+              show: optionsSetup.isShow,
+              position: "right",
+              distance: optionsSetup.distance,
+              fontSize: optionsSetup.fontSize,
+              color: optionsSetup.subTextColor,
+              fontWeight: optionsSetup.fontWeight
+            }
+            series[index].itemStyle = {
+              normal: {
+                color: new echarts.graphic.LinearGradient(1, 0, 0, 0,
+                  [
+                    {
+                      offset: 0,
+                      color: optionsSetup.bar0color // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: optionsSetup.bar100color // 100% 处的颜色
+                    }
+                  ],
+                ),
+                barBorderRadius: optionsSetup.radius, //圆角
+                shadowColor: optionsSetup.shadowColor, // 阴影颜色
+                shadowBlur: optionsSetup.shadowBlur //模糊系数
+              }
+            }
+          } else {
+            console.log("postion-top");
+            series[index].label = {
+              show: optionsSetup.isShow,
+              position: "top",
+              distance: optionsSetup.distance,
+              fontSize: optionsSetup.fontSize,
+              color: optionsSetup.subTextColor,
+              fontWeight: optionsSetup.fontWeight
+            }
+            series[index].itemStyle = {
+              normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1,
+                  [
+                    {
+                      offset: 0,
+                      color: optionsSetup.bar0color // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: optionsSetup.bar100color // 100% 处的颜色
+                    }
+                  ],
+                ),
+                barBorderRadius: optionsSetup.radius, //圆角
+                shadowColor: optionsSetup.shadowColor, // 阴影颜色
+                shadowBlur: optionsSetup.shadowBlur //模糊系数
+              }
+            }
           }
-        } else {
-          series[0].label = {
-            show: optionsSetup.isShow,
-            position: "top",
-            distance: optionsSetup.distance,
-            fontSize: optionsSetup.fontSize,
-            color: optionsSetup.subTextColor,
-            fontWeight: optionsSetup.fontWeight
-          }
+          series[index].barWidth = optionsSetup.maxWidth;
         }
-        series[0].barWidth = optionsSetup.maxWidth;
-      }
+      })
+
     },
     // tooltip 提示语设置
     setOptionsTooltip () {
@@ -361,50 +433,6 @@ export default {
         this.options.legend['data'] = arr
       }
     },
-    // 渐变色
-    setOptionsColor () {
-      const optionsSetup = this.optionsSetup;
-      const itemStyle = this.options.series[0]["itemStyle"];
-      let normal = {}
-      if (optionsSetup.verticalShow) {
-        normal = {
-          color: new echarts.graphic.LinearGradient(1, 0, 0, 0,
-            [
-              {
-                offset: 0,
-                color: optionsSetup.bar0color // 0% 处的颜色
-              },
-              {
-                offset: 1,
-                color: optionsSetup.bar100color // 100% 处的颜色
-              }
-            ],
-          ),
-          barBorderRadius: optionsSetup.radius, //圆角
-          shadowColor: optionsSetup.shadowColor, // 阴影颜色
-          shadowBlur: optionsSetup.shadowBlur //模糊系数
-        }
-      } else {
-        normal = {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1,
-            [
-              {
-                offset: 0,
-                color: optionsSetup.bar0color // 0% 处的颜色
-              },
-              {
-                offset: 1,
-                color: optionsSetup.bar100color // 100% 处的颜色
-              }
-            ],
-          ),
-          barBorderRadius: optionsSetup.radius, //圆角
-          shadowColor: optionsSetup.shadowColor, // 阴影颜色
-          shadowBlur: optionsSetup.shadowBlur //模糊系数
-        }
-      }
-      itemStyle["normal"] = normal;
-    },
     // 数据解析
     setOptionsData () {
       const optionsSetup = this.optionsSetup;
@@ -466,31 +494,103 @@ export default {
       });
     },
     renderingFn (optionsSetup, val) {
-      // x轴
-      if (optionsSetup.verticalShow) {
-        this.options.xAxis.data = [];
-        this.options.yAxis.data = val.xAxis;
-        this.options.xAxis.type = "value";
-        this.options.yAxis.type = "category";
-      } else {
-        this.options.xAxis.data = val.xAxis;
-        this.options.yAxis.data = [];
-        this.options.xAxis.type = "category";
-        this.options.yAxis.type = "value";
-      }
-
-      // series
-      const series = this.options.series;
-      const legendName = [];
-      for (const i in series) {
-        if (series[i].type == "bar") {
-          series[i].name = val.series[i].name;
-          series[i].data = val.series[i].data;
+      console.log("val", val);
+      //还原x轴，y轴数据
+      this.restore();
+      optionsSetup.verticalShow ? this.setXData(val, optionsSetup) : this.setYData(val, optionsSetup);
+      // 数值设定 or 柱体设置
+      this.setOptionsTop();
+      console.log(this.options);
+    },
+    //还原x轴，y轴数据
+    restore () {
+      this.options = {
+        ...this.options,
+        xAxis: {
+          type: "value",
+          data: [],
+          axisLine: {
+            lineStyle: {
+              color: "rgba(255,255,255,0.12)"
+            }
+          },
+          axisLabel: {
+            margin: 10,
+            color: "#e2e9ff",
+            textStyle: {
+              fontSize: 14
+            }
+          }
+        },
+        yAxis: {
+          name: "",
+          type: "value",
+          data: [],
+          axisLabel: {
+            formatter: "{value}",
+            color: "#e2e9ff"
+          },
+          axisLine: {
+            show: false,
+            lineStyle: {
+              color: "rgba(255,255,255,0)"
+            }
+          },
+          splitLine: {
+            lineStyle: {
+              color: "rgba(255,255,255,0.12)"
+            }
+          }
         }
-        legendName.push(val.series[i].name);
       }
-      this.options.legend['data'] = legendName;
-      this.setOptionsLegendName(legendName);
+    },
+    //X轴数据设定
+    setXData (val, optionsSetup) {
+      console.log("X轴");
+      // 动态多列
+      this.setOptionsY(val.xAxis);
+      // Y轴-类目类型
+      val.xAxis.forEach((item, index) => {
+        this.options.yAxis[index].type = "category";
+      });
+      //设定滚动条
+      this.options.dataZoom = [
+        {
+          type: 'slider',
+          yAxisIndex: this.options.yAxis.map((item, index) => index),
+          filterMode: 'none',
+          start: 0,
+          end: optionsSetup.dataZoomEnd
+        }
+      ];
+      //series 数据
+      this.options.series = val.series;
+      //图例值
+      this.options.legend['data'] = val.legend;
+    },
+    //Y轴数据设定
+    setYData (val, optionsSetup) {
+      console.log("Y轴");
+      // 动态多列
+      this.setOptionsX(val.xAxis);
+      //x轴--类目类型
+      val.xAxis.forEach((item, index) => {
+        this.options.xAxis[index].type = "category";
+      })
+      // 滚动条
+      this.options.dataZoom = [
+        {
+          type: 'slider',
+          xAxisIndex: this.options.xAxis.map((item, index) => index),
+          filterMode: 'none',
+          start: 0,
+          end: optionsSetup.dataZoomEnd
+        }
+      ];
+      //series 数据
+      this.options.series = val.series;
+      //图例值
+      this.options.legend['data'] = val.legend;
     }
   }
 };
