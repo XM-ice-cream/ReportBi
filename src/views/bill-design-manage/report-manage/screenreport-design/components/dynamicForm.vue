@@ -127,11 +127,11 @@ export default {
   },
   watch: {
     value (newValue, oldValue) {
-      //  console.log('newValue', newValue);
+      console.log('newValue', newValue, oldValue);
       this.formData = newValue || {};
     },
     options (val) {
-      //   console.log('options', this.options);
+      console.log('options', this.options);
       this.setDefaultValue();
       this.isShowData();
     }

@@ -79,7 +79,7 @@
           <!-- Packing2 -->
           <template slot-scope="{ row }" slot="step14">
             <span v-if="row.category==='wip'" class="red">{{ row.step14 }}</span>
-            <span v-else> {{ row.step8 }}</span>
+            <span v-else> {{ row.step14 }}</span>
           </template>
 
         </Table>
@@ -282,19 +282,12 @@ export default {
     },
     // 导出
     exportClick () {
-      const { workOrderInfo } = this.req;
-      if (workOrderInfo) {
-        const obj = {
-          condition: workOrderInfo
-        };
-        exportReq(obj).then((res) => {
-          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-          const fileName = `${this.$t("led-wip-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
-          exportFile(blob, fileName);
-        });
-      } else {
-        this.$Message.warning("请完善查询条件");
-      }
+
+      exportReq({}).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `${this.$t("led-wip-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     //合并单元格
     handleSpan ({ row, column, rowIndex, columnIndex }) {

@@ -255,6 +255,7 @@ export default {
 
     // 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
     widgetOnDragged (evt, widgetCode) {
+      console.log("0", evt, widgetCode);
       let widgetType = widgetCode;
 
       // 获取结束坐标和列名
@@ -451,7 +452,7 @@ export default {
 
     // 对组件默认值处理
     handleDefaultValue (widgetJson) {
-      //  console.log(widgetJson);
+      console.log("1", widgetJson);
       for (const key in widgetJson) {
         if (key == "options") {
           // collapse、data、position、setup

@@ -84,7 +84,7 @@ export default {
   watch: {
     value: {
       handler () {
-        //  console.log('value', this.value);
+        console.log('value', this.value);
       },
       immediate: true
     }

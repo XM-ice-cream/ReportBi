@@ -109,6 +109,7 @@ export default {
   watch: {
     formData: {
       handler (val) {
+
         this.echoDataSet(val);
       },
       deep: true
@@ -126,8 +127,7 @@ export default {
     }
   },
   mounted () {
-    // this.loadDataSet();
-    // this.selectDataSet();
+
     this.echoDataSet(this.formData);
   },
   methods: {
@@ -214,16 +214,17 @@ export default {
     },
     // 数据集回显
     async echoDataSet (val) {
+      console.log(val);
       if (!val) return;
       this.dataSetValue = val.setCode;
-
       await this.loadDataSet();//加载全部数据集
 
       await this.selectDataSet();//获取选择的数据集信息
+
       this.echoDynamicData(val);
     },
     echoDynamicData (val) {
-      console.log("val", val);
+      console.log("echoDynamicData", val);
       //   const chartProperties = this.deepClone(val.chartProperties);
       //   this.chartProperties = chartProperties;
       //获取设定的行参数

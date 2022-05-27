@@ -497,6 +497,7 @@ export default {
       console.log("val", val);
       //还原x轴，y轴数据
       this.restore();
+      //动态设定数值与type=value/category
       optionsSetup.verticalShow ? this.setXData(val, optionsSetup) : this.setYData(val, optionsSetup);
       // 数值设定 or 柱体设置
       this.setOptionsTop();

@@ -31,9 +31,13 @@
           </Row>
         </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-selection-change="currentClick">
+          <template slot-scope="{ row }" slot="action">
+            <Button size="small" class="replydetail" @click="replyDetail(row)">回复明细</Button>
+          </template>
         </Table>
       </Card>
       <reply-maverick :selectArr="selectArr" ref="replymaverick" />
+      <expand-row ref="expandrow" />
     </div>
   </div>
 </template>
@@ -58,17 +62,6 @@ export default {
         id: "",
       }, //查询数据
       columns: [
-        {
-          type: 'expand',
-          width: 50,
-          render: (h, params) => {
-            return h(expandRow, {
-              props: {
-                row: params.row
-              }
-            })
-          }
-        },
         { type: "index", fixed: "left", width: 50, align: "center" },
         { type: "selection", width: 60, align: 'center' },
         { title: "ID", key: "id", align: "center", width: 60, tooltip: true },
@@ -85,14 +78,9 @@ export default {
         { title: "RootCause", key: "rootcause", align: "center", minWidth: 90, tooltip: true },
         { title: "NextDRI", key: "nextDRI", align: "center", minWidth: 90, tooltip: true },
         { title: "Status", key: "status", align: "center", minWidth: 90, tooltip: true },
+        { title: 'Action', slot: 'action', width: 100, align: 'center' }
       ], // 表格数据
       selectArr: [],//表格选中数据
-      columns1: [
-        { title: "fA_EMPNO", key: "fA_EMPNO", align: "center", width: 60, tooltip: true },
-        { title: "fA_MSG", key: "fA_MSG", align: "center", width: 60, tooltip: true },
-        { title: "fA_TIME", key: "fA_TIME", align: "center", width: 60, tooltip: true },
-        { title: "cA_EMPNO", key: "cA_EMPNO", align: "center", width: 60, tooltip: true },
-      ]
     };
   },
   activated () {
@@ -174,7 +162,11 @@ export default {
       } else {
         return null;
       }
-    }
+    },
+    //查看回复明细
+    replyDetail (row) {
+      this.$refs.expandrow.pageLoad(row);
+    },
   },
   mounted () {
     const params = this.getUrlParams();
@@ -183,3 +175,10 @@ export default {
   },
 }
 </script>
+<style scoped>
+.replydetail {
+  color: #0078dd;
+  background-color: #4127ce00;
+  border-color: #0189fd;
+}
+</style>
