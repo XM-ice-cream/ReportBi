@@ -13,61 +13,17 @@
                     <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">{{ $t("selectQuery") }}</Button>
                     <div class="poptip-style-content" slot="content">
                       <Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
-                        <!-- 起始时间 -->
-                        <FormItem :label="$t('startTime')" prop="startTime">
-                          <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
-                        </FormItem>
-                        <!-- 结束时间 -->
-                        <FormItem :label="$t('endTime')" prop="endTime">
-                          <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
-                        </FormItem>
                         <!-- 工单 -->
                         <FormItem :label="$t('workOrder')" prop="workOrder">
-                          <Input v-model.trim="req.workOrder" :placeholder="
-                              $t('pleaseEnter') + $t('workOrder') + $t('multiple,separated')
-                            " @on-keyup.enter="searchClick" />
-                        </FormItem>
-                        <!-- unitId -->
-                        <FormItem :label="$t('unitId')" prop="unitid">
-                          <Input v-model.trim="req.unitid" :placeholder="
-                              $t('pleaseEnter') + $t('unitId') + $t('multiple,separated')
-                            " @on-keyup.enter="searchClick" />
-                        </FormItem>
-                        <!-- BuildType -->
-                        <FormItem label="BuildType" prop="buildtype">
-                          <Input v-model.trim="req.buildtype" @on-keyup.enter="searchClick" :placeholder="$t('pleaseEnter') + 'BuildType'" />
-                        </FormItem>
-                        <!-- config -->
-                        <FormItem :label="$t('config')" prop="config">
-                          <v-selectpage class="select-page-style" ref="config" v-if="searchPoptipModal" key-field="name" show-field="name" :data="configPageListUrl" v-model="req.config" :placeholder="$t('pleaseEnter') + $t('config')" :result-format="
-                        (res) => {
-                        return {                            
-                            totalRow: res.total,
-                            list: res.data || [],
+                          <v-selectpage style="width:250px" class="select-page-style" key-field="workOrder" show-field="workOrder" :data="workerPageListUrl" multiple ref="workOrder" v-model="req.workOrder" :placeholder="$t('pleaseSelect') + $t('workOrder')" :result-format="
+                      (res) => {
+                        return {
+                          totalRow: res.total,
+                          list: res.data || [],
                         };
-                        }
+                      }
                     ">
                           </v-selectpage>
-                        </FormItem>
-                        <!-- 料号 -->
-                        <FormItem :label="$t('pn')" prop="pn">
-                          <Input type="text" v-model="req.pn" @on-keyup.enter="searchClick" :placeholder="$t('pleaseEnter') + $t('pn')" />
-                        </FormItem>
-                        <!-- 线体 -->
-                        <FormItem :label="$t('line')" prop="linename">
-                          <v-selectpage class="select-page-style" multiple v-if="searchPoptipModal" key-field="name" show-field="name" :data="linePageListUrl" v-model="req.linename" :placeholder="$t('pleaseEnter') + $t('line')" :result-format="
-                        (res) => {
-                        return {                            
-                            totalRow: res.total,
-                            list: res.data || [],
-                        };
-                        }
-                    ">
-                          </v-selectpage>
-                        </FormItem>
-                        <!-- 小线体 -->
-                        <FormItem label="小线体" prop="subline">
-                          <Input type="text" v-model="req.subline" @on-keyup.enter="searchClick" :placeholder="$t('pleaseEnter') +'小线体'" />
                         </FormItem>
                       </Form>
                       <div class="poptip-style-button">
@@ -78,83 +34,30 @@
                   </Poptip>
                 </i-col>
                 <i-col span="12">
-                  <button-custom :btnData="btnData" @on-removeCirc-click="removeCircClick" @on-retainCirc-click="retainCircClick" @on-export-click="exportClick"></button-custom>
+                  <button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
                 </i-col>
               </Row>
             </div>
             <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
-              <!-- 投入 -->
-              <template slot-scope="{ row }" slot="inputQty">
+              <!-- WIP -->
+              <template slot-scope="{ row }" slot="wip">
                 <div @click="show(row, 1)" style="color:blue;cursor:pointer">
-                  {{ row.inputs }}
+                  {{ row.wip }}
                 </div>
               </template>
-              <!-- 一次检查pass -->
-              <template slot-scope="{ row }" slot="firstpass">
-                <div @click="show(row, 2)" style="color:blue;cursor:pointer">
-                  {{ row.firstpass }}
+              <!-- 报废数量 -->
+              <template slot-scope="{ row }" slot="scrapNumber">
+                <div @click="skipTo(row.workorder)" style="color:blue;cursor:pointer">
+                  {{ row.scrapNumber }}
                 </div>
               </template>
-              <!-- 重测通过 -->
-              <template slot-scope="{ row }" slot="retest">
-                <div @click="show(row, 3)" style="color:blue;cursor:pointer">
-                  {{ row.retest }}
-                </div>
-              </template>
-              <!-- 所有不良 -->
-              <template slot-scope="{ row }" slot="defect">
-                <div @click="show(row, 4)" style="color:blue;cursor:pointer">
-                  {{ row.defect }}
-                </div>
-              </template>
-              <!--  最终不良 -->
-              <template slot-scope="{ row }" slot="defectnow">
-                <div @click="show(row, 5)" style="color:blue;cursor:pointer">
-                  {{ row.defectnow }}
-                </div>
-              </template>
-              <!-- 产出 -->
-              <template slot-scope="{ row }" slot="outputs">
-                <div @click="show(row, 6)" style="color:blue;cursor:pointer">
-                  {{ row.outputs }}
-                </div>
-              </template>
-              <!-- 一次通过率 -->
-              <template slot-scope="{ row }" slot="firstrate">
-                <div>{{ (row.firstrate * 100).toFixed(2) }}%</div>
-              </template>
-              <!-- 重测通过率 -->
-              <template slot-scope="{ row }" slot="rerate">
-                <div>{{ (row.rerate * 100).toFixed(2) }}%</div>
-              </template>
-              <!-- 良率 -->
-              <template slot-scope="{ row }" slot="yieldrate">
-                <div>{{ (row.yieldrate * 100).toFixed(2) }}%</div>
-              </template>
-              <!-- 良率 -->
-              <template slot-scope="{ row }" slot="ngrate">
-                <div>{{ (row.ngrate * 100).toFixed(2) }}%</div>
-              </template>
+
             </Table>
+            <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
           </Card>
         </TabPane>
-        <TabPane label="投入数" name="tab2" :index="2" v-if="tab2">
+        <TabPane label="WipSn" name="tab2" :index="2" v-if="tab2">
           <TabTable ref="tab2" />
-        </TabPane>
-        <TabPane label="一次检测通过" name="tab3" :index="3" v-if="tab3">
-          <TabTable ref="tab3" />
-        </TabPane>
-        <TabPane label="重测pass" name="tab4" :index="4" v-if="tab4">
-          <TabTable ref="tab4" />
-        </TabPane>
-        <TabPane label="所有不良" name="tab5" :index="5" v-if="tab5">
-          <TabTable ref="tab5" />
-        </TabPane>
-        <TabPane label="最终不良" name="tab6" :index="6" v-if="tab6">
-          <TabTable ref="tab6" />
-        </TabPane>
-        <TabPane label="产出" name="tab7" :index="7" v-if="tab7">
-          <TabTable ref="tab7" />
         </TabPane>
         <!-- <TabKanban /> -->
       </Tabs>
@@ -163,28 +66,20 @@
 </template>
 
 <script>
-import { getlistReq, trackOutExportReq, configPageListUrl, linePageListUrl } from "@/api/bill-manage/quality-yield-query-report";
+import { getpagelistReq, exportReq } from "@/api/bill-manage/workorder-wip-report";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
-import { formatDate, getButtonBoolean, commaSplitString } from "@/libs/tools";
-import TabTable from "./quality-yield-query-report/tabTable.vue";
+import { formatDate, getButtonBoolean } from "@/libs/tools";
+import TabTable from "./workorder-wip-report/tabTable.vue";
 import { exportFile } from "@/libs/tools";
 
 export default {
   components: { TabTable },
-  name: "quality-yield-query-report",
+  name: "workorder-wip-report",
   data () {
     return {
-      configPageListUrl: configPageListUrl(),
-      linePageListUrl: linePageListUrl(),
       tabName: "tab1",
       tab1: true,
       tab2: false,
-      tab3: false,
-      tab4: false,
-      tab5: false,
-      tab6: false,
-      tab7: false,
-      tab8: true,
       workerPageListUrl: workerPageListUrl(),
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
@@ -194,22 +89,10 @@ export default {
       searchPoptipModal: false,
       btnData: [],
       req: {
-        startTime: "",
-        endTime: "",
         workOrder: "", //工单
-        pn: "", // 料号,
-        linename: "", // 线体
-        subline: '',
-        buildtype: "", //段别
-        unitid: "", //unidId
-        config: "",
-        removeCirc: "N",//去除/保留维修回流产品
         ...this.$config.pageConfig,
       }, //查询数据
       searchObj: {},
-      modalReq: {
-        ...this.$config.pageConfig,
-      },
       columns: [
         {
           type: "index",
@@ -221,72 +104,48 @@ export default {
           },
         },
         {
-          title: this.$t("stepName"),
-          key: "stepname",
+          title: "工单",
+          key: "workorder",
           minWidth: 140,
           ellipsis: true,
+          align: "center",
           tooltip: true,
         },
         {
-          title: this.$t("input_PassQty"),
+          title: "工单总数",
           minWidth: 80,
           align: "center",
-          slot: "inputQty",
+          key: "allIn",
         },
         {
-          title: "一次检测通过",
+          title: "工单已投入数量",
           minWidth: 80,
           align: "center",
-          slot: "firstpass",
+          key: "inPut",
         },
         {
-          title: "重测pass",
+          title: "报废数量",
           minWidth: 80,
           align: "center",
-          slot: "retest",
+          slot: "scrapNumber",
         },
         {
-          title: "所有不良",
+          title: "报废率",
           minWidth: 80,
           align: "center",
-          slot: "defect",
+          key: "scrapPage",
         },
         {
-          title: "最终不良",
+          title: "WIP",
           minWidth: 80,
           align: "center",
-          slot: "defectnow",
-        },
-        {
-          title: "产出",
-          minWidth: 80,
-          align: "center",
-          slot: "outputs",
-        },
-        {
-          title: "一次良率",
-          slot: "firstrate",
-          minWidth: 80,
-          align: "center",
-        },
-        {
-          title: "重测通过率",
-          slot: "rerate",
-          minWidth: 80,
-          align: "center",
-        },
-        {
-          title: '最终良率',
-          slot: "yieldrate",
-          minWidth: 80,
-          align: "center",
-          ellipsis: true,
-          tooltip: true,
+          slot: "wip",
         }
       ],
     };
   },
   activated () {
+    this.tableConfig.loading = false;
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
@@ -300,63 +159,46 @@ export default {
     },
     // 获取分页列表数据
     pageLoad () {
-      this.tableConfig.loading = false;
-      const { workOrder, pn, linename, subline, buildtype, config, startTime, endTime, unitid, removeCirc } = this.req;
-      if (workOrder || pn || linename || subline || buildtype || config || startTime || endTime || unitid) {
-        this.tableConfig.loading = true;
-        this.searchObj = {
-          starttime: formatDate(startTime),
-          endtime: formatDate(endTime),
-          workorder: commaSplitString(workOrder).join(),
-          pn,
-          linename: linename ? linename.split(',') : [],
-          subline,
-          buildtype,
-          config,
-          unitid,
-          removeCirc,
-        };
-        getlistReq(this.searchObj)
-          .then((res) => {
-            this.tableConfig.loading = false;
-            if (res.code === 200) {
-              this.data = res.result || [];
-              this.searchPoptipModal = false;
-            }
-          })
-          .catch(() => (this.tableConfig.loading = false));
-      } else {
-        this.$Message.warning("请完善查询条件");
-      }
+      const { workOrder } = this.req;
+      this.tableConfig.loading = true;
+      this.searchObj = {
+        orderField: "workOrder", // 排序字段
+        ascending: true, // 是否升序
+        pageSize: this.req.pageSize, // 分页大小
+        pageIndex: this.req.pageIndex, // 当前页码
+        total: 0,
+        data: {
+          workOrder, //工单
+        },
+      };
+      getpagelistReq(this.searchObj)
+        .then((res) => {
+          this.tableConfig.loading = false;
+          if (res.code === 200) {
+            let { data, pageSize, pageIndex, total, totalPage } = res.result;
+            this.data = data || [];
+            this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
+            this.searchPoptipModal = false;
+          }
+        })
+        .catch(() => (this.tableConfig.loading = false));
     },
     // 导出
     exportClick () {
-      const { workOrder, pn, linename, subline, buildtype, config, startTime, endTime, unitid, removeCirc } = this.req;
-      if (workOrder || pn || linename || subline || buildtype || config || startTime || endTime || unitid) {
-        const obj = {
-          starttime: formatDate(startTime),
-          endtime: formatDate(endTime),
-          workorder: commaSplitString(workOrder).join(),
-          pn,
-          linename: linename ? linename.split(',') : [],
-          subline,
-          buildtype,
-          config,
-          unitid,
-          removeCirc,
-        };
-        trackOutExportReq(obj).then((res) => {
-          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-          const fileName = `${this.$t("quality-yield-query-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
-          exportFile(blob, fileName);
-        });
-      } else {
-        this.$Message.warning("请完善查询条件");
-      }
+      const { workOrder } = this.req;
+      const obj = {
+        workOrder
+      };
+      exportReq(obj).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `${this.$t("workorder-wip-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     // 表格单元格点击事件
     show (row, type) {
-      let obj = { ...this.searchObj, tracktype: String(type), stepname: row.stepname };
+      let obj = { workOrder: row.workorder };
+      console.log("obj", obj);
       let index = type + 1;
       this.tabName = "tab" + index;
       this["tab" + index] = true;
@@ -366,25 +208,12 @@ export default {
         this.$refs["tab" + index].pageLoad(obj);
       });
     },
-    // 点击切换:去除维修回流产品
-    removeCircClick () {
-      // if(this.req.removeCirc == "N" || this.req.removeCirc == "")
-      // {
-      //   this.req.removeCirc = "Y";
-      // }
-      // else
-      // {
-      //   this.req.removeCirc = "N";
-      // }
-      this.req.removeCirc = "Y";
-      this.req.pageIndex = 1;
-      this.pageLoad();
-    },
-    // 点击切换:保留维修回流产品
-    retainCircClick () {
-      this.req.removeCirc = "N";
-      this.req.pageIndex = 1;
-      this.pageLoad();
+    //跳转到报废报表
+    skipTo (workorder) {
+      this.$router.push({
+        name: "scrap-report",
+        params: { workorder },
+      });
     },
     // 自动改变表格高度
     autoSize () {
@@ -403,8 +232,12 @@ export default {
     },
     // 点击重置按钮触发
     resetClick () {
-      this.$refs.searchReq.resetFields();
-      this.$refs.workOrder.remove();
+      this.$refs.workOrder.remove()
+      this.searchPoptipModal = false;
+      this.$nextTick(() => {
+        this.searchPoptipModal = true;
+      });
+      //   this.searchClick();
     },
     // 点击搜索按钮触发
     searchClick () {
@@ -413,7 +246,6 @@ export default {
     },
   },
   mounted () {
-    this.pageLoad();
   },
 };
 </script>

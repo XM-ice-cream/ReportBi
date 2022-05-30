@@ -159,7 +159,6 @@ export default {
   },
   activated () {
     this.getDataItemData();
-    this.pageLoad();
     this.autoSize();
     this.getLineList();
     window.addEventListener('resize', () => this.autoSize());
@@ -308,5 +307,13 @@ export default {
       this.pageLoad();
     },
   },
+  mounted () {
+    //有从工单WIP报表跳转到报废报表
+    const workorder = this.$route.params.workorder;
+    if (workorder) {
+      this.req.workOrder = workorder;
+    }
+    this.pageLoad();
+  }
 };
 </script>
