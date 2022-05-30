@@ -43,8 +43,8 @@ export default {
           name: "Q",
           children: [
             { name: "回复人员", key: "q_EMPNO" },
-            { name: "回复时间", key: "cA_TIME" },
-            { name: "回复信息", key: "cA_MSG" }
+            { name: "回复时间", key: "q_TIME" },
+            { name: "回复信息", key: "q_MSG" }
           ]
         }
       ],

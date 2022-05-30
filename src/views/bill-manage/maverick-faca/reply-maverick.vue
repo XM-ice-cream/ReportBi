@@ -2,7 +2,7 @@
 <template>
   <div>
     <!-- 左侧抽屉 -->
-    <Drawer class="reply-maverick" v-if="drawerFlag" title="回复列表信息" width="800" :mask-closable="false" @on-close="cancelClick">
+    <Drawer class="reply-maverick" v-model="drawerFlag" title="回复列表信息" width="800" :mask-closable="false" @on-close="cancelClick">
       <!-- 页面表格 -->
       <div class="comment">
         <Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="90" :label-colon="true" @submit.native.prevent>
@@ -55,7 +55,8 @@
 </template>
 
 <script>
-import { modifyReq } from "@/api/bill-manage/maverick-faca";
+import { modifyReq, getMailDepartReq } from "@/api/bill-manage/maverick-faca";
+import { formatDate } from "@/libs/tools";
 
 export default {
   name: "reply-maverick",
@@ -68,7 +69,7 @@ export default {
   data () {
     return {
       drawerFlag: false,
-      mailDepartArry: ["治具", "设备", "AOI", "DFM", "FA", "TE", "SQE", "MFG", "PQE", "Shift", "EE"],
+      mailDepartArry: [],
       tableConfig: { ...this.$config.tableConfig }, // table配置
       req: {
         Msg: "",
@@ -97,7 +98,9 @@ export default {
       if (this.drawerFlag) {
         const { fA_MSG, fA_EMPNO, q_MSG, q_EMPNO, cA_MSG, cA_EMPNO, status } = this.selectArr[0];
         const msgObj = status === "FA" ? { Msg: fA_MSG, EMPNO: fA_EMPNO } : (status === "Q" ? { Msg: q_MSG, EMPNO: q_EMPNO } : { Msg: cA_MSG, EMPNO: cA_EMPNO });
-        this.req = { ...this.selectArr[0], ...msgObj }
+        this.req = { ...this.selectArr[0], ...msgObj };
+        //获取群组
+        this.getMailDepart();
       }
     }
   },
@@ -108,8 +111,10 @@ export default {
         if (validate) {
           const { Msg, category, location, rootcause, nextDRI, EMPNO, mailDepartArry } = this.req;
           let warningType = false;
+          const nowTime = formatDate(new Date())
           let maverickDetailList = this.selectArr.map((item, index) => {
-            const msgObj = item.status === "FA" ? { fA_MSG: Msg, fA_EMPNO: EMPNO } : (item.status === "Q" ? { q_MSG: Msg, q_EMPNO: EMPNO } : { cA_MSG: Msg, cA_EMPNO: EMPNO });
+            const msgObj = item.status === "FA" ? { fA_MSG: Msg, fA_EMPNO: EMPNO, fA_TIME: nowTime } : (item.status === "Q" ? { q_MSG: Msg, q_EMPNO: EMPNO, q_TIME: nowTime } : { cA_MSG: Msg, cA_EMPNO: EMPNO, cA_TIME: nowTime });
+            let status = item.status;
             //提交状态+1
             if (type === "submit") {
               if (item.status === "Closed" && index === 0) {
@@ -118,7 +123,7 @@ export default {
               }
               if (!warningType) {
                 const type = parseInt(this.getStatus(item.status)) + 1;
-                item.status = this.getStatus(type);
+                status = this.getStatus(type);
               }
 
             }
@@ -130,11 +135,11 @@ export default {
               }
               if (!warningType) {
                 const type = parseInt(this.getStatus(item.status)) - 1;
-                item.status = this.getStatus(type);
+                status = this.getStatus(type);
               }
 
             }
-            return { ...item, ...msgObj, category, location, rootcause, nextDRI }
+            return { ...item, ...msgObj, category, location, rootcause, nextDRI, status }
           });
           const obj = {
             maverickDetailList,
@@ -158,6 +163,7 @@ export default {
         }
       });
     },
+    //获取状态
     getStatus (type) {
       const status = {
         "FA": 0,
@@ -171,6 +177,16 @@ export default {
       }
       return status[type]
     },
+    //获取邮件群组
+    getMailDepart () {
+      getMailDepartReq().then(res => {
+        if (res.code === 200) {
+          this.mailDepartArry = res.result;
+        }
+
+      })
+    },
+
     // 左侧抽屉取消
     cancelClick () {
       this.drawerFlag = false;
