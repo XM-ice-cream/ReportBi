@@ -57,9 +57,24 @@
                         }}</Option>
                       </Select>
                     </FormItem>
-                    <!-- 机种名称 -->
-                    <FormItem :label="$t('modelName')" prop="modelName">
-                      <Input v-model.trim="req.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')+ $t('multiple,separated')" />
+                    <!-- 机种 -->
+                    <FormItem :label="$t('model')" prop="modelName">
+                      <v-selectpage class="select-page-style" ref="modelName" v-if="searchPoptipModal" key-field="modelName" show-field="modelName" :data="modelPageListUrl" v-model="req.modelName" multiple :placeholder="$t('pleaseSelect') + $t('model')" :result-format="
+                          (res) => {
+                            return {
+                              totalRow: res.total,
+                              list: res.data || [],
+                            };
+                          }
+                        ">
+                      </v-selectpage>
+                    </FormItem>
+                    <!-- 下载是否有图片 -->
+                    <FormItem label="下载是否有图片" prop="isPicture" :label-width="100">
+                      <i-switch size="large" v-model="req.isPicture" :true-value="1" :false-value="0">
+                        <span slot="open">有</span>
+                        <span slot="close">无</span>
+                      </i-switch>
                     </FormItem>
                     <!-- 备注 -->
                     <FormItem :label="$t('remark')" prop="remark">
@@ -94,12 +109,13 @@
 </template>
 
 <script>
-import { getpagelistReq, exportReq } from "@/api/bill-manage/scrap-report";
+import { getpagelistReq, exportReq, exportNoPictureReq } from "@/api/bill-manage/scrap-report";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
 import { getAreaFloorLineListReq } from "@/api/basis-info/area-floor";
 import { formatDate, getButtonBoolean, exportFile, commaSplitString } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { Spin } from "view-design";
+import { modelPageListUrl } from "@/api/basis-info/model-manager";
 import axios from "axios";
 export default {
   name: "scrap-report",
@@ -108,6 +124,7 @@ export default {
       imgUrl: "",
       visible: false,
       workerPageListUrl: workerPageListUrl(),
+      modelPageListUrl: modelPageListUrl(),
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
@@ -124,6 +141,7 @@ export default {
         modelName: "",
         remark: "",
         previewServerIP: "",
+        isPicture: 1,
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -267,15 +285,18 @@ export default {
     },
     // 导出
     exportClick () {
-      let { startTime, endTime, workOrder, unitId, panelNo, lineName, modelName, remark, previewServerIP } = this.req;
-      exportReq({
+      let { startTime, endTime, workOrder, unitId, panelNo, lineName, modelName, remark, previewServerIP, isPicture } = this.req;
+      const obj = {
         startTime: formatDate(startTime), endTime: formatDate(endTime), workOrder,
         unitId: commaSplitString(unitId).join(),
         panelNo: commaSplitString(panelNo).join(),
         lineName: lineName.toString(),
         modelName: commaSplitString(modelName).join(), remark,
         previewServerIP,
-      }).then(
+      };
+      let requestApi = exportReq;
+      if (!isPicture) requestApi = exportNoPictureReq;
+      requestApi(obj).then(
         (res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });
           const fileName = `${this.$t("scrap-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
