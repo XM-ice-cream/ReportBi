@@ -135,11 +135,11 @@ export default {
     },
     // 初始化Excel
     initExcel (jsonStr_parse, setParam, setParam_parse, result) {
+      console.log(window.luckysheet);
       this.reportName = jsonStr_parse.name;
       // 渲染查询表单
       this.tableData2 = this.getParamsList(setParam, setParam_parse);
-      //   const { total, pageCount } = jsonStr_parse.filter(item => item.status === 1)[0];
-      //   this.params = { ...this.params, total, totalPage: pageCount }
+
       this.params = {
         ...this.params,
         total: jsonStr_parse[this.jsonIndex].total,
@@ -163,7 +163,6 @@ export default {
         }
         extendArry.push({ name: i, children: children });
       }
-      console.log('extendArry', extendArry);
       return extendArry;
     },
     // Excel导出
@@ -244,6 +243,7 @@ export default {
       options.data = this.sheetData;
       $(function () {
         luckysheet.create(options);
+        // console.log(luckysheet.getRangeValue());
       });
     },
     //时间格式化
