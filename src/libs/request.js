@@ -13,6 +13,7 @@ const _status = {
   999: i18n.t('err999')
 }
 
+const ignoreRecordUrlList = ['/api/reportcenter/v1/usagerecord/addusagerecord']
 // 错误返回值处理
 const errorInfo = ({loading}, {config, data, status, statusText}) => {
   // 错误信息
@@ -119,6 +120,16 @@ export function requestCenter(params) {
         delete config.data.isFuzzyKey
       }
     }
+    if (params.url != "" && params.url.startsWith("/api/reportcenter") && !ignoreRecordUrlList.includes(params.url)) {
+      let obj = { 
+        ip: '',
+        apiUrl: params.url 
+      };
+        let request = addUsageRecordReq(obj);
+        request.then((res) => {
+          console.log('==========request.res===========',res)
+        });
+    }
     return config
   }, error => {
     if (params.loading) Spin.hide()
@@ -158,4 +169,13 @@ export function requestCenter(params) {
   })
 
   return instance(params)
+}
+export const addUsageRecordReq = data => {
+  return requestCenter({
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/v1/usagerecord/addusagerecord',
+    method: 'post',
+    data
+  })
 }
