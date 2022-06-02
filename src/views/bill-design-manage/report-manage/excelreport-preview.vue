@@ -49,6 +49,8 @@
             </Tooltip>
           </div>
           <div id="luckysheetpreview" style="margin:0;padding:0;position:absolute;width:100%;height:calc(100% - 34px);left: 0;top: 0;"></div>
+          <!-- <div id="luckysheetpreview"></div> -->
+          <div id="excelpreview" class="data-table"></div>
           <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
           <div style="display:none"></div>
         </Content>
@@ -98,6 +100,9 @@ export default {
     };
   },
   methods: {
+
+
+
     async searchPreview (flag = true) {
 
       if (!flag) this.params.requestCount = 1;  // 点击查询按钮
@@ -117,13 +122,17 @@ export default {
       this.loading = true;
       await getExcelPreviewReq(this.params).then(res => {
         if (res.code === 200) {
+
           this.loading = false;
           let { setParam } = this.params;
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
           const setParam_parse = JSON.parse(res.result.setParam);
           this.jsonStr = jsonStr_parse;
+          console.log(jsonStr_parse);
           //第一次获取请求值
           this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result);
+          // 渲染表格
+          //   this.getTable("excelpreview", jsonStr_parse);
         } else {
           this.$Message.error(res.message);
           this.sheetData = [{}];
@@ -132,6 +141,118 @@ export default {
         }
       })
 
+    },
+    //获取表格
+    getTable (tableid, data) {
+      let htm = "<table class='table tableScroll'>";
+      const { celldata, config } = data[0];
+      //处理数据,将同一行为一组数据
+      let result = [];
+      celldata.forEach(item => {
+        if (!result[item.r]) result[item.r] = [];
+        result[item.r].push(item)
+      })
+      result.forEach((item, itemIndex) => {
+        htm += "<tr>";
+        item.forEach((tdItem, tdIndex) => {
+          //   console.log(tdItem);
+          const { v, bg, bl, fc, ht, vt, mc, fs } = tdItem.v; //获取样式
+          const { columnlen, rowlen, borderInfo } = config;//
+          let style = "";
+          //   宽高
+          const width = columnlen[tdIndex] || 219
+          const height = rowlen[itemIndex] || 18;
+          //边框
+          let border = "none";
+          borderInfo.forEach((borderItem, borderIndex) => {
+            const { borderType, color, range } = borderItem;
+            //列号在范围内
+            const columnRang = (range[0].column[0] <= tdIndex) && (range[0].column[1] >= tdIndex);
+            //行号在范围内
+            const rowRang = (range[0].row[0] <= itemIndex) && (range[0].row[1] >= itemIndex);
+            if (borderType === "border-all" && columnRang && rowRang) {
+              border = `1px solid ${color}`;
+            }
+            if (borderType === "border-none" && columnRang && rowRang) {
+              border = "none";
+            }
+          })
+          if (bg) style += `background:${bg};`;//背景颜色
+          if (bl) style += `font-weight:${bl == 1 ? 'bold' : 'normal'};`; //字体粗细
+          if (fc) style += `color:${fc};`;//字体颜色
+          if (ht) style += `text-align:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
+          if (vt) style += `verticle-align:middle;`;//垂直居中
+          if (fs) style += `font-size:${fs}px;`;//文字大小
+          style += `width:${width}px;height:${height}px;`;//宽高
+          style += `border:${border};`;//边框
+
+
+
+          htm += `<td style="${style}" colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}">${v}</td>`
+          //   htm += "<td style='background:" + bg + ",font-weight:"+bl===1?'bold':'normal+'"'>" + v + "</td>";
+          if (tdIndex + 1 === item.length) htm += "</tr>"
+        })
+
+        // if (item.c === 0) {
+        //   htm += "<tr><td>" + item.v.v + "</td>"
+        // } else {
+        //   htm += "<td>" + item.v.v + "</td></tr>";
+        // }
+      })
+      //   const { title, dataList } = data;
+
+
+
+      //   //#region 渲染前两行
+      //   let htm0 = "<tr>"; // 第一行html
+      //   let htm1 = "<tr>";// 第二行html
+      //   for (let key in title) {
+      //     htm0 += "<th colspan=" + title[key].length + ">" + key + "</th>";
+      //     for (let i = 0; i < title[key].length; i++) {
+      //       htm1 += "<td style='background-color:#f0f3f6;color:#484848;'>" + title[key][i] + "</td>";
+      //     }
+      //   }
+      //   htm += htm0 + "</tr>" + htm1 + "</tr>";
+      //   //#endregion
+
+      //   // 获取需要合并单元格的个数{key:num;key:num}
+      //   let dataListItem = dataList.map(item => {
+      //     return item[0]
+      //   })
+      //   dataListItem = dataListItem.reduce(function (prev, next) {
+      //     prev[next] = (prev[next] + 1) || 1;
+      //     return prev;
+      //   }, {});
+
+      //   let index = 0; // 合并单元格的索引
+      //   let flag = false; // 是否已合并
+      //   dataList.forEach((item, j) => {
+      //     htm += "<tr>";
+
+      //     // 判断是否已合并
+      //     if (j === index) {
+      //       index += dataListItem[item[0]];
+      //       flag = true;
+      //     }
+
+      //     // 合并单元格第一列
+      //     if (flag) {
+      //       htm += "<td rowspan=" + dataListItem[item[0]] + ">" + item[0] + "</td>";
+      //       flag = false;
+      //     }
+
+      //     // 从第二列开始显示数据
+      //     for (let k = 1; k < item.length; k++) {
+      //       htm += "<td>" + item[k] + "</td>";
+      //     }
+
+      //     htm += "</tr>";
+      //   });
+
+
+      htm += "</table>";
+      console.log(htm);
+      document.getElementById(tableid).innerHTML = htm;
     },
     // 初始化Excel
     initExcel (jsonStr_parse, setParam, setParam_parse, result) {
@@ -300,8 +421,8 @@ export default {
 }
 </script>
  <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
-
 <style>
+@import "../../../assets/table.less";
 .luckysheet-input-box {
   z-index: 1000;
 }

@@ -47,19 +47,33 @@
       <!-- 右侧基础配置 -->
       <Sider hide-trigger class="sider" style="right:0;position:absolute">
         <Tabs>
-          <TabPane label="基础配置" name="first">
-            <Form ref="rightForm" :model="rightForm" :label-width="60" style="padding: 0 0.5rem">
+          <TabPane label="扩展" name="first">
+            <Form ref="rightForm" :model="rightForm" :label-width="40" style="padding: 0 0.5rem">
               <FormItem label="坐标">
                 <Input v-model="rightForm.coordinate" />
               </FormItem>
               <FormItem label="值">
                 <Input v-model="rightForm.value" />
               </FormItem>
-              <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
-                <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event)" /> &nbsp;
+              <!-- <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
+                <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event,'auto')" /> &nbsp;
                 <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
                   <i class="el-icon-question"> </i>
                 </Tooltip>
+              </FormItem> -->
+              <FormItem label="扩展方向">
+                <RadioGroup type="button" v-model="rightForm.expend" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expend')">
+                  <Radio label="no">无</Radio>
+                  <Radio label="cross">横向</Radio>
+                  <Radio label="portrait">纵向</Radio>
+                </RadioGroup>
+              </FormItem>
+              <FormItem label="扩展排序">
+                <RadioGroup type="button" v-model="rightForm.expendSort" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expendSort')">
+                  <Radio label="no">无</Radio>
+                  <Radio label="asc">升序</Radio>
+                  <Radio label="desc">降序</Radio>
+                </RadioGroup>
               </FormItem>
             </Form>
           </TabPane>
@@ -199,7 +213,9 @@ export default {
         r: "",
         c: "",
         auto: false,
-        autoIsShow: false
+        autoIsShow: false,
+        expend: "portrait",
+        expendSort: "no",
       },
       reportExcelDto: {
         id: null,
@@ -223,7 +239,6 @@ export default {
         if (index + 1 !== this.dataBaseList.length) {
           const { setName, setCode } = this.dataBaseList[index + 1];
           Promise.all([this.detail(item.setCode), this.detail(setCode)]).then(res => {
-            console.log(res);
             const obj = {
               setCode: item.setCode,
               setName: item.setName,
@@ -318,30 +333,26 @@ export default {
         plugins: ['chart'],
         hook: {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
+            //设定右侧值
+            const { r, c } = postion;
+            const value = cell == null ? "" : cell.v;
+            that.rightForm = { ...that.rightForm, r, c, coordinate: r + "," + c, value, autoIsShow: true, expend: "portrait", expendSort: "no" }
+
+            const { expend, expendSort } = that.rightForm;
             window.luckysheet.setCellValue(
               postion.r,
               postion.c,
-              that.draggableFieldLabel
+              { v: that.draggableFieldLabel, m: that.draggableFieldLabel, expend, expendSort }
             );
           },
           cellMousedown: function (cell, postion, sheetFile, ctx) {
-            //单元格点击事件
-            that.rightForm.coordinate = postion.r + "," + postion.c;
-            that.rightForm.r = postion.r;
-            that.rightForm.c = postion.c;
-            that.rightForm.value = cell == null ? "" : cell.v;
-            that.rightForm.autoIsShow = true
-            //判断单元格是否是静态数据并且是合并单元格
-            if (cell != null && (cell.v == undefined || cell.v.indexOf('#{') === -1)) {
-              that.rightForm.autoIsShow = true
-              if (cell.auto != null && cell.auto == '1') {
-                that.rightForm.auto = true
-              } else {
-                that.rightForm.auto = false
-              }
-            } else {
-              that.rightForm.auto = false
-            }
+            console.log(cell);
+            const { r, c } = postion;
+            const value = cell == null ? "" : cell.v;
+            const expend = cell?.expend || "portrait";
+            const expendSort = cell?.expendSort || "no";
+            that.rightForm = { ...that.rightForm, r, c, coordinate: r + "," + c, value, autoIsShow: true, expend, expendSort }
+
           },
 
         },
@@ -403,12 +414,17 @@ export default {
       let fieldLabel = evt.item.innerText; // 列名称
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
     },
-    autoChangeFunc (auto) {
-      if (auto) {
-        luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "1" })
-      } else {
-        luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "0" })
-      }
+    autoChangeFunc (evt, type) {
+      let obj = {};
+      obj[type] = this.rightForm[type];
+      //   console.log(obj, type, this.rightForm, { ...obj });
+      luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...obj });
+
+      //   if (auto) {
+      //     luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "1" })
+      //   } else {
+      //     luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "0" })
+      //   }
     },
     //查看所有数据集
     queryAllDataSet () {
@@ -481,6 +497,8 @@ export default {
     //保存
     async save () {
       const jsonData = luckysheet.getAllSheets();
+      console.log(jsonData, this.rightForm);
+      //   return;
       for (let i = 0; i < jsonData.length; i++) {
         //清空data数据，以celldata数据为主
         jsonData[i]["data"] = [];
@@ -570,10 +588,10 @@ export default {
 </style>
 <style lang="less" scoped>
 .sider {
-  width: 180px !important;
-  min-width: 180px !important;
-  max-width: 180px !important;
-  flex: 0 0 180px !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  flex: 0 0 200px !important;
   height: 100%;
   //   border: 2px solid #3d85c6;
   margin: 0 0.5rem;
