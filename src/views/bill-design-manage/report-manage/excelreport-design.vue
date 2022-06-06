@@ -46,38 +46,7 @@
       </Content>
       <!-- 右侧基础配置 -->
       <Sider hide-trigger class="sider" style="right:0;position:absolute">
-        <Tabs>
-          <TabPane label="扩展" name="first">
-            <Form ref="rightForm" :model="rightForm" :label-width="40" style="padding: 0 0.5rem">
-              <FormItem label="坐标">
-                <Input v-model="rightForm.coordinate" />
-              </FormItem>
-              <FormItem label="值">
-                <Input v-model="rightForm.value" />
-              </FormItem>
-              <!-- <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
-                <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event,'auto')" /> &nbsp;
-                <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
-                  <i class="el-icon-question"> </i>
-                </Tooltip>
-              </FormItem> -->
-              <FormItem label="扩展方向">
-                <RadioGroup type="button" v-model="rightForm.expend" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expend')">
-                  <Radio label="no">无</Radio>
-                  <Radio label="cross">横向</Radio>
-                  <Radio label="portrait">纵向</Radio>
-                </RadioGroup>
-              </FormItem>
-              <FormItem label="扩展排序">
-                <RadioGroup type="button" v-model="rightForm.expendSort" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expendSort')">
-                  <Radio label="no">无</Radio>
-                  <Radio label="asc">升序</Radio>
-                  <Radio label="desc">降序</Radio>
-                </RadioGroup>
-              </FormItem>
-            </Form>
-          </TabPane>
-        </Tabs>
+        <RightTabPane :formData="rightForm" @autoChangeFunc="autoChangeFunc" />
       </Sider>
     </Layout>
 
@@ -85,7 +54,7 @@
     <Modal title="数据集管理" v-model="outerVisible" class="tableModal">
       <div class="tableTabs">
         <Tabs>
-          <TabPane label="数据集" :index="1">
+          <TabPane label="数据集" :index="1" name="数据集">
             <Form :label-width="150" :label-colon="true" inline @keyup.enter.native="queryAllDataSet">
               <FormItem label="数据集名称">
                 <Input type="text" v-model="req.setName" cleabler />
@@ -114,7 +83,7 @@
               </draggable>
             </div>
           </TabPane>
-          <TabPane label="对应关系" :index="2" v-if="dataSetDataList.length>0">
+          <TabPane label="对应关系" :index="2" name="对应关系" v-if="dataSetDataList.length>0">
             <template v-for="(item,index) in dataSetDataList">
               <Form :label-width="80" :label-colon="true" :key="index" inline>
                 <FormItem label="数据集1">
@@ -138,7 +107,7 @@
               </Form>
             </template>
           </TabPane>
-          <TabPane label="关联参数" :index="3" v-if="dataSetDataList.length>0">
+          <TabPane label="关联参数" :index="3" name="关联参数" v-if="dataSetDataList.length>0">
             <template v-for="(item,itemIndex) in dataSetDataList">
               <table :key="itemIndex" style="width: 100%;" class="connection-table">
                 <tr>
@@ -190,10 +159,11 @@ import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-
 import { getExcelByReportcodeReq, insertExcelReportReq, modifyExcelReportReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
 import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
+import RightTabPane from './excelreport-design/right-tabPane.vue';
 
 export default {
   name: "excelreport-design",
-  components: { draggable },
+  components: { draggable, RightTabPane },
   data () {
     return {
       dataSet: [],
@@ -335,8 +305,11 @@ export default {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
             //设定右侧值
             const { r, c } = postion;
-            const value = cell == null ? "" : cell.v;
-            that.rightForm = { ...that.rightForm, r, c, coordinate: r + "," + c, value, autoIsShow: true, expend: "portrait", expendSort: "no" }
+            that.rightForm = {
+              ...that.rightForm, r, c, coordinate: r + "," + c,
+              value: that.draggableFieldLabel, autoIsShow: true,
+              expend: "portrait", expendSort: "no"
+            }
 
             const { expend, expendSort } = that.rightForm;
             window.luckysheet.setCellValue(
@@ -414,17 +387,11 @@ export default {
       let fieldLabel = evt.item.innerText; // 列名称
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
     },
-    autoChangeFunc (evt, type) {
-      let obj = {};
-      obj[type] = this.rightForm[type];
-      //   console.log(obj, type, this.rightForm, { ...obj });
-      luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...obj });
-
-      //   if (auto) {
-      //     luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "1" })
-      //   } else {
-      //     luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "0" })
-      //   }
+    //更新单元格信息，扩展、排序...
+    autoChangeFunc (right) {
+      console.log("更新", right);
+      const { expend, expendSort } = right;
+      luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { expend, expendSort });
     },
     //查看所有数据集
     queryAllDataSet () {
@@ -575,7 +542,6 @@ export default {
   },
   created () {
     this.getDataItemData();
-    console.log("创建");
     this.$nextTick(() => {
       this.reportCode = this.$route.query.reportCode
       this.design();
@@ -588,10 +554,10 @@ export default {
 </style>
 <style lang="less" scoped>
 .sider {
-  width: 200px !important;
-  min-width: 200px !important;
-  max-width: 200px !important;
-  flex: 0 0 200px !important;
+  width: 300px !important;
+  min-width: 300px !important;
+  max-width: 300px !important;
+  flex: 0 0 300px !important;
   height: 100%;
   //   border: 2px solid #3d85c6;
   margin: 0 0.5rem;
@@ -639,7 +605,7 @@ export default {
   padding-right: 0.5rem;
 }
 .content {
-  width: calc(100% - 400px);
+  width: calc(100% - 600px);
   height: 100%;
   background-color: #fff;
   position: absolute;
