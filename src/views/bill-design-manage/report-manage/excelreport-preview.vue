@@ -159,21 +159,24 @@ export default {
           const { columnlen, rowlen, borderInfo } = config;//
           let style = "";
           //   宽高
-          const width = columnlen[tdIndex] || 219
-          const height = rowlen[itemIndex] || 18;
+          const width = columnlen ? columnlen[tdIndex] : 219
+          const height = rowlen ? rowlen[itemIndex] : 18;
           //边框
           let border = "none";
-          borderInfo.forEach((borderItem, borderIndex) => {
-            const { borderType, color, range } = borderItem;
-            //列号在范围内
-            const columnRang = (range[0].column[0] <= tdIndex) && (range[0].column[1] >= tdIndex);
-            //行号在范围内
-            const rowRang = (range[0].row[0] <= itemIndex) && (range[0].row[1] >= itemIndex);
-            if (borderType === "border-all" && columnRang && rowRang) {
-              border = `1px solid ${color}`;
-            }
-            if (borderType === "border-none" && columnRang && rowRang) {
-              border = "none";
+          console.log(borderInfo);
+          borderInfo?.forEach((borderItem, borderIndex) => {
+            const { borderType, color, range, rangeType } = borderItem;
+            if (rangeType === "range") {
+              //列号在范围内
+              const columnRang = (range[0].column[0] <= tdIndex) && (range[0].column[1] >= tdIndex);
+              //行号在范围内
+              const rowRang = (range[0].row[0] <= itemIndex) && (range[0].row[1] >= itemIndex);
+              if (borderType === "border-all" && columnRang && rowRang) {
+                border = `1px solid ${color}`;
+              }
+              if (borderType === "border-none" && columnRang && rowRang) {
+                border = "none";
+              }
             }
           })
           if (bg) style += `background:${bg};`;//背景颜色
@@ -194,7 +197,6 @@ export default {
 
 
       htm += "</table>";
-      console.log(htm);
       document.getElementById(tableid).innerHTML = htm;
     },
     //获取查询参数 并获得参数类型及是否必填

@@ -91,6 +91,7 @@ export default {
 <style scoped lang = "less">
 .extel-panel {
   display: flex;
+  margin-left: 0.5rem;
   .excel-menu {
     width: 3rem;
     display: inline-block;

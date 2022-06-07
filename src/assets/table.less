@@ -5,16 +5,22 @@
   float: left;
   border-collapse: collapse;/*去除表格缝隙*/
   border: 1px solid #efefef;
+  
+  
 }
 .data-table{
     display: inline-block;/*宽高由内容撑开*/
+    width: 100%;
+    height: calc(100% - 2rem);
 }
 
 /*关键设置 tbody出现滚动条*/
 .tableScroll tbody {
-  display: block;
-  width:100%;
-  overflow-x: scroll;
+    display: block;
+    width: 107rem;
+    overflow: auto;
+    /* height: 5rem; */
+    height: 47rem;
 }
 
 
