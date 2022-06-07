@@ -46,7 +46,7 @@
             </i-col>
           </Row>
         </div>
-        <div id="excelpreview" class="data-table"></div>
+        <div id="excelpreview" class="data-table" :style="{height:params.height+'px'}"></div>
         <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
@@ -85,6 +85,7 @@ export default {
         total: 0, //  总条数
         totalPage: 0, //  总页数,
         sheetIndex: '',//sheet 当前激活索引
+        height: "120",//表格高度
         // ...this.$config.pageConfig,
       },
       jsonStr: [], // json数据
@@ -143,7 +144,7 @@ export default {
     },
     //获取表格
     getTable (tableid, data) {
-      let htm = "<table class='table tableScroll'>";
+      let htm = "<table class='table tableScroll' id='exceltable'>";
       const { celldata, config } = data[0];
       //处理数据,将同一行为一组数据
       let result = [];
@@ -163,7 +164,6 @@ export default {
           const height = rowlen ? rowlen[itemIndex] : 18;
           //边框
           let border = "none";
-          console.log(borderInfo);
           borderInfo?.forEach((borderItem, borderIndex) => {
             const { borderType, color, range, rangeType } = borderItem;
             if (rangeType === "range") {
@@ -215,6 +215,7 @@ export default {
       }
       return extendArry;
     },
+
     // Excel导出
     async download () {
       exportReq(this.params).then((res) => {
@@ -249,6 +250,11 @@ export default {
       }
       return objSecond
     },
+    // 自动改变表格高度
+    autoSize () {
+      this.params.height = document.body.clientHeight - 120;
+      console.log("this.params.height", this.params.height);
+    },
     // 选择第几页
     pageChange (index) {
       this.params.requestCount = index
@@ -268,10 +274,12 @@ export default {
       this.loading = true;
       this.tableData2 = [];
       this.searchPreview();
+      this.autoSize();
+      window.addEventListener('resize', () => this.autoSize());
       // 解决Jquery 版本冲突问题
       //   window.jQuery.noConflict();
     })
-  }
+  },
   // 销毁luckysheet
   // window.luckysheet.destroy();
 }
