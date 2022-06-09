@@ -186,6 +186,10 @@ export default {
         autoIsShow: false,
         expend: "portrait",
         expendSort: "no",
+        leftParent: "default",
+        topParent: "default",
+        topParentValue: "",
+        leftParentValue: "",
       },
       reportExcelDto: {
         id: null,
@@ -305,10 +309,23 @@ export default {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
             //设定右侧值
             const { r, c } = postion;
+            console.log(r, c);
+            // 列
+            for (let i = c - 1; i >= 0; i--) {
+              console.log(r, c, i);
+              console.log(luckysheet.getCellValue(r, i, { type: 'expend' }));
+            }
+            // 行
+            for (let i = r - 1; i >= 0; i--) {
+              console.log(luckysheet.getCellValue(i, c));
+            }
+
             that.rightForm = {
               ...that.rightForm, r, c, coordinate: r + "," + c,
               value: that.draggableFieldLabel, autoIsShow: true,
-              expend: "portrait", expendSort: "no"
+              expend: "portrait",
+              expendSort: "no",
+
             }
 
             const { expend, expendSort } = that.rightForm;

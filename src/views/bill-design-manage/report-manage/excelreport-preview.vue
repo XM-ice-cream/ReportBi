@@ -46,8 +46,13 @@
             </i-col>
           </Row>
         </div>
-        <div id="excelpreview" class="data-table" :style="{height:params.height+'px'}"></div>
-        <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+        <!-- 表格 -->
+        <div class="data-table" :style="{height:(params.height+50)+'px'}">
+          <table class='table tableScroll' id="excelpreview" :style="{height:params.height+'px'}">
+          </table>
+          <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+        </div>
+
       </Card>
     </div>
     <img :src="require('../../../assets/images/loading.gif')" v-if="loading" class="loading-img" />
@@ -122,16 +127,16 @@ export default {
         if (res.code === 200) {
           this.loading = false;
           let { jsonStr, setParam } = res.result;
-          jsonStr = JSON.parse(jsonStr);
+          this.jsonStr = JSON.parse(jsonStr);
           // 查询参数
           this.tableData2 = this.getParamsList(this.params.setParam, JSON.parse(setParam));
           this.params = {
             ...this.params,
-            total: jsonStr[this.jsonIndex].total,
-            totalPage: jsonStr[this.jsonIndex].pageCount
+            total: this.jsonStr[this.jsonIndex].total,
+            totalPage: this.jsonStr[this.jsonIndex].pageCount
           }
           // 渲染表格
-          this.getTable("excelpreview", jsonStr);
+          this.getTable("excelpreview", this.jsonStr);
         } else {
           this.$Message.error(res.message);
           this.sheetData = [{}];
@@ -145,32 +150,46 @@ export default {
     //获取表格
     getTable (tableid, data) {
       let htm = "<table class='table tableScroll' id='exceltable'>";
-      const { celldata, config } = data[0];
+      const { celldata, config, frozen } = data[0];
+      console.log(data);
       //处理数据,将同一行为一组数据
       let result = [];
+      let maxColumns = 0;
       celldata.forEach(item => {
         if (!result[item.r]) result[item.r] = [];
-        result[item.r].push(item)
+        result[item.r].push(item);
+        //取最大列
+        maxColumns = item.c > maxColumns ? item.c : maxColumns;
       })
-      result.forEach((item, itemIndex) => {
+      console.log(result);
+      //行
+      result.forEach((item, rowIndex) => {
         htm += "<tr>";
-        item.forEach((tdItem, tdIndex) => {
+        let tdIndex = 0;
+        // 列
+        item.forEach((tdItem, columnIndex) => {
           //   console.log(tdItem);
+          const { c, r } = tdItem;
           const { v, bg, bl, fc, ht, vt, mc, fs } = tdItem.v; //获取样式
-          const { columnlen, rowlen, borderInfo } = config;//
+          const { columnlen, rowlen, borderInfo } = config;//边框
           let style = "";
           //   宽高
-          const width = columnlen ? columnlen[tdIndex] : 219
-          const height = rowlen ? rowlen[itemIndex] : 18;
+          let width = 219;
+          let height = 18;
+          if (columnlen && columnlen[tdIndex]) width = columnlen[tdIndex];
+          if (rowlen && rowlen[rowIndex]) height = rowlen[rowIndex];
+
           //边框
           let border = "none";
           borderInfo?.forEach((borderItem, borderIndex) => {
             const { borderType, color, range, rangeType } = borderItem;
-            if (rangeType === "range") {
+            console.log(borderItem);
+            if (rangeType === "range" && range[0]) {
+              //   console.log(range[0]);
               //列号在范围内
-              const columnRang = (range[0].column[0] <= tdIndex) && (range[0].column[1] >= tdIndex);
+              const columnRang = (range[0].column[0] <= c) && (range[0].column[1] >= c);
               //行号在范围内
-              const rowRang = (range[0].row[0] <= itemIndex) && (range[0].row[1] >= itemIndex);
+              const rowRang = (range[0].row[0] <= r) && (range[0].row[1] >= r);
               if (borderType === "border-all" && columnRang && rowRang) {
                 border = `1px solid ${color}`;
               }
@@ -179,6 +198,14 @@ export default {
               }
             }
           })
+
+          //   //冻结
+          //   let frozenTd = "static";
+          //   //首行冻结
+          //   if (frozen.type === "row" && rowIndex === 0) {
+          //     frozenTd = "fixed;"
+          //   }
+
           if (bg) style += `background:${bg};`;//背景颜色
           if (bl) style += `font-weight:${bl == 1 ? 'bold' : 'normal'};`; //字体粗细
           if (fc) style += `color:${fc};`;//字体颜色
@@ -187,16 +214,28 @@ export default {
           if (fs) style += `font-size:${fs}px;`;//文字大小
           style += `width:${width}px;height:${height}px;`;//宽高
           style += `border:${border};`;//边框
+          //   style += `position:${frozenTd};`;//冻结
 
-
+          //空单元格 当前列小于c 前面有空cell
+          for (let i = tdIndex; i < c; i++) {
+            // console.log("r", r, "c", c, "i", i);
+            tdIndex++;
+            htm += `<td  colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"></td>`
+          }
 
           htm += `<td style="${style}" colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}">${v}</td>`
-          if (tdIndex + 1 === item.length) htm += "</tr>"
+          //空单元格 当前列小于maxColumns 后面有空cell
+          if (columnIndex + 1 === item.length) {
+            for (let i = c; i < maxColumns; i++) {
+              tdIndex++;
+              htm += `<td  colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"></td>`
+            }
+            htm += "</tr>"
+          };
+          ++tdIndex;
         })
       })
 
-
-      htm += "</table>";
       document.getElementById(tableid).innerHTML = htm;
     },
     //获取查询参数 并获得参数类型及是否必填
@@ -276,6 +315,7 @@ export default {
       this.searchPreview();
       this.autoSize();
       window.addEventListener('resize', () => this.autoSize());
+      window.addEventListener('resize', () => this.getTable("excelpreview", this.jsonStr))
       // 解决Jquery 版本冲突问题
       //   window.jQuery.noConflict();
     })
@@ -353,9 +393,9 @@ export default {
   width: 1.2rem !important;
 }
 .excel-page {
-  width: 98%;
+  //   width: 98%;
   position: absolute;
   bottom: 8px;
-  z-index: 9999;
+  //   z-index: 9999;
 }
 </style>

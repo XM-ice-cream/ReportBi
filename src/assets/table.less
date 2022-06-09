@@ -6,13 +6,16 @@
   border-collapse: collapse;/*去除表格缝隙*/
   border: 1px solid #efefef;
   height: 100%;
-  
+  display: block;
+  overflow: auto;
+  width: 100%;
+  table-layout: fixed
   
 }
 .data-table{
     display: inline-block;/*宽高由内容撑开*/
     width: 100%;
-    overflow: auto;
+    position: relative;
 }
 
 
@@ -31,8 +34,7 @@
 }
 
 .data-table td {
-  border-right: 1px solid #efefef;
-  border-bottom: 1px solid #efefef;
   font-size: 12px;
   padding: 6px 6px 6px 12px;
+  word-wrap: break;
 }

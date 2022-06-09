@@ -17,6 +17,18 @@
             <Radio label="desc">降序</Radio>
           </RadioGroup>
         </FormItem>
+        <FormItem label="上父格">
+          <Select v-model="rightForm.topParent" size="small" transfer>
+            <Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+          <Input type="text" v-model="rightForm.topParentValue" size="small" v-if="rightForm.topParent=='userDefined'" placeholder="例：A1"></Input>
+        </FormItem>
+        <FormItem label="左父格">
+          <Select v-model="rightForm.leftParent" size="small" transfer>
+            <Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+          <Input type="text" v-model="rightForm.leftParentValue" size="small" v-if="rightForm.leftParent=='userDefined'" placeholder="例：A1"></Input>
+        </FormItem>
       </Form>
     </TabPane>
     <TabPane label="样式" name="second">
@@ -58,6 +70,18 @@ export default {
   data () {
     return {
       rightForm: {},
+      cellRelationList: [
+        {
+          label: "无",
+          value: "null"
+        }, {
+          label: "默认",
+          value: "default"
+        }, {
+          label: "自定义",
+          value: "userDefined"
+        }
+      ]
     }
   },
   methods: {
