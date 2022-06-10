@@ -184,12 +184,20 @@ export default {
         c: "",
         auto: false,
         autoIsShow: false,
-        expend: "portrait",
-        expendSort: "no",
-        leftParent: "default",
-        topParent: "default",
-        topParentValue: "",
-        leftParentValue: "",
+        // 单元格属性
+        cellAttribute: {
+          //扩展属性
+          expend: {
+            expend: "portrait",
+            expendSort: "no",
+            leftParent: "default",
+            topParent: "default",
+            topParentValue: "",
+            leftParentValue: "",
+          }
+
+        }
+
       },
       reportExcelDto: {
         id: null,
@@ -307,41 +315,32 @@ export default {
         plugins: ['chart'],
         hook: {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
-            //设定右侧值
-            const { r, c } = postion;
-            console.log(r, c);
-            // 列
-            for (let i = c - 1; i >= 0; i--) {
-              console.log(r, c, i);
-              console.log(luckysheet.getCellValue(r, i, { type: 'expend' }));
-            }
-            // 行
-            for (let i = r - 1; i >= 0; i--) {
-              console.log(luckysheet.getCellValue(i, c));
-            }
-
-            that.rightForm = {
-              ...that.rightForm, r, c, coordinate: r + "," + c,
-              value: that.draggableFieldLabel, autoIsShow: true,
-              expend: "portrait",
-              expendSort: "no",
-
-            }
-
-            const { expend, expendSort } = that.rightForm;
-            window.luckysheet.setCellValue(
-              postion.r,
-              postion.c,
-              { v: that.draggableFieldLabel, m: that.draggableFieldLabel, expend, expendSort }
-            );
+            that.setRightForm(cell, postion, sheetFile, ctx, that.draggableFieldLabel);//rightForm默认值
+            // that.rightForm = {
+            //   ...that.rightForm, r, c, coordinate: r + "," + c,
+            //   value: that.draggableFieldLabel, autoIsShow: true,
+            //   cellAttribute: {
+            //     expend: {
+            //       expend: "portrait",
+            //       expendSort: "no",
+            //       leftParent: "default",
+            //       topParent: "default",
+            //       topParentValue,
+            //       leftParentValue,
+            //     }
+            //   }
+            // }
+            // window.luckysheet.setCellValue(
+            //   postion.r,
+            //   postion.c,
+            //   { v: that.draggableFieldLabel, m: that.draggableFieldLabel, ...that.rightForm }
+            // );
           },
           cellMousedown: function (cell, postion, sheetFile, ctx) {
-            console.log(cell);
-            const { r, c } = postion;
+
             const value = cell == null ? "" : cell.v;
-            const expend = cell?.expend || "portrait";
-            const expendSort = cell?.expendSort || "no";
-            that.rightForm = { ...that.rightForm, r, c, coordinate: r + "," + c, value, autoIsShow: true, expend, expendSort }
+            that.setRightForm(cell, postion, sheetFile, ctx, value);//rightForm默认值
+
 
           },
 
@@ -394,10 +393,64 @@ export default {
           luckysheet.create(options);
         })
       })
-
-
-
     },
+    //获取父格值
+    getParentValue (r, c) {
+      let topParentValue = "";//上父格值
+      let leftParentValue = "";//左父格值
+      // 列
+      for (let i = c - 1; i >= 0; i--) {
+        const expend = luckysheet.getCellValue(r, i, { type: 'cellAttribute' })?.expend.expend || "";
+        //扩展方向为纵向，即为左父格
+        if (expend === "portrait") {
+          leftParentValue = { label: `${r},${i}`, value: `${r},${i}` };
+          break;
+        }
+      }
+      // 行
+      for (let i = r - 1; i >= 0; i--) {
+        const expend = luckysheet.getCellValue(i, c, { type: 'cellAttribute' })?.expend.expend || "";
+        //扩展方向为横向，即为左父格
+        if (expend === "cross") {
+          topParentValue = { label: `${i},${c}`, value: `${i},${c}` };
+          break;
+        }
+      }
+      return { topParentValue, leftParentValue }
+    },
+
+    //设定RightForm
+    setRightForm (cell, postion, sheetFile, ctx, value) {
+      const { r, c } = postion;
+      //单元格属性扩展
+      const { expend, expendSort, leftParent, topParent } = cell?.cellAttribute?.expend || {};
+      //设定父子格值
+      const { topParentValue, leftParentValue } = this.getParentValue(r, c);
+      this.rightForm = {
+        ...this.rightForm,
+        r,
+        c,
+        coordinate: r + "," + c,
+        value,
+        autoIsShow: true,
+        v: value,
+        m: value,
+        //单元格属性
+        cellAttribute: {
+          //扩展参数及默认值
+          expend: {
+            expend: expend || "portrait",
+            expendSort: expendSort || "no",
+            leftParent: leftParent || "default",
+            leftParentValue: leftParentValue || "",
+            topParent: topParent || "default",
+            topParentValue: topParentValue || ""
+          }
+        }
+      }
+      window.luckysheet.setCellValue(r, c, { ...this.rightForm });
+    },
+
     // 左侧列表拖拽
     onStart (setCode, evt) {
       this.setCode = setCode;
@@ -407,8 +460,7 @@ export default {
     //更新单元格信息，扩展、排序...
     autoChangeFunc (right) {
       console.log("更新", right);
-      const { expend, expendSort } = right;
-      luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { expend, expendSort });
+      luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...right, });
     },
     //查看所有数据集
     queryAllDataSet () {
@@ -480,23 +532,30 @@ export default {
     },
     //保存
     async save () {
-      const jsonData = luckysheet.getAllSheets();
+      //设定传参
+      this.reportExcelDto = this.setReportExcelDto();
+      const requestReq = this.reportId == null ? insertExcelReportReq : modifyExcelReportReq;
+      this.reportExcelDto.id = this.reportId || null;
+      const { code, message } = await requestReq(this.reportExcelDto);
+      if (code != 200) {
+        this.$Message.error(message);
+        return;
+      };
+      this.$Message.success("保存成功");
+
+    },
+    //设定传参
+    setReportExcelDto () {
+      let jsonData = luckysheet.getAllSheets();
       console.log(jsonData, this.rightForm);
       //   return;
-      for (let i = 0; i < jsonData.length; i++) {
-        //清空data数据，以celldata数据为主
-        jsonData[i]["data"] = [];
-      }
-
-      this.reportExcelDto.jsonStr = JSON.stringify(luckysheet.getAllSheets());
       let setCodeList = [];
       let setParams = {};
+
+      //查询参数
       this.dataSet.forEach(code => {
         setCodeList.push(code.setCode);
-        if (
-          code.dataSetParamDtoList != null &&
-          code.dataSetParamDtoList.length > 0
-        ) {
+        if (code.dataSetParamDtoList != null && code.dataSetParamDtoList.length > 0) {
           let dataSetParam = {};
           code.dataSetParamDtoList.forEach(value => {
             const paramName = value.paramName;
@@ -508,25 +567,30 @@ export default {
         }
       });
 
-      this.reportExcelDto.setParam = JSON.stringify(setParams);
-      this.reportExcelDto.setCodes = setCodeList.join("|");
-      this.reportExcelDto.reportCode = this.reportCode;
-      if (this.reportId == null) {
-        const { code, message } = await insertExcelReportReq(this.reportExcelDto);
-        if (code != 200) {
-          this.$Message.error(message);
-          return;
-        };
-        this.$Message.success("保存成功");
-      } else {
-        this.reportExcelDto.id = this.reportId;
-        const { code, message } = await modifyExcelReportReq(this.reportExcelDto);
-        if (code != 200) {
-          this.$Message.error(message);
-          return;
-        };
-        this.$Message.success("更新成功");
+      //修正一遍左上父格的值
+      jsonData.forEach((item, itemIndex) => {
+        const { celldata } = item;
+        for (let i = celldata.length - 1; i > 0; i--) {
+          const { leftParent, topParent } = jsonData[itemIndex].celldata[i].v.cellAttribute.expend;
+          if (leftParent === "default" || topParent === "default") {
+            const { r, c } = celldata[i];
+            //设定父子格值
+            const { topParentValue, leftParentValue } = this.getParentValue(r, c);
+            if (leftParent === "default") jsonData[itemIndex].celldata[i].v.cellAttribute.expend.leftParentValue = leftParentValue;
+            if (topParent === "default") jsonData[itemIndex].celldata[i].v.cellAttribute.expend.topParentValue = topParentValue;
+          }
+        }
+      })
+
+
+      return {
+        ...this.reportExcelDto,
+        jsonStr: JSON.stringify(jsonData),
+        setParam: JSON.stringify(setParams),
+        setCodes: setCodeList.join("|"),
+        reportCode: this.reportCode
       }
+
     },
     //删除数据集数据
     del (val) {

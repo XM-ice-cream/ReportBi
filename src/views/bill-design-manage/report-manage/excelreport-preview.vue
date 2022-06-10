@@ -156,8 +156,11 @@ export default {
       let result = [];
       let maxColumns = 0;
       celldata.forEach(item => {
-        if (!result[item.r]) result[item.r] = [];
-        result[item.r].push(item);
+        const { r, c } = item;
+        if (!result[r]) result[r] = [];
+        if (!result[r][c]) result[r][c] = {};
+        result[r][c] = { ...item };
+        console.log(result[item.r][item.c]);
         //取最大列
         maxColumns = item.c > maxColumns ? item.c : maxColumns;
       })
@@ -183,7 +186,6 @@ export default {
           let border = "none";
           borderInfo?.forEach((borderItem, borderIndex) => {
             const { borderType, color, range, rangeType } = borderItem;
-            console.log(borderItem);
             if (rangeType === "range" && range[0]) {
               //   console.log(range[0]);
               //列号在范围内
@@ -212,7 +214,7 @@ export default {
           if (ht) style += `text-align:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
           if (vt) style += `verticle-align:middle;`;//垂直居中
           if (fs) style += `font-size:${fs}px;`;//文字大小
-          style += `width:${width}px;height:${height}px;`;//宽高
+          const widthHeight = `width:${width}px;height:${height}px;`;//宽高
           style += `border:${border};`;//边框
           //   style += `position:${frozenTd};`;//冻结
 
@@ -222,8 +224,8 @@ export default {
             tdIndex++;
             htm += `<td  colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"></td>`
           }
-
-          htm += `<td style="${style}" colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}">${v}</td>`
+          //宽度不生效解决方案：内部添加div，并设定宽高
+          htm += `<td style="${style}" colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"><div style="${widthHeight}">${v}</div></td>`
           //空单元格 当前列小于maxColumns 后面有空cell
           if (columnIndex + 1 === item.length) {
             for (let i = c; i < maxColumns; i++) {

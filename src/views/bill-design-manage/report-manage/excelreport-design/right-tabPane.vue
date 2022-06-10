@@ -19,7 +19,7 @@
     </div>
     <div class="excel-tabs">
       <!-- 单元格属性 -->
-      <tab-pane-1 :type="activeName" :formData="rightForm" @autoChangeFunc="autoChangeFunc"></tab-pane-1>
+      <tab-pane-1 :type="activeName" :formData="rightForm.cellAttribute" @autoChangeFunc="autoChangeFunc"></tab-pane-1>
     </div>
   </div>
 
@@ -39,7 +39,6 @@ export default {
   watch: {
     formData: {
       handler () {
-        console.log("监听:", this.formData);
         this.rightForm = { ...this.formData };
       },
       deep: true,
@@ -57,8 +56,10 @@ export default {
     changeMenu (name) {
       this.activeName = name;
     },
-    autoChangeFunc (rightForm) {
-      this.$emit("autoChangeFunc", rightForm);
+    autoChangeFunc (type, rightForm) {
+      this.rightForm[type] = { ...rightForm };
+      console.log(rightForm, type, this.rightForm);
+      this.$emit("autoChangeFunc", this.rightForm);
     }
   }
 }
