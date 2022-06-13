@@ -22,7 +22,7 @@
         <FormItem label="颜色">
           <Input v-model="colorValue" style="width: 200px" placeholder="请输入颜色" size="small">
           <template slot="append">
-            <ColorPicker v-model="colorValue" :predefine="predefineColors" size="small" />
+            <ColorPicker v-model="colorValue" transfer :predefine="predefineColors" size="small" />
           </template>
           </Input>
         </FormItem>

@@ -1672,6 +1672,7 @@ export default {
     'pda-version-update': 'PDA版本发布',
     'flow-work': '流程管理',
     'flow-card': '流程卡',
+    'flow-card-sip': '流程卡SIP',
     'antivirus': '杀毒软件监控',
     'spare-manager': '备品管理',
     'storage-manager': '储位管理',
@@ -1945,6 +1946,7 @@ export default {
     'packagewight-report': '包装报表',
     'quality-yield-lake-report': 'K01&K10 Yield Report',
     'PreBack': 'PreBack报表',
+    'workorder-wip-report': '工单WIP报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

@@ -13,8 +13,6 @@
 	<link rel='stylesheet' href='./css/luckysheet.css' />
 	<link rel='stylesheet' href='./assets/iconfont/iconfont.css' />
 	<script src="./plugins/js/plugin.js"></script>
-
-	<!-- rollup luckysheet.js -->
 	<script src="./luckysheet.umd.js"></script>
 
 </head>
@@ -69,7 +67,7 @@
                 options = {
                     container: "luckysheet",
                     lang: lang,
-                    allowUpdate:true,
+                    // allowUpdate:true,
                     updateImageUrl: location.origin + "/luckysheet/api/updateImg",
                     updateUrl: "ws://"+ location.host +"/luckysheet/websocket/luckysheet",
                     gridKey: gridKey,

@@ -12,10 +12,10 @@ export const getpagelistReq = data => {
         method: 'post',
         data
     })
-  }
-  
-  // 导出
-  export const exportReq = data => {
+}
+
+// 导出
+export const exportReq = data => {
     return requestCenter({
         loading: true,
         timeout: 0,
@@ -25,4 +25,16 @@ export const getpagelistReq = data => {
         responseType: 'arraybuffer',
         data
     })
-  }
+}
+// 导出(没图片)
+export const exportNoPictureReq = data => {
+    return requestCenter({
+        loading: true,
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/anonymous/v1/scrapreport/exportscrap',
+        method: 'post',
+        responseType: 'arraybuffer',
+        data
+    })
+}

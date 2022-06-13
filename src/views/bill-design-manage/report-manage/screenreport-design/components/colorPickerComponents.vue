@@ -57,3 +57,8 @@ export default {
   height: 23px;
 }
 </style>
+<style>
+.ivu-select-dropdown {
+  max-width: 310px;
+}
+</style>

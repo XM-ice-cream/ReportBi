@@ -40,9 +40,9 @@
                   <Button @click="preview(item.reportCode)">
                     <Icon type="md-eye" />预览
                   </Button>
-                  <Button @click="design(item.reportCode)">
+                  <!-- <Button @click="design(item.reportCode)">
                     <Icon type="md-create" />设计
-                  </Button>
+                  </Button> -->
                 </span>
               </span>
               <div class="content">

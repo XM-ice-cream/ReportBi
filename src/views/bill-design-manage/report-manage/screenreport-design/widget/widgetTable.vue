@@ -150,31 +150,36 @@ export default {
     //初始化title
     setHead () {
       if (this.list.length > 0) {
-        const head = this.optionsSetUp.dynamicAddTable;
-        console.log(head, "head");
-        this.header = head;
+        // const head = this.optionsSetUp.dynamicAddTable;
+        // console.log(head, "head");
+
+        let head = []
         Object.keys(this.list[0]).forEach(item => {
-          this.header.push({
+          head.push({
             key: item,
             name: item,
             width: "200",
           })
         })
         // const head = this.header;
+        this.header = head;
+        // this.optionsSetUp.dynamicAddTable = head.map(item => { return { ...item } })
         // this.optionsSetUp.dynamicAddTable = head;
-
       }
     },
+    // 处理数据
     handlerData () {
       const tableData = this.optionsData;
       tableData.dataType == "staticData"
         ? this.handlerStaticData(tableData.staticData)
         : this.handlerDynamicData(tableData.dynamicData, tableData.refreshTime);
     },
+    //静态数据
     handlerStaticData (data) {
       this.handlerHead();
       this.list = data;
     },
+    // 动态数据
     handlerDynamicData (data, refreshTime) {
       if (!data) return;
       if (this.ispreview) {
@@ -190,7 +195,7 @@ export default {
       const data = this.queryEchartsData(val);
       data.then(res => {
         console.log("表格数据", res);
-        this.list = res;
+        this.list = res.data;
         this.setHead(); //设定头部
         this.hackResetFun();
       });
@@ -227,7 +232,7 @@ export default {
       let styleJson = {};
       const tableWidth = this.header[index].width;
       if (tableWidth) {
-        styleJson["width"] = tableWidth.indexOf('%') < 0 ? tableWidth + 'px' : tableWidth;
+        styleJson["min-width"] = tableWidth.indexOf('%') < 0 ? tableWidth + 'px' : tableWidth;
       }
       return styleJson;
     }

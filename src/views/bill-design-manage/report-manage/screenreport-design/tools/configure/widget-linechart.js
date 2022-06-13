@@ -20,6 +20,13 @@ export const widgetLinechart = {
                 required: false,
                 placeholder: '',
                 value: ''
+            }, {
+                type: 'Slider',
+                label: '滚动条显示百分比',
+                name: 'dataZoomEnd',
+                require: false,
+                placeholder: '',
+                value: 100,
             },
             [{
                     name: '折线设置',
@@ -400,6 +407,13 @@ export const widgetLinechart = {
                             required: false,
                             placeholder: '',
                             value: '#fff',
+                        }, {
+                            type: 'InputNumber',
+                            label: '多轴间距',
+                            name: 'spaceX',
+                            required: false,
+                            placeholder: '',
+                            value: 20,
                         }
                     ],
                 },

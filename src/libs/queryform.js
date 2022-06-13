@@ -48,35 +48,25 @@ let queryform = {
                     result
                 } = await getDataReq(params);
                 if (code != 200) return;
-                const {
-                    rows,
-                    columns
-                } = result;
-                let isFuntion = ""; //获取哪一个有计算属性
-                // [rows, columns].forEach((item, index) => {
-                //     console.log(index, item);
-                //     if (item.filter(x => x.function).length > 0) {
-                //         isFuntion = index === 0 ? "rows" : "columns";
-                //     }
-                // })
-                const analysisData = this.analysisChartsData(params, result, isFuntion);
+                const analysisData = this.analysisChartsData(params, result);
                 resolve(analysisData)
             })
         },
         // 解析不同图标的数据
-        analysisChartsData(params, data, isFuntion) {
+        analysisChartsData(params, data) {
             // widget-barchart 柱线图、widget-linechart 折线图、 widget-barlinechart 柱线图
             // widget-piechart 饼图、widget-funnel 漏斗图
             // widget-text 文本框
             // widge-table 表格(数据不要转)
             // widget-stackchart 堆叠图
-            const chartType = params.chartType
+            const chartType = params.chartType;
+            console.log("chartType", chartType);
             if (
                 chartType == "widget-barchart" ||
                 chartType == "widget-linechart" ||
                 chartType == "widget-barlinechart"
             ) {
-                return this.barOrLineChartFn(data.chartProperties, data.data, isFuntion);
+                return this.barOrLineChartFn(data.chartProperties, data.data);
             } else if (
                 chartType == "widget-piechart" ||
                 chartType == "widget-funnel"
@@ -91,15 +81,8 @@ let queryform = {
             }
         },
         // 柱状图、折线图、柱线图
-        barOrLineChartFn(chartProperties, data, isFuntion) {
-            // console.log('data', data, chartProperties);
+        barOrLineChartFn(chartProperties, data) {
             const ananysicData = {};
-            // if (!isFuntion) {
-            //     console.log("无计数");
-            //     ananysicData["value"] = data;
-            //     return ananysicData
-            // }
-
             const xAxisList = []; //x轴
             const series = [];
             let legend = [];

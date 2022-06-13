@@ -168,6 +168,11 @@ export default {
     };
   },
   mounted () {
+    //有从工单WIP报表跳转到离线品追踪
+    const panelNo = this.$route.params.panelNo;
+    if (panelNo) {
+      this.req.panelNo = panelNo;
+    }
     this.pageLoad();
   },
   async activated () {

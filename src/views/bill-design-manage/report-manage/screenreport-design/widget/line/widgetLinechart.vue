@@ -1,6 +1,7 @@
+/**折线图 */
 <template>
   <div :style="styleObj">
-    <v-chart :options="options" autoresize />
+    <v-chart :options="options" autoresize v-if="isShow" />
   </div>
 </template>
 
@@ -33,6 +34,13 @@ export default {
             color: "#fff"
           }
         },
+        dataZoom: [
+          {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'none'
+          }
+        ],
         xAxis: {
           type: "category",
           data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -62,7 +70,8 @@ export default {
       optionsStyle: {}, // 样式
       optionsData: {}, // 数据
       optionsCollapse: {}, // 图标属性
-      optionsSetup: {}
+      optionsSetup: {},
+      isShow: false,//是否显示图表
     };
   },
   computed: {
@@ -104,15 +113,16 @@ export default {
   methods: {
     // 修改图标options属性
     editorOptions () {
+      this.isShow = false;
       this.setOptionsTitle();
-      this.setOptionsX();
-      this.setOptionsY();
-      this.setOptionsTop();
       this.setOptionsTooltip();
       this.setOptionsData();
       this.setOptionsMargin();
       this.setOptionsLegend();
       this.setOptionsColor();
+      this.$nextTick(() => {
+        this.isShow = true;
+      })
     },
     // 标题修改
     setOptionsTitle () {
@@ -135,78 +145,94 @@ export default {
       this.options.title = title;
     },
     // X轴设置
-    setOptionsX () {
+    setOptionsX (xAxis) {
       const optionsSetup = this.optionsSetup;
-      const xAxis = {
-        type: "category",
-        show: optionsSetup.hideX, // 坐标轴是否显示
-        name: optionsSetup.xName, // 坐标轴名称
-        nameTextStyle: {
-          color: optionsSetup.nameColorX,
-          fontSize: optionsSetup.nameFontSizeX
-        },
-        nameRotate: optionsSetup.textAngle, // 文字角度
-        inverse: optionsSetup.reversalX, // 轴反转
-        axisLabel: {
-          show: true,
-          interval: optionsSetup.textInterval, // 文字间隔
-          rotate: optionsSetup.textAngle, // 文字角度
-          textStyle: {
-            color: optionsSetup.Xcolor, // x轴 坐标文字颜色
-            fontSize: optionsSetup.fontSizeX
-          }
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: optionsSetup.lineColorX
-          }
-        },
-        splitLine: {
-          show: optionsSetup.isShowSplitLineX,
-          lineStyle: {
-            color: optionsSetup.splitLineColorX
-          }
-        }
-      };
-      this.options.xAxis = xAxis;
+      let xAxisData = [];
+      let offset = 0;
+      xAxis?.forEach(item => {
+        xAxisData.push({
+          type: "category",
+          show: optionsSetup.hideX, // 坐标轴是否显示
+          name: optionsSetup.xName, // 坐标轴名称
+          data: item,
+          nameTextStyle: {
+            color: optionsSetup.nameColorX,
+            fontSize: optionsSetup.nameFontSizeX
+          },
+          nameRotate: optionsSetup.textAngle, // 文字角度
+          inverse: optionsSetup.reversalX, // 轴反转
+          axisLabel: {
+            show: true,
+            interval: optionsSetup.textInterval, // 文字间隔
+            rotate: optionsSetup.textAngle, // 文字角度
+            textStyle: {
+              color: optionsSetup.Xcolor, // x轴 坐标文字颜色
+              fontSize: optionsSetup.fontSizeX
+            }
+          },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: optionsSetup.lineColorX
+            }
+          },
+          splitLine: {
+            show: optionsSetup.isShowSplitLineX,
+            lineStyle: {
+              color: optionsSetup.splitLineColorX
+            }
+          },
+          position: "bottom",
+          offset
+        })
+        offset = offset + optionsSetup.spaceX;
+      })
+      this.options.xAxis = xAxisData;
+      //   this.options.xAxis = xAxis;
     },
     // Y轴设置
-    setOptionsY () {
+    setOptionsY (yAxis) {
       const optionsSetup = this.optionsSetup;
-      const yAxis = {
-        type: "value",
-        scale: optionsSetup.scale,
-        splitNumber: optionsSetup.splitNumber,// 均分
-        show: optionsSetup.isShowY, // 坐标轴是否显示
-        name: optionsSetup.textNameY, // 坐标轴名称
-        nameTextStyle: { // 别名
-          color: optionsSetup.nameColorY,
-          fontSize: optionsSetup.namefontSizeY
-        },
-        inverse: optionsSetup.reversalY, // 轴反转
-        axisLabel: {
-          show: true,
-          rotate: optionsSetup.ytextAngle, // 文字角度
-          textStyle: {
-            color: optionsSetup.colorY, // y轴 坐标文字颜色
-            fontSize: optionsSetup.fontSizeY
-          }
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: optionsSetup.lineColorY
-          }
-        },
-        splitLine: {
-          show: optionsSetup.isShowSplitLineY,
-          lineStyle: {
-            color: optionsSetup.splitLineColorY
-          }
-        }
-      };
-      this.options.yAxis = yAxis;
+      let yAxisData = [];
+      let offset = 0;
+      yAxis.forEach(item => {
+        yAxisData.push({
+          type: "value",
+          scale: optionsSetup.scale,
+          splitNumber: optionsSetup.splitNumber,// 均分
+          show: optionsSetup.isShowY, // 坐标轴是否显示
+          name: optionsSetup.textNameY, // 坐标轴名称
+          nameTextStyle: { // 别名
+            color: optionsSetup.nameColorY,
+            fontSize: optionsSetup.namefontSizeY
+          },
+          inverse: optionsSetup.reversalY, // 轴反转
+          axisLabel: {
+            show: true,
+            rotate: optionsSetup.ytextAngle, // 文字角度
+            textStyle: {
+              color: optionsSetup.colorY, // y轴 坐标文字颜色
+              fontSize: optionsSetup.fontSizeY
+            }
+          },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: optionsSetup.lineColorY
+            }
+          },
+          splitLine: {
+            show: optionsSetup.isShowSplitLineY,
+            lineStyle: {
+              color: optionsSetup.splitLineColorY
+            }
+          },
+          position: "left",
+          offset,
+        })
+        offset = offset + optionsSetup.spaceY;;
+      })
+      this.options.yAxis = yAxisData;
     },
     // 折线设置
     setOptionsTop () {
@@ -271,6 +297,7 @@ export default {
     setOptionsLegend () {
       const optionsSetup = this.optionsSetup;
       const legend = this.options.legend;
+      console.log("optionsSetup", optionsSetup, legend);
       legend.show = optionsSetup.isShowLegend;
       legend.left = optionsSetup.lateralPosition;
       legend.right = optionsSetup.lateralPosition;
@@ -361,19 +388,58 @@ export default {
       });
     },
     renderingFn (val) {
-      // x轴
-      this.options.xAxis.data = val.xAxis;
+      console.log("val", val);
+      //还原x，y轴
+      this.restore();
+      // 动态列
+      this.setOptionsX(val.xAxis);
       // series
-      const series = this.options.series;
-      const legendName = [];
-      for (const i in series) {
-        if (series[i].type == "line") {
-          series[i].data = val.series[i].data;
+      this.options.series = [];
+      val.series.forEach((item, index) => {
+        let series = {
+          type: "line",
+          data: item.data
         }
-        legendName.push(val.series[i].name);
+        this.options.series[index] = series;
+      })
+      // 设定滚动条
+      this.options.dataZoom = [
+        {
+          type: 'slider',
+          xAxisIndex: this.options.xAxis.map((item, index) => index),
+          filterMode: 'none',
+          start: 0,
+          end: this.optionsSetup.dataZoomEnd
+        }
+      ];
+      this.setOptionsLegendName(val.legend);
+
+      console.log(this.options);
+
+    },
+    //还原x轴，y轴数据
+    restore () {
+      this.options = {
+        ...this.options, xAxis: {
+          type: "category",
+          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: "#fff"
+            }
+          }
+        },
+        yAxis: {
+          type: "value",
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: "#fff"
+            }
+          }
+        },
       }
-      this.options.legend['data'] = legendName;
-      this.setOptionsLegendName(legendName);
     }
   }
 };

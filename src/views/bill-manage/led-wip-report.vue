@@ -1,6 +1,6 @@
 /* LedWip看板报表 */
 <template>
-  <div class="page-style">
+  <div class="page-style led-wip-report">
     <!-- 页面表格 -->
     <div class="comment">
 
@@ -39,6 +39,14 @@
             </i-col>
           </Row>
         </div>
+        <div class="title">
+          <span class="title-name">
+            LPA Production WIP Status By Line
+          </span>
+          <span class="title-time">
+            Cut time:{{searchTime}}
+          </span>
+        </div>
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" :span-method="handleSpan">
           <!-- 工单 -->
           <template slot-scope="{ row }" slot="moNumber">
@@ -71,7 +79,7 @@
           <!-- Packing2 -->
           <template slot-scope="{ row }" slot="step14">
             <span v-if="row.category==='wip'" class="red">{{ row.step14 }}</span>
-            <span v-else> {{ row.step8 }}</span>
+            <span v-else> {{ row.step14 }}</span>
           </template>
 
         </Table>
@@ -221,6 +229,7 @@ export default {
         }
       ],
       tableConfig: { ...this.$config.tableConfig }, // table配置
+      searchTime: formatDate(new Date)
     };
   },
   activated () {
@@ -263,6 +272,7 @@ export default {
           this.tableConfig.loading = false;
           if (res.code === 200) {
             this.data = res.result || [];
+            this.searchTime = formatDate(new Date);
             this.searchPoptipModal = false;
           } else {
             this.$Message.warning(res.message);
@@ -272,19 +282,12 @@ export default {
     },
     // 导出
     exportClick () {
-      const { workOrderInfo } = this.req;
-      if (workOrderInfo) {
-        const obj = {
-          condition: workOrderInfo
-        };
-        exportReq(obj).then((res) => {
-          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-          const fileName = `${this.$t("led-wip-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
-          exportFile(blob, fileName);
-        });
-      } else {
-        this.$Message.warning("请完善查询条件");
-      }
+
+      exportReq({}).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `${this.$t("led-wip-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     //合并单元格
     handleSpan ({ row, column, rowIndex, columnIndex }) {
@@ -321,6 +324,36 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+.led-wip-report {
+  .title {
+    width: 100%;
+    height: 3rem;
+    text-align: center;
+    line-height: 3rem;
+    font-size: 1.32rem;
+    font-weight: bold;
+    color: #fdf61f;
+    background: #030d16;
+    position: relative;
+    .title-name {
+      display: inline-block;
+      text-align: center;
+      width: 100%;
+    }
+    .title-time {
+      font-size: 1.02rem;
+      text-align: center;
+      display: inline-block;
+      /* padding-left: 1rem; */
+      width: 15%;
+      position: absolute;
+      top: 0px;
+      right: 8rem;
+      color: #ffffff;
+      background: #27ce88;
+    }
+  }
+}
 .file {
   position: absolute;
   width: 100%;
@@ -331,20 +364,24 @@ export default {
 .green {
   color: #00ff66;
   background-color: #4b997240;
-  padding: 4px 18px;
+  padding: 7px 18px;
   margin: 3px 0px;
   border-radius: 3px;
   cursor: default;
   font-weight: bold;
+  display: inline-block;
+  min-width: 4rem;
 }
 .red {
   color: #ff0404;
   background-color: #cf676747;
-  padding: 4px 18px;
+  padding: 7px 18px;
   margin: 3px 0px;
   border-radius: 3px;
   cursor: default;
   font-weight: bold;
+  display: inline-block;
+  min-width: 4rem;
 }
 /deep/.ivu-table .ivu-table-header th,
 /deep/.ivu-table .ivu-table-body th,

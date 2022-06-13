@@ -41,7 +41,7 @@
             </Modal>
           </FormItem>
           <dynamicComponents v-if="item.type == 'dycustComponents' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" :dict-key="item.dictKey" @change="changed($event, item.name)" @getSetParamsList="getSetParamsList" />
-          <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @change="changed($event, item.name)" />
+          <!-- <dynamic-add-table v-if="item.type == 'dynamic-add-table' && inputShow[item.name]" v-model="formData[item.name]" :chart-type="item.chartType" @change="changed($event, item.name)" /> -->
         </div>
         <div v-else-if="isShowForm(item, '[object Array]')" :key="'a-' + index" class="screenCollapse">
           <Collapse v-model="collapseIndex" accordion>
@@ -127,11 +127,11 @@ export default {
   },
   watch: {
     value (newValue, oldValue) {
-      //  console.log('newValue', newValue);
+      console.log('newValue', newValue, oldValue);
       this.formData = newValue || {};
     },
     options (val) {
-      //   console.log('options', this.options);
+      console.log('options', this.options);
       this.setDefaultValue();
       this.isShowData();
     }

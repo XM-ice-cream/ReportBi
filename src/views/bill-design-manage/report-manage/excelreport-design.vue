@@ -1,92 +1,181 @@
 <template>
   <div style="height:100%">
-    <div class="layout">
-      <Layout>
-        <!-- 左侧 -->
-        <Sider hide-trigger class="sider">
-          <!-- 数据集管理 -->
-          <div class="title">数据集管理</div>
-          <!-- 添加图表 -->
-          <div class="icon" @click="queryAllDataSet">
-            <Icon type="md-add" />
-          </div>
-          <!-- DBlist -->
-          <div class="dblist">
-            <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs" v-model="activeNames">
-              <Panel :name="item.setCode">
-                {{item.setName}}
-                <div slot="content">
-                  <div class="deletePop">
-                    <Icon type="md-trash" @click="del(item)" />
-                  </div>
-
-                  <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
-                    <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
-                  </draggable>
+    <Layout class="layout">
+      <!-- 左侧 -->
+      <Sider hide-trigger class="sider">
+        <!-- 数据集管理 -->
+        <div class="title">数据集管理</div>
+        <!-- 添加图表 -->
+        <div class="icon" @click="queryAllDataSet">
+          <Icon type="md-add" />
+        </div>
+        <!-- DBlist -->
+        <div class="dblist">
+          <Collapse simple v-for="(item, indexs) in dataSet" :key="indexs">
+            <Panel :name="item.setCode" :title="item.setName">
+              {{item.setName}}
+              <div slot="content">
+                <div class="deletePop">
+                  <Icon type="md-trash" @click="del(item)" />
                 </div>
-              </Panel>
-            </Collapse>
-          </div>
-        </Sider>
-        <!-- 中间内容excel -->
-        <Content class="content">
-          <div class="push_btn">
-            <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
-              <Button type="text" @click="save(false)">
-                <Icon type="ios-folder" />
-              </Button>
-            </Tooltip>
-            <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
-              <Button type="text" @click="preview()">
-                <Icon type="md-eye" />
-              </Button>
-            </Tooltip>
+                <draggable v-model="item.setParamList" :sort="false" group="people" style="margin-left: 10px" @start="onStart(item.setCode, $event)">
+                  <div class="row" v-for="(i, index) in item.setParamList" :key="index">{{i}}</div>
+                </draggable>
+              </div>
+            </Panel>
+          </Collapse>
+        </div>
+      </Sider>
+      <!-- 中间内容excel -->
+      <Content class="content">
+        <div class="push_btn">
+          <Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
+            <Button type="text" @click="save()">
+              <Icon type="ios-folder" />
+            </Button>
+          </Tooltip>
+          <Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
+            <Button type="text" @click="preview()">
+              <Icon type="md-eye" />
+            </Button>
+          </Tooltip>
 
-          </div>
-          <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
-          <div style="display:none"></div>
-        </Content>
-        <!-- 右侧基础配置 -->
-        <Sider hide-trigger class="sider" style="right:0;position:absolute">
-          <Tabs v-model="activeName">
-            <TabPane label="基础配置" name="first">
-              <Form ref="rightForm" :model="rightForm" :label-width="60" style="padding: 0 0.5rem">
-                <FormItem label="坐标">
-                  <Input v-model="rightForm.coordinate" />
-                </FormItem>
-                <FormItem label="值">
-                  <Input v-model="rightForm.value" />
-                </FormItem>
-                <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
-                  <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event)" /> &nbsp;
-                  <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
-                    <i class="el-icon-question"> </i>
-                  </Tooltip>
-                </FormItem>
-              </Form>
-            </TabPane>
-          </Tabs>
-        </Sider>
-      </Layout>
-    </div>
-    <div slot="footer" class="dialog-footer">
-      <Button @click="closeDialog">取消</Button>
-      <Button type="primary" @click="save(true)">保存并关闭</Button>
-    </div>
+        </div>
+        <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
+        <div style="display:none"></div>
+      </Content>
+      <!-- 右侧基础配置 -->
+      <Sider hide-trigger class="sider" style="right:0;position:absolute">
+        <Tabs>
+          <TabPane label="扩展" name="first">
+            <Form ref="rightForm" :model="rightForm" :label-width="40" style="padding: 0 0.5rem">
+              <FormItem label="坐标">
+                <Input v-model="rightForm.coordinate" />
+              </FormItem>
+              <FormItem label="值">
+                <Input v-model="rightForm.value" />
+              </FormItem>
+              <!-- <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
+                <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event,'auto')" /> &nbsp;
+                <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
+                  <i class="el-icon-question"> </i>
+                </Tooltip>
+              </FormItem> -->
+              <FormItem label="扩展方向">
+                <RadioGroup type="button" v-model="rightForm.expend" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expend')">
+                  <Radio label="no">无</Radio>
+                  <Radio label="cross">横向</Radio>
+                  <Radio label="portrait">纵向</Radio>
+                </RadioGroup>
+              </FormItem>
+              <FormItem label="扩展排序">
+                <RadioGroup type="button" v-model="rightForm.expendSort" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expendSort')">
+                  <Radio label="no">无</Radio>
+                  <Radio label="asc">升序</Radio>
+                  <Radio label="desc">降序</Radio>
+                </RadioGroup>
+              </FormItem>
+            </Form>
+          </TabPane>
+        </Tabs>
+      </Sider>
+    </Layout>
 
     <!-- 数据集管理弹框--表格 -->
-    <Modal title="数据集管理" v-model="outerVisible" class="tableModal" :z-index='902'>
+    <Modal title="数据集管理" v-model="outerVisible" class="tableModal">
       <div class="tableTabs">
         <Tabs>
-          <TabPane label="数据集">
-
+          <TabPane label="数据集" :index="1">
+            <Form :label-width="150" :label-colon="true" inline @keyup.enter.native="queryAllDataSet">
+              <FormItem label="数据集名称">
+                <Input type="text" v-model="req.setName" cleabler />
+              </FormItem>
+              <FormItem label="数据集编码">
+                <Input type="text" v-model="req.setCode" cleabler />
+              </FormItem>
+              <FormItem label="数据源编码">
+                <Input type="text" v-model="req.sourceCode" cleabler />
+              </FormItem>
+            </Form>
+            <!-- 数据集表格 -->
+            <div class="dataset-table">
+              <ul>
+                <draggable v-model="setParamListC" :group="{name:'dataset',pull:'clone'}">
+                  <li :key="index" v-for="(item,index) in setParamListC">{{item.setName}}</li>
+                </draggable>
+              </ul>
+              <Spin size="large" class="loading" v-if="setParamListC.length==0"></Spin>
+              <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+            </div>
+            <!-- 数据集拖拽显示的列 -->
+            <div class="dataset-draggable">
+              <draggable :group="{name:'dataset'}" class="dataset-item" v-model="dataBaseList" chosenClass="item">
+                <div v-for="(item,index) in dataBaseList" :key="index">{{item.setName}}</div>
+              </draggable>
+            </div>
           </TabPane>
-          <!-- <TabPane label="Windows">标签二的内容</TabPane>
-          <TabPane label="Linux">标签三的内容</TabPane> -->
+          <TabPane label="对应关系" :index="2" v-if="dataSetDataList.length>0">
+            <template v-for="(item,index) in dataSetDataList">
+              <Form :label-width="80" :label-colon="true" :key="index" inline>
+                <FormItem label="数据集1">
+                  <Select v-model="dataSetDataList[index].setName" clearable filterable transfer @on-change="setCodeChange(index)">
+                    <Option v-for="(dataBaseItem, dataBaseIndex) in dataBaseList" :value="dataBaseItem.setName" :key="dataBaseIndex">
+                      {{dataBaseItem.setName}}
+                    </Option>
+                  </Select>
+                </FormItem>
+                <FormItem label="类型" :label-width="50">
+                  <Select v-model="dataSetDataList[index].type" clearable filterable transfer>
+                    <Option v-for="(item, i) in typeList" :value="item.detailName" :key="i">
+                      {{ item.detailName }}
+                    </Option>
+                  </Select>
+                </FormItem>
+                <FormItem label="数据集2">
+                  <Input v-model="dataSetDataList[index].setName2" />
+                </FormItem>
+                <!-- <span style="display:none">{{index = index +2}}</span> -->
+              </Form>
+            </template>
+          </TabPane>
+          <TabPane label="关联参数" :index="3" v-if="dataSetDataList.length>0">
+            <template v-for="(item,itemIndex) in dataSetDataList">
+              <table :key="itemIndex" style="width: 100%;" class="connection-table">
+                <tr>
+                  <th>{{item.setName}}</th>
+                  <th>操作符</th>
+                  <th>{{item.setName2}}</th>
+                  <th></th>
+                </tr>
+                <tr v-for="(fieldItem,fieldIndex) in item.field" :key="fieldIndex">
+                  <td>
+                    <Select v-model="dataSetDataList[itemIndex].field[fieldIndex].field1" clearable filterable transfer>
+                      <Option v-for="(item, i) in item.setCodeList" :value="item" :key="i">{{item}}</Option>
+                    </Select>
+                  </td>
+                  <td>
+                    <Select v-model="dataSetDataList[itemIndex].field[fieldIndex].operator" clearable filterable transfer>
+                      <Option v-for="(item, i) in selectList" :value="item.detailName" :key="i">
+                        {{ item.detailName }}
+                      </Option>
+                    </Select>
+                  </td>
+                  <td>
+                    <Select v-model="dataSetDataList[itemIndex].field[fieldIndex].field2" clearable filterable transfer>
+                      <Option v-for="(item, i) in item.setCode2List" :value="item" :key="i">{{item}}</Option>
+                    </Select>
+                  </td>
+                  <td>
+                    <Button type="primary" @click.native="addData(itemIndex)" :key="itemIndex+fieldIndex+'B'"> 添加</Button>
+                    &nbsp;&nbsp;
+                    <Button type="error" @click.native="deleteData(itemIndex,fieldIndex)" :key="itemIndex+fieldIndex+'D'"> 删除</Button>
+                  </td>
+                </tr>
+              </table>
+            </template>
+          </TabPane>
         </Tabs>
       </div>
-      <Table ref="multipleTable" :data="dataSetData" :columns='columns' height='300' tooltip-effect="dark" @on-selection-change="handleSelectionChange" draggable="true" @on-drag-drop="onDragDrop"></Table>
-      <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       <div slot="footer" class="dialog-footer">
         <Button @click="outerVisible = false">取 消</Button>
         <Button type="primary" @click="checkDataSet">确定 </Button>
@@ -100,26 +189,22 @@
 import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 import { getExcelByReportcodeReq, insertExcelReportReq, modifyExcelReportReq } from '@/api/bill-design-manage/report-manage.js'
 import draggable from "vuedraggable";
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
+
 export default {
   name: "excelreport-design",
   components: { draggable },
   data () {
     return {
-
-      dialogFormVisibleTitle: '报表EXCEL 设计',
-      formData: {},
       dataSet: [],
-      activeNames: ["1"],
-      activeName: "first",
+      setCode: "",
       outerVisible: false,
-      dataSetData: [],
-      setCode: '',
       reportCode: '',
-      selectArr: [],
       draggableFieldLabel: '',//拖拽的文本内容
       sheetData: '',
       tableConfig: { ...this.$config.tableConfig }, // table配置
       req: {
+        sourceCode: "", setCode: "", setName: "",
         ...this.$config.pageConfig,
       },
       rightForm: {
@@ -128,21 +213,10 @@ export default {
         r: "",
         c: "",
         auto: false,
-        autoIsShow: false
+        autoIsShow: false,
+        expend: "portrait",
+        expendSort: "no",
       },
-      columns: [
-        {
-          type: 'selection',
-          width: 60,
-          align: 'center',
-        },
-        {
-          type: "index", width: 50, align: "center",
-        },
-        { title: '数据集名称', key: "setName", align: "center", tooltip: true, width: '120' },
-        { title: '数据集描述', key: "setDesc", align: "center", tooltip: true, width: '180' },
-        { title: '数据集编码', key: "setCode", align: "center", tooltip: true }
-      ],
       reportExcelDto: {
         id: null,
         jsonStr: "",
@@ -150,18 +224,85 @@ export default {
         setParam: "",
         reportCode: ""
       },
+      dataBaseList: [],//选中数据集列
+      dataSetDataList: [],//选中数据集结果集
+      dataSetData: [],//数据集
+      selectList: [],//操作符下拉
+      typeList: [],//连接类型下拉
 
     };
   },
+  watch: {
+    dataBaseList () {
+      this.dataSetDataList = [];
+      this.dataBaseList.forEach((item, index) => {
+        if (index + 1 !== this.dataBaseList.length) {
+          const { setName, setCode } = this.dataBaseList[index + 1];
+          Promise.all([this.detail(item.setCode), this.detail(setCode)]).then(res => {
+            const obj = {
+              setCode: item.setCode,
+              setName: item.setName,
+              setName2: setName,
+              setCode2: setCode,
+              setCodeList: res[0].setParamList,
+              setCode2List: res[1].setParamList,
+              field: !(item?.field || 0) ? [{ field1: "", field2: "", operator: "=" }] : item.field
+            }
+            this.dataSetDataList[index] = { ...obj };
+            this.$nextTick(() => {
+              this.dataSetDataList = JSON.parse(JSON.stringify(this.dataSetDataList));
+              console.log(this.dataSetDataList, this.dataBaseList);
+            })
+          })
+        }
+      })
+
+    },
+  },
+  computed: {
+    setParamListC: {
+      get () {
+        return [...new Set(this.dataSetData)]
+      },
+      set () { }
+    },
+  },
   methods: {
+    //拖拽选择的数据集
+    addData (index) {
+      this.dataSetDataList[index].field.push({ field1: "", field2: "", operator: "=" });
+      this.$forceUpdate();
+    },
+    //删除数据集
+    deleteData (index, fieldIndex) {
+      //至少要有一个关联数据
+      //   if (this.dataSetDataList[index].field.length == 1) {
+      //     this.$Message.error("至少有一个关联字段，不可删除！");
+      //     return;
+      //   }
+      //删除指定索引数据集字段
+      this.dataSetDataList[index].field.splice(fieldIndex, 1)
+    },
+    //修改setCode,setCodeList
+    setCodeChange (index) {
+      //获取setName 对应的setCode
+      const setCode = this.dataBaseList.filter(item => item.setName === this.dataSetDataList[index].setName)[0].setCode;
+      this.dataSetDataList[index].setCode = setCode;
+      //修改setCode 对应的字段集合
+      this.detail(setCode).then(res => {
+        this.dataSetDataList[index].setCodeList = res.setParamList;
+        this.$nextTick(() => {
+          this.dataSetDataList = JSON.parse(JSON.stringify(this.dataSetDataList));
+        })
+      })
+    },
+
     //初始化显示第一条
     design () {
       // 根据reportCode获取单条报表
       getExcelByReportcodeReq({ reportCode: this.reportCode }).then(res => {
         if (res.code === 200) {
-
           const { result } = res;
-
           if (result != null) {
             this.reportId = result.reportCode;
           }
@@ -171,7 +312,9 @@ export default {
             if (result.setCodes != null && result.setCodes !== "") {
               let dataSetList = result.setCodes.split("|");
               dataSetList.forEach(code => {
-                this.detail(code);
+                this.detail(code).then(res => {
+                  this.dataSet.push(res);
+                });
               });
             }
           }
@@ -190,30 +333,26 @@ export default {
         plugins: ['chart'],
         hook: {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
+            //设定右侧值
+            const { r, c } = postion;
+            const value = cell == null ? "" : cell.v;
+            that.rightForm = { ...that.rightForm, r, c, coordinate: r + "," + c, value, autoIsShow: true, expend: "portrait", expendSort: "no" }
+
+            const { expend, expendSort } = that.rightForm;
             window.luckysheet.setCellValue(
               postion.r,
               postion.c,
-              that.draggableFieldLabel
+              { v: that.draggableFieldLabel, m: that.draggableFieldLabel, expend, expendSort }
             );
           },
           cellMousedown: function (cell, postion, sheetFile, ctx) {
-            //单元格点击事件
-            that.rightForm.coordinate = postion.r + "," + postion.c;
-            that.rightForm.r = postion.r;
-            that.rightForm.c = postion.c;
-            that.rightForm.value = cell == null ? "" : cell.v;
-            that.rightForm.autoIsShow = true
-            //判断单元格是否是静态数据并且是合并单元格
-            if (cell != null && (cell.v == undefined || cell.v.indexOf('#{') === -1)) {
-              that.rightForm.autoIsShow = true
-              if (cell.auto != null && cell.auto == '1') {
-                that.rightForm.auto = true
-              } else {
-                that.rightForm.auto = false
-              }
-            } else {
-              that.rightForm.auto = false
-            }
+            console.log(cell);
+            const { r, c } = postion;
+            const value = cell == null ? "" : cell.v;
+            const expend = cell?.expend || "portrait";
+            const expendSort = cell?.expendSort || "no";
+            that.rightForm = { ...that.rightForm, r, c, coordinate: r + "," + c, value, autoIsShow: true, expend, expendSort }
+
           },
 
         },
@@ -275,26 +414,28 @@ export default {
       let fieldLabel = evt.item.innerText; // 列名称
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
     },
-    //表格拖拽
-    onDragDrop () {
+    autoChangeFunc (evt, type) {
+      let obj = {};
+      obj[type] = this.rightForm[type];
+      //   console.log(obj, type, this.rightForm, { ...obj });
+      luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...obj });
 
-    },
-    autoChangeFunc (auto) {
-      if (auto) {
-        luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "1" })
-      } else {
-        luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "0" })
-      }
+      //   if (auto) {
+      //     luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "1" })
+      //   } else {
+      //     luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { auto: "0" })
+      //   }
     },
     //查看所有数据集
     queryAllDataSet () {
       this.outerVisible = true;
+      const { sourceCode, setCode, setName } = this.req;
       let obj = {
         orderField: "setCode", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
-        data: { sourceCode: "", setCode: "", setName: "" },
+        data: { sourceCode, setCode, setName },
       };
       getpagelistReq(obj).then(res => {
         if (res.code === 200) {
@@ -305,33 +446,59 @@ export default {
       })
     },
     //选择选中的数据集
-    checkDataSet () {
+    async checkDataSet () {
       this.outerVisible = false;
-      if (this.selectArr.length > 1) {
-        this.$Message.warning("一次最多勾选一个数据集");
+      if (this.dataBaseList.length > 1) {
+        this.$Message.warning("一次最多选择一个数据集");
         this.outerVisible = true;
       } else {
-        this.detail(this.selectArr[0].setCode);
+        const setCode = this.dataBaseList[0].setCode;
+        let data = await this.detail(setCode);
+        this.dataSet.push(data);
       }
+      console.log(this.dataSetDataList);
     },
-    detail (setCode) {
+    async detail (setCode) {
       const obj = { setCode: setCode };
-      getDeatilByIdReq(obj).then(res => {
+      return await getDeatilByIdReq(obj).then((res) => {
         if (res.code === 200) {
           const data = res.result;
-          this.dataSet.push(data);
+          //console.log("this.dataSet", data);
+          return data;
         }
       });
+    },
 
+    // 获取业务数据
+    async getDataItemData () {
+      this.selectList = await this.getDataItemDetailList("dataSetSymbol"); // 操作符
+      this.typeList = await this.getDataItemDetailList("dataSetRelationship"); // 获取站点数据
+    },
+    // 获取数据字典数据
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) {
+          arr = res.result || [];
+        }
+      });
+      return arr;
     },
     //预览
     preview () {
-      this.closeDialog();
-      this.$parent.previewVisib = true;
+      const { href } = this.$router.resolve({
+        path: '/bill-design-manage/excelreport-preview',
+        query: {
+          reportCode: this.reportCode
+        }
+      });
+      window.open(href, '_blank');
     },
     //保存
-    async save (flag) {
+    async save () {
       const jsonData = luckysheet.getAllSheets();
+      console.log(jsonData, this.rightForm);
+      //   return;
       for (let i = 0; i < jsonData.length; i++) {
         //清空data数据，以celldata数据为主
         jsonData[i]["data"] = [];
@@ -367,7 +534,6 @@ export default {
           return;
         };
         this.$Message.success("保存成功");
-        if (flag) this.closeDialog();
       } else {
         this.reportExcelDto.id = this.reportId;
         const { code, message } = await modifyExcelReportReq(this.reportExcelDto);
@@ -376,12 +542,7 @@ export default {
           return;
         };
         this.$Message.success("更新成功");
-        this.closeDialog();
       }
-    },
-    //删除多选
-    handleSelectionChange (val) {
-      this.selectArr = val;
     },
     //删除数据集数据
     del (val) {
@@ -400,11 +561,6 @@ export default {
       });
 
     },
-    //关闭弹框
-    closeDialog () {
-      this.$emit('update:visib', false);
-      this.dataSet = [];
-    },
     // 选择第几页
     pageChange (index) {
       this.req.pageIndex = index;
@@ -417,29 +573,25 @@ export default {
       this.queryAllDataSet();
     },
   },
-  mounted () {
+  created () {
+    this.getDataItemData();
+    console.log("创建");
     this.$nextTick(() => {
       this.reportCode = this.$route.query.reportCode
       this.design();
-      //   window.jQuery.noConflict();
-      //  console.log(window);
     })
-
-  }
+  },
 };
 </script>
  <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
 <style>
-.luckysheet-input-box {
-  z-index: 1000;
-}
 </style>
 <style lang="less" scoped>
 .sider {
-  width: 180px !important;
-  min-width: 180px !important;
-  max-width: 180px !important;
-  flex: 0 0 180px !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  flex: 0 0 200px !important;
   height: 100%;
   //   border: 2px solid #3d85c6;
   margin: 0 0.5rem;
@@ -482,6 +634,10 @@ export default {
     }
   }
 }
+/deep/ .ivu-collapse > .ivu-collapse-item > .ivu-collapse-header {
+  overflow: hidden;
+  padding-right: 0.5rem;
+}
 .content {
   width: calc(100% - 400px);
   height: 100%;
@@ -492,12 +648,12 @@ export default {
   transform: translate(-50%, -50%);
   margin-left: 0rem;
   padding: 1rem;
+  overflow-x: visible !important;
   .push_btn {
     position: absolute;
-    z-index: 100;
     top: 15px;
     right: 13%;
-
+    z-index: 99;
     i {
       color: #6c6666;
       font-size: 1.12rem;
@@ -544,9 +700,68 @@ export default {
   /deep/ .ivu-modal {
     width: 60% !important;
   }
+  /deep/.ivu-tabs .ivu-tabs-tabpane {
+    overflow: auto;
+  }
   .tableTabs {
-    min-height: 200px;
+    min-height: 500px;
     margin-bottom: 0.5rem;
+    height: 500px;
+    overflow-y: auto;
+    .ivu-tabs {
+      height: 100%;
+    }
+    /deep/ .ivu-tabs .ivu-tabs-content-animated {
+      height: calc(100% - 2.5rem);
+    }
+    .dataset-table,
+    .dataset-draggable {
+      width: 50%;
+      display: inline-block;
+      float: left;
+      height: 90%;
+      ul {
+        height: calc(100% - 2rem);
+        overflow-y: auto;
+        li {
+          background: #32dd951f;
+          padding: 0.5rem;
+          width: 90%;
+          margin: 0 auto;
+          //   color: #1ec0d1;
+          margin-bottom: 0.3rem;
+        }
+      }
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 20%;
+      }
+    }
+  }
+  .dataset-item {
+    height: 100%;
+    background: #32dd951f;
+    border-radius: 10px;
+    margin-left: 1.5rem;
+    div {
+      padding: 0.3rem 0.5rem;
+      text-align: center;
+      line-height: 2rem;
+      border: 1px solid #27ce88;
+      border-radius: 1rem;
+      display: inline-block;
+      margin: 0.5rem;
+    }
+  }
+  .connection-table {
+    margin: 1rem 0;
+    tr {
+      margin: 1rem 0;
+    }
+  }
+  tr .ivu-select {
+    padding: 0.5rem;
   }
 }
 /deep/ #luckysheet-row-count-show {

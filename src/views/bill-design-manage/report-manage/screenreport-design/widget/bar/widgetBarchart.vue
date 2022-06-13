@@ -86,6 +86,7 @@ export default {
   watch: {
     value: {
       handler (val) {
+        console.log("type", "widget-bar-chart");
         this.optionsStyle = val.position;
         this.optionsData = val.data;
         this.optionsCollapse = val.setup;
@@ -408,11 +409,66 @@ export default {
       });
     },
     renderingFn (optionsSetup, val) {
-      //如果均为字符串，显示表格
-      //   if (val.value) {
-      //     return;
-      //   }
       //还原x轴，y轴数据
+      this.restore();
+      //动态设定数值与type=value/category
+      optionsSetup.verticalShow ? this.setXData(val, optionsSetup) : this.setYData(val, optionsSetup);
+      // 数值设定 or 柱体设置
+      this.setOptionsTop();
+    },
+    //X轴数据设定
+    setXData (val, optionsSetup) {
+      // 动态列
+      this.setOptionsY(val.xAxis);
+
+      //y轴数值--类目类型
+      val.xAxis.forEach((item, index) => {
+        this.options.yAxis[index].type = "category";
+      });
+      //series 数据
+      this.options.series = val.series;
+
+      // 设定滚动条
+      this.options.dataZoom = [
+        {
+          type: 'slider',
+          yAxisIndex: this.options.yAxis.map((item, index) => index),
+          filterMode: 'none',
+          start: 0,
+          end: optionsSetup.dataZoomEnd
+        }
+      ];
+      //图例值
+      this.options.legend['data'] = val.legend;
+    },
+    //Y轴数据设定
+    setYData (val, optionsSetup) {
+      // 动态列
+      this.setOptionsX(val.xAxis);
+
+      //x轴数值--类目类型
+      val.xAxis.forEach((item, index) => {
+        this.options.xAxis[index].type = "category";
+      })
+      //series 数据
+      this.options.series = val.series;
+
+      // 设定滚动条
+      this.options.dataZoom = [
+        {
+          type: 'slider',
+          xAxisIndex: this.options.xAxis.map((item, index) => index),
+          filterMode: 'none',
+          start: 0,
+          end: optionsSetup.dataZoomEnd
+        }
+      ];
+
+      //图例值
+      this.options.legend['data'] = val.legend;
+    },
+    //还原x轴，y轴数据
+    restore () {
       this.options = {
         ...this.options, xAxis: {
           type: "value",
@@ -435,47 +491,6 @@ export default {
           }
         }
       }
-      // x轴 
-      if (optionsSetup.verticalShow) {
-        this.setOptionsY(val.xAxis);
-        val.xAxis.forEach((item, index) => {
-          this.options.yAxis[index].type = "category";
-        });
-        this.options.series = val.series;
-        console.log(this.options, "X轴");
-        this.options.dataZoom = [
-          {
-            type: 'slider',
-            yAxisIndex: this.options.yAxis.map((item, index) => index),
-            filterMode: 'none',
-            start: 0,
-            end: optionsSetup.dataZoomEnd
-          }
-        ];
-      } else {
-        this.setOptionsX(val.xAxis);
-        console.log(val.yAxis);
-        val.xAxis.forEach((item, index) => {
-          this.options.xAxis[index].type = "category";
-        })
-        this.options.series = val.series;
-        console.log(this.options, "Y轴");
-        this.options.dataZoom = [
-          {
-            type: 'slider',
-            xAxisIndex: this.options.xAxis.map((item, index) => index),
-            filterMode: 'none',
-            start: 0,
-            end: optionsSetup.dataZoomEnd
-          }
-        ];
-      }
-      console.log(this.isShow);
-      //图例值
-      this.options.legend['data'] = val.legend;
-      // 数值设定 or 柱体设置
-      this.setOptionsTop();
-      console.log(this.options);
     }
   }
 };

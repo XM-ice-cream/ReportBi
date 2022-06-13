@@ -1,8 +1,9 @@
 <template>
   <div>
-    <Form :label-width="80" label-position="left">
+    <!-- 数据集选择及查询参数 -->
+    <Form :label-width="80" label-position="left" class="dynamicComponent-search">
       <FormItem label="数据集">
-        <Select size="small" v-model="dataSetValue" filterable placeholder="请选择" @on-change="selectDataSet">
+        <Select size="small" v-model="dataSetValue" filterable transfer placeholder="请选择" @on-change="selectDataSet">
           <Option v-for="item in dataSet" :key="item.setCode" :label="item.setName" :value="item.setCode" />
         </Select>
       </FormItem>
@@ -12,6 +13,10 @@
         <DatePicker v-else v-model="item.sampleItem" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable size="small"></DatePicker>
         <!-- <Input v-model.trim="item.sampleItem" size="small" /> -->
       </FormItem>
+    </Form>
+    <!-- 行列拖拽 -->
+    <Form :label-width="80" label-position="left" class="dynamicComponent-drag">
+      <!-- 行 -->
       <FormItem label="行">
         <div class="row">
           <draggable group="site" v-model="rowParamList" class="site-flex" chosenClass="item">
@@ -29,6 +34,7 @@
                   <DropdownMenu slot="list">
                     <DropdownItem name="">原值</DropdownItem>
                     <DropdownItem name="Count">计数</DropdownItem>
+                    <DropdownItem name="CountDistinct">计数(不同值)</DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               </DropdownMenu>
@@ -36,6 +42,7 @@
           </draggable>
         </div>
       </FormItem>
+      <!-- 列 -->
       <FormItem label="列">
         <div class="columns">
           <draggable group="site" v-model="columnsParamList" class="site-flex" chosenClass="item">
@@ -53,6 +60,7 @@
                   <DropdownMenu slot="list">
                     <DropdownItem name="">原值</DropdownItem>
                     <DropdownItem name="Count">计数</DropdownItem>
+                    <DropdownItem name="CountDistinct">计数(不同值)</DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               </DropdownMenu>
@@ -60,13 +68,13 @@
           </draggable>
         </div>
       </FormItem>
-      <Button style="width: 100%" type="primary" plain size="small" @click="saveDataBtn">刷新</Button>
     </Form>
+    <Button style="width: 100%" type="primary" plain size="small" @click="saveDataBtn">刷新</Button>
   </div>
 </template>
 <script>
 // import { queryAllDataSet, detailBysetId } from "@/api/bigscreen";
-import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
+import { getPagelistNoCaseresult as getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 // import { getDataReq } from '@/api/bill-design-manage/report-manage.js'
 import Dictionary from "@/components/dictionary/index";
 import draggable from "vuedraggable";
@@ -93,7 +101,6 @@ export default {
       dataSet: [], // 数据集
       userNameList: [], // 用户
       setParamList: [], // 对应的不同的图形数据参数
-      params: {},
       chartProperties: {},
       rowParamList: [],//行
       columnsParamList: [],//列
@@ -102,6 +109,7 @@ export default {
   watch: {
     formData: {
       handler (val) {
+
         this.echoDataSet(val);
       },
       deep: true
@@ -119,7 +127,7 @@ export default {
     }
   },
   mounted () {
-    this.loadDataSet();
+
     this.echoDataSet(this.formData);
   },
   methods: {
@@ -161,8 +169,11 @@ export default {
     async selectDataSet () {
       const { code, result } = await getDeatilByIdReq({ setCode: this.dataSetValue });
       console.log("获取选中数据集具体数据", result);
-      this.userNameList = result.dataSetParamDtoList;
-      this.setParamList = result.setParamList;
+      this.userNameList = result?.dataSetParamDtoList || [];
+      this.setParamList = result?.setParamList || [];
+      //切换数据集 清空行列拖拽数据集
+      this.rowParamList = [];
+      this.columnsParamList = [];
       this.$emit("getSetParamsList", this.setParamList);
       if (code != 200) return;
     },
@@ -203,63 +214,90 @@ export default {
     },
     // 数据集回显
     async echoDataSet (val) {
+      console.log(val);
       if (!val) return;
       this.dataSetValue = val.setCode;
+      await this.loadDataSet();//加载全部数据集
 
-      await this.loadDataSet();
+      await this.selectDataSet();//获取选择的数据集信息
 
-      await this.selectDataSet();
       this.echoDynamicData(val);
     },
     echoDynamicData (val) {
-      const chartProperties = this.deepClone(val.chartProperties);
-      this.chartProperties = chartProperties;
-      if (this.userNameList.length > 0) {
-      }
-      if (this.setParamList.length > 0) {
-        for (let i = 0; i < this.setParamList.length; i++) {
-          const item = this.setParamList[i];
-          if (chartProperties.hasOwnProperty(item)) {
-            this.params[item] = chartProperties[item];
-          }
+      console.log("echoDynamicData", val);
+      //   const chartProperties = this.deepClone(val.chartProperties);
+      //   this.chartProperties = chartProperties;
+      //获取设定的行参数
+      this.rowParamList = val.autoTurn.rows.map(item => {
+        if (item.function) {
+          return `${item.function}(${item.name})`
+        } else {
+          return item.name
         }
-      }
+      });
+      //获取设定的列参数
+      this.columnsParamList = val.autoTurn.columns.map(item => {
+        if (item.function) {
+          return `${item.function}(${item.name})`
+        } else {
+          return item.name
+        }
+      });
+      console.log("rowParamList", this.rowParamList, this.columnsParamList);
+      //   if (this.userNameList.length > 0) {
+      //   }
+      //   if (this.setParamList.length > 0) {
+      //     for (let i = 0; i < this.setParamList.length; i++) {
+      //       const item = this.setParamList[i];
+      //       if (chartProperties.hasOwnProperty(item)) {
+      //         this.params[item] = chartProperties[item];
+      //       }
+      //     }
+      //   }
     }
   }
 };
 </script>
 <style lang="less" scoped>
-.row,
-.columns {
-  width: 100%;
-  height: 100px;
-  max-height: 15rem;
-  border: 1px solid #036595;
-  min-height: 10rem;
-  border-radius: 10px;
-  overflow-y: auto;
-  .site-flex {
-    height: 100%;
-    cursor: pointer;
-  }
-  span {
-    display: flex;
-    max-height: 5rem;
-    min-height: 3rem;
-    flex-wrap: wrap;
-  }
-  /deep/.ivu-dropdown {
-    margin: 0.3rem 0.3rem;
-    padding: 0px 0.6rem;
-    background: #51afff;
+.dynamicComponent-search {
+  max-height: 325px;
+  overflow-y: scroll;
+  margin-bottom: 1rem;
+}
+.dynamicComponent-drag {
+  .row,
+  .columns {
+    width: 100%;
+    height: 100px;
+    max-height: 15rem;
+    border: 1px solid #036595;
+    min-height: 10rem;
     border-radius: 10px;
-    color: #fff;
-    text-align: center;
-    height: 1.6rem;
-    width: auto;
-    flex-basis: auto;
+    overflow-y: auto;
+    .site-flex {
+      height: 100%;
+      cursor: pointer;
+    }
+    span {
+      display: flex;
+      max-height: 5rem;
+      min-height: 3rem;
+      flex-wrap: wrap;
+    }
+    /deep/.ivu-dropdown {
+      margin: 0.3rem 0.3rem;
+      padding: 0px 0.6rem;
+      background: #51afff;
+      border-radius: 10px;
+      color: #fff;
+      text-align: center;
+      height: 1.6rem;
+      width: auto;
+      flex-basis: auto;
+    }
   }
 }
+
 /deep/.ivu-dropdown {
   display: inline-block;
   width: 100%;
