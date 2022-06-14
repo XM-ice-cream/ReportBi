@@ -188,16 +188,18 @@ export default {
         cellAttribute: {
           //扩展属性
           expend: {
-            expend: "portrait",
-            expendSort: "no",
-            leftParent: "default",
-            topParent: "default",
-            topParentValue: "",
-            leftParentValue: "",
+            expend: "portrait", //扩展方向：默认纵向（cross为纵向）
+            expendSort: "no",//是否排序：默认无（asc,desc:顺序，逆序）
+            leftParent: "default",//左父格：默认default(no/userDefined:无/自定义)
+            topParent: "default",//上父格：默认default(no/userDefined:无/自定义)
+            topParentValue: "",//上父格所选单元格（横向扩展或自定义值），无：""
+            leftParentValue: "",//左父格所选单元格（纵向扩展或自定义值）无：""
           }
 
+        },
+        cell: {
+          coordinate: "",//单元格位置
         }
-
       },
       reportExcelDto: {
         id: null,

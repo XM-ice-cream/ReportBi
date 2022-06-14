@@ -149,6 +149,10 @@ export default {
     },
     //获取表格
     getTable (tableid, data) {
+      if (!data[0].celldata.length) {
+        this.$Message.warning("查询结果为空");
+        return;
+      }
       let htm = "<table class='table tableScroll' id='exceltable'>";
       const { celldata, config, frozen } = data[0];
       console.log(data);
@@ -217,20 +221,20 @@ export default {
           const widthHeight = `width:${width}px;height:${height}px;`;//宽高
           style += `border:${border};`;//边框
           //   style += `position:${frozenTd};`;//冻结
-
+          //合并单元格 colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"
           //空单元格 当前列小于c 前面有空cell
           for (let i = tdIndex; i < c; i++) {
             // console.log("r", r, "c", c, "i", i);
             tdIndex++;
-            htm += `<td  colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"></td>`
+            htm += `<td  ></td>`
           }
           //宽度不生效解决方案：内部添加div，并设定宽高
-          htm += `<td style="${style}" colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"><div style="${widthHeight}">${v}</div></td>`
+          htm += `<td style="${style}"><div style="${widthHeight}">${v}</div></td>`
           //空单元格 当前列小于maxColumns 后面有空cell
           if (columnIndex + 1 === item.length) {
             for (let i = c; i < maxColumns; i++) {
               tdIndex++;
-              htm += `<td  colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"></td>`
+              htm += `<td></td>`
             }
             htm += "</tr>"
           };

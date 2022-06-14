@@ -20,15 +20,17 @@
     <div class="excel-tabs">
       <!-- 单元格属性 -->
       <tab-pane-1 :type="activeName" :formData="rightForm.cellAttribute" @autoChangeFunc="autoChangeFunc"></tab-pane-1>
+      <tab-pane-2 :type="activeName" :formData="rightForm.cell" @autoChangeFunc="autoChangeFunc"></tab-pane-2>
     </div>
   </div>
 
 </template>
 <script>
 import tabPane1 from './tabPane1.vue';
+import TabPane2 from './tabPane2.vue';
 
 export default {
-  components: { tabPane1 },
+  components: { tabPane1, TabPane2 },
   name: "right-tabPane",
   props: {
     formData: {

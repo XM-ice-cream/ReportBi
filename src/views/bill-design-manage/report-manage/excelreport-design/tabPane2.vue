@@ -1,52 +1,36 @@
 
 <template>
-  <Tabs size="small" v-if="type===1">
-    <TabPane label="扩展" name="first" size="small">
+  <Tabs size="small" v-if="type===2" class="tabPane2">
+    <TabPane label="单元格元素" name="first" size="small">
       <Form ref="rightForm" :model="rightForm" :label-width="60" style="padding: 0 0.5rem">
-        <FormItem label="扩展方向">
-          <RadioGroup type="button" v-model="rightForm.expend.expend" button-style="solid" size="small" @on-change="autoChangeFunc()">
-            <Radio label="no">无</Radio>
-            <Radio label="cross">横向</Radio>
-            <Radio label="portrait">纵向</Radio>
-          </RadioGroup>
+        <FormItem label="单元格">
+          <label>{{rightForm.coordinate}}</label>
         </FormItem>
-        <FormItem label="扩展排序">
-          <RadioGroup type="button" v-model="rightForm.expend.expendSort" button-style="solid" size="small" @on-change="autoChangeFunc()">
-            <Radio label="no">无</Radio>
-            <Radio label="asc">升序</Radio>
-            <Radio label="desc">降序</Radio>
-          </RadioGroup>
-        </FormItem>
-        <FormItem label="上父格">
-          <Select v-model="rightForm.expend.topParent" size="small" transfer @on-change="resetParent('topParentValue')">
-            <Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+        <!-- 显示方式：分组，列表，汇总 -->
+        <FormItem label="数据设置">
+          <Select v-model="rightForm.showType" size="small" transfer class="showtype">
+            <Option v-for="item in showTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
-          <Input type="text" v-model="rightForm.expend.topParentValue.label" size="small" v-if="rightForm.expend.topParent=='userDefined'" placeholder="例：A1" @on-blur="(evt)=>changeInput(evt,'topParentValue')"></Input>
-        </FormItem>
-        <FormItem label="左父格">
-          <Select v-model="rightForm.expend.leftParent" size="small" transfer @on-change="resetParent('leftParentValue')">
-            <Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          <!-- 分组为普通的 -->
+          <Select v-model="rightForm.showTypeValue" size="small" transfer v-if="rightForm.showType==='group'" class="showtype">
+            <Option v-for="item in showTypeList[0].children" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
-          <Input type="text" v-model="rightForm.expend.leftParentValue.label" size="small" v-if="rightForm.expend.leftParent=='userDefined'" placeholder="例：A1" @on-blur="(evt)=>changeInput(evt,'leftParentValue')"></Input>
+          <!-- 分组为高级 -->
+          <div v-if="rightForm.showTypeValue==='high'" class="showtypebtn" @click="userDefinedClick">自定义</div>
         </FormItem>
       </Form>
     </TabPane>
-    <TabPane label="样式" name="second">
-
-    </TabPane>
-    <TabPane label="形态" name="third">
-
-    </TabPane>
-    <TabPane label="其他" name="fourth">
-
-    </TabPane>
+    <!-- 自定义 -->
+    <pane-2-user-defined ref="userDefined" :formData="rightForm" />
   </Tabs>
 
 </template>
 <script>
+import pane2UserDefined from './pane2-user-defined.vue';
 
 export default {
-  name: "tabPane1",
+  components: { pane2UserDefined },
+  name: "tabPane2",
   props: {
     formData: {
       type: Object,
@@ -60,6 +44,7 @@ export default {
   watch: {
     formData: {
       handler () {
+        console.log("this.formData", this.formData);
         this.rightForm = { ...this.formData };
       },
       deep: true,
@@ -69,16 +54,22 @@ export default {
   data () {
     return {
       rightForm: {},
-      cellRelationList: [
+      //数据显示类型
+      showTypeList: [
         {
-          label: "无",
-          value: "no"
+          label: "分组",
+          value: "group",
+          children: [
+            { label: "普通", value: "ordinary" },
+            { label: "相邻连续", value: "adjacent" },
+            { label: "高级", value: "high" }
+          ]
         }, {
-          label: "默认",
-          value: "default"
+          label: "列表",
+          value: "list"
         }, {
-          label: "自定义",
-          value: "userDefined"
+          label: "汇总",
+          value: "summary"
         }
       ]
     }
@@ -123,7 +114,7 @@ export default {
       return obj[key]
     },
     //重置父子格数据
-    resetParent (key) {
+    resetShowType (key) {
       this.rightForm.expend[key] = { label: "", value: "" };
       const { leftParent, topParent } = this.rightForm.expend;
       //无父子格
@@ -131,11 +122,25 @@ export default {
         this.rightForm.expend[key] = "";
       }
       this.autoChangeFunc();
-    }
+    },
+    //自定义按钮设定
+    userDefinedClick () {
+      console.log(this.$refs.userDefined);
+      this.$refs.userDefined.drawerFlag = true;
+    },
   }
 }
 </script>
 <style>
 </style>
 <style scoped lang = "less">
+.tabPane2 {
+  .showtype {
+    margin-bottom: 5px;
+  }
+  .showtypebtn {
+    border: 1px solid #dcdee2;
+    text-align: center;
+  }
+}
 </style>
