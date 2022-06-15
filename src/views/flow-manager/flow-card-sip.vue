@@ -57,6 +57,12 @@
                     <FormItem :label="$t('stepName')" prop="curprocessname">
                       <Input v-model.trim="req.curprocessname" :placeholder="$t('pleaseEnter') + $t('stepName')" />
                     </FormItem>
+                    <FormItem :label="$t('cartonNo')" prop="cartonno">
+                      <Input v-model.trim="req.cartonno" :placeholder="$t('pleaseEnter') + $t('cartonNo')" />
+                    </FormItem>
+                    <FormItem :label="$t('currentStatus')" prop="currentstatus">
+                      <Input v-model.trim="req.currentstatus" :placeholder="$t('pleaseEnter') + $t('currentStatus')" />
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -101,6 +107,8 @@ export default {
         unitId56: "",
         buildConfig: "",
         curprocessname: "",
+        cartonno: "",
+        currentstatus: "",
         isHistory: false,
         ...this.$config.pageConfig,
       }, //查询数据
@@ -169,6 +177,8 @@ export default {
         unitId56,
         buildConfig,
         curprocessname,
+        cartonno,
+        currentstatus,
         isHistory,
       } = this.req;
       if (
@@ -180,7 +190,9 @@ export default {
         panelNo ||
         unitId56 ||
         buildConfig ||
-        curprocessname
+        curprocessname ||
+        cartonno ||
+        currentstatus
       ) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -206,6 +218,8 @@ export default {
                 unitId56: commaSplitString(unitId56).join(),
                 buildConfig,
                 curprocessname,
+                cartonno,
+                currentstatus,
                 isHistory,
               },
             };
@@ -240,6 +254,8 @@ export default {
         unitId56,
         buildConfig,
         curprocessname,
+        cartonno,
+        currentstatus,
         isHistory,
       } = this.req;
       if (
@@ -251,7 +267,9 @@ export default {
         panelNo ||
         unitId56 ||
         buildConfig ||
-        curprocessname
+        curprocessname ||
+        cartonno ||
+        currentstatus
       ) {
         if (limitStrLength(panelNo) || limitStrLength(unitId) || limitStrLength(unitId56)) {
           this.$Message.error('查询条件超出最大长度2000!');
@@ -268,6 +286,8 @@ export default {
           unitId56: commaSplitString(unitId56).join(),
           buildConfig,
           curprocessname,
+          cartonno,
+          currentstatus,
           isHistory,
         };
         exportReq(obj).then((res) => {
