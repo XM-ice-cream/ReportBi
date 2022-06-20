@@ -21,13 +21,13 @@
           <Select v-model="rightForm.expend.topParent" size="small" transfer @on-change="resetParent('topParentValue')">
             <Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
-          <Input type="text" v-model="rightForm.expend.topParentValue.label" size="small" v-if="rightForm.expend.topParent=='userDefined'" placeholder="例：A1" @on-blur="(evt)=>changeInput(evt,'topParentValue')"></Input>
+          <Input type="text" v-model="rightForm.expend.topParentValue.label" size="small" v-if="rightForm.expend.topParent=='userDefined'" placeholder="例:A1" @on-blur="(evt)=>changeInput(evt,'topParentValue')"></Input>
         </FormItem>
         <FormItem label="左父格">
           <Select v-model="rightForm.expend.leftParent" size="small" transfer @on-change="resetParent('leftParentValue')">
             <Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
-          <Input type="text" v-model="rightForm.expend.leftParentValue.label" size="small" v-if="rightForm.expend.leftParent=='userDefined'" placeholder="例：A1" @on-blur="(evt)=>changeInput(evt,'leftParentValue')"></Input>
+          <Input type="text" v-model="rightForm.expend.leftParentValue.label" size="small" v-if="rightForm.expend.leftParent=='userDefined'" placeholder="例:A1" @on-blur="(evt)=>changeInput(evt,'leftParentValue')"></Input>
         </FormItem>
       </Form>
     </TabPane>
@@ -84,6 +84,7 @@ export default {
     }
   },
   methods: {
+    //修改父组件rightForm值
     autoChangeFunc () {
       this.$emit("autoChangeFunc", 'cellAttribute', this.rightForm);
     },
@@ -91,23 +92,18 @@ export default {
     changeInput (evt, key) {
       const value = evt.target.value;
       console.log("监听父子格输入框", value, this.rightForm.expend);
-      //   this.rightForm.expend[key].value = value;
       const { leftParent, topParent, leftParentValue, topParentValue } = this.rightForm.expend;
       //左父格，上父格为自定义时,修改值
-      if (leftParent === "userDefined") {
-        const alpha = leftParentValue.label.toUpperCase().match(/[A-Z]+/gi);
-        const str = this.getAlphaSeq(alpha);
-        const num = leftParentValue.label.match(/\d+$/gi) - 1;
-        this.rightForm.expend.leftParentValue.value = `${num},${str}`;//行，列
-      }
-      if (topParent === "userDefined") {
-        const alpha = topParentValue.label.toUpperCase().match(/[A-Z]+/gi);
-        const str = this.getAlphaSeq(alpha);
-        const num = topParentValue.label.match(/\d+$/gi) - 1;
-        this.rightForm.expend.topParentValue.value = `${num},${str}`;//行，列
-      }
-      console.log("this.rightForm.expend.leftParentValue.value", this.rightForm.expend.leftParentValue, "this.rightForm.expend.topParentValue", this.rightForm.expend.topParentValue);
+      if (leftParent === "userDefined") this.rightForm.expend.leftParentValue.value = this.setParentValue(leftParentValue.label);//行，列
+      if (topParent === "userDefined") this.rightForm.expend.topParentValue.value = this.setParentValue(topParentValue.label);//行，列
       this.autoChangeFunc();
+    },
+    //父格自定义 value值改为 行号，列号 格式
+    setParentValue (label) {
+      const alpha = label.toUpperCase().match(/[A-Z]+/gi);
+      const str = this.getAlphaSeq(alpha);
+      const num = label.match(/\d+$/gi) - 1;
+      return `${num},${str}`;
     },
     //获取字母是第几列
     getAlphaSeq (key) {
@@ -122,18 +118,14 @@ export default {
       }
       return obj[key]
     },
+
     //重置父子格数据
     resetParent (key) {
       this.rightForm.expend[key] = { label: "", value: "" };
       const { leftParent, topParent } = this.rightForm.expend;
       //无父子格
-      if (leftParent === "no") {
-        this.rightForm.expend[key] = "";
-      }
-      //无父子格
-      if (topParent === "no") {
-        this.rightForm.expend[key] = "";
-      }
+      if (leftParent === "no") this.rightForm.expend[key] = "";
+      if (topParent === "no") this.rightForm.expend[key] = "";
       this.autoChangeFunc();
     }
   }

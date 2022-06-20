@@ -116,13 +116,6 @@
         <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
-    <!-- Excel 的设计与预览 -->
-    <!-- <excelreport-design :visib.sync="excelVisib" :reportCode="selectObj.reportCode" />
-    <excelreport-preview :visib.sync="previewVisib" :reportCode="selectObj.reportCode" /> -->
-
-    <!-- 大屏的设计与预览 -->
-    <!-- <screenreport-design :visib.sync="screenVisib" :reportCode="selectObj.reportCode" /> -->
-    <!-- <screenreport-preview :visib.sync="previewScreenVisib" :reportCode="selectObj.reportCode" /> -->
   </div>
 </template>
 
