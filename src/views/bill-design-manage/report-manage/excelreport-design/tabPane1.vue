@@ -97,14 +97,14 @@ export default {
       if (leftParent === "userDefined") {
         const alpha = leftParentValue.label.toUpperCase().match(/[A-Z]+/gi);
         const str = this.getAlphaSeq(alpha);
-        const num = leftParentValue.label.match(/\d+$/gi);
-        this.rightForm.expend.leftParentValue.value = `${str},${num}`;
+        const num = leftParentValue.label.match(/\d+$/gi) - 1;
+        this.rightForm.expend.leftParentValue.value = `${num},${str}`;//行，列
       }
       if (topParent === "userDefined") {
         const alpha = topParentValue.label.toUpperCase().match(/[A-Z]+/gi);
         const str = this.getAlphaSeq(alpha);
-        const num = topParentValue.label.match(/\d+$/gi);
-        this.rightForm.expend.topParentValue.value = `${str},${num}`;
+        const num = topParentValue.label.match(/\d+$/gi) - 1;
+        this.rightForm.expend.topParentValue.value = `${num},${str}`;//行，列
       }
       console.log("this.rightForm.expend.leftParentValue.value", this.rightForm.expend.leftParentValue, "this.rightForm.expend.topParentValue", this.rightForm.expend.topParentValue);
       this.autoChangeFunc();
@@ -127,7 +127,11 @@ export default {
       this.rightForm.expend[key] = { label: "", value: "" };
       const { leftParent, topParent } = this.rightForm.expend;
       //无父子格
-      if (leftParent === "no" || topParent === "no") {
+      if (leftParent === "no") {
+        this.rightForm.expend[key] = "";
+      }
+      //无父子格
+      if (topParent === "no") {
         this.rightForm.expend[key] = "";
       }
       this.autoChangeFunc();

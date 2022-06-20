@@ -235,7 +235,6 @@ export default {
             this.dataSetDataList[index] = { ...obj };
             this.$nextTick(() => {
               this.dataSetDataList = JSON.parse(JSON.stringify(this.dataSetDataList));
-              console.log(this.dataSetDataList, this.dataBaseList);
             })
           })
         }
@@ -318,32 +317,10 @@ export default {
         hook: {
           cellDragStop: function (cell, postion, sheetFile, ctx) {
             that.setRightForm(cell, postion, sheetFile, ctx, that.draggableFieldLabel);//rightForm默认值
-            // that.rightForm = {
-            //   ...that.rightForm, r, c, coordinate: r + "," + c,
-            //   value: that.draggableFieldLabel, autoIsShow: true,
-            //   cellAttribute: {
-            //     expend: {
-            //       expend: "portrait",
-            //       expendSort: "no",
-            //       leftParent: "default",
-            //       topParent: "default",
-            //       topParentValue,
-            //       leftParentValue,
-            //     }
-            //   }
-            // }
-            // window.luckysheet.setCellValue(
-            //   postion.r,
-            //   postion.c,
-            //   { v: that.draggableFieldLabel, m: that.draggableFieldLabel, ...that.rightForm }
-            // );
           },
           cellMousedown: function (cell, postion, sheetFile, ctx) {
-
             const value = cell == null ? "" : cell.v;
             that.setRightForm(cell, postion, sheetFile, ctx, value);//rightForm默认值
-
-
           },
 
         },
@@ -450,7 +427,8 @@ export default {
           }
         }
       }
-      window.luckysheet.setCellValue(r, c, { ...this.rightForm });
+      console.log("value", value);
+      if (value) window.luckysheet.setCellValue(r, c, { ...this.rightForm });
     },
 
     // 左侧列表拖拽
@@ -461,7 +439,6 @@ export default {
     },
     //更新单元格信息，扩展、排序...
     autoChangeFunc (right) {
-      console.log("更新", right);
       luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...right, });
     },
     //查看所有数据集
@@ -494,7 +471,6 @@ export default {
         let data = await this.detail(setCode);
         this.dataSet.push(data);
       }
-      console.log(this.dataSetDataList);
     },
     async detail (setCode) {
       const obj = { setCode: setCode };
@@ -536,6 +512,7 @@ export default {
     async save () {
       //设定传参
       this.reportExcelDto = this.setReportExcelDto();
+      //   return;
       const requestReq = this.reportId == null ? insertExcelReportReq : modifyExcelReportReq;
       this.reportExcelDto.id = this.reportId || null;
       const { code, message } = await requestReq(this.reportExcelDto);
@@ -572,19 +549,62 @@ export default {
       //修正一遍左上父格的值
       jsonData.forEach((item, itemIndex) => {
         const { celldata } = item;
+        jsonData[itemIndex].relationList = [];
         for (let i = celldata.length - 1; i > 0; i--) {
-          const { leftParent, topParent } = jsonData[itemIndex].celldata[i].v.cellAttribute.expend;
+          //说明为静态数据，不判断父子格
+          if (!jsonData[itemIndex].celldata[i].v?.cellAttribute) {
+            continue;
+          }
+          const expend = jsonData[itemIndex].celldata[i].v.cellAttribute.expend;
+          const { leftParent, topParent } = expend;
+          const { r, c } = celldata[i];
+          let relationObj = "";
           if (leftParent === "default" || topParent === "default") {
-            const { r, c } = celldata[i];
             //设定父子格值
             const { topParentValue, leftParentValue } = this.getParentValue(r, c);
-            if (leftParent === "default") jsonData[itemIndex].celldata[i].v.cellAttribute.expend.leftParentValue = leftParentValue;
-            if (topParent === "default") jsonData[itemIndex].celldata[i].v.cellAttribute.expend.topParentValue = topParentValue;
+            if (leftParent === "default") expend.leftParentValue = leftParentValue;
+            if (topParent === "default") expend.topParentValue = topParentValue;
           }
+          const { leftParentValue, topParentValue } = expend;
+          if (leftParentValue || topParentValue) {
+            relationObj = { start: `${r},${c}`, end: `${r},${c}` };
+            if (leftParentValue?.value) relationObj = this.compareValue(relationObj, leftParentValue.value);
+            if (topParentValue?.value) relationObj = this.compareValue(relationObj, topParentValue.value);
+          }
+          if (relationObj) jsonData[itemIndex].relationList.push(relationObj);
         }
       })
 
+      //确定数据块
+      jsonData.forEach((item, itemIndex) => {
+        jsonData[itemIndex].relationList.forEach((relation, relationIndex) => {
+          const { start, end } = relation;
+          const minRow = start.split(',')[0];
+          const minColumn = start.split(',')[1];
+          const maxRow = end.split(',')[0];
+          const maxColumn = end.split(',')[1];
+          jsonData[itemIndex].relationList.forEach((rela, relaIndex) => {
+            //索引相同说明值相同，不进行比较
+            if (relationIndex !== relaIndex) {
+              const { start: startRela, end: endRela } = rela;
+              const startCell = startRela.split(',');
+              const endCell = endRela.split(',');
+              //   最小行B在最小行A与最大行A直接  || 最大行B在最小行A与最大行A直接
+              const isRow = (minRow >= startCell[0] && minRow <= endCell[0]) || (maxRow >= startCell[0] && maxRow <= endCell[0]);
+              // 最小列B在最小列A与最大列A之间 || 最大列B在最小列A与最大列A之间
+              const isColumn = (minColumn >= startCell[1] && minColumn <= endCell[1]) || (maxColumn >= startCell[1] && maxColumn <= endCell[1]);
+              //以上条件为TRUE ，则为一个数据块
+              if (isRow && isColumn) {
+                jsonData[itemIndex].relationList[relationIndex] = this.compareValue(jsonData[itemIndex].relationList[relationIndex], startRela);
+                jsonData[itemIndex].relationList[relationIndex] = this.compareValue(jsonData[itemIndex].relationList[relationIndex], endRela);
+                delete jsonData[itemIndex].relationList[relaIndex];//删除已经计算过的父子格区间
+              }
+            }
 
+          })
+        })
+        jsonData[itemIndex].relationList = jsonData[itemIndex].relationList.filter(item => item);
+      })
       return {
         ...this.reportExcelDto,
         jsonStr: JSON.stringify(jsonData),
@@ -592,8 +612,24 @@ export default {
         setCodes: setCodeList.join("|"),
         reportCode: this.reportCode
       }
-
     },
+    //比较数据
+    compareValue (relation, parentValue) {
+      //比较的行与列
+      const value = parentValue.split(',');
+      const row = value[0];//父格行
+      const column = value[1];//父格列
+      //原始行与列
+      let relationObj = { ...relation };
+      let start = relationObj.start.split(',');
+      let end = relationObj.end.split(',')
+      start[0] = Number(start[0]) < Number(row) ? start[0] : row;
+      start[1] = Number(start[1]) < Number(column) ? start[1] : column;
+      end[0] = Number(end[0]) > Number(row) ? end[0] : row;
+      end[1] = Number(end[1]) > Number(column) ? end[1] : column;
+      return { start: `${start[0]},${start[1]}`, end: `${end[0]},${end[1]}` }
+    },
+
     //删除数据集数据
     del (val) {
       this.$Modal.confirm({
