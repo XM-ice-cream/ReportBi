@@ -200,7 +200,7 @@ export default {
         { title: "责任单位", key: "dutyDept", width: 140, align: "center" },
         { title: "pcbBin", key: "pcbBin", align: "center", width: 140 },
         { title: "ledBin", key: "ledBin", align: "center", width: 140 },
-        { title: "维修人员", key: "createUserName", width: 80, align: "center" },
+        { title: "维修人员", key: "repairUser", width: 80, align: "center" },
         { title: this.$t("modifyUser"), key: "modifyUserName", width: 80, align: "center" },
         {
           title: this.$t("modifyDate"),
