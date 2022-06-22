@@ -114,7 +114,8 @@
             </i-col>
           </Row>
         </div>
-        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
+        <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
+        </Table>
         <page-custom :elapsedMilliseconds='req.elapsedMilliseconds' :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
@@ -200,7 +201,13 @@ export default {
         { title: "责任单位", key: "dutyDept", width: 140, align: "center" },
         { title: "pcbBin", key: "pcbBin", align: "center", width: 140 },
         { title: "ledBin", key: "ledBin", align: "center", width: 140 },
-        { title: "维修人员", key: "createUserName", width: 80, align: "center" },
+        { title: "AutoOnOff2", key: "autoOnOff2", align: "center", width: 140 },
+        { title: "AutoOnOff3", key: "autoOnOff3", align: "center", width: 140 },
+        { title: "Function", key: "function", align: "center", width: 140 },
+        { title: "Mura", key: "mura", align: "center", width: 140 },
+        { title: "I16", key: "i16", align: "center", width: 140 },
+        { title: "Fvi", key: "fvi", align: "center", width: 140 },
+        { title: "维修人员", key: "repairUser", width: 80, align: "center" },
         { title: this.$t("modifyUser"), key: "modifyUserName", width: 80, align: "center" },
         {
           title: this.$t("modifyDate"),

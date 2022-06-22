@@ -24,6 +24,9 @@
             <FormItem label='过站时间' prop="currentDateTime">
               <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') +'过站时间'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.currentDateTime"></DatePicker>
             </FormItem>
+            <FormItem label='大版码模板' prop="originalPanel">
+              <Input type="text" v-model="req.originalPanel" clearable size="default"></Input>
+            </FormItem>
             <FormItem label='大版码' prop="currentPanel">
               <Input type="text" v-model="req.currentPanel" clearable size="default"></Input>
             </FormItem>
@@ -72,9 +75,9 @@ export default {
     return {
       req: {
         originalSn: "",
-        originalPanel: "",
         currentSn: "",
-        currentPanel: "",
+        currentPanel: "",//大板码
+        originalPanel: "",//大板码模板
         lineName: "",//线体
         fillEqpId: "",//Fill设备
         damEqpId: "",//Dam设备
@@ -95,6 +98,12 @@ export default {
             message: this.$t("pleaseEnter") + this.$t("currentPanel"),
             trigger: "blur",
           },
+        ],
+        originalPanel: [
+          {
+            required: true,
+            message: this.$t("pleaseEnter") + this.$t("originalPanel"),
+          }
         ],
         lineName: [
           {
