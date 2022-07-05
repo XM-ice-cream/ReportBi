@@ -198,7 +198,8 @@ export default {
 
         },
         cell: {
-          coordinate: "",//单元格位置
+          showType: "group",//数据设置,默认 分组
+          showTypeValue: "ordinary", //数据设置值 默认为普通
         }
       },
       reportExcelDto: {
@@ -401,10 +402,16 @@ export default {
     //设定RightForm
     setRightForm (cell, postion, sheetFile, ctx, value) {
       const { r, c } = postion;
+      console.log("cell", cell);
       //单元格属性扩展
-      const { expend, expendSort, leftParent, topParent } = cell?.cellAttribute?.expend || {};
+      let { expend, expendSort, leftParent, topParent, leftParentValue, topParentValue } = cell?.cellAttribute?.expend || {};
       //设定父子格值
-      const { topParentValue, leftParentValue } = this.getParentValue(r, c);
+      if (leftParent === "default") leftParentValue = this.getParentValue(r, c)?.leftParentValue || "";
+      if (topParent === "default") topParentValue = this.getParentValue(r, c)?.topParentValue || "";
+
+      //单元格元素数据设置
+      let { showType, showTypeValue } = cell?.cell || {};
+
       this.rightForm = {
         ...this.rightForm,
         r,
@@ -425,9 +432,14 @@ export default {
             topParent: topParent || "default",
             topParentValue: topParentValue || ""
           }
+        },
+        // 单元格元素
+        cell: {
+          showType: showType || "group",
+          showTypeValue: showTypeValue || "ordinary"
         }
       }
-      console.log("value", value);
+      console.log("value", this.rightForm);
       if (value) window.luckysheet.setCellValue(r, c, { ...this.rightForm });
     },
 
@@ -550,21 +562,35 @@ export default {
       jsonData.forEach((item, itemIndex) => {
         const { celldata } = item;
         jsonData[itemIndex].relationList = [];
-        for (let i = celldata.length - 1; i > 0; i--) {
+        for (let i = celldata.length - 1; i >= 0; i--) {
           //说明为静态数据，不判断父子格
-          if (!jsonData[itemIndex].celldata[i].v?.cellAttribute) {
+          const v = jsonData[itemIndex].celldata[i].v;
+          if (!v?.cellAttribute || !v.v) {
+            //去除数据为空的无效单元格
+            if (JSON.stringify(v) === "{}" || !v.v) {
+              jsonData[itemIndex].celldata.splice(i, 1);
+            };
             continue;
           }
-          const expend = jsonData[itemIndex].celldata[i].v.cellAttribute.expend;
+          // 常量
+          if (v.v.indexOf("#") === -1 && v.cellAttribute) {
+            delete jsonData[itemIndex].celldata[i].v.cellAttribute;
+            delete jsonData[itemIndex].celldata[i].v.cell;
+            continue;
+          }
+
+          const expend = v.cellAttribute.expend;
           const { leftParent, topParent } = expend;
           const { r, c } = celldata[i];
           let relationObj = "";
+          // 确定父子格
           if (leftParent === "default" || topParent === "default") {
             //设定父子格值
             const { topParentValue, leftParentValue } = this.getParentValue(r, c);
             if (leftParent === "default") expend.leftParentValue = leftParentValue;
             if (topParent === "default") expend.topParentValue = topParentValue;
           }
+          //确定关系块
           const { leftParentValue, topParentValue } = expend;
           if (leftParentValue || topParentValue) {
             relationObj = { start: `${r},${c}`, end: `${r},${c}` };
@@ -613,7 +639,7 @@ export default {
         reportCode: this.reportCode
       }
     },
-    //比较数据
+    //比较数据 取块
     compareValue (relation, parentValue) {
       //比较的行与列
       const value = parentValue.split(',');

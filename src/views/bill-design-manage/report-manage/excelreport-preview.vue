@@ -98,6 +98,8 @@ export default {
       // 验证实体
       ruleValidate: {},
       searchPoptipModal: false,
+      htm: "",
+      tdIndex: 0,
     };
   },
   // 导航离开该组件的对应路由时调用
@@ -153,7 +155,7 @@ export default {
         this.$Message.warning("查询结果为空");
         return;
       }
-      let htm = "<table class='table tableScroll' id='exceltable'>";
+      this.htm = "<table class='table tableScroll' id='exceltable'>";
       const { celldata, config, frozen } = data[0];
       console.log(data);
       //处理数据,将同一行为一组数据
@@ -171,39 +173,24 @@ export default {
       console.log(result);
       //行
       result.forEach((item, rowIndex) => {
-        htm += "<tr>";
-        let tdIndex = 0;
+        this.htm += "<tr>";
+        this.tdIndex = 0;
         // 列
         item.forEach((tdItem, columnIndex) => {
-          //   console.log(tdItem);
+          // console.log(tdItem);
           const { c, r } = tdItem;
           const { v, bg, bl, fc, ht, vt, mc, fs } = tdItem.v; //获取样式
           const { columnlen, rowlen, borderInfo } = config;//边框
           let style = "";
           //   宽高
-          let width = 219;
+          let width = 75;
           let height = 18;
-          if (columnlen && columnlen[tdIndex]) width = columnlen[tdIndex];
+          if (columnlen && columnlen[this.tdIndex]) width = columnlen[this.tdIndex];
           if (rowlen && rowlen[rowIndex]) height = rowlen[rowIndex];
 
           //边框
-          let border = "none";
-          borderInfo?.forEach((borderItem, borderIndex) => {
-            const { borderType, color, range, rangeType } = borderItem;
-            if (rangeType === "range" && range[0]) {
-              //   console.log(range[0]);
-              //列号在范围内
-              const columnRang = (range[0].column[0] <= c) && (range[0].column[1] >= c);
-              //行号在范围内
-              const rowRang = (range[0].row[0] <= r) && (range[0].row[1] >= r);
-              if (borderType === "border-all" && columnRang && rowRang) {
-                border = `1px solid ${color}`;
-              }
-              if (borderType === "border-none" && columnRang && rowRang) {
-                border = "none";
-              }
-            }
-          })
+          let border = this.getBorderInfo(borderInfo, r, c);
+
 
           //   //冻结
           //   let frozenTd = "static";
@@ -212,37 +199,39 @@ export default {
           //     frozenTd = "fixed;"
           //   }
 
+          // td 样式
           if (bg) style += `background:${bg};`;//背景颜色
           if (bl) style += `font-weight:${bl == 1 ? 'bold' : 'normal'};`; //字体粗细
           if (fc) style += `color:${fc};`;//字体颜色
           if (ht) style += `text-align:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
           if (vt) style += `verticle-align:middle;`;//垂直居中
           if (fs) style += `font-size:${fs}px;`;//文字大小
-          const widthHeight = `width:${width}px;height:${height}px;`;//宽高
-          style += `border:${border};`;//边框
+          if (border) style += `border:${border};`;//边框
+
+          //td 内部div样式
+          let widthHeight = `width:${width}px;height:${height}px;`;//宽高
+          widthHeight += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;`;//超出文字省略
           //   style += `position:${frozenTd};`;//冻结
           //合并单元格 colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"
+
+
           //空单元格 当前列小于c 前面有空cell
-          for (let i = tdIndex; i < c; i++) {
-            // console.log("r", r, "c", c, "i", i);
-            tdIndex++;
-            htm += `<td  ></td>`
-          }
+          this.appendNullTd(this.tdIndex, c, borderInfo, r);
+
+
           //宽度不生效解决方案：内部添加div，并设定宽高
-          htm += `<td style="${style}"><div style="${widthHeight}">${v}</div></td>`
+          this.htm += `<td style="${style}"><div style="${widthHeight}" title="${v}">${v}</div></td>`
+
           //空单元格 当前列小于maxColumns 后面有空cell
           if (columnIndex + 1 === item.length) {
-            for (let i = c; i < maxColumns; i++) {
-              tdIndex++;
-              htm += `<td></td>`
-            }
-            htm += "</tr>"
+            this.appendNullTd(c + 1, maxColumns, borderInfo, r);//当前列的后一列开始计算
+            this.htm += `</tr>`
           };
-          ++tdIndex;
+          ++this.tdIndex;
         })
       })
 
-      document.getElementById(tableid).innerHTML = htm;
+      document.getElementById(tableid).innerHTML = this.htm;
     },
     //获取查询参数 并获得参数类型及是否必填
     getParamsList (setParam, setParam_parse) {
@@ -259,6 +248,37 @@ export default {
         extendArry.push({ name: i, children: children });
       }
       return extendArry;
+    },
+    // 获取边框
+    getBorderInfo (borderInfo, r, c) {
+      let border = "none";
+      borderInfo?.forEach((borderItem, borderIndex) => {
+        const { borderType, color, range, rangeType } = borderItem;
+        if (rangeType === "range" && range[0]) {
+          //   console.log(range[0]);
+          //列号在范围内
+          const columnRang = (range[0].column[0] <= c) && (range[0].column[1] >= c);
+          //行号在范围内
+          const rowRang = (range[0].row[0] <= r) && (range[0].row[1] >= r);
+          if (borderType === "border-all" && columnRang && rowRang) {
+            border = `1px solid ${color}`;
+          }
+          if (borderType === "border-none" && columnRang && rowRang) {
+            border = "none";
+          }
+        }
+      })
+      return border;
+    },
+    // 左右两边空td渲染
+    appendNullTd (c, maxColumns, borderInfo, r) {
+      for (let i = c; i < maxColumns; i++) {
+        this.tdIndex++;
+        console.log(r, i);
+        const border = this.getBorderInfo(borderInfo, r, i);
+        const widthHeight = `width:75px;height:18px;`;//宽高
+        this.htm += `<td  style="border:${border}"><div style="${widthHeight}"></div></td>`
+      }
     },
 
     // Excel导出

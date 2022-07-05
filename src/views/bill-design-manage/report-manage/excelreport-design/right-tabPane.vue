@@ -20,6 +20,7 @@
     <div class="excel-tabs">
       <!-- 单元格属性 -->
       <tab-pane-1 :type="activeName" :formData="rightForm.cellAttribute" @autoChangeFunc="autoChangeFunc"></tab-pane-1>
+      <!-- 单元格元素 -->
       <tab-pane-2 :type="activeName" :formData="rightForm.cell" @autoChangeFunc="autoChangeFunc"></tab-pane-2>
     </div>
   </div>
@@ -42,6 +43,7 @@ export default {
     formData: {
       handler () {
         this.rightForm = { ...this.formData };
+        console.log(this.rightForm);
       },
       deep: true,
       immediate: true
