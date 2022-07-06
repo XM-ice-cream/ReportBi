@@ -29,24 +29,24 @@
         <FormItem label="编号名称" prop="name">
           <Input v-model="submitData.name" :placeholder="$t('pleaseEnter') + '编号名称'" />
         </FormItem>
-        <!-- 通道名称 -->
-        <FormItem label="通道名称" prop="channelType">
-          <Input v-model="submitData.channelType" :placeholder="$t('pleaseEnter') + '通道名称'" />
+        <!-- 线体 -->
+        <FormItem label="线体" prop="channelType">
+          <Input v-model="submitData.channelType" :placeholder="$t('pleaseEnter') + '线体'" />
         </FormItem>
-        <!-- 通道参数 -->
-        <FormItem label="通道参数" prop="channelParamter">
-          <Input
-            v-model="submitData.channelParamter"
-            :placeholder="$t('pleaseEnter') + '通道参数'"
-          />
+        <!-- 上抛SPC -->
+        <FormItem label="上抛SPC" prop="channelParamter">
+          <Select v-model="submitData.channelParamter" transfer :placeholder="$t('pleaseSelect') + '上抛SPC'">
+            <Option value="0">否</Option>
+            <Option value="1">是</Option>
+          </Select>
         </FormItem>
         <!-- 下限值 -->
         <FormItem label="下限值" prop="specLimitLower">
           <Input v-model="submitData.specLimitLower" :placeholder="$t('pleaseEnter') + '下限值'" />
         </FormItem>
-        <!-- 目标值 -->
-        <FormItem label="目标值" prop="specLimitTarget">
-          <Input v-model="submitData.specLimitTarget" :placeholder="$t('pleaseEnter') + '目标值'" />
+        <!-- 标准值 -->
+        <FormItem label="标准值" prop="specLimitTarget">
+          <Input v-model="submitData.specLimitTarget" :placeholder="$t('pleaseEnter') + '标准值'" />
         </FormItem>
         <!-- 上限值 -->
         <FormItem label="上限值" prop="specLimitUpper">
@@ -115,6 +115,17 @@
                         :placeholder="$t('pleaseEnter') + '编号名称'"
                         @keyup.native.enter="searchClick"
                       />
+                    </FormItem>
+                    <!-- 线体 -->
+                    <FormItem label="线体" prop="channelType">
+                      <Input v-model="req.channelType" :placeholder="$t('pleaseEnter') + '线体'" />
+                    </FormItem>
+                    <!-- 上抛SPC -->
+                    <FormItem label="上抛SPC" prop="channelParamter">
+                      <Select v-model="req.channelParamter" transfer :placeholder="$t('pleaseSelect') + '上抛SPC'">
+                        <Option :value=1>是</Option>
+                        <Option :value=0>否</Option>
+                      </Select>
                     </FormItem>
                     <div class="poptip-style-button">
                       <Button @click="resetClick">{{ $t("reset") }}</Button>
@@ -185,10 +196,10 @@ export default {
         },
         { title: "站点", key: "station", align: "center", width: 140, tooltip: true  },
         { title: "编号名称", key: "name", align: "center", width: 120, tooltip: true  },
-        { title: "通道名称", key: "channelType", align: "center", width: 350, tooltip: true  },
-        { title: "通道参数", key: "channelParamter", align: "center", width: 300, tooltip: true  },
+        { title: "线体", key: "channelType", align: "center", width: 350, tooltip: true  },
+        { title: "上抛SPC", key: "channelParamter", align: "center", width: 300, tooltip: true  },
         { title: "下限值", key: "specLimitLower", align: "center", width: 100, tooltip: true  },
-        { title: "目标值", key: "specLimitTarget", align: "center", width: 100, tooltip: true  },
+        { title: "标准值", key: "specLimitTarget", align: "center", width: 100, tooltip: true  },
         { title: "上限值", key: "specLimitUpper", align: "center", width: 100, tooltip: true  },
         { title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true  },
         { title: this.$t("enabled"), key: "enabled", align: "center", width: 70, render: renderIsEnabled },
@@ -202,6 +213,8 @@ export default {
       req: {
         station: "",
         name: "",
+        channelType: "",
+        channelParamter: "",
         ...this.$config.pageConfig,
       },
       submitData: {
@@ -209,7 +222,7 @@ export default {
         station: "", //站点（必填）
         name: "", //编号名称（必填）
         channelType: "", //通道名称（必填）
-        channelParamter: "", //通道参数（必填）
+        channelParamter: "0", //通道参数（必填）
         specLimitLower: "", //下限值（必填）
         specLimitTarget: "", //目标值（必填）
         specLimitUpper: "", //上限值（必填）
@@ -235,14 +248,14 @@ export default {
         channelType: [
           {
             required: true,
-            message: `${this.$t("pleaseEnter")}通道名称`,
+            message: `${this.$t("pleaseEnter")}线体`,
             trigger: "change",
           },
         ],
         channelParamter: [
           {
             required: true,
-            message: `${this.$t("pleaseEnter")}通道参数`,
+            message: `${this.$t("pleaseSelect")}上抛SPC`,
             trigger: "change",
           },
         ],
@@ -256,7 +269,7 @@ export default {
         specLimitTarget: [
           {
             required: true,
-            message: `${this.$t("pleaseEnter")}目标值`,
+            message: `${this.$t("pleaseEnter")}标准值`,
             trigger: "change",
           },
         ],
@@ -283,13 +296,13 @@ export default {
     // 获取分页列表数据
     pageLoad() {
       this.tableConfig.loading = true;
-      let { pageIndex, pageSize, ascending, orderField, station, name } = this.req;
+      let { pageIndex, pageSize, ascending, orderField, station, name, channelType, channelParamter } = this.req;
       const obj = {
         orderField, // 排序字段
         ascending, // 是否升序
         pageSize, // 分页大小
         pageIndex, // 当前页码
-        data: { station, name, enabled: -1 },
+        data: { station, name, channelType, channelParamter, enabled: -1 },
         isFuzzyKey: [],
       };
       getpagelistReq(obj)
