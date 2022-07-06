@@ -106,17 +106,14 @@ export default {
       return `${num},${str}`;
     },
     //获取字母是第几列
-    getAlphaSeq (key) {
-      const obj = {
-        A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, J: 6, H: 7, I: 8, G: 9, K: 10, L: 11, M: 12, N: 13, O: 14, P: 15, Q: 16, R: 17, S: 18, T: 19,
-        U: 20,
-        V: 21,
-        W: 22,
-        X: 23,
-        Y: 24,
-        Z: 25
+    getAlphaSeq (str) {
+      let strArray = str.toString().split('') || "";
+      let num = 0;
+      for (let i = 0; i < strArray.length; i++) {
+        //   charCodeAt 转ASCII码，A:65
+        num = (num + Math.pow(26, i) + (parseInt(strArray[i].charCodeAt() - 65)));
       }
-      return obj[key]
+      return num - 1;
     },
 
     //重置父子格数据

@@ -374,30 +374,7 @@ export default {
         })
       })
     },
-    //获取父格值
-    getParentValue (r, c) {
-      let topParentValue = "";//上父格值
-      let leftParentValue = "";//左父格值
-      // 列
-      for (let i = c - 1; i >= 0; i--) {
-        const expend = luckysheet.getCellValue(r, i, { type: 'cellAttribute' })?.expend.expend || "";
-        //扩展方向为纵向，即为左父格
-        if (expend === "portrait") {
-          leftParentValue = { label: `${r},${i}`, value: `${r},${i}` };
-          break;
-        }
-      }
-      // 行
-      for (let i = r - 1; i >= 0; i--) {
-        const expend = luckysheet.getCellValue(i, c, { type: 'cellAttribute' })?.expend.expend || "";
-        //扩展方向为横向，即为左父格
-        if (expend === "cross") {
-          topParentValue = { label: `${i},${c}`, value: `${i},${c}` };
-          break;
-        }
-      }
-      return { topParentValue, leftParentValue }
-    },
+
 
     //设定RightForm
     setRightForm (cell, postion, sheetFile, ctx, value) {
@@ -451,6 +428,7 @@ export default {
     },
     //更新单元格信息，扩展、排序...
     autoChangeFunc (right) {
+      console.log(right);
       luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...right, });
     },
     //查看所有数据集
@@ -654,6 +632,31 @@ export default {
       end[0] = Number(end[0]) > Number(row) ? end[0] : row;
       end[1] = Number(end[1]) > Number(column) ? end[1] : column;
       return { start: `${start[0]},${start[1]}`, end: `${end[0]},${end[1]}` }
+    },
+    //获取父格值
+    getParentValue (r, c) {
+      let topParentValue = "";//上父格值
+      let leftParentValue = "";//左父格值
+      // 列
+      for (let i = c - 1; i >= 0; i--) {
+        const expend = luckysheet.getCellValue(r, i, { type: 'cellAttribute' })?.expend.expend || "";
+        //扩展方向为纵向，即为左父格
+        if (expend === "portrait") {
+          leftParentValue = { label: `${r},${i}`, value: `${r},${i}` };
+          console.log(leftParentValue);
+          break;
+        }
+      }
+      // 行
+      for (let i = r - 1; i >= 0; i--) {
+        const expend = luckysheet.getCellValue(i, c, { type: 'cellAttribute' })?.expend.expend || "";
+        //扩展方向为横向，即为左父格
+        if (expend === "cross") {
+          topParentValue = { label: `${i},${c}`, value: `${i},${c}` };
+          break;
+        }
+      }
+      return { topParentValue, leftParentValue }
     },
 
     //删除数据集数据
