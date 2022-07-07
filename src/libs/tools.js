@@ -681,6 +681,16 @@ export const renderPrintStatus = (h, params) => {
     return h("div", printedString[date] || null);
 };
 
+// 是否打印成功
+export const renderYesNo = (h, params) => {
+    let date = params.row[params.column.key];
+    let yesNoString = {
+        0: "否",
+        1: "是",
+    };
+    return h("div", yesNoString[date] || null);
+};
+
 /**
  * 深度克隆对象
  * @param origin 被克隆的对象

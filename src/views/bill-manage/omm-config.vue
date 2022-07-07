@@ -40,17 +40,17 @@
             <Option value="1">是</Option>
           </Select>
         </FormItem>
-        <!-- 下限值 -->
-        <FormItem label="下限值" prop="specLimitLower">
-          <Input v-model="submitData.specLimitLower" :placeholder="$t('pleaseEnter') + '下限值'" />
+        <!-- 下公差 -->
+        <FormItem label="下公差" prop="specLimitLower">
+          <Input v-model="submitData.specLimitLower" :placeholder="$t('pleaseEnter') + '下公差'" />
         </FormItem>
         <!-- 标准值 -->
         <FormItem label="标准值" prop="specLimitTarget">
           <Input v-model="submitData.specLimitTarget" :placeholder="$t('pleaseEnter') + '标准值'" />
         </FormItem>
-        <!-- 上限值 -->
-        <FormItem label="上限值" prop="specLimitUpper">
-          <Input v-model="submitData.specLimitUpper" :placeholder="$t('pleaseEnter') + '上限值'" />
+        <!-- 上公差 -->
+        <FormItem label="上公差" prop="specLimitUpper">
+          <Input v-model="submitData.specLimitUpper" :placeholder="$t('pleaseEnter') + '上公差'" />
         </FormItem>
         <!-- 备注 -->
         <FormItem label="备注" prop="remark">
@@ -122,9 +122,9 @@
                     </FormItem>
                     <!-- 上抛SPC -->
                     <FormItem label="上抛SPC" prop="channelParamter">
-                      <Select v-model="req.channelParamter" transfer :placeholder="$t('pleaseSelect') + '上抛SPC'">
-                        <Option :value=1>是</Option>
-                        <Option :value=0>否</Option>
+                      <Select v-model="req.channelParamter" transfer clearable :placeholder="$t('pleaseSelect') + '上抛SPC'">
+                        <Option value="0">否</Option>
+                        <Option value="1">是</Option>
                       </Select>
                     </FormItem>
                     <div class="poptip-style-button">
@@ -171,7 +171,7 @@
 
 <script>
 import { getpagelistReq, addReq, modifyReq } from "@/api/bill-manage/omm-config";
-import { getButtonBoolean, errorType, renderIsEnabled, renderDate } from "@/libs/tools";
+import { getButtonBoolean, errorType, renderIsEnabled, renderDate, renderYesNo } from "@/libs/tools";
 import {getlistReq as getdataitemlistReq} from "@/api/system-manager/data-item";
 export default {
   name: "omm-config",
@@ -197,10 +197,10 @@ export default {
         { title: "站点", key: "station", align: "center", width: 140, tooltip: true  },
         { title: "编号名称", key: "name", align: "center", width: 120, tooltip: true  },
         { title: "线体", key: "channelType", align: "center", width: 350, tooltip: true  },
-        { title: "上抛SPC", key: "channelParamter", align: "center", width: 300, tooltip: true  },
-        { title: "下限值", key: "specLimitLower", align: "center", width: 100, tooltip: true  },
+        { title: "上抛SPC", key: "channelParamter", align: "center", width: 300, tooltip: true, render: renderYesNo  },
+        { title: "下公差", key: "specLimitLower", align: "center", width: 100, tooltip: true  },
         { title: "标准值", key: "specLimitTarget", align: "center", width: 100, tooltip: true  },
-        { title: "上限值", key: "specLimitUpper", align: "center", width: 100, tooltip: true  },
+        { title: "上公差", key: "specLimitUpper", align: "center", width: 100, tooltip: true  },
         { title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true  },
         { title: this.$t("enabled"), key: "enabled", align: "center", width: 70, render: renderIsEnabled },
         { title: this.$t("createUser"), key: "createUserName", align: "center", width: 80 },
@@ -223,9 +223,9 @@ export default {
         name: "", //编号名称（必填）
         channelType: "", //通道名称（必填）
         channelParamter: "0", //通道参数（必填）
-        specLimitLower: "", //下限值（必填）
+        specLimitLower: "", //下公差（必填）
         specLimitTarget: "", //目标值（必填）
-        specLimitUpper: "", //上限值（必填）
+        specLimitUpper: "", //上公差（必填）
         remark: "", //备注（非必填）
         enabled: 1, //是否有效
       },
@@ -262,7 +262,7 @@ export default {
         specLimitLower: [
           {
             required: true,
-            message: `${this.$t("pleaseEnter")}下限值`,
+            message: `${this.$t("pleaseEnter")}下公差`,
             trigger: "change",
           },
         ],
@@ -276,7 +276,7 @@ export default {
         specLimitUpper: [
           {
             required: true,
-            message: `${this.$t("pleaseEnter")}上限值`,
+            message: `${this.$t("pleaseEnter")}上公差`,
             trigger: "change",
           },
         ],
