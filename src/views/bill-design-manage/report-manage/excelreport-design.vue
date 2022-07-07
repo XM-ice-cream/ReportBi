@@ -640,18 +640,20 @@ export default {
       // 列
       for (let i = c - 1; i >= 0; i--) {
         const expend = luckysheet.getCellValue(r, i, { type: 'cellAttribute' })?.expend.expend || "";
-        //扩展方向为纵向，即为左父格
-        if (expend === "portrait") {
+        const v = luckysheet.getCellValue(r, i, { type: 'v' });
+        //扩展方向为纵向，即为左父格(有值且为变量)
+        if (expend === "portrait" && v && v.indexOf("#") !== -1) {
           leftParentValue = { label: `${r},${i}`, value: `${r},${i}` };
-          console.log(leftParentValue);
+          console.log(leftParentValue, luckysheet.getCellValue(r, i, { type: 'v' }));
           break;
         }
       }
       // 行
       for (let i = r - 1; i >= 0; i--) {
         const expend = luckysheet.getCellValue(i, c, { type: 'cellAttribute' })?.expend.expend || "";
-        //扩展方向为横向，即为左父格
-        if (expend === "cross") {
+        const v = luckysheet.getCellValue(i, c, { type: 'v' });
+        //扩展方向为横向，即为左父格(有值且为变量)
+        if (expend === "cross" && v && v.indexOf("#") !== -1) {
           topParentValue = { label: `${i},${c}`, value: `${i},${c}` };
           break;
         }
