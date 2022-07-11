@@ -48,7 +48,21 @@
         </div>
         <!-- 表格 -->
         <div class="data-table" :style="{height:(params.height+50)+'px'}">
-          <table class='table tableScroll' id="excelpreview" :style="{height:params.height+'px'}">
+          <!-- <table class='table tableScroll' id="excelpreview" :style="{height:params.height+'px'}">
+          </table> -->
+          <table class='table tableScroll' id='exceltable'>
+            <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr">
+              <template v-for="(item,index) in itemTr">
+                <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan" :rowspan="item.rowspan" :key="index">
+                  <div :title="item.value" :style="item.widthHeight">
+                    {{item.value}}
+                  </div>
+                </td>
+                <td v-if="!item" :key="index"></td>
+              </template>
+
+            </tr>
+
           </table>
           <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
         </div>
@@ -73,7 +87,6 @@ export default {
       intervalData: '',
       options: {},
       sheet: {},
-      sheetData: [],
       reportId: null,
       reportName: null,
       dataSet: null,
@@ -100,6 +113,7 @@ export default {
       searchPoptipModal: false,
       htm: "",
       tdIndex: 0,
+      tableHtml: []
     };
   },
   // 导航离开该组件的对应路由时调用
@@ -117,10 +131,6 @@ export default {
       //左侧查询参数 --必要参数接收
       const arr = this.toObject(this.tableData2)
       this.params.setParam = JSON.stringify(arr)
-
-      this.sheetData = [{}] //表格数据
-      window.luckysheet.destroy() //销毁
-
       this.intervalPreview()  //每次都重新加载需要改成刷新
     },
     async intervalPreview () {
@@ -138,100 +148,69 @@ export default {
             totalPage: this.jsonStr[this.jsonIndex].pageCount
           }
           // 渲染表格
-          this.getTable("excelpreview", this.jsonStr);
+          this.getTable(this.jsonStr);
         } else {
           this.$Message.error(res.message);
-          this.sheetData = [{}];
-          //初始化Excel
-          this.createSheet();
+          this.loading = false;
         }
         this.searchPoptipModal = false;
       })
 
     },
     //获取表格
-    getTable (tableid, data) {
+    getTable (data) {
       if (!data[0].celldata.length) {
         this.$Message.warning("查询结果为空");
         return;
       }
-      this.htm = "<table class='table tableScroll' id='exceltable'>";
+      //   this.htm = "<table class='table tableScroll' id='exceltable'>";
       const { celldata, config, frozen } = data[0];
       console.log(data);
-      //处理数据,将同一行为一组数据
-      let result = [];
-      let maxColumns = 0;
+      // 处理表格单元格样式
       celldata.forEach(item => {
         const { r, c } = item;
-        if (!result[r]) result[r] = [];
-        if (!result[r][c]) result[r][c] = {};
-        result[r][c] = { ...item };
-        console.log(result[item.r][item.c]);
-        //取最大列
-        maxColumns = item.c > maxColumns ? item.c : maxColumns;
+        if (!this.tableHtml[r]) this.tableHtml[r] = [];
+        if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
+
+        const { v, bg, bl, fc, ht, vt, mc, fs } = item.v; //获取样式
+        const { columnlen, rowlen, borderInfo } = config;//边框
+        let style = "";
+        //   宽高
+        let width = columnlen && columnlen[c] ? columnlen[c] : 75;
+        let height = rowlen && rowlen[r] ? rowlen[r] : 18;
+        //边框
+        let border = this.getBorderInfo(borderInfo, r, c);
+        // td 样式
+        if (bg) style += `background:${bg};`;//背景颜色
+        if (bl) style += `font-weight:${bl == 1 ? 'bold' : 'normal'};`; //字体粗细
+        if (fc) style += `color:${fc};`;//字体颜色
+        if (ht) style += `text-align:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
+        if (vt) style += `verticle-align:middle;`;//垂直居中
+        if (fs) style += `font-size:${fs}px;`;//文字大小
+        if (border) style += `border:${border};`;//边框
+        //合并单元格 
+        const colspan = `${mc?.cs || 1}`;
+        const rowspan = `${mc?.rs || 1}`;
+        if (colspan > 1) {
+          for (let i = 1; i < colspan; i++) {
+            if (!this.tableHtml[r]) this.tableHtml[r] = [];
+            if (!this.tableHtml[r][c + i]) this.tableHtml[r][c + i] = {};
+            this.tableHtml[r][c + i] = { ...this.tableHtml[r][c + i], rowspan: 0 }
+          }
+        }
+        if (rowspan > 0) {
+          for (let i = 1; i < rowspan; i++) {
+            if (!this.tableHtml[r + i]) this.tableHtml[r + i] = [];
+            if (!this.tableHtml[r + i][c]) this.tableHtml[r + i][c] = {};
+            this.tableHtml[r + i][c] = { ...this.tableHtml[r + i][c], rowspan: 0 }
+          }
+        }
+        //td 内部div样式
+        let widthHeight = `width:${width * colspan}px;height:${height * rowspan}px;`;//宽高
+        widthHeight += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;`;//超出文字省略
+        this.tableHtml[r][c] = { style, colspan, rowspan, widthHeight, value: v };
       })
-      console.log(result);
-      //行
-      result.forEach((item, rowIndex) => {
-        this.htm += "<tr>";
-        this.tdIndex = 0;
-        // 列
-        item.forEach((tdItem, columnIndex) => {
-          // console.log(tdItem);
-          const { c, r } = tdItem;
-          const { v, bg, bl, fc, ht, vt, mc, fs } = tdItem.v; //获取样式
-          const { columnlen, rowlen, borderInfo } = config;//边框
-          let style = "";
-          //   宽高
-          let width = 75;
-          let height = 18;
-          if (columnlen && columnlen[this.tdIndex]) width = columnlen[this.tdIndex];
-          if (rowlen && rowlen[rowIndex]) height = rowlen[rowIndex];
-
-          //边框
-          let border = this.getBorderInfo(borderInfo, r, c);
-
-
-          //   //冻结
-          //   let frozenTd = "static";
-          //   //首行冻结
-          //   if (frozen.type === "row" && rowIndex === 0) {
-          //     frozenTd = "fixed;"
-          //   }
-
-          // td 样式
-          if (bg) style += `background:${bg};`;//背景颜色
-          if (bl) style += `font-weight:${bl == 1 ? 'bold' : 'normal'};`; //字体粗细
-          if (fc) style += `color:${fc};`;//字体颜色
-          if (ht) style += `text-align:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
-          if (vt) style += `verticle-align:middle;`;//垂直居中
-          if (fs) style += `font-size:${fs}px;`;//文字大小
-          if (border) style += `border:${border};`;//边框
-
-          //td 内部div样式
-          let widthHeight = `width:${width}px;height:${height}px;`;//宽高
-          widthHeight += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;`;//超出文字省略
-          //   style += `position:${frozenTd};`;//冻结
-          //合并单元格 colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}"
-
-
-          //空单元格 当前列小于c 前面有空cell
-          this.appendNullTd(this.tdIndex, c, borderInfo, r);
-
-
-          //宽度不生效解决方案：内部添加div，并设定宽高
-          this.htm += `<td style="${style}"><div style="${widthHeight}" title="${v}">${v}</div></td>`
-
-          //空单元格 当前列小于maxColumns 后面有空cell
-          if (columnIndex + 1 === item.length) {
-            this.appendNullTd(c + 1, maxColumns, borderInfo, r);//当前列的后一列开始计算
-            this.htm += `</tr>`
-          };
-          ++this.tdIndex;
-        })
-      })
-
-      document.getElementById(tableid).innerHTML = this.htm;
+      console.log(this.tableHtml);
     },
     //获取查询参数 并获得参数类型及是否必填
     getParamsList (setParam, setParam_parse) {
@@ -270,17 +249,6 @@ export default {
       })
       return border;
     },
-    // 左右两边空td渲染
-    appendNullTd (c, maxColumns, borderInfo, r) {
-      for (let i = c; i < maxColumns; i++) {
-        this.tdIndex++;
-        console.log(r, i);
-        const border = this.getBorderInfo(borderInfo, r, i);
-        const widthHeight = `width:75px;height:18px;`;//宽高
-        this.htm += `<td  style="border:${border}"><div style="${widthHeight}"></div></td>`
-      }
-    },
-
     // Excel导出
     async download () {
       exportReq(this.params).then((res) => {
@@ -318,7 +286,6 @@ export default {
     // 自动改变表格高度
     autoSize () {
       this.params.height = document.body.clientHeight - 120;
-      console.log("this.params.height", this.params.height);
     },
     // 选择第几页
     pageChange (index) {
@@ -346,31 +313,10 @@ export default {
       //   window.jQuery.noConflict();
     })
   },
-  // 销毁luckysheet
-  // window.luckysheet.destroy();
 }
 </script>
- <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
 <style>
 @import "../../../assets/table.less";
-.luckysheet-input-box {
-  z-index: 1000;
-}
-
-#luckysheet-pivotTableFilter-byvalue-select .ListBox {
-  min-height: 150px !important;
-}
-.luckysheet-modal-controll-btn {
-  height: 20px;
-  width: 20px;
-  padding: 0;
-  text-align: center;
-  font-size: 0.01rem !important;
-}
-.ivu-modal-mask,
-.ivu-modal-wrap {
-  z-index: 910 !important;
-}
 .excel-preview .card-style {
   padding: 1rem;
 }
@@ -401,22 +347,10 @@ export default {
 /deep/.ivu-collapse-simple {
   border-top: none;
 }
-/deep/.luckysheet-stat-area {
-  background: transparent;
-}
-/deep/.luckysheet {
-  border-top: none;
-}
-/deep/.luckysheet-share-logo {
-  display: none;
-}
 .tableModal {
   /deep/ .ivu-modal {
     width: 600px !important;
   }
-}
-/deep/ #luckysheet-row-count-show {
-  width: 1.2rem !important;
 }
 .excel-page {
   //   width: 98%;

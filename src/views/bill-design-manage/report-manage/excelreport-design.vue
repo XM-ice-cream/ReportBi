@@ -379,7 +379,6 @@ export default {
     //设定RightForm
     setRightForm (cell, postion, sheetFile, ctx, value) {
       const { r, c } = postion;
-      console.log("cell", cell);
       //单元格属性扩展
       let { expend, expendSort, leftParent, topParent, leftParentValue, topParentValue } = cell?.cellAttribute?.expend || {};
       //设定父子格值
@@ -416,7 +415,6 @@ export default {
           showTypeValue: showTypeValue || "ordinary"
         }
       }
-      console.log("value", this.rightForm);
       if (value) window.luckysheet.setCellValue(r, c, { ...this.rightForm });
     },
 
@@ -428,7 +426,6 @@ export default {
     },
     //更新单元格信息，扩展、排序...
     autoChangeFunc (right) {
-      console.log(right);
       luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...right, });
     },
     //查看所有数据集
@@ -644,7 +641,6 @@ export default {
         //扩展方向为纵向，即为左父格(有值且为变量)
         if (expend === "portrait" && v && v.indexOf("#") !== -1) {
           leftParentValue = { label: `${r},${i}`, value: `${r},${i}` };
-          console.log(leftParentValue, luckysheet.getCellValue(r, i, { type: 'v' }));
           break;
         }
       }
