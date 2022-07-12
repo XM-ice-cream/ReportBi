@@ -65,7 +65,7 @@
           <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
           <!-- 请求路径 -->
           <FormItem label="连接串" prop="sourceConnect">
-            <Input v-model.trim="submitData.sourceConnect" :placeholder="$t('pleaseEnter') + '连接串'" />
+            <Input type="password" v-model.trim="submitData.sourceConnect" :placeholder="$t('pleaseEnter') + '连接串'" />
           </FormItem>
           </Col>
         </Row>
