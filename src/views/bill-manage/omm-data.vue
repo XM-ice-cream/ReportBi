@@ -33,6 +33,18 @@
                     <FormItem :label="$t('category')" prop="category">
                       <Input v-model.trim="req.category" :placeholder="$t('pleaseEnter') + $t('category')" />
                     </FormItem>
+                    <!-- 参数2 -->
+                    <FormItem label="参数2" prop="opt2">
+                      <Input v-model.trim="req.opt2" :placeholder="$t('pleaseEnter') + '参数2'" />
+                    </FormItem>
+                    <!-- 参数3 -->
+                    <FormItem label="参数3" prop="opt3">
+                      <Input v-model.trim="req.opt3" :placeholder="$t('pleaseEnter') + '参数3'" />
+                    </FormItem>
+                    <!-- 参数4 -->
+                    <FormItem label="参数4" prop="opt4">
+                      <Input v-model.trim="req.opt4" :placeholder="$t('pleaseEnter') + '参数4'" />
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -72,6 +84,9 @@ export default {
         endTime: "",
         stationType: "",
         category: "",
+        opt2: "",
+        opt3: "",
+        opt4: "",
         ...this.$config.pageConfig,
       }, //查询数据
       stationList: [],
@@ -87,6 +102,9 @@ export default {
         },
         { title: "站点", key: "station", align: "center", tooltip: true },
         { title: "类别", key: "category", align: "center", tooltip: true },
+        { title: "参数2", key: "opt2", align: "center", tooltip: true },
+        { title: "参数3", key: "opt3", align: "center", tooltip: true },
+        { title: "参数4", key: "opt4", align: "center", tooltip: true },
         { title: "设备ID", key: "eqpid", align: "center", tooltip: true },
         { title: "Barcode", key: "barcode", align: "center", width: 150, tooltip: true },
         { title: "编号", key: "faicode", align: "center", tooltip: true },
@@ -122,7 +140,7 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, stationType, category } = this.req;
+      let { startTime, endTime, stationType, category, opt2, opt3, opt4 } = this.req;
       if (stationType) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -137,6 +155,9 @@ export default {
                 endTime: formatDate(endTime),
                 stationType,
                 category,
+                opt2,
+                opt3,
+                opt4,
               },
             };
             getpagelistReq(obj)
@@ -158,13 +179,16 @@ export default {
     },
     // 导出
     exportClick () {
-      let { startTime, endTime, stationType, category } = this.req;
+      let { startTime, endTime, stationType, category, opt2, opt3, opt4 } = this.req;
       if (stationType) {
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
           stationType,
           category,
+          opt2,
+          opt3,
+          opt4,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });

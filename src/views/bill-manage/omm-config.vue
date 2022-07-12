@@ -52,6 +52,26 @@
         <FormItem label="上公差" prop="specLimitUpper">
           <Input v-model="submitData.specLimitUpper" :placeholder="$t('pleaseEnter') + '上公差'" />
         </FormItem>
+        <!-- 参数1 -->
+        <FormItem label="参数1" prop="opt1">
+          <Input v-model="submitData.opt1" :placeholder="$t('pleaseEnter') + '参数1'" />
+        </FormItem>
+        <!-- 参数2 -->
+        <FormItem label="参数2" prop="opt2">
+          <Input v-model="submitData.opt2" :placeholder="$t('pleaseEnter') + '参数2'" />
+        </FormItem>
+        <!-- 参数3 -->
+        <FormItem label="参数3" prop="opt3">
+          <Input v-model="submitData.opt3" :placeholder="$t('pleaseEnter') + '参数3'" />
+        </FormItem>
+        <!-- 参数4 -->
+        <FormItem label="参数4" prop="opt4">
+          <Input v-model="submitData.opt4" :placeholder="$t('pleaseEnter') + '参数4'" />
+        </FormItem>
+        <!-- 参数5 -->
+        <FormItem label="参数5" prop="opt5">
+          <Input v-model="submitData.opt5" :placeholder="$t('pleaseEnter') + '参数5'" />
+        </FormItem>
         <!-- 备注 -->
         <FormItem label="备注" prop="remark">
           <Input v-model="submitData.remark" :placeholder="$t('pleaseEnter') + '备注'" />
@@ -127,6 +147,26 @@
                         <Option value="1">是</Option>
                       </Select>
                     </FormItem>
+                    <!-- 参数1 -->
+                    <FormItem label="参数1" prop="opt1">
+                      <Input v-model.trim="req.opt1" :placeholder="$t('pleaseEnter') + '参数1'" />
+                    </FormItem>
+                    <!-- 参数2 -->
+                    <FormItem label="参数2" prop="opt2">
+                      <Input v-model.trim="req.opt2" :placeholder="$t('pleaseEnter') + '参数2'" />
+                    </FormItem>
+                    <!-- 参数3 -->
+                    <FormItem label="参数3" prop="opt3">
+                      <Input v-model.trim="req.opt3" :placeholder="$t('pleaseEnter') + '参数3'" />
+                    </FormItem>
+                    <!-- 参数4 -->
+                    <FormItem label="参数4" prop="opt4">
+                      <Input v-model.trim="req.opt4" :placeholder="$t('pleaseEnter') + '参数4'" />
+                    </FormItem>
+                    <!-- 参数5 -->
+                    <FormItem label="参数5" prop="opt5">
+                      <Input v-model.trim="req.opt5" :placeholder="$t('pleaseEnter') + '参数5'" />
+                    </FormItem>
                     <div class="poptip-style-button">
                       <Button @click="resetClick">{{ $t("reset") }}</Button>
                       <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
@@ -201,6 +241,11 @@ export default {
         { title: "下公差", key: "specLimitLower", align: "center", width: 100, tooltip: true  },
         { title: "标准值", key: "specLimitTarget", align: "center", width: 100, tooltip: true  },
         { title: "上公差", key: "specLimitUpper", align: "center", width: 100, tooltip: true  },
+        { title: "参数1", key: "opt1", align: "center", width: 100, tooltip: true },
+        { title: "参数2", key: "opt2", align: "center", width: 100, tooltip: true },
+        { title: "参数3", key: "opt3", align: "center", width: 100, tooltip: true },
+        { title: "参数4", key: "opt4", align: "center", width: 100, tooltip: true },
+        { title: "参数5", key: "opt5", align: "center", width: 100, tooltip: true },
         { title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true  },
         { title: this.$t("enabled"), key: "enabled", align: "center", width: 70, render: renderIsEnabled },
         { title: this.$t("createUser"), key: "createUserName", align: "center", width: 80 },
@@ -215,6 +260,11 @@ export default {
         name: "",
         channelType: "",
         channelParamter: "",
+        opt1: "",
+        opt2: "",
+        opt3: "",
+        opt4: "",
+        opt5: "",
         ...this.$config.pageConfig,
       },
       submitData: {
@@ -226,6 +276,11 @@ export default {
         specLimitLower: "", //下公差（必填）
         specLimitTarget: "", //目标值（必填）
         specLimitUpper: "", //上公差（必填）
+        opt1: "",
+        opt2: "",
+        opt3: "",
+        opt4: "",
+        opt5: "",
         remark: "", //备注（非必填）
         enabled: 1, //是否有效
       },
@@ -296,13 +351,13 @@ export default {
     // 获取分页列表数据
     pageLoad() {
       this.tableConfig.loading = true;
-      let { pageIndex, pageSize, ascending, orderField, station, name, channelType, channelParamter } = this.req;
+      let { pageIndex, pageSize, ascending, orderField, station, name, channelType, channelParamter, opt1, opt2, opt3, opt4, opt5 } = this.req;
       const obj = {
         orderField, // 排序字段
         ascending, // 是否升序
         pageSize, // 分页大小
         pageIndex, // 当前页码
-        data: { station, name, channelType, channelParamter, enabled: -1 },
+        data: { station, name, channelType, channelParamter, opt1, opt2, opt3, opt4, opt5, enabled: -1 },
         isFuzzyKey: [],
       };
       getpagelistReq(obj)
