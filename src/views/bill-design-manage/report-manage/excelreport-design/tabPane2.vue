@@ -26,7 +26,7 @@
     <!-- 自定义 -->
     <pane-2-user-defined ref="userDefined" :formData="rightForm" />
     <!-- 过滤数据 -->
-    <pane-2-filter-data ref="filterData" :formData="rightForm" />
+    <pane-2-filter-data ref="filterData" :formData="rightForm" @autoChangeFunc="autoChangeFunc"/>
   </Tabs>
 
 </template>
@@ -81,7 +81,9 @@ export default {
     }
   },
   methods: {
-    autoChangeFunc () {
+    autoChangeFunc (val) {
+        console.log(val);
+       this.rightForm = {...this.rightForm,...val}
       const { showType } = this.rightForm;
       if (showType !== "group") this.rightForm.showTypeValue = "";
       this.$emit("autoChangeFunc", 'cell', this.rightForm);

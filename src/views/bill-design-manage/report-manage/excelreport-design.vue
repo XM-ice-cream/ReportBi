@@ -386,7 +386,7 @@ export default {
       if (topParent === "default") topParentValue = this.getParentValue(r, c)?.topParentValue || "";
 
       //单元格元素数据设置
-      let { showType, showTypeValue } = cell?.cell || {};
+      let { showType, showTypeValue,filterData,isFather } = cell?.cell || {};
 
       this.rightForm = {
         ...this.rightForm,
@@ -411,8 +411,10 @@ export default {
         },
         // 单元格元素
         cell: {
-          showType: showType || "group",
-          showTypeValue: showTypeValue || "ordinary"
+            showType: showType || "group",
+            showTypeValue: showTypeValue || "ordinary",
+            filterData:filterData||"",
+            isFather:isFather||true
         }
       }
       if (value) window.luckysheet.setCellValue(r, c, { ...this.rightForm });
@@ -464,7 +466,6 @@ export default {
       return await getDeatilByIdReq(obj).then((res) => {
         if (res.code === 200) {
           const data = res.result;
-          //console.log("this.dataSet", data);
           return data;
         }
       });
@@ -513,7 +514,7 @@ export default {
     //设定传参
     setReportExcelDto () {
       let jsonData = luckysheet.getAllSheets();
-      console.log(jsonData, this.rightForm);
+      console.log("jsonData",jsonData);
       //   return;
       let setCodeList = [];
       let setParams = {};
@@ -581,27 +582,28 @@ export default {
       jsonData.forEach((item, itemIndex) => {
         jsonData[itemIndex].relationList.forEach((relation, relationIndex) => {
           const { start, end } = relation;
-          const minRow = start.split(',')[0];
-          const minColumn = start.split(',')[1];
-          const maxRow = end.split(',')[0];
-          const maxColumn = end.split(',')[1];
+          const minRow = Number(start.split(',')[0]);
+          const minColumn = Number(start.split(',')[1]);
+          const maxRow = Number( end.split(',')[0]);
+          const maxColumn =  Number(end.split(',')[1]);
           jsonData[itemIndex].relationList.forEach((rela, relaIndex) => {
             //索引相同说明值相同，不进行比较
-            if (relationIndex !== relaIndex) {
+            // if (relationIndex !== relaIndex) {
               const { start: startRela, end: endRela } = rela;
               const startCell = startRela.split(',');
               const endCell = endRela.split(',');
               //   最小行B在最小行A与最大行A直接  || 最大行B在最小行A与最大行A直接
-              const isRow = (minRow >= startCell[0] && minRow <= endCell[0]) || (maxRow >= startCell[0] && maxRow <= endCell[0]);
+              const isRow = (minRow >=  Number(startCell[0]) && minRow <=  Number(endCell[0])) || (maxRow >=  Number(startCell[0]) && maxRow <=  Number(endCell[0]));
               // 最小列B在最小列A与最大列A之间 || 最大列B在最小列A与最大列A之间
-              const isColumn = (minColumn >= startCell[1] && minColumn <= endCell[1]) || (maxColumn >= startCell[1] && maxColumn <= endCell[1]);
+              const isColumn = (minColumn >=  Number(startCell[1]) && minColumn <=  Number(endCell[1])) || (maxColumn >= Number( startCell[1]) && maxColumn <= Number( endCell[1]));
               //以上条件为TRUE ，则为一个数据块
               if (isRow && isColumn) {
                 jsonData[itemIndex].relationList[relationIndex] = this.compareValue(jsonData[itemIndex].relationList[relationIndex], startRela);
                 jsonData[itemIndex].relationList[relationIndex] = this.compareValue(jsonData[itemIndex].relationList[relationIndex], endRela);
-                delete jsonData[itemIndex].relationList[relaIndex];//删除已经计算过的父子格区间
+               
+               if (relationIndex !== relaIndex) delete jsonData[itemIndex].relationList[relaIndex];//删除已经计算过的父子格区间
               }
-            }
+            // }
 
           })
         })

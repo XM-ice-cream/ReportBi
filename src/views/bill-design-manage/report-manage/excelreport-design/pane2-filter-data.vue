@@ -2,7 +2,7 @@
 <template>
   <div class="pane2-filter-data">
     <!-- 左侧抽屉 -->
-    <Drawer v-model="drawerFlag" title="过滤数据" width="750" :mask-closable="false" @on-close="cancelClick">
+    <Drawer v-model="drawerFlag" :title="drawerTitle" width="750" :mask-closable="false" @on-close="cancelClick">
       <Form ref="submitReq" :model="rightForm" :label-width="110" :label-colon="true" @submit.native.prevent>
         <!-- 自定义分组类型：条件，公式分组 -->
         <FormItem label="父格条件" prop="isFather">
@@ -55,11 +55,7 @@
             <Button type="success" class="row-button" @click="addRow(index)">
               <Icon type="md-add" />
             </Button>
-            &nbsp;
-            <Button type="error" ghost class="row-button" @click="deleteRow(index)">
-              <Icon type="md-close" />
-            </Button>
-          </template>
+           </template>
         </Table>
         <!-- 添加括号/去除括号 -->
         <FormItem class="addbtn">
@@ -70,8 +66,17 @@
             去除括号
           </Button>
         </FormItem>
-
-        <Tree :data="data" show-checkbox multiple @on-check-change='checkChange' check-strictly></Tree>
+         <!-- 树状图 -->
+        <Tree :data="data" show-checkbox multiple @on-check-change='checkChange' check-strictly @on-contextmenu="handleContextMenu">
+            <template #contextMenu>
+               <DropdownItem @click.native="handleContextMenuDelete" style="color: #ed4014">删除</DropdownItem>
+            </template>
+        </Tree>
+        
+        <!-- 按钮 -->
+        <FormItem>
+          <drawer-button :text="drawerTitle" class="tree" @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
+        </FormItem>
 
       </Form>
     </Drawer>
@@ -79,7 +84,6 @@
 </template>
 
 <script>
-import { resolveComponent } from 'vue'
 export default {
   name: "pane2-filter-data",
   components: {},
@@ -106,8 +110,10 @@ export default {
       rightForm: {},
       tableConfig: { ...this.$config.tableConfig }, // table配置
       drawerFlag: false,
+      drawerTitle:"过滤数据",
       data: [],//树状图
       checkList: [],//树状图选中
+      contextData:[],
       columns: [
         { title: "可选列", slot: "selectItem", minWidth: 100, align: "center" },
         { title: "操作符", slot: "operator", minWidth: 100, align: "center" },
@@ -165,6 +171,14 @@ export default {
   },
   mounted () { },
   methods: {
+    //更新数据
+    submitClick(){
+        this.rightForm.filterData = "";
+        this.data.forEach(item=>{
+            this.rightForm.filterData+=`${item.title} `;
+        })
+       this.$emit("autoChangeFunc", this.rightForm);
+    },
     // 新增
     getColumnsList () {
       this.columns = []
@@ -213,25 +227,45 @@ export default {
       )
     },
     // 新增下一列
-    addRow () {
+    async addRow () {
       const { selectItem, operator, content, relation } = this.tableData[0];
 
-      this.data.push({ title: `${relation} ( ${selectItem}) ${operator} ${content}` });
+      const curContent = `( ${selectItem} ) ${operator} ${content}`;
 
-      this.data[0].title =  this.data[0].title.replace(/and|or/g," ");
-       
-      this.tableData[0] = { selectItem: "", operator: "=", type: "string", content: "", relation: "and" };
-      this.tableData = JSON.parse(JSON.stringify(this.tableData));
+      // 是否存在值
+      const isExit =await this.getValue(this.data,curContent);
+      if(isExit) {
+          this.$Message.error("数据已存在！！");
+          return;
+      }
+      //添加值 第一笔不显示and/or
+      const obj =this.data.length>0? { title: `${relation}${curContent}`, contextmenu: true } :{title: `${curContent}`, contextmenu: true};
+      this.data.push(obj);;
+      console.log(this.data);
+    },
+    //递归判断值是否存在
+    getValue(data,e){
+       return data.some((item)=>{
+            const title = item.title.replace(/^and|^or/g,"");
+             if(title === e){
+                 return true;
+             }else if(item.children){
+                 this.getValue(item.children,e)
+             }
+        })
+
     },
     //括号的添加
     async bracketAdd () {
       let callback = ({ data, index }) => {
-        let title = 'and ('
+        let title = "";
         this.checkList.map((item, index) => {
           item.checked = false
           if (index == 0) {
+            const reg = /^and|^or/g;
+            title = `${item.title.match(reg)||""} (`;
             let index = item.title.indexOf("(");
-            item.title = item.title.replace(/and|or/g," ");
+            item.title = item.title.replace(reg,"");
             title += item.title.substring(
               item.title.indexOf("(", index)
             )
@@ -240,7 +274,7 @@ export default {
           }
         })
         title += ' )';
-        let obj = { title, expand: true, children: this.checkList, checked: false ,disableCheckbox:false};
+        let obj = { title, expand: true, children: this.checkList, checked: false ,disableCheckbox:false, contextmenu: true};
         data[index] = { ...data[index], ...obj };
       };
       let callback1 = ({ data, index }) => {
@@ -266,7 +300,8 @@ export default {
             this.checkList.map((item,iIndex) => {
              item?.children?.forEach((cItem,cIndex)=>{ 
                  if(cIndex==0){
-                     data[index+cIndex] = {...cItem,checked : false,disableCheckbox:false,title:`and ${cItem.title}`};
+                     const reg = /^and|^or/g;
+                     data[index+cIndex] = {...cItem,checked : false,disableCheckbox:false,title:`${item.title.match(reg)} ${cItem.title}`};
                  }else{
                     data.splice(index+cIndex,0,{...cItem,checked : false,disableCheckbox:false})
                  }                
@@ -287,7 +322,7 @@ export default {
     //递归获取操作的数据后执行 callback 操作
     getActionData (data, e, callback) {
       data.some((item, index) => {
-        console.log(item);
+        if(item. nodeKey==0){ item.title = item.title.replace(/^and|^or/g,"") }
         if (item?.title === e?.title) {
           callback({ data, item, index });
           return true;
@@ -296,63 +331,21 @@ export default {
         }
       });
     },
+    // 树节点 checkBox
     checkChange (row) {
       this.checkList = row.map(item=>{return {...item,disableCheckbox:true}})
     },
-    renderContent (h, { root, node, data }) {
-      return h('span', {
-        style: {
-          display: 'inline-block',
-          width: '100%'
-        }
-      }, [
-        h('span', data.title),
-        h('span', {
-          style: {
-            display: 'inline-block',
-            float: 'right',
-            marginLeft: '30px'
-          }
-        }, [
-          h(resolveComponent('Button'), {
-            ...this.buttonProps,
-            icon: 'ios-add',
-            style: {
-              marginRight: '8px'
-            },
-            onClick: () => { this.append(data) }
-          }),
-          h(resolveComponent('Button'), {
-            ...this.buttonProps,
-            icon: 'ios-remove',
-            onClick: () => { this.remove(root, node, data) }
-          })
-        ])
-      ]);
+    // 树状图 当前节点点击右键时触发
+     handleContextMenu (data) {
+        this.contextData = data;
     },
-    append (data) {
-      const children = data.children || [];
-      children.push({
-        title: 'appended node',
-        expand: true
-      });
-      data.children = children
-    },
-    remove (root, node, data) {
-      console.log(root, node, data, !node);
-      const parentKey = root.find(el => el === node).parent;
-      const parent = root.find(el => el.nodeKey === parentKey)?.node;
-      const index = parent?.children.indexOf(data);
-      if (!index) {
-        this.data.splice(data.nodeKey, 1);
-        return;
-      }
-      parent.children.splice(index, 1);
+    // 树状图删除
+    handleContextMenuDelete () {
+      this.data.splice( this.contextData.nodeKey, 1);
     },
     // 自动改变表格高度
     autoSize () {
-      this.tableConfig.height = document.body.clientHeight - 200;
-      console.log(this.tableConfig.height);
+      this.tableConfig.height = 100;
     },
     // 左侧抽屉取消
     cancelClick () {
@@ -364,10 +357,9 @@ export default {
 };
 </script>
 <style>
-.timeline .ivu-timeline-item-head {
-  background-color: #fff0;
-  font-size: 1rem;
-}
+
+
+
 </style>
 <style scoped lang="less">
 /deep/.ivu-form-item .row-button {
@@ -381,12 +373,12 @@ export default {
 /deep/.ivu-table-wrapper {
   margin-bottom: 1rem;
 }
-.timeline {
-  min-height: 27rem;
-  max-height: 10rem;
-  padding: 1rem;
-  background: #27ce882e;
-  border-radius: 1rem;
-  overflow: auto;
+/deep/.ivu-tree {
+    height: 500px;
+    background:#e6fbf2;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 3rem;
+    overflow: auto;
 }
 </style>

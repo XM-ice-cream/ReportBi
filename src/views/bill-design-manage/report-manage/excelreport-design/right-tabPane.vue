@@ -62,7 +62,7 @@ export default {
     },
     autoChangeFunc (type, rightForm) {
       this.rightForm[type] = { ...rightForm };
-      console.log(rightForm, type, this.rightForm);
+      console.log("rightForm",rightForm, type, this.rightForm);
       this.$emit("autoChangeFunc", this.rightForm);
     }
   }
