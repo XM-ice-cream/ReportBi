@@ -109,7 +109,7 @@ export default {
         curprocessname: "",
         cartonno: "",
         currentstatus: "",
-        isHistory: false,
+        isHistory: true,
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
