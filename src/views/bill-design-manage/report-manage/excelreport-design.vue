@@ -537,6 +537,7 @@ export default {
       jsonData.forEach((item, itemIndex) => {
         const { celldata } = item;
         jsonData[itemIndex].relationList = [];
+        jsonData[itemIndex].data = [];
         for (let i = celldata.length - 1; i >= 0; i--) {
           //说明为静态数据，不判断父子格
           const v = jsonData[itemIndex].celldata[i].v;

@@ -18,18 +18,24 @@
           <!-- 分组为高级 -->
           <div v-if="rightForm.showTypeValue==='high'" class="showtypebtn" @click="userDefinedClick">自定义</div>
         </FormItem>
+        <FormItem label="过滤条件">
+          <Button long @click="filterClick">编辑</Button>
+        </FormItem>
       </Form>
     </TabPane>
     <!-- 自定义 -->
     <pane-2-user-defined ref="userDefined" :formData="rightForm" />
+    <!-- 过滤数据 -->
+    <pane-2-filter-data ref="filterData" :formData="rightForm" />
   </Tabs>
 
 </template>
 <script>
+import Pane2FilterData from './pane2-filter-data.vue';
 import pane2UserDefined from './pane2-user-defined.vue';
 
 export default {
-  components: { pane2UserDefined },
+  components: { pane2UserDefined, Pane2FilterData },
   name: "tabPane2",
   props: {
     formData: {
@@ -85,6 +91,10 @@ export default {
       console.log(this.$refs.userDefined);
       this.$refs.userDefined.drawerFlag = true;
     },
+    //过滤数据
+    filterClick () {
+      this.$refs.filterData.drawerFlag = true;
+    }
   }
 }
 </script>

@@ -51,14 +51,14 @@
           <!-- <table class='table tableScroll' id="excelpreview" :style="{height:params.height+'px'}">
           </table> -->
           <table class='table tableScroll' id='exceltable'>
-            <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr">
+            <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr" style="height:18px">
               <template v-for="(item,index) in itemTr">
-                <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan" :rowspan="item.rowspan" :key="index">
-                  <div :title="item.value" :style="item.widthHeight">
+                <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan||1" :rowspan="item.rowspan||1" :key="index">
+                  <div :title="item.value" :style="item.divStyle">
                     {{item.value}}
                   </div>
                 </td>
-                <td v-if="!item" :key="index"></td>
+                <td v-if="!item" :key="index" style="width:75px;height:18px"></td>
               </template>
 
             </tr>
@@ -137,7 +137,6 @@ export default {
       this.loading = true;
       await getExcelPreviewReq(this.params).then(res => {
         if (res.code === 200) {
-          this.loading = false;
           let { jsonStr, setParam } = res.result;
           this.jsonStr = JSON.parse(jsonStr);
           // 查询参数
@@ -151,10 +150,9 @@ export default {
           this.getTable(this.jsonStr);
         } else {
           this.$Message.error(res.message);
-          this.loading = false;
         }
         this.searchPoptipModal = false;
-      })
+      }).finally(() => (this.loading = false))
 
     },
     //获取表格
@@ -164,11 +162,13 @@ export default {
         return;
       }
       //   this.htm = "<table class='table tableScroll' id='exceltable'>";
-      const { celldata, config, frozen } = data[0];
+      let { celldata, config, frozen } = data[0];
       console.log(data);
+      this.tableHtml = [];
       // 处理表格单元格样式
       celldata.forEach(item => {
         const { r, c } = item;
+
         if (!this.tableHtml[r]) this.tableHtml[r] = [];
         if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
 
@@ -184,8 +184,6 @@ export default {
         if (bg) style += `background:${bg};`;//背景颜色
         if (bl) style += `font-weight:${bl == 1 ? 'bold' : 'normal'};`; //字体粗细
         if (fc) style += `color:${fc};`;//字体颜色
-        if (ht) style += `text-align:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
-        if (vt) style += `verticle-align:middle;`;//垂直居中
         if (fs) style += `font-size:${fs}px;`;//文字大小
         if (border) style += `border:${border};`;//边框
         //合并单元格 
@@ -206,9 +204,11 @@ export default {
           }
         }
         //td 内部div样式
-        let widthHeight = `width:${width * colspan}px;height:${height * rowspan}px;`;//宽高
-        widthHeight += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;`;//超出文字省略
-        this.tableHtml[r][c] = { style, colspan, rowspan, widthHeight, value: v };
+        let divStyle = `width:${width * colspan}px;height:${height * rowspan}px;`;//宽高
+        divStyle += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;`;//超出文字省略
+        if (ht) divStyle += `justify-content:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
+        if (vt) divStyle += `align-items:${vt == 0 ? 'center' : (vt == 2 ? 'right' : 'left')};;`;//垂直居中
+        this.tableHtml[r][c] = { style, colspan, rowspan, divStyle, value: v };
       })
       console.log(this.tableHtml);
     },
