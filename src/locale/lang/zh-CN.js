@@ -1947,6 +1947,8 @@ export default {
     'quality-yield-lake-report': 'K01&K10 Yield Report',
     'PreBack': 'PreBack报表',
     'workorder-wip-report': '工单WIP报表',
+    'sip-boxno-check': 'SIP 包装核验',
+    'maverick-faca': 'MaverickFaca',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
