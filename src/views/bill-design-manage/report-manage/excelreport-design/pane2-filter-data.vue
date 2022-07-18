@@ -172,11 +172,12 @@ export default {
   mounted () { },
   methods: {
     //更新数据
-    submitClick(){
+    submitClick(flag){
         this.rightForm.filterData = "";
         this.data.forEach(item=>{
             this.rightForm.filterData+=`${item.title} `;
         })
+        if(flag) this.cancelClick();
        this.$emit("autoChangeFunc", this.rightForm);
     },
     // 新增
@@ -336,7 +337,7 @@ export default {
       this.checkList = row.map(item=>{return {...item,disableCheckbox:true}})
     },
     // 树状图 当前节点点击右键时触发
-     handleContextMenu (data) {
+    handleContextMenu (data) {
         this.contextData = data;
     },
     // 树状图删除

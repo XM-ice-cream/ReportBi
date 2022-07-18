@@ -82,7 +82,6 @@ export default {
   },
   methods: {
     autoChangeFunc (val) {
-        console.log(val);
        this.rightForm = {...this.rightForm,...val}
       const { showType } = this.rightForm;
       if (showType !== "group") this.rightForm.showTypeValue = "";
@@ -90,7 +89,6 @@ export default {
     },
     //自定义按钮设定
     userDefinedClick () {
-      console.log(this.$refs.userDefined);
       this.$refs.userDefined.drawerFlag = true;
     },
     //过滤数据
