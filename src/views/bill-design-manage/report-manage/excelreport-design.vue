@@ -414,7 +414,8 @@ export default {
             showType: showType || "group",
             showTypeValue: showTypeValue || "ordinary",
             filterData:filterData||"",
-            isFather:isFather||true
+            isFather:isFather||true,
+            label: value,
         }
       }
       if (value) window.luckysheet.setCellValue(r, c, { ...this.rightForm });

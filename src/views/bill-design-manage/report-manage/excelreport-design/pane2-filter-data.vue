@@ -18,8 +18,8 @@
         <Table :columns="columns" :data="tableData" :height="tableConfig.height" :border="tableConfig.border" disabled-hover>
           <!-- 可选列 -->
           <template slot-scope="{ index }" slot="selectItem">
-            <Select v-model="tableData[index].selectItem" size="small" transfer>
-              <Option v-for="item in selectList.selectItemList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            <Select v-model="tableData[index].selectItem" size="small" transfer filterable>
+              <Option v-for="item in selectList.selectItemList" :value="item" :key="item">{{ item }}</Option>
             </Select>
           </template>
           <!-- 操作符 -->
@@ -84,6 +84,8 @@
 </template>
 
 <script>
+import { getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
+
 export default {
   name: "pane2-filter-data",
   components: {},
@@ -94,20 +96,12 @@ export default {
     },
   },
   watch: {
-    formData: {
-      handler () {
-        console.log("this.formData", this.formData);
-        this.rightForm = { ...this.formData };
-      },
-      deep: true,
-      immediate: true
-    },
   },
   computed: {
   },
   data () {
     return {
-      rightForm: {},
+      rightForm: this.formData,
       tableConfig: { ...this.$config.tableConfig }, // table配置
       drawerFlag: false,
       drawerTitle:"过滤数据",
@@ -128,11 +122,7 @@ export default {
       ],
       selectList: {
         //可选列集合
-        selectItemList: [
-          { label: "苹果", value: "apple" },
-          { label: "梨", value: "pear" },
-          { label: "香蕉", value: "banana" }
-        ],
+        selectItemList: [],//选中数据集所以字段
         operatorList: [
           { label: "等于", value: "=" },
           { label: "不等于", value: "!=" },
@@ -160,7 +150,7 @@ export default {
     drawerFlag (newValue) {
       if (newValue) {
         if (this.drawerTitle) {
-          this.title = this.drawerTitle;
+          this.title = this.drawerTitle;          
           this.autoSize();
           window.addEventListener('resize', () => {
             this.autoSize();
@@ -179,30 +169,6 @@ export default {
         })
         if(flag) this.cancelClick();
        this.$emit("autoChangeFunc", this.rightForm);
-    },
-    // 新增
-    getColumnsList () {
-      this.columns = []
-      this.columns = this.data.map(val => ({
-        title: val.columnName,
-        key: val.columnName,
-        required: val.isRequired,
-      }))
-      this.columns.push({
-        title: this.$t("operation"), slot: "operation", width: 130, align: "center"
-      },
-        {
-          fixed: "left",
-          title: this.$t("sort"),
-          width: 50,
-          key: "sort",
-          align: "center",
-          render: (h, params) => {
-            return h("span", {
-            }, params.index + 1)
-          }
-        }
-      )
     },
     //编辑
     getEditColumnsList () {
@@ -234,6 +200,7 @@ export default {
       const curContent = `( ${selectItem} ) ${operator} ${content}`;
 
       // 是否存在值
+      console.log(this.getValue(this.data,curContent));
       const isExit =await this.getValue(this.data,curContent);
       if(isExit) {
           this.$Message.error("数据已存在！！");
@@ -248,6 +215,7 @@ export default {
     getValue(data,e){
        return data.some((item)=>{
             const title = item.title.replace(/^and|^or/g,"");
+            console.log(title);
              if(title === e){
                  return true;
              }else if(item.children){
@@ -302,8 +270,9 @@ export default {
              item?.children?.forEach((cItem,cIndex)=>{ 
                  if(cIndex==0){
                      const reg = /^and|^or/g;
-                     data[index+cIndex] = {...cItem,checked : false,disableCheckbox:false,title:`${item.title.match(reg)} ${cItem.title}`};
+                     data[index+cIndex] = {...cItem,checked : false,disableCheckbox:false,title:`${item.title.match(reg)||""} ${cItem.title}`};
                  }else{
+                     // 指定位置插入数据
                     data.splice(index+cIndex,0,{...cItem,checked : false,disableCheckbox:false})
                  }                
              })
@@ -344,6 +313,18 @@ export default {
     handleContextMenuDelete () {
       this.data.splice( this.contextData.nodeKey, 1);
     },
+     //获取全部数据集
+    async loadDataSet (val) {
+        console.log(val);
+        //label = #{WF_UNITINFOTRAVEL.unitid};
+      const label = val.replace(/#|{|}/g,"");
+      const setCode = label.split('.');
+      let obj = { setCode:setCode[0]};
+      const { code, result } = await getDeatilByIdReq(obj);
+      this.selectList.selectItemList = result.setParamList;
+      this.tableData[0].selectItem = setCode[1];
+      if (code != 200) return;
+    },
     // 自动改变表格高度
     autoSize () {
       this.tableConfig.height = 100;
@@ -351,7 +332,7 @@ export default {
     // 左侧抽屉取消
     cancelClick () {
       this.drawerFlag = false;
-      this.tableData = [{ selectItem: "apple", operator: "=", type: "string", content: "", relation: "add" }];
+      this.tableData = [{ selectItem: "apple", operator: "=", type: "string", content: "", relation: "and" }];
       this.data = [];
     },
   },

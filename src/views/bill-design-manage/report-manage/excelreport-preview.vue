@@ -48,8 +48,6 @@
         </div>
         <!-- 表格 -->
         <div class="data-table" :style="{height:(params.height+50)+'px'}">
-          <!-- <table class='table tableScroll' id="excelpreview" :style="{height:params.height+'px'}">
-          </table> -->
           <table class='table tableScroll' id='exceltable'>
             <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr" style="height:18px">
               <template v-for="(item,index) in itemTr">

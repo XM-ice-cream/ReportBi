@@ -18,7 +18,8 @@
           <!-- 分组为高级 -->
           <div v-if="rightForm.showTypeValue==='high'" class="showtypebtn" @click="userDefinedClick">自定义</div>
         </FormItem>
-        <FormItem label="过滤条件">
+        <!-- 常量不设定过滤值 -->
+        <FormItem label="过滤条件" v-if='rightForm.label&&rightForm.label.indexOf("#")>-1'>
           <Button long @click="filterClick">编辑</Button>
         </FormItem>
       </Form>
@@ -93,7 +94,8 @@ export default {
     },
     //过滤数据
     filterClick () {
-      this.$refs.filterData.drawerFlag = true;
+        this.$refs.filterData.drawerFlag = true;
+       this.$refs.filterData.loadDataSet(this.rightForm.label);     
     }
   }
 }
