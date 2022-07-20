@@ -322,8 +322,7 @@ export default {
           cellMousedown: function (cell, postion, sheetFile, ctx) {
             const value = cell == null ? "" : cell.v;
             that.setRightForm(cell, postion, sheetFile, ctx, value);//rightForm默认值
-          },
-
+          }
         },
         data: [
           {
@@ -378,10 +377,13 @@ export default {
 
     //设定RightForm
     setRightForm (cell, postion, sheetFile, ctx, value) {
+      console.log(cell, postion, sheetFile, ctx, value,luckysheet.getAllSheets());
+
       const { r, c } = postion;
       //单元格属性扩展
       let { expend, expendSort, leftParent, topParent, leftParentValue, topParentValue } = cell?.cellAttribute?.expend || {};
       //设定父子格值
+       
       if (leftParent === "default") leftParentValue = this.getParentValue(r, c)?.leftParentValue || "";
       if (topParent === "default") topParentValue = this.getParentValue(r, c)?.topParentValue || "";
 
@@ -418,7 +420,41 @@ export default {
             label: value,
         }
       }
-      if (value) window.luckysheet.setCellValue(r, c, { ...this.rightForm });
+      if (value) {
+          window.luckysheet.setCellValue(r, c, { ...this.rightForm });
+          this.imageExpendUpdate(this.rightForm.cellAttribute.expend.expend,r,c,"expend");
+        }
+    },
+    //更新扩展方向图片
+    imageExpendUpdate(expend,r,c){
+      // 删除添加过的图片
+      luckysheet.getAllSheets().forEach(item=>{
+          if(item.images) {
+            Object.keys(item.images).forEach(kItem=>{
+            const {rowIndex,colIndex,te} = item.images[kItem];
+            if(rowIndex===r&&colIndex===c&&te=="expend") {
+                luckysheet.deleteImage({order:0,idList:[kItem]});
+            } 
+           })
+          }
+         
+      })
+      const obj = {order:0,rowIndex:r,colIndex:c,type:"expend"};
+      luckysheet.insertImage(require(`@/assets/images/report-design/${expend}.png`),obj)
+    },
+      //更新父格方向图片
+    imageParentUpdate(expend,r,c){
+      // 删除添加过的图片
+      luckysheet.getAllSheets().forEach(item=>{
+            if(item.images) {
+                Object.keys(item.images).forEach(kItem=>{
+                const {rowIndex,colIndex,te} = item.images[kItem];
+                if(te=="parent") luckysheet.deleteImage({order:0,idList:[kItem]}); 
+            })
+          }//删除父格
+        })
+      const obj = {order:0,rowIndex:r,colIndex:c,type:"parent"};
+      luckysheet.insertImage(require(`@/assets/images/report-design/${expend}.png`),obj)
     },
 
     // 左侧列表拖拽
@@ -429,7 +465,9 @@ export default {
     },
     //更新单元格信息，扩展、排序...
     autoChangeFunc (right) {
-      luckysheet.setCellValue(this.rightForm.r, this.rightForm.c, { ...right, });
+      const {r,c,cellAttribute} = right;
+      luckysheet.setCellValue(r, c, { ...right, });
+      this.imageExpendUpdate(cellAttribute.expend.expend,r,c,"expend");
     },
     //查看所有数据集
     queryAllDataSet () {
@@ -645,6 +683,8 @@ export default {
         //扩展方向为纵向，即为左父格(有值且为变量)
         if (expend === "portrait" && v && v.indexOf("#") !== -1) {
           leftParentValue = { label: `${r},${i}`, value: `${r},${i}` };
+          // 添加图片父箭头
+           this.imageParentUpdate("leftParent",r,i,"parent");
           break;
         }
       }
@@ -655,6 +695,8 @@ export default {
         //扩展方向为横向，即为左父格(有值且为变量)
         if (expend === "cross" && v && v.indexOf("#") !== -1) {
           topParentValue = { label: `${i},${c}`, value: `${i},${c}` };
+            // 添加图片父箭头
+           this.imageParentUpdate("topParent",i,c,"parent");
           break;
         }
       }
