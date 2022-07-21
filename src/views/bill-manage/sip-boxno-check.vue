@@ -37,10 +37,15 @@
                     </FormItem>
                 </Col>
                 <Col span="24">
-                    <FormItem label='二维码' prop="inputBoxNo">
-                         <Input type="text" v-model="req.inputBoxNo" :disabled = "!isInputNo" ref="inputBoxNo" clearable size="default" placeholder="请刷入二维码" @on-enter="checkBoxNo"></Input>
+                    <FormItem label='内箱码' prop="inputBoxNo">
+                         <Input type="text" v-model="req.inputBoxNo" :disabled = "!isInputNo" ref="inputBoxNo" clearable size="default" placeholder="请刷入内箱码" @on-enter="checkBoxNo"></Input>
                     </FormItem>
                 </Col>
+                 <Col span="24">
+                    <FormItem label='外箱码' prop="inputCartonNo">
+                         <Input type="text" v-model="req.inputCartonNo" :disabled = "!isInputNo" ref="inputCartonNo" clearable size="default" placeholder="请刷入外箱码" @on-enter="checkCartonNo"></Input>
+                    </FormItem>
+                </Col>                
                 <Col span="24">
                     <FormItem>
                          <Button type="primary" @click="reset()" size="default">{{ $t("reset") }}</Button>
@@ -70,12 +75,13 @@ export default {
       req: {
         unitID: "",
         pn: "",
-        vendorNO: null,
+        vendorNO: null,//厂商NO
         cartonNo: "",
+        inputCartonNo:"",//输入的外箱条码
         boxNo: "",
-        inputBoxNo:"",
-        shipAddr:"",
-        cartonQTY: "",
+        inputBoxNo:"", //输入的内箱条码
+        shipAddr:"", //配送地
+        cartonQTY: "", 
       },
       tipMsg:"",//提示信息
       isInputNo:false,//是否可输入箱号核对
@@ -91,7 +97,7 @@ export default {
               if(!res.result){
                 this.tipMsg = "NG 未查到此条码，请确认";
                 this.isInputNo = false;//不可输入箱号核对
-                this.req= {...this.req, pn: "",vendorNO: null,cartonNo: "",boxNo: "", inputBoxNo:"", shipAddr:"",cartonQTY: "",};
+                this.req= {...this.req, pn: "",vendorNO: null,cartonNo: "",inputCartonNo:"",boxNo: "", inputBoxNo:"", shipAddr:"",cartonQTY: "",};
                 return;
               };    
                      
@@ -104,13 +110,23 @@ export default {
             } 
           })
     },
-    //核验箱号
+    //核验内箱号
     checkBoxNo(){
         const { boxNo,inputBoxNo} = this.req;
         if(boxNo===inputBoxNo){
+             //输入框聚焦
+             inputSelectContent(this.$refs.inputCartonNo);
+        }else{
+            this.tipMsg = "NG 检查失败 与内箱条码不匹配!";
+        }
+    },
+    // 核验外箱码
+    checkCartonNo(){
+        const { cartonNo,inputCartonNo} = this.req;
+        if(cartonNo===inputCartonNo){
             this.tipMsg = "OK 检查成功";
         }else{
-            this.tipMsg = "NG 检查失败 内箱条码与外箱条码不匹配!";
+            this.tipMsg = "NG 检查失败 与外箱条码不匹配!";
         }
     },
     // 重置
