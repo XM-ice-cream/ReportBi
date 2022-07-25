@@ -22,12 +22,19 @@
         <FormItem label="过滤条件" v-if='rightForm.label&&rightForm.label.indexOf("#")>-1'>
           <Button long @click="filterClick">编辑</Button>
         </FormItem>
+        <Divider>补充空白数据</Divider>
+        <!-- 补充空白行 -->
+        <FormItem label="数据倍数">
+          <Checkbox v-model="rightForm.isFill"> </Checkbox>
+          <InputNumber v-model="rightForm.fillValue" class="inputNumber" v-if="rightForm.isFill" placeholder="请输入填充倍数" />
+        </FormItem>
+
       </Form>
     </TabPane>
     <!-- 自定义 -->
     <pane-2-user-defined ref="userDefined" :formData="rightForm" />
     <!-- 过滤数据 -->
-    <pane-2-filter-data ref="filterData" :formData="rightForm" @autoChangeFunc="autoChangeFunc"/>
+    <pane-2-filter-data ref="filterData" :formData="rightForm" @autoChangeFunc="autoChangeFunc" />
   </Tabs>
 
 </template>
@@ -83,7 +90,7 @@ export default {
   },
   methods: {
     autoChangeFunc (val) {
-       this.rightForm = {...this.rightForm,...val}
+      this.rightForm = { ...this.rightForm, ...val }
       const { showType } = this.rightForm;
       if (showType !== "group") this.rightForm.showTypeValue = "";
       this.$emit("autoChangeFunc", 'cell', this.rightForm);
@@ -94,8 +101,8 @@ export default {
     },
     //过滤数据
     filterClick () {
-        this.$refs.filterData.drawerFlag = true;
-       this.$refs.filterData.loadDataSet(this.rightForm.label);     
+      this.$refs.filterData.drawerFlag = true;
+      this.$refs.filterData.loadDataSet(this.rightForm.label);
     }
   }
 }
@@ -110,6 +117,9 @@ export default {
   .showtypebtn {
     border: 1px solid #dcdee2;
     text-align: center;
+  }
+  .inputNumber {
+    width: 50%;
   }
 }
 </style>

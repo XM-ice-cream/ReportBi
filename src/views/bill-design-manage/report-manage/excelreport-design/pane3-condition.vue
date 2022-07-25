@@ -1,12 +1,11 @@
-/* 单元格元素自定义按钮 */
+/* 条件属性设定 */
 <template>
-  <div class="pane2-user-defined">
+  <div class="pane3-condition">
     <!-- 左侧抽屉 -->
-    <Drawer v-model="drawerFlag" title="自定义分组" width="750" :mask-closable="false" @on-close="cancelClick">
+    <Drawer v-model="drawerFlag" title="条件属性设定" width="750" :mask-closable="false" @on-close="cancelClick">
       <Form ref="submitReq" :model="rightForm" :label-width="110" :label-colon="true" @submit.native.prevent>
-        <!-- 自定义分组类型：条件，公式分组 -->
-        <FormItem label="自定义分组" prop="userDefinedType">
-          <Select v-model="rightForm.userDefinedType" size="small" transfer class="showtype">
+        <FormItem label="属性" prop="type">
+          <Select v-model="rightForm.type" size="small" transfer class="showtype">
             <Option value="condition">条件分组</Option>
             <Option value="formula">公式分组</Option>
           </Select>
@@ -31,25 +30,25 @@
           <!-- 普通的表格 -->
           <Table :columns="columns" :data="tableData" :height="tableConfig.height" :border="tableConfig.border" disabled-hover draggable @on-drag-drop="changeRow" v-if="rightForm.type==='ordinary'">
             <!-- 可选列 -->
-            <template slot-scope="{ index }" slot="selectItem">
+            <template slot-scope="{ row,index }" slot="selectItem">
               <Select v-model="tableData[index].selectItem" size="small" transfer>
                 <Option v-for="item in selectList.selectItemList" :value="item.value" :key="item.value">{{ item.label }}</Option>
               </Select>
             </template>
             <!-- 操作符 -->
-            <template slot-scope="{ index }" slot="operator">
+            <template slot-scope="{ row,index }" slot="operator">
               <Select v-model="tableData[index].operator" size="small" transfer>
                 <Option v-for="item in selectList.operatorList" :value="item.value" :key="item.value">{{ item.label }}</Option>
               </Select>
             </template>
             <!-- 类型 -->
-            <template slot-scope="{ index }" slot="type">
+            <template slot-scope="{ row,index }" slot="type">
               <Select v-model="tableData[index].type" size="small" transfer>
                 <Option v-for="item in selectList.typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
               </Select>
             </template>
             <!-- 内容 -->
-            <template slot-scope="{ index }" slot="content">
+            <template slot-scope="{ row,index }" slot="content">
               <Input v-model="tableData[index].content" v-if="['string','Function','cell'].includes(tableData[index].type)" />
               <InputNumber v-model="tableData[index].content" v-if="tableData[index].type==='int'" />
               <DatePicker transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="tableData[index].content" v-if="tableData[index].type==='date'"></DatePicker>
@@ -59,13 +58,13 @@
               </Select>
             </template>
             <!-- 关系 -->
-            <template slot-scope="{ index }" slot="relation">
+            <template slot-scope="{ row,index }" slot="relation">
               <RadioGroup v-model="tableData[index].relation">
                 <Radio label="add">与</Radio>
                 <Radio label="or">或</Radio>
               </RadioGroup>
             </template>
-            <template slot-scope="{ index }" slot="operation">
+            <template slot-scope="{ row,index }" slot="operation">
               <Button type="success" class="row-button" @click="addRowClick(index,'ordinary')">
                 <Icon type="md-add" />
               </Button>
@@ -78,23 +77,23 @@
           <!-- 公式的表格 -->
           <Table :columns="columns2" :data="tableData2" :height="tableConfig.height" :border="tableConfig.border" disabled-hover draggable @on-drag-drop="changeRow" v-if="rightForm.type==='formula'">
             <!-- 公式 -->
-            <template slot-scope="{ index }" slot="formula">
+            <template slot-scope="{ row,index }" slot="formula">
               <Input v-model="tableData2[index].formula" type="textarea" :autosize="{minRows: 2,maxRows: 5}" />
             </template>
             <!-- 定义 -->
-            <template slot-scope="{ index }" slot="defined">
+            <template slot-scope="{ row,index }" slot="defined">
               <Button type="primary" class="row-button" @click="addRowClick(index)">
                 定义
               </Button>
             </template>
             <!-- 关系 -->
-            <template slot-scope="{ index }" slot="relation">
+            <template slot-scope="{ row,index }" slot="relation">
               <RadioGroup v-model="tableData2[index].relation">
                 <Radio label="add">与</Radio>
                 <Radio label="or">或</Radio>
               </RadioGroup>
             </template>
-            <template slot-scope="{ index }" slot="operation">
+            <template slot-scope="{ row,index }" slot="operation">
               <Button type="success" class="row-button" @click="addRowClick(index,'formula')">
                 <Icon type="md-add" />
               </Button>
