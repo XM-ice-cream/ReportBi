@@ -33,6 +33,10 @@
                     <FormItem :label="$t('category')" prop="category">
                       <Input v-model.trim="req.category" :placeholder="$t('pleaseEnter') + $t('category')" />
                     </FormItem>
+                    <!-- 条形码 -->
+                    <FormItem :label="$t('barCode')" prop="barCode">
+                      <Input v-model.trim="req.barCode" placeholder="请输入条形码,多个以英文逗号或空格分隔" />
+                    </FormItem>
                     <!-- 参数2 -->
                     <FormItem label="参数2" prop="opt2">
                       <Input v-model.trim="req.opt2" :placeholder="$t('pleaseEnter') + '参数2'" />
@@ -68,7 +72,7 @@
 
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/omm-data";
-import { getButtonBoolean, formatDate, exportFile, renderDate } from "@/libs/tools";
+import { getButtonBoolean, formatDate, exportFile, renderDate, commaSplitString } from "@/libs/tools";
 import { getlistReq as getdataitemlistReq } from "@/api/system-manager/data-item";
 export default {
   name: "omm-data",
@@ -84,6 +88,7 @@ export default {
         endTime: "",
         stationType: "",
         category: "",
+        barCode: "",//条形码
         opt2: "",
         opt3: "",
         opt4: "",
@@ -140,7 +145,7 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, stationType, category, opt2, opt3, opt4 } = this.req;
+      let { startTime, endTime, stationType, category, opt2, opt3, opt4, barCode } = this.req;
       if (stationType) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -153,6 +158,7 @@ export default {
               data: {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
+                barCode: commaSplitString(barCode).join(),
                 stationType,
                 category,
                 opt2,
@@ -179,11 +185,12 @@ export default {
     },
     // 导出
     exportClick () {
-      let { startTime, endTime, stationType, category, opt2, opt3, opt4 } = this.req;
+      let { startTime, endTime, stationType, category, opt2, opt3, opt4, barCode } = this.req;
       if (stationType) {
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
+          barCode: commaSplitString(barCode).join(),
           stationType,
           category,
           opt2,
