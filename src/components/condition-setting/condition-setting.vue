@@ -1,14 +1,10 @@
 /* 单元格元素过滤数据 */
 <template>
-  <div class="condition-setting">
-    <!-- 左侧抽屉 -->
-    <!-- <Form ref="submitReq" :label-width="110" :label-colon="true" @submit.native.prevent> -->
-    <!-- 添加按钮 -->
-
-    <!-- 普通的表格 -->
-    <Table :columns="columns" :data="tableData" :height="tableConfig.height" :border="tableConfig.border" disabled-hover>
+  <div class="condition-setting" v-if="drawerFlag">
+    <!-- 表格 -->
+    <Table :columns="columns" :data="tableData" :height="70" :border="tableConfig.border" disabled-hover>
       <!-- 可选列 -->
-      <template slot-scope="{ index }" slot="selectItem">
+      <template slot-scope="{ index }" slot="selectItem" v-if="type">
         <Select v-model="tableData[index].selectItem" size="small" transfer filterable>
           <Option v-for="item in selectItemList" :value="item" :key="item">{{ item }}</Option>
         </Select>
@@ -74,10 +70,22 @@ export default {
   name: "condition-setting",
   components: {},
   props: {
+    type: {
+      type: String,
+      default: ""
+    },
     selectItemList: {
       type: Array,
-      default: [],
+      default: () => [],
     },
+    drawerFlag: {
+      type: Boolean,
+      default: false,
+    },
+    rightForm: {
+      type: Array,
+      default: () => []
+    }
   },
   watch: {
     "data.length": {
@@ -86,6 +94,16 @@ export default {
       },
       deep: true,
       immediate: true,
+    },
+    drawerFlag (newVal) {
+      if (newVal) {
+        if (!this.type) {
+          this.columns = this.columns.filter(item => item.slot !== "selectItem");
+        }
+        if (this.rightForm) this.data = [...this.rightForm];
+      } else {
+        this.cancelClick();
+      }
     }
   },
   computed: {
@@ -97,15 +115,15 @@ export default {
       checkList: [],//树状图选中
       contextData: [],
       columns: [
-        { title: "可选列", slot: "selectItem", minWidth: 100, align: "center" },
-        { title: "操作符", slot: "operator", minWidth: 100, align: "center" },
-        { title: "类型", slot: "type", minWidth: 100, align: "center" },
+        { title: "可选列", slot: "selectItem", width: 100, align: "center" },
+        { title: "操作符", slot: "operator", width: 80, align: "center" },
+        { title: "类型", slot: "type", width: 80, align: "center" },
         { title: "内容", slot: "content", minWidth: 150, align: "center" },
         { title: "关系", slot: "relation", width: 100, align: "center" },
         { title: "操作", slot: "operation", width: 80, align: "center" },
 
       ],
-      tableData: [{ selectItem: "aaa", operator: "=", content: "", relation: "and", type: "string" }],
+      tableData: [{ selectItem: "", operator: "=", content: "", relation: "and", type: "string" }],
       selectList: {
         //可选列集合
         operatorList: [
@@ -137,8 +155,7 @@ export default {
     async addRow () {
       const { selectItem, operator, content, relation } = this.tableData[0];
 
-      const curContent = `( ${selectItem} ) ${operator} ${content}`;
-
+      const curContent = this.type ? `( ${selectItem} ) ${operator} ${content}` : `${operator} ${content}`;
       // 是否存在值
       const isExit = await this.getValue(this.data, curContent);
       if (isExit) {
@@ -153,7 +170,6 @@ export default {
     getValue (data, e) {
       return data.some((item) => {
         const title = item.title.replace(/^and|^or/g, "");
-        console.log(title);
         if (title === e) {
           return true;
         } else if (item.children) {
@@ -253,12 +269,12 @@ export default {
     },
     // 自动改变表格高度
     autoSize () {
-      this.tableConfig.height = 100;
+      this.tableConfig.height = 20;
     },
     // 左侧抽屉取消
     cancelClick () {
       this.drawerFlag = false;
-      this.tableData = [{ selectItem: "apple", operator: "=", type: "string", content: "", relation: "and" }];
+      this.tableData = [{ selectItem: "", operator: "=", type: "string", content: "", relation: "and" }];
       this.data = [];
     },
   },
@@ -274,6 +290,7 @@ export default {
 }
 .addbtn {
   text-align: right;
+  margin-bottom: 0.6rem;
 }
 /deep/.ivu-table-wrapper {
   margin-bottom: 1rem;

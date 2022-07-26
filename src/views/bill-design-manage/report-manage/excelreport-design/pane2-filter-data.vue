@@ -9,8 +9,8 @@
           <Checkbox v-model="rightForm.isFather" size="small">将父格作为过滤条件（适用于父子格来自于同一个数据集）</Checkbox>
         </FormItem>
 
-        <!-- 过滤表格 -->
-        <ConditionSetting ref="conditionsetting" :selectItemList="selectItemList" @updateData="updateData" />
+        <!-- 过滤表格 type=""说明默认不显示可选列-->
+        <ConditionSetting ref="conditionsetting" type="1" :selectItemList="selectItemList" :drawerFlag.sync="drawerFlag" @updateData="updateData" />
 
         <!-- 按钮 -->
         <FormItem>
@@ -69,6 +69,7 @@ export default {
   methods: {
     //更新数据
     submitClick (flag) {
+      console.log(flag);
       this.rightForm.filterData = "";
       this.data.forEach(item => {
         this.rightForm.filterData += `${item.title} `;
@@ -82,14 +83,12 @@ export default {
     },
     //获取全部数据集
     async loadDataSet (val) {
-      console.log(val);
       //label = #{WF_UNITINFOTRAVEL.unitid};
       const label = val.replace(/#|{|}/g, "");
       const setCode = label.split('.');
       let obj = { setCode: setCode[0] };
-      const { code, result } = await getDeatilByIdReq(obj);
+      const { result } = await getDeatilByIdReq(obj);
       this.selectItemList = result.setParamList;
-      if (code != 200) return;
     },
     // 自动改变表格高度
     autoSize () {

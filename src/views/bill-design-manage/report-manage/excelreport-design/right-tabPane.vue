@@ -14,14 +14,21 @@
             <Icon type="ios-keypad" />
           </Poptip>
           </MenuItem>
+          <MenuItem :name="3">
+          <Poptip trigger="hover" content="条件属性" placement="left">
+            <Icon type="md-construct" />
+          </Poptip>
+          </MenuItem>
         </MenuGroup>
       </Menu>
     </div>
     <div class="excel-tabs">
       <!-- 单元格属性 -->
-      <tab-pane-1 :type="activeName" :formData="rightForm.cellAttribute" @autoChangeFunc="autoChangeFunc"></tab-pane-1>
+      <tab-pane-1 :type="activeName" :formData="rightForm.cellAttribute" @autoChangeFunc="autoChangeFunc" />
       <!-- 单元格元素 -->
-      <tab-pane-2 :type="activeName" :formData="rightForm.cell" @autoChangeFunc="autoChangeFunc"></tab-pane-2>
+      <tab-pane-2 :type="activeName" :formData="rightForm.cell" @autoChangeFunc="autoChangeFunc" />
+      <!-- 条件属性 -->
+      <tab-pane-3 :type="activeName" :formData="rightForm.conditions" @autoChangeFunc="autoChangeFunc" />
     </div>
   </div>
 
@@ -29,9 +36,10 @@
 <script>
 import tabPane1 from './tabPane1.vue';
 import TabPane2 from './tabPane2.vue';
+import TabPane3 from './tabPane3.vue';
 
 export default {
-  components: { tabPane1, TabPane2 },
+  components: { tabPane1, TabPane2, TabPane3 },
   name: "right-tabPane",
   props: {
     formData: {
@@ -61,8 +69,8 @@ export default {
       this.activeName = name;
     },
     autoChangeFunc (type, rightForm) {
-      this.rightForm[type] = { ...rightForm };
-      console.log("rightForm",rightForm, type, this.rightForm);
+      this.rightForm[type] = rightForm instanceof Array ? [...rightForm] : { ...rightForm };
+      console.log("rightForm", rightForm, type, this.rightForm);
       this.$emit("autoChangeFunc", this.rightForm);
     }
   }

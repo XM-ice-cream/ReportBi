@@ -218,7 +218,6 @@ export default {
       const { barCode, stationType } = this.req
       this.$refs.searchReq.validate((validate) => {
         if (validate) {
-          console.log('134');
           this.tableConfig.loading = true;
           let obj = {
             orderField: 'BarCode', // 排序字段
@@ -233,7 +232,6 @@ export default {
           };
           const getpagelistReq = this.getRequest('get' + stationType);
           this.columns = stationType === 'OP20' ? this.OP20columns : (stationType === 'OP25' ? this.OP25columns : (stationType === 'OP30' ? this.OP30columns : this.OP15columns))
-          console.log(getpagelistReq);
           getpagelistReq(obj).then((res) => {
             this.tableConfig.loading = false;
             if (res.code === 200) {

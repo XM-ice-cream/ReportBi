@@ -137,7 +137,6 @@ export default {
       }).catch(() => (this.tableConfig.loading = false));
     },
     show (panelNo) {
-      console.log("panelno", panelNo);
       this.$router.push({
         name: "offlinetracking-query",
         params: { panelNo },

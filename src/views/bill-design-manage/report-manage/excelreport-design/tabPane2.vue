@@ -101,8 +101,9 @@ export default {
     },
     //过滤数据
     filterClick () {
-      this.$refs.filterData.drawerFlag = true;
       this.$refs.filterData.loadDataSet(this.rightForm.label);
+      this.$refs.filterData.drawerFlag = true;
+
     }
   }
 }

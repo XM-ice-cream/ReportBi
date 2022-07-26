@@ -414,7 +414,6 @@ export default {
       ];
       this.setOptionsLegendName(val.legend);
 
-      console.log(this.options);
 
     },
     //还原x轴，y轴数据

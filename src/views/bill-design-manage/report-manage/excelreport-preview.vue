@@ -161,7 +161,6 @@ export default {
       }
       //   this.htm = "<table class='table tableScroll' id='exceltable'>";
       let { celldata, config, frozen } = data[0];
-      console.log(data);
       this.tableHtml = [];
       // 处理表格单元格样式
       celldata.forEach(item => {
