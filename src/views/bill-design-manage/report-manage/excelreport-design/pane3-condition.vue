@@ -18,7 +18,7 @@
         </ListItem>
       </List>
       <!-- 过滤表格 -->
-      <ConditionSetting ref="conditionsetting" @updateData="updateData" :drawerFlag.sync="drawerFlag" :rightForm="rightForm.data" />
+      <ConditionSetting ref="conditionsetting" :drawerFlag.sync="drawerFlag" :rightForm="rightForm.data" @updateData="updateData" />
 
       <drawer-button :text="drawerTitle" class="tree" @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
 
@@ -54,7 +54,7 @@ export default {
       this.rightForm.filterData = "";
       this.rightForm.data = [...this.data];
       this.data.forEach(item => {
-        this.rightForm.filterData += `${item.title} `;
+        this.rightForm.filterData += `${item.logic} `;
       })
       if (flag) this.cancelClick();
       this.$emit("autoChangeFunc", this.rightForm);

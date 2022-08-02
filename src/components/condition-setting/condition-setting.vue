@@ -17,7 +17,7 @@
       </template>
       <!-- 类型 -->
       <template slot-scope="{ index }" slot="type">
-        <Select v-model="tableData[index].type" size="small" transfer>
+        <Select v-model="tableData[index].type" size="small" transfer @on-change="tableData[index].content=''">
           <Option v-for="item in selectList.typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
       </template>
@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import { formatDate } from "@/libs/tools";
 
 export default {
   name: "condition-setting",
@@ -74,13 +75,13 @@ export default {
       type: String,
       default: ""
     },
-    selectItemList: {
-      type: Array,
-      default: () => [],
-    },
     drawerFlag: {
       type: Boolean,
       default: false,
+    },
+    selectItemList: {
+      type: Array,
+      default: () => [],
     },
     rightForm: {
       type: Array,
@@ -100,7 +101,9 @@ export default {
         if (!this.type) {
           this.columns = this.columns.filter(item => item.slot !== "selectItem");
         }
-        if (this.rightForm) this.data = [...this.rightForm];
+        if (this.rightForm) {
+          this.data = [...this.rightForm];
+        }
       } else {
         this.cancelClick();
       }
@@ -116,7 +119,7 @@ export default {
       contextData: [],
       columns: [
         { title: "可选列", slot: "selectItem", width: 100, align: "center" },
-        { title: "操作符", slot: "operator", width: 80, align: "center" },
+        { title: "操作符", slot: "operator", width: 110, align: "center" },
         { title: "类型", slot: "type", width: 80, align: "center" },
         { title: "内容", slot: "content", minWidth: 150, align: "center" },
         { title: "关系", slot: "relation", width: 100, align: "center" },
@@ -135,6 +138,9 @@ export default {
           { label: "小于或等于", value: "<=" },
           { label: "开头是", value: "startWith" },
           { label: "开头不是", value: "!startWith" },
+          { label: "包含", value: "include" },
+          { label: "不包含", value: "!include" },
+          { label: "包含于", value: "include in" },
         ],
         typeList: [
           { label: "字符串", value: "string" },
@@ -153,7 +159,8 @@ export default {
   methods: {
     // 新增下一列
     async addRow () {
-      const { selectItem, operator, content, relation } = this.tableData[0];
+      let { selectItem, operator, content, relation, type } = this.tableData[0];
+      if (type === "date") content = formatDate(content);
 
       const curContent = this.type ? `( ${selectItem} ) ${operator} ${content}` : `${operator} ${content}`;
       // 是否存在值
@@ -162,9 +169,65 @@ export default {
         this.$Message.error("数据已存在！！");
         return;
       }
+
+      //处理数据为js逻辑表达式
+      let logic = this.getLogic(type, selectItem, operator, content);
+
       //添加值 第一笔不显示and/or
-      const obj = this.data.length > 0 ? { title: `${relation}${curContent}`, contextmenu: true } : { title: `${curContent}`, contextmenu: true };
+      const obj = this.data.length > 0 ? { title: `${relation} ${curContent}`, contextmenu: true, logic: `${relation} ${logic}` } : { title: `${curContent}`, contextmenu: true, logic };
       this.data.push(obj);;
+    },
+    //处理数据为js逻辑表达式
+    getLogic (type, selectItem, operator, content) {
+      let logic = "";
+      const val = type === "string" ? `"${content}"` : (type === "date" ? `new Date("${content}")` : content);
+      const item = type === "date" ? `new Date(( ${selectItem} ))` : `( ${selectItem} )`;
+      //开头不是
+      if (operator === "!startWith") {
+        logic = `${item}.indexOf(${val}) !==0`;
+      }
+      //开头是
+      if (operator === "startWith") {
+        logic = `${item}.indexOf(${val}) ===0`;
+      }
+      // 等于
+      if (operator === "=") {
+        logic = `${item}===${val}`;
+      }
+      // 不等于
+      if (operator === "!=") {
+        logic = `${item}!==${val}`;
+      }
+      // 大于
+      if (operator === ">") {
+        logic = `${item} > ${val}`;
+      }
+      // 大于或等于
+      if (operator === ">=") {
+        logic = `${item} >= ${val}`;
+      }
+      // 小于
+      if (operator === "<") {
+        logic = `${item} < ${val}`;
+      }
+      // 小于或等于
+      if (operator === "<=") {
+        logic = `${item} <= ${val}`;
+      }
+      //包含
+      if (operator === "include") {
+        logic = `${item}.indexOf(${val}) !==-1`;
+      }
+      //不包含
+      if (operator === "!include") {
+        logic = `${item}.indexOf(${val}) ===-1`;
+      }
+      //包含于
+      if (operator === "include in") {
+        logic = `${val}.indexOf(${item}) !==-1`;
+      }
+      console.log(logic);
+      return logic;
     },
     //递归判断值是否存在
     getValue (data, e) {
