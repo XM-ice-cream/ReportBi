@@ -6,6 +6,11 @@
       <Card :bordered="false" dis-hover class="card-style" id="sip-boxno-check">
         <Form ref="submitReq" :model="req" :label-width="80" :label-colon="false" style="width: 80%;margin:0 atuo" @submit.native.prevent>
           <Row>
+            <Col :xs="24" :sm="24" :md="24" :lg="24">
+            <FormItem label='工单号' prop="workorder">
+              <label>{{req.workorder}}</label>
+            </FormItem>
+            </Col>
             <Col :xs="24" :sm="24" :md="12" :lg="8">
             <FormItem label='外箱号' prop="cartonNo">
               <label>{{req.cartonNo}}</label>
