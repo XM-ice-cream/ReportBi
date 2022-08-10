@@ -139,6 +139,7 @@ export default {
         { title: "箱号", key: "cartonno", align: "center", width: 100, tooltip: true },
         { title: "UNITSEQ", key: "unitseqoncar", align: "center", width: 60, tooltip: true },
         { title: "UNITSEQONCAR", key: "unitseqoncar", align: "center", width: 120, tooltip: true },
+        { title: "APN", key: "customerno", align: "center", width: 120, tooltip: true },
       ], // 表格数据
     };
   },
