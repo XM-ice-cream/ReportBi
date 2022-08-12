@@ -23,23 +23,23 @@
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
-                      <Input v-model="req.workOrder" :placeholder="$t('pleaseEnter') + $t('workOrder')" @on-search="pageLoad" />
+                      <Input v-model="req.workOrder" :placeholder="$t('pleaseEnter') + $t('workOrder') +'多个以英文逗号或空格分隔'" @on-search="pageLoad" />
                     </FormItem>
                     <!-- 产品序号 -->
                     <FormItem :label="$t('product') + $t('sort')" prop="unitId">
-                      <Input v-model="req.unitId" :placeholder="$t('pleaseEnter') + $t('product') + $t('sort')" @on-search="pageLoad" />
+                      <Input v-model="req.unitId" :placeholder="$t('pleaseEnter') + $t('product') + $t('sort') +'多个以英文逗号或空格分隔'" @on-search="pageLoad" />
                     </FormItem>
                     <!-- 栈板号 -->
                     <FormItem :label="$t('palletCode')" prop="palletNo">
-                      <Input v-model="req.palletNo" :placeholder="$t('pleaseEnter') + $t('palletCode')" @on-search="pageLoad" />
+                      <Input v-model="req.palletNo" :placeholder="$t('pleaseEnter') + $t('palletCode') +'多个以英文逗号或空格分隔'" @on-search="pageLoad" />
                     </FormItem>
                     <!-- BoxNo -->
                     <FormItem label="BoxNo" prop="boxNo">
-                      <Input v-model="req.boxNo" :placeholder="$t('pleaseEnter') + 'BoxNo'" @on-search="pageLoad" />
+                      <Input v-model="req.boxNo" :placeholder="$t('pleaseEnter') + 'BoxNo' +'多个以英文逗号或空格分隔'" @on-search="pageLoad" />
                     </FormItem>
                     <!-- CartonNO -->
                     <FormItem label="CartonNO" prop="cartonNo">
-                      <Input v-model="req.cartonNo" :placeholder="$t('pleaseEnter') + 'CartonNO'" />
+                      <Input v-model="req.cartonNo" :placeholder="$t('pleaseEnter') + 'CartonNO' +'多个以英文逗号或空格分隔'" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -63,7 +63,7 @@
 
 <script>
 import { getlistReq, exportReq } from "@/api/bill-manage/pack-query";
-import { getButtonBoolean, formatDate, exportFile, renderDate } from "@/libs/tools";
+import { getButtonBoolean, formatDate, exportFile, renderDate ,commaSplitString} from "@/libs/tools";
 export default {
   name: "pack-query",
   data () {
@@ -150,11 +150,11 @@ export default {
               data: {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
-                workOrder, //工单
-                unitId, //产品序号
-                palletNo, //	栈板号
-                boxNo, //	BoxNo
-                cartonNo, //	CartonNO
+                workOrder:commaSplitString(workOrder).join(), //工单
+                unitId:commaSplitString(unitId).join(), //产品序号
+                palletNo:commaSplitString(palletNo).join(), //	栈板号
+                boxNo:commaSplitString(boxNo).join(), //	BoxNo
+                cartonNo:commaSplitString(cartonNo).join(), //	CartonNO
               },
             };
             getlistReq(obj)
@@ -183,13 +183,13 @@ export default {
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
         data: {
-          startTime: formatDate(startTime),
-          endTime: formatDate(endTime),
-          workOrder, //工单
-          unitId, //产品序号
-          palletNo, //	栈板号
-          boxNo, //	BoxNo
-          cartonNo, //	CartonNO
+            startTime: formatDate(startTime),
+            endTime: formatDate(endTime),
+            workOrder:commaSplitString(workOrder).join(), //工单
+            unitId:commaSplitString(unitId).join(), //产品序号
+            palletNo:commaSplitString(palletNo).join(), //	栈板号
+            boxNo:commaSplitString(boxNo).join(), //	BoxNo
+            cartonNo:commaSplitString(cartonNo).join(), //	CartonNO
         },
       };
       exportReq(obj).then((res) => {
