@@ -14,7 +14,7 @@
                 <template v-for="(subitem,subindex) in item.children">
                   <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                     <!-- 字符串 -->
-                    <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable />
+                    <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable @keyup.native.enter="searchPreview(false)"/>
                     <!-- 布尔 true/false/0/1-->
                     <RadioGroup v-else-if="subitem.type==='Boolean'&&['true','false','0','1'].includes(subitem.value)" v-model="subitem.value">
                       <template v-if="['true','false'].includes(subitem.value)">
