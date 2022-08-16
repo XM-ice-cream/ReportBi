@@ -14,7 +14,7 @@
                 <template v-for="subitem in item.children">
                   <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                     <!-- 字符串 -->
-                    <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable @keyup.native.enter="searchPreview(false)"/>
+                    <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable @keyup.native.enter="searchClick(false)"/>
                     <!-- 布尔 true/false/0/1-->
                     <RadioGroup v-else-if="subitem.type==='Boolean'&&['true','false','0','1'].includes(subitem.value)" v-model="subitem.value">
                       <template v-if="['true','false'].includes(subitem.value)">
@@ -35,7 +35,10 @@
                   </FormItem>
                 </template>
               </template>
-              <Button type="primary" @click="searchPreview(false)" style="width: 100%;">查询</Button>
+                 <div class="poptip-style-button">
+                  <Button @click="resetClick">{{ $t("reset") }}</Button>
+                  <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
+                </div>
             </Form>
           </div>
         </Sider>
@@ -71,16 +74,9 @@ export default {
   components: { draggable },
   data () {
     return {
-      intervalData: '',
-      options: {},
-      sheet: {},
       sheetData: [{}],
-      reportId: null,
-      reportName: null,
-      dataSet: null,
       tableData2: [],
       loading: false,
-      reportCode: '',
       params: {
         reportCode: "",
         setParam: "",
@@ -104,103 +100,53 @@ export default {
     // 获取查询参数
    async getParams(){
         const obj = {
-            reportCode:this.reportCode,
+            reportCode: this.params.reportCode,
             sheetIndex:"",
         }
       await  getParamsReq(obj).then(res=>{
             if(res.code===200){
                 const setParam =JSON.parse( res.result.setParam);
                 const setCodes = res.result.setCodes.split("|");
-                 const setNames = res.result.setNames.split("|");
-              // 渲染查询表单
-              this.tableData2 = this.getParamsList(setParam,setCodes,setNames);
+                const setNames = res.result.setNames.split("|");
+                // 渲染查询表单
+                this.tableData2 = this.getParamsList(setParam,setCodes,setNames);
             }
         })
     },
 
 
 
-    async searchPreview (flag = true) {
+    async searchClick (flag = true) {
 
       if (!flag) this.params.requestCount = 1;  // 点击查询按钮
 
       this.dateFormate();  // 左侧查询参数--时间格式化 
 
       //左侧查询参数 --必要参数接收
-      const arr = this.toObject(this.tableData2)
-      this.params.setParam = JSON.stringify(arr)
-
-      this.sheetData = [{}] //表格数据
+      const arr = this.toObject(this.tableData2);
+      this.params.setParam = JSON.stringify(arr);
       window.luckysheet.destroy() //销毁
-
-      this.intervalPreview() 
-    },
-    async intervalPreview () {
       this.loading = true;
       await getExcelPreviewReq(this.params).then(res => {
-        if (res.code === 200) {
-
-          this.loading = false;
-          const jsonStr_parse = JSON.parse(res.result.jsonStr);
-          this.jsonStr = jsonStr_parse;
-
-         //第一次获取请求值
-          this.initExcel(jsonStr_parse, res.result);
+        if (res.code === 200) { 
+            this.jsonStr  = JSON.parse(res.result.jsonStr);           
+            this.params = {
+                ...this.params,
+                total: this.jsonStr[this.jsonIndex].total,
+                totalPage: this.jsonStr[this.jsonIndex].pageCount
+            }
+            // //初始化Excel
+            this.sheetData = res.result ===null ? [{}] : this.jsonStr;
+            this.createSheet();
         } else {
           this.$Message.error(res.message);
           this.sheetData = [{}];
           //初始化Excel
           this.createSheet();
         }
-      })
-
+      }).finally(()=>{  this.loading = false; })
     },
-    // 初始化Excel
-    initExcel (jsonStr_parse, result) {
-      console.log(window.luckysheet);
-      this.reportName = jsonStr_parse.name;    
-
-      this.params = {
-        ...this.params,
-        total: jsonStr_parse[this.jsonIndex].total,
-        totalPage: jsonStr_parse[this.jsonIndex].pageCount
-      }
-      //初始化Excel
-      this.sheetData = result == null ? [{}] : jsonStr_parse;
-      this.createSheet();
-    },
-    //获取查询参数 并获得参数类型及是否必填
-    getParamsList (setParam,setCodes,setNames) {
-      const extendObj = setParam;
-      const extendArry = [];
-      for (const i in extendObj) {
-        const children = [];
-        for (const y in extendObj[i]) {
-          if (!y.endsWith('required') && !y.endsWith('type')) {
-            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
-            this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
-          }
-        }
-        //报表编码的索引
-        const index = setCodes.findIndex((item) => {
-            return item === i;
-        })
-        extendArry.push({ name: i, children: children,title:setNames[index] });
-      }
-      return extendArry;
-    },
-    // Excel导出
-    async download () {
-      //刷新
-      //   window.luckysheet.refresh();
-      //   exportExcel(luckysheet.getAllSheets(), this.params.reportCode + '-' + `${formatDate(new Date())}`)
-
-      exportReq(this.params).then((res) => {
-        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-        const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
-        exportFile(blob, fileName);
-      });
-    },
+   
     //初始化表格
     createSheet () {
       const options = {
@@ -219,7 +165,7 @@ export default {
             this.params.totalPage = this.jsonStr[this.jsonIndex].pageCount; //总页数
             this.params.requestCount = 1;//切换sheet 重置起始页
             this.params.sheetIndex = index;
-            this.searchPreview();
+            this.searchClick();
           }
         },
         data: [
@@ -270,6 +216,44 @@ export default {
         // console.log(luckysheet.getRangeValue());
       });
     },
+
+     //获取查询参数 并获得参数类型及是否必填
+    getParamsList (setParam,setCodes,setNames) {
+      const extendObj = setParam;
+      const extendArry = [];
+      for (const i in extendObj) {
+        const children = [];
+        for (const y in extendObj[i]) {
+          if (!y.endsWith('required') && !y.endsWith('type')) {
+            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
+            this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
+          }
+        }
+        //报表编码的索引,从而获取报表编码的名称
+        const index = setCodes.findIndex((item) => {
+            return item === i;
+        })
+        extendArry.push({ name: i, children: children,title:setNames[index] });
+      }
+      return extendArry;
+    },
+    // Excel导出
+    async download () {
+      exportReq(this.params).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
+    },
+    //重置
+    resetClick(){
+        console.log(this.tableData2);
+        this.tableData2.map(item=>{
+            item.children.map(cItem=>{
+                cItem.value = "";
+            })
+        })
+    },
     //时间格式化
     dateFormate () {
       this.tableData2.forEach((item, itemIndex) => {
@@ -299,28 +283,23 @@ export default {
     // 选择第几页
     pageChange (index) {
       this.params.requestCount = index
-      this.searchPreview()
+      this.searchClick()
     },
     // 选择一页几条数据
     pageSizeChange (index) {
       this.params.requestCount = 1
       this.params.pageSize = index
-      this.searchPreview()
+      this.searchClick()
     }
   },
   mounted () {
     this.$nextTick(() => {
-      this.reportCode = this.$route.query.reportCode;
-      this.params.reportCode = this.reportCode;
+      this.params.reportCode = this.$route.query.reportCode;
       this.tableData2 = [];
       this.getParams();
       this.createSheet ();
-      // 解决Jquery 版本冲突问题
-      //   window.jQuery.noConflict();
     })
   }
-  // 销毁luckysheet
-  // window.luckysheet.destroy();
 }
 </script>
  <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
