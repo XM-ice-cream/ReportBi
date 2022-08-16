@@ -9,10 +9,10 @@
           <!-- DBlist -->
           <div class="dblist">
             <Form ref="submitReq" :label-width="80" :label-colon="true">
-              <template v-for="(item,index) in tableData2">
-                <span class="title" :key="index">{{item.name}}</span>
+              <template v-for="(item,index) in tableData2" >
+                <span class="title" >{{item.title}}</span>
                 <template v-for="(subitem,subindex) in item.children">
-                  <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                  <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                     <!-- 字符串 -->
                     <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable @keyup.native.enter="searchPreview(false)"/>
                     <!-- 布尔 true/false/0/1-->
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage'
+import { getExcelPreviewReq,getParamsReq, exportReq } from '@/api/bill-design-manage/report-manage'
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
 
@@ -74,7 +74,7 @@ export default {
       intervalData: '',
       options: {},
       sheet: {},
-      sheetData: [],
+      sheetData: [{}],
       reportId: null,
       reportName: null,
       dataSet: null,
@@ -101,6 +101,23 @@ export default {
   },
   methods: {
 
+    // 获取查询参数
+   async getParams(){
+        const obj = {
+            reportCode:this.reportCode,
+            sheetIndex:"",
+        }
+      await  getParamsReq(obj).then(res=>{
+            if(res.code===200){
+                const setParam =JSON.parse( res.result.setParam);
+                const setCodes = res.result.setCodes.split("|");
+                 const setNames = res.result.setNames.split("|");
+              // 渲染查询表单
+              this.tableData2 = this.getParamsList(setParam,setCodes,setNames);
+            }
+        })
+    },
+
 
 
     async searchPreview (flag = true) {
@@ -116,7 +133,7 @@ export default {
       this.sheetData = [{}] //表格数据
       window.luckysheet.destroy() //销毁
 
-      this.intervalPreview()  //每次都重新加载需要改成刷新
+      this.intervalPreview() 
     },
     async intervalPreview () {
       this.loading = true;
@@ -124,15 +141,11 @@ export default {
         if (res.code === 200) {
 
           this.loading = false;
-          let { setParam } = this.params;
           const jsonStr_parse = JSON.parse(res.result.jsonStr);
-          const setParam_parse = JSON.parse(res.result.setParam);
           this.jsonStr = jsonStr_parse;
-          console.log(jsonStr_parse);
-          //第一次获取请求值
-          this.initExcel(jsonStr_parse, setParam, setParam_parse, res.result);
-          // 渲染表格
-          //   this.getTable("excelpreview", jsonStr_parse);
+
+         //第一次获取请求值
+          this.initExcel(jsonStr_parse, res.result);
         } else {
           this.$Message.error(res.message);
           this.sheetData = [{}];
@@ -142,124 +155,10 @@ export default {
       })
 
     },
-    //获取表格
-    getTable (tableid, data) {
-      let htm = "<table class='table tableScroll'>";
-      const { celldata, config } = data[0];
-      //处理数据,将同一行为一组数据
-      let result = [];
-      celldata.forEach(item => {
-        if (!result[item.r]) result[item.r] = [];
-        result[item.r].push(item)
-      })
-      result.forEach((item, itemIndex) => {
-        htm += "<tr>";
-        item.forEach((tdItem, tdIndex) => {
-          //   console.log(tdItem);
-          const { v, bg, bl, fc, ht, vt, mc, fs } = tdItem.v; //获取样式
-          const { columnlen, rowlen, borderInfo } = config;//
-          let style = "";
-          //   宽高
-          const width = columnlen[tdIndex] || 219
-          const height = rowlen[itemIndex] || 18;
-          //边框
-          let border = "none";
-          borderInfo.forEach((borderItem, borderIndex) => {
-            const { borderType, color, range } = borderItem;
-            //列号在范围内
-            const columnRang = (range[0].column[0] <= tdIndex) && (range[0].column[1] >= tdIndex);
-            //行号在范围内
-            const rowRang = (range[0].row[0] <= itemIndex) && (range[0].row[1] >= itemIndex);
-            if (borderType === "border-all" && columnRang && rowRang) {
-              border = `1px solid ${color}`;
-            }
-            if (borderType === "border-none" && columnRang && rowRang) {
-              border = "none";
-            }
-          })
-          if (bg) style += `background:${bg};`;//背景颜色
-          if (bl) style += `font-weight:${bl == 1 ? 'bold' : 'normal'};`; //字体粗细
-          if (fc) style += `color:${fc};`;//字体颜色
-          if (ht) style += `text-align:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
-          if (vt) style += `verticle-align:middle;`;//垂直居中
-          if (fs) style += `font-size:${fs}px;`;//文字大小
-          style += `width:${width}px;height:${height}px;`;//宽高
-          style += `border:${border};`;//边框
-
-
-
-          htm += `<td style="${style}" colspan="${mc?.cs || 1}" rowspan="${mc?.rs || 1}">${v}</td>`
-          //   htm += "<td style='background:" + bg + ",font-weight:"+bl===1?'bold':'normal+'"'>" + v + "</td>";
-          if (tdIndex + 1 === item.length) htm += "</tr>"
-        })
-
-        // if (item.c === 0) {
-        //   htm += "<tr><td>" + item.v.v + "</td>"
-        // } else {
-        //   htm += "<td>" + item.v.v + "</td></tr>";
-        // }
-      })
-      //   const { title, dataList } = data;
-
-
-
-      //   //#region 渲染前两行
-      //   let htm0 = "<tr>"; // 第一行html
-      //   let htm1 = "<tr>";// 第二行html
-      //   for (let key in title) {
-      //     htm0 += "<th colspan=" + title[key].length + ">" + key + "</th>";
-      //     for (let i = 0; i < title[key].length; i++) {
-      //       htm1 += "<td style='background-color:#f0f3f6;color:#484848;'>" + title[key][i] + "</td>";
-      //     }
-      //   }
-      //   htm += htm0 + "</tr>" + htm1 + "</tr>";
-      //   //#endregion
-
-      //   // 获取需要合并单元格的个数{key:num;key:num}
-      //   let dataListItem = dataList.map(item => {
-      //     return item[0]
-      //   })
-      //   dataListItem = dataListItem.reduce(function (prev, next) {
-      //     prev[next] = (prev[next] + 1) || 1;
-      //     return prev;
-      //   }, {});
-
-      //   let index = 0; // 合并单元格的索引
-      //   let flag = false; // 是否已合并
-      //   dataList.forEach((item, j) => {
-      //     htm += "<tr>";
-
-      //     // 判断是否已合并
-      //     if (j === index) {
-      //       index += dataListItem[item[0]];
-      //       flag = true;
-      //     }
-
-      //     // 合并单元格第一列
-      //     if (flag) {
-      //       htm += "<td rowspan=" + dataListItem[item[0]] + ">" + item[0] + "</td>";
-      //       flag = false;
-      //     }
-
-      //     // 从第二列开始显示数据
-      //     for (let k = 1; k < item.length; k++) {
-      //       htm += "<td>" + item[k] + "</td>";
-      //     }
-
-      //     htm += "</tr>";
-      //   });
-
-
-      htm += "</table>";
-      console.log(htm);
-      document.getElementById(tableid).innerHTML = htm;
-    },
     // 初始化Excel
-    initExcel (jsonStr_parse, setParam, setParam_parse, result) {
+    initExcel (jsonStr_parse, result) {
       console.log(window.luckysheet);
-      this.reportName = jsonStr_parse.name;
-      // 渲染查询表单
-      this.tableData2 = this.getParamsList(setParam, setParam_parse);
+      this.reportName = jsonStr_parse.name;    
 
       this.params = {
         ...this.params,
@@ -271,8 +170,8 @@ export default {
       this.createSheet();
     },
     //获取查询参数 并获得参数类型及是否必填
-    getParamsList (setParam, setParam_parse) {
-      const extendObj = setParam = setParam_parse;
+    getParamsList (setParam,setCodes,setNames) {
+      const extendObj = setParam;
       const extendArry = [];
       for (const i in extendObj) {
         const children = [];
@@ -282,7 +181,11 @@ export default {
             this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
           }
         }
-        extendArry.push({ name: i, children: children });
+        //报表编码的索引
+        const index = setCodes.findIndex((item) => {
+            return item === i;
+        })
+        extendArry.push({ name: i, children: children,title:setNames[index] });
       }
       return extendArry;
     },
@@ -409,9 +312,9 @@ export default {
     this.$nextTick(() => {
       this.reportCode = this.$route.query.reportCode;
       this.params.reportCode = this.reportCode;
-      this.loading = true;
       this.tableData2 = [];
-      this.searchPreview();
+      this.getParams();
+      this.createSheet ();
       // 解决Jquery 版本冲突问题
       //   window.jQuery.noConflict();
     })
