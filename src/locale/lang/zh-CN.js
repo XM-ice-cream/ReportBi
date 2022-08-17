@@ -1949,6 +1949,12 @@ export default {
     'workorder-wip-report': '工单WIP报表',
     'sip-boxno-check': 'SIP 包装核验',
     'maverick-faca': 'MaverickFaca',
+    'insight-detail': 'Insight明细',
+    'nxt-config': 'NXT 对比配置',
+    'insight-open-close': 'insight开关',
+    'insight-manage': 'insight管理',
+    'productivity-report': '生产报表',
+    'tooling-report': '磨具报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',

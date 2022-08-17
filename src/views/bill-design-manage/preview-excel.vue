@@ -27,8 +27,8 @@
         </div>
         <!-- 预览Card -->
         <div class="previewCard">
-          <template v-for="(item,index) in data">
-            <div class="cardCell" :key="index">
+          <template v-for="item in data">
+            <div class="cardCell" title="点击查看" @click="preview(item.reportCode)" >
               <span class="title">
                 <span class="circle">
                   <Icon type="ios-albums" />
@@ -36,14 +36,14 @@
                 <span class="name" :title="item.reportName">
                   {{item.reportName}}
                 </span>
-                <span class='title-dot'>
+                <!-- <span class='title-dot'>
                   <Button @click="preview(item.reportCode)">
                     <Icon type="md-eye" />预览
                   </Button>
-                  <!-- <Button @click="design(item.reportCode)">
+                  <Button @click="design(item.reportCode)">
                     <Icon type="md-create" />设计
-                  </Button> -->
-                </span>
+                  </Button>
+                </span> -->
               </span>
               <div class="content">
                 <div>
@@ -63,7 +63,7 @@
                   </span>
                 </div>
                 <div>
-                  修改时间: <span class="value" :title="formatDate(item.createDate)">{{formatDate(item.createDate)}}</span>
+                  修改时间: <span class="value" :title="formatDate(item.modifyDate)">{{formatDate(item.modifyDate)}}</span>
                 </div>
               </div>
             </div>
@@ -78,7 +78,8 @@
 
 <script>
 import { formatDate } from "@/libs/tools";
-import { getpagelistReq } from "@/api/bill-design-manage/report-manage.js";
+import { getpagelistReq } from "@/api/bill-design-manage/report-manage";
+import { getpagelisttreeReq } from '@/api/organize-manager/authorize-manager/menu-manager'
 export default {
   components: {},
   name: "previewExcel",
@@ -87,6 +88,8 @@ export default {
       data: [], // 结果集
       selectObj: null,//表格选中
       formatDate: formatDate,
+      roleBtn:[],//该角色下的报表权限卡片
+      pageConfig:{ ...this.$config.pageConfig },
       req: {
         reportName: '',
         reportCode: '',
@@ -97,6 +100,7 @@ export default {
     };
   },
   mounted () {
+    this.getRoleBtn();
     this.pageLoad();
   },
   // 导航离开该组件的对应路由时调用
@@ -158,6 +162,29 @@ export default {
       });
       return href;
     },
+    //获取角色按钮
+    getRoleBtn(){
+         const obj = {
+            orderField: this.pageConfig.orderField, // 排序字段
+            ascending: true, // 是否升序
+            pageSize:  this.pageConfig.pageSize, // 分页大小
+            pageIndex:  this.pageConfig.pageIndex, // 当前页码
+            data: {
+                id: '',
+                parentId: this.$store.state.menuId,
+                category: 2,
+                source: 1,
+                name: '',
+                title: '',
+                enabled: 1
+            },
+        }
+        getpagelisttreeReq(obj).then(res=>{
+            if(res.code===200){
+                this.roleBtn = res.result.data.map(item=>item.name);
+            }
+        })
+    },
 
     // 选择第几页
     pageChange (index) {
@@ -197,6 +224,7 @@ export default {
     position: relative;
     background: #f0f5ff;
     border-radius: 12px;
+    cursor: pointer;
     .title {
       display: inline-block;
       padding: 0.1rem;
@@ -229,7 +257,7 @@ export default {
       }
       //标题名
       .name {
-        width: 8rem;
+        width: 15rem;
         overflow: hidden;
         display: inline-block;
         text-overflow: ellipsis;
