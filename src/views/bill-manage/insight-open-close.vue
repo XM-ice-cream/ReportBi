@@ -77,6 +77,7 @@
 <script>
 import { getpagelistReq ,addReq,modifyReq } from "@/api/bill-manage/insight-open-close";
 import {  getButtonBoolean,formatDate, renderDate,renderIsEnabled } from "@/libs/tools";
+import { errorType } from "@/libs/tools";
 
 export default {
   name: "insight-open-close",

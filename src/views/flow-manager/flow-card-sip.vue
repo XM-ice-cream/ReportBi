@@ -137,7 +137,7 @@ export default {
         { title: "操作员ID", key: "opid", align: "center", width: 100, tooltip: true , resizable: true},
         { title: "彩盒数", key: "boxno", align: "center", width: 100, tooltip: true , resizable: true},
         { title: "箱号", key: "cartonno", align: "center", width: 100, tooltip: true , resizable: true},
-        { title: "UNITSEQ", key: "unitseqoncar", align: "center", width: 60, tooltip: true , resizable: true},
+        { title: "UNITSEQ", key: "unitseq", align: "center", width: 60, tooltip: true , resizable: true},
         { title: "UNITSEQONCAR", key: "unitseqoncar", align: "center", width: 120, tooltip: true , resizable: true},
         { title: "APN", key: "customerno", align: "center", width: 120, tooltip: true , resizable: true},
       ], // 表格数据
