@@ -41,44 +41,9 @@
           </Tooltip>
 
         </div>
-        <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
+        <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:98%;left: 0px;top: 0.2rem;"></div>
         <div style="display:none"></div>
       </Content>
-      <!-- 右侧基础配置 -->
-      <Sider hide-trigger class="sider" style="right:0;position:absolute">
-        <Tabs>
-          <TabPane label="扩展" name="first">
-            <Form ref="rightForm" :model="rightForm" :label-width="40" style="padding: 0 0.5rem">
-              <FormItem label="坐标">
-                <Input v-model="rightForm.coordinate" />
-              </FormItem>
-              <FormItem label="值">
-                <Input v-model="rightForm.value" />
-              </FormItem>
-              <!-- <FormItem label="自动扩展" v-if="rightForm.autoIsShow">
-                <i-switch v-model="rightForm.auto" @on-change="autoChangeFunc($event,'auto')" /> &nbsp;
-                <Tooltip class="item" effect="dark" content="只针对静态数据的单元格" placement="top">
-                  <i class="el-icon-question"> </i>
-                </Tooltip>
-              </FormItem> -->
-              <FormItem label="扩展方向">
-                <RadioGroup type="button" v-model="rightForm.expend" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expend')">
-                  <Radio label="no">无</Radio>
-                  <Radio label="cross">横向</Radio>
-                  <Radio label="portrait">纵向</Radio>
-                </RadioGroup>
-              </FormItem>
-              <FormItem label="扩展排序">
-                <RadioGroup type="button" v-model="rightForm.expendSort" button-style="solid" size="small" @on-change="autoChangeFunc($event,'expendSort')">
-                  <Radio label="no">无</Radio>
-                  <Radio label="asc">升序</Radio>
-                  <Radio label="desc">降序</Radio>
-                </RadioGroup>
-              </FormItem>
-            </Form>
-          </TabPane>
-        </Tabs>
-      </Sider>
     </Layout>
 
     <!-- 数据集管理弹框--表格 -->
@@ -116,7 +81,7 @@
           </TabPane>
           <TabPane label="对应关系" :index="2" v-if="dataSetDataList.length>0">
             <template v-for="(item,index) in dataSetDataList">
-              <Form :label-width="80" :label-colon="true" :key="index" inline>
+              <Form :label-width="80" :label-colon="true" inline>
                 <FormItem label="数据集1">
                   <Select v-model="dataSetDataList[index].setName" clearable filterable transfer @on-change="setCodeChange(index)">
                     <Option v-for="(dataBaseItem, dataBaseIndex) in dataBaseList" :value="dataBaseItem.setName" :key="dataBaseIndex">
@@ -140,7 +105,7 @@
           </TabPane>
           <TabPane label="关联参数" :index="3" v-if="dataSetDataList.length>0">
             <template v-for="(item,itemIndex) in dataSetDataList">
-              <table :key="itemIndex" style="width: 100%;" class="connection-table">
+              <table  style="width: 100%;" class="connection-table">
                 <tr>
                   <th>{{item.setName}}</th>
                   <th>操作符</th>
@@ -593,19 +558,19 @@ export default {
   max-width: 200px !important;
   flex: 0 0 200px !important;
   height: 100%;
-  //   border: 2px solid #3d85c6;
   margin: 0 0.5rem;
-  /* padding: 0 0.5rem; */
-  background-color: transparent;
+  background-color:transparent;
   .title {
     width: 100%;
     height: 2rem;
     color: #1ec0d1;
     text-align: center;
-    margin: 0.2rem 0;
+    margin: 0.2rem 0 0;
     line-height: 2rem;
     font-weight: bold;
     font-size: 0.94rem;
+    background: #fff;
+    border-radius: 0 0 0 1.4rem;
   }
   .icon {
     height: 2rem;
@@ -618,7 +583,9 @@ export default {
   }
   .dblist {
     height: calc(100% - 5rem);
-    overflow-y: scroll;
+    overflow-y: scroll;    
+    background-color: #fff;
+    border-radius:1.4rem 0 0 0 ;
     .row {
       padding: 0.2rem;
       margin: 0 1.6rem 0.3rem;
@@ -639,13 +606,11 @@ export default {
   padding-right: 0.5rem;
 }
 .content {
-  width: calc(100% - 400px);
+  width: calc(100% - 200px - 1rem);
   height: 100%;
   background-color: #fff;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  right: 1rem;
   margin-left: 0rem;
   padding: 1rem;
   overflow-x: visible !important;
@@ -682,7 +647,7 @@ export default {
 /deep/.layout,
 .ivu-layout {
   height: 100%;
-  background: #fff;
+  background: #efefef;
 }
 /deep/.ivu-collapse-simple {
   border-top: none;

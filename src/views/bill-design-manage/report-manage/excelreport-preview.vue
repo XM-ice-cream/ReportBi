@@ -2,48 +2,51 @@
   <div style="height:100%">
     <div class="layout">
       <Layout>
-        <!-- 左侧 -->
-        <Sider hide-trigger class="sider">
-          <!-- 数据集管理 -->
-          <div class="title">表格查询</div>
-          <!-- DBlist -->
-          <div class="dblist">
-            <Form ref="submitReq" :label-width="80" :label-colon="true">
-              <template v-for="item in tableData2" >
-                <span class="title" >{{item.title}}</span>
-                <template v-for="subitem in item.children">
-                  <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
-                    <!-- 字符串 -->
-                    <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable @keyup.native.enter="searchClick(false)"/>
-                    <!-- 布尔 true/false/0/1-->
-                    <RadioGroup v-else-if="subitem.type==='Boolean'&&['true','false','0','1'].includes(subitem.value)" v-model="subitem.value">
-                      <template v-if="['true','false'].includes(subitem.value)">
-                        <Radio label="true">true</Radio>
-                        <Radio label="false">false</Radio>
-                      </template>
-                      <template v-if="['0','1'].includes(subitem.value)">
-                        <Radio label="0">0</Radio>
-                        <Radio label="1">1</Radio>
-                      </template>
-                    </RadioGroup>
-                    <!-- 数组 -->
-                    <Input v-else-if="subitem.type==='Array'" type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" clearable />
-                    <!-- 时间 -->
-                    <DatePicker v-else-if="subitem.type==='DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
-                    <!-- 其余类型 -->
-                    <Input v-else v-model.trim="subitem.value" type="text" clearable />
-                  </FormItem>
-                </template>
-              </template>
-                 <div class="poptip-style-button">
-                  <Button @click="resetClick">{{ $t("reset") }}</Button>
-                  <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
-                </div>
-            </Form>
-          </div>
-        </Sider>
         <!-- 中间内容excel -->
         <Content class="content">
+            <!-- 查询参数 -->
+          <div class="params_search">
+             <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
+                <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
+                  {{ $t("selectQuery") }}
+                </Button>
+                <div class="poptip-style-content" slot="content">
+                      <Form ref="submitReq" :label-width="80" :label-colon="true">
+                        <template v-for="item in tableData2" >
+                            <span class="title" >{{item.title}}</span>
+                            <template v-for="subitem in item.children">
+                            <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                                <!-- 字符串 -->
+                                <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable @keyup.native.enter="searchClick()"/>
+                                <!-- 布尔 true/false/0/1-->
+                                <RadioGroup v-else-if="subitem.type==='Boolean'&&['true','false','0','1'].includes(subitem.value)" v-model="subitem.value">
+                                <template v-if="['true','false'].includes(subitem.value)">
+                                    <Radio label="true">true</Radio>
+                                    <Radio label="false">false</Radio>
+                                </template>
+                                <template v-if="['0','1'].includes(subitem.value)">
+                                    <Radio label="0">0</Radio>
+                                    <Radio label="1">1</Radio>
+                                </template>
+                                </RadioGroup>
+                                <!-- 数组 -->
+                                <Input v-else-if="subitem.type==='Array'" type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" clearable />
+                                <!-- 时间 -->
+                                <DatePicker v-else-if="subitem.type==='DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+                                <!-- 其余类型 -->
+                                <Input v-else v-model.trim="subitem.value" type="text" clearable />
+                            </FormItem>
+                            </template>
+                        </template>
+                            <div class="poptip-style-button">
+                            <Button @click="resetClick">{{ $t("reset") }}</Button>
+                            <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
+                            </div>
+                        </Form>
+                </div>
+            </Poptip>
+          </div>
+          <!-- 下载 -->
           <div class="push_btn">
             <Tooltip class="item" effect="dark" content="导出excel" placement="bottom-start">
               <Button type="text" @click="download()">
@@ -51,16 +54,13 @@
               </Button>
             </Tooltip>
           </div>
-          <div id="luckysheetpreview" style="margin:0;padding:0;position:absolute;width:100%;height:calc(100% - 34px);left: 0;top: 0;"></div>
+          <div id="luckysheetpreview" style="margin:0;padding:0;position:absolute;width:100%;height:calc(100% - 60px);left: 0;top: 0;"></div>
           <!-- <div id="luckysheetpreview"></div> -->
-          <div id="excelpreview" class="data-table"></div>
-          <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+          <page-custom class="excel-page" :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
           <div style="display:none"></div>
         </Content>
       </Layout>
     </div>
-    <img :src="require('../../../assets/images/loading.gif')" v-if="loading" class="loading-img" />
-
   </div>
 </template>
 
@@ -74,10 +74,10 @@ export default {
   components: { draggable },
   data () {
     return {
-      sheetData: [{}],
+      sheetData: [{ row: 30, column: 26}],//初始化默认显示30行 26列
       tableData2: [],
-      loading: false,
-      params: {
+      searchPoptipModal: false,
+      req: {
         reportCode: "",
         setParam: "",
         pageSize: 30, // 每页显示数
@@ -87,6 +87,7 @@ export default {
         total: 0, //  总条数
         totalPage: 0, //  总页数,
         sheetIndex: '',//sheet 当前激活索引
+        elapsedMilliseconds:0,
         // ...this.$config.pageConfig,
       },
       jsonStr: [], // json数据
@@ -98,9 +99,9 @@ export default {
   methods: {
 
     // 获取查询参数
-   async getParams(){
+    async getParams(){
         const obj = {
-            reportCode: this.params.reportCode,
+            reportCode: this.req.reportCode,
             sheetIndex:"",
         }
       await  getParamsReq(obj).then(res=>{
@@ -114,41 +115,42 @@ export default {
         })
     },
 
-
-
-    async searchClick (flag = true) {
-
-      if (!flag) this.params.requestCount = 1;  // 点击查询按钮
-
-      this.dateFormate();  // 左侧查询参数--时间格式化 
-
-      //左侧查询参数 --必要参数接收
-      const arr = this.toObject(this.tableData2);
-      this.params.setParam = JSON.stringify(arr);
-      window.luckysheet.destroy() //销毁
-      this.loading = true;
-      await getExcelPreviewReq(this.params).then(res => {
-        if (res.code === 200) { 
-            this.jsonStr  = JSON.parse(res.result.jsonStr);           
-            this.params = {
-                ...this.params,
-                total: this.jsonStr[this.jsonIndex].total,
-                totalPage: this.jsonStr[this.jsonIndex].pageCount
-            }
-            // //初始化Excel
-            this.sheetData = res.result ===null ? [{}] : this.jsonStr;
+    async searchClick () {
+      this.req.requestCount = 1;  // 点击查询按钮 
+      this.pageLoad();
+      
+    },
+    async pageLoad(){
+        this.dateFormate();  // 左侧查询参数--时间格式化 
+        //左侧查询参数 --必要参数接收
+        const arr = this.toObject(this.tableData2);
+        this.req.setParam = JSON.stringify(arr);
+        this.$Spin.show();
+        
+        await getExcelPreviewReq(this.req).then(res => {
+            if (res.code === 200) { 
+                this.jsonStr  = JSON.parse(res.result.jsonStr);           
+                this.req = {
+                    ...this.req,
+                    total: this.jsonStr[this.jsonIndex].total,
+                    totalPage: this.jsonStr[this.jsonIndex].pageCount,
+                    elapsedMilliseconds: res.elapsedMilliseconds
+                }
+                // //初始化Excel
+                this.sheetData = res.result ===null ? [{}] : this.jsonStr;
+                this.createSheet();
+            } else {
+            this.$Message.error(res.message);
+            this.sheetData = [{}];
+            //初始化Excel
             this.createSheet();
-        } else {
-          this.$Message.error(res.message);
-          this.sheetData = [{}];
-          //初始化Excel
-          this.createSheet();
-        }
-      }).finally(()=>{  this.loading = false; })
+            }
+        }).finally(()=>{   this.searchPoptipModal = false; this.$Spin.hide();})
     },
    
     //初始化表格
     createSheet () {
+       window.luckysheet.destroy() //销毁
       const options = {
         container: "luckysheetpreview", // 设定DOM容器的id
         title: "", // 设定表格名称
@@ -161,10 +163,10 @@ export default {
                 this.jsonIndex = itemIndex
               }
             })
-            this.params.total = this.jsonStr[this.jsonIndex].total;//总数量
-            this.params.totalPage = this.jsonStr[this.jsonIndex].pageCount; //总页数
-            this.params.requestCount = 1;//切换sheet 重置起始页
-            this.params.sheetIndex = index;
+            this.req.total = this.jsonStr[this.jsonIndex].total;//总数量
+            this.req.totalPage = this.jsonStr[this.jsonIndex].pageCount; //总页数
+            this.req.requestCount = 1;//切换sheet 重置起始页
+            this.req.sheetIndex = index;
             this.searchClick();
           }
         },
@@ -176,8 +178,8 @@ export default {
             status: 1, //激活状态
             order: 0, //工作表的下标
             hide: 0, //是否隐藏
-            row: 36, //行数
-            column: 18, //列数
+            row: 30, //行数
+            column: 26, //列数
             defaultRowHeight: 19, //自定义行高
             defaultColWidth: 73, //自定义列宽
             celldata: [], //初始化使用的单元格数据
@@ -211,6 +213,7 @@ export default {
         ]
       };
       options.data = this.sheetData;
+      console.log("this.sheetData",this.sheetData);
       $(function () {
         luckysheet.create(options);
         // console.log(luckysheet.getRangeValue());
@@ -239,9 +242,9 @@ export default {
     },
     // Excel导出
     async download () {
-      exportReq(this.params).then((res) => {
+      exportReq(this.req).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-        const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+        const fileName = this.req.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
         exportFile(blob, fileName);
       });
     },
@@ -282,19 +285,19 @@ export default {
     },
     // 选择第几页
     pageChange (index) {
-      this.params.requestCount = index
+      this.req.requestCount = index
       this.searchClick()
     },
     // 选择一页几条数据
     pageSizeChange (index) {
-      this.params.requestCount = 1
-      this.params.pageSize = index
+      this.req.requestCount = 1
+      this.req.pageSize = index
       this.searchClick()
     }
   },
   mounted () {
     this.$nextTick(() => {
-      this.params.reportCode = this.$route.query.reportCode;
+      this.req.reportCode = this.$route.query.reportCode;
       this.tableData2 = [];
       this.getParams();
       this.createSheet ();
@@ -324,59 +327,22 @@ export default {
   z-index: 910 !important;
 }
 </style>
-<style lang="less" scoped>
-.sider {
-  width: 250px !important;
-  min-width: 250px !important;
-  max-width: 250px !important;
-  flex: 0 0 250px !important;
-  height: 100%;
-  margin: 0 0.5rem;
-  background-color: transparent;
-  .title {
+<style lang="less" scoped>  
+.title {
     width: 100%;
     height: 2rem;
-    color: #1ec0d1;
+    color: #2369ed;
     text-align: center;
-    margin: 0.2rem 0;
     line-height: 2rem;
-    font-weight: bold;
-    font-size: 0.94rem;
   }
-  .icon {
-    height: 2rem;
-    text-align: right;
-    padding-right: 1rem;
-    font-size: 1.5rem;
-    line-height: 2rem;
-    background: #efefef;
-    color: #1ec0d1;
-  }
-  .dblist {
-    padding: 0 5px;
-    .title {
-      width: 100%;
-      height: 1.5rem;
-      background-color: #efefef;
-      text-align: center;
-      display: inline-block;
-      line-height: 1.5rem;
-      color: #666262d9;
-      border-radius: 5px;
-      margin-bottom: 1rem;
-    }
-    .row {
-      padding: 0.2rem;
-      margin: 0 1.6rem 0.3rem;
-    }
-  }
-}
 .content {
-  width: calc(100% - 250px);
+  width: 90%;
   height: 100%;
-  background-color: #fff;
+  margin: 0 auto;
+  background-color: #efefef;
   padding: 1rem;
   position: relative;
+
   .push_btn {
     position: absolute;
     z-index: 100;
@@ -389,12 +355,12 @@ export default {
       margin-right: 0.3rem;
     }
   }
-}
-.loading-img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  .params_search{
+    position: absolute;
+    z-index: 100;
+    top: 15px;
+    left: 5%;
+  }
 }
 
 /deep/.ivu-modal-fullscreen .ivu-modal-body {
@@ -435,7 +401,7 @@ export default {
 .excel-page {
   width: 98%;
   position: absolute;
-  bottom: 8px;
+  bottom: 20px;
   z-index: 9999;
 }
 </style>
