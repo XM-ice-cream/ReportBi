@@ -59,7 +59,7 @@
           <Form :label-width="100" class="demo-ruleForm">
             <Tabs v-model.trim="tabsActiveName" type="card" @on-click="handleClickTabs">
               <TabPane label="查询参数" name="first">
-                <Button type="primary" v-if="tableData.length == 0" size="small" @click="addRow()">添加
+                <Button type="primary" v-if="tableData.length == 0" size="small" @click="addRow(-1)">添加
                 </Button>
                 <Table :data="tableData" border :columns="columns" :max-height="350" style="width: 100%">
                   <template slot-scope="{index}" slot="paramName">
@@ -85,7 +85,7 @@
                   </template>
                   <template slot-scope="{row,index}" slot="operator">
                     <Button type="text" size="small" @click.native.prevent="cutOutRow(index, tableData)">删除</Button>
-                    <Button type="text" size="small" @click="addRow(row)">追加</Button>
+                    <Button type="text" size="small" @click="addRow(index,row)">追加</Button>
                   </template>
                 </Table>
               </TabPane>
@@ -397,8 +397,8 @@ export default {
       this.tableData[val].requiredFlag = !this.tableData[val].mandatory ? 0 : 1;
     },
     // 追加
-    addRow () {
-      this.tableData.push({
+    addRow (index) {
+        const obj = {
         paramName: "",
         paramDesc: "",
         paramType: "",
@@ -406,7 +406,8 @@ export default {
         mandatory: true,
         requiredFlag: 1,
         validationRules: `function verification(data){\n\t//自定义脚本内容\n\t//可返回true/false单纯校验键入的data正确性\n\t//可返回文本，实时替换,比如当前时间等\n\t//return "2099-01-01 00:00:00";\n\treturn true;\n}`,
-      });
+      }
+      this.tableData.splice(index+1,0,obj);
     },
     async submit (formName) {
       this.formData.setType = this.setType;
