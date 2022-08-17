@@ -30,7 +30,7 @@
           <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
           <FormItem label="查询SQL">
             <div class="codemirror">
-              <monaco-editor v-model.trim="formData.dynSentence" language="sql" style="height:400px" />
+              <monaco-editor v-model.trim="formData.dynSentence" language="sql"  />
             </div>
           </FormItem>
           </Col>

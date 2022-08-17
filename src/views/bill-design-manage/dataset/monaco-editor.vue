@@ -1,5 +1,5 @@
 <template>
-  <div ref="editor" class="main"></div>
+  <div ref="editor" class="main" style="height:400px"></div>
 </template>
 
 <script>
