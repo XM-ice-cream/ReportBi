@@ -166,7 +166,6 @@ export default {
         { title: this.$t("description"), key: "description", align: "center", width: 150, tooltip: true },
         { title: this.$t("scrapReason"), key: "scrapreason", align: "center", width: 150, tooltip: true },
         { title: "签核状态", key: "state", align: "center", width: 60, tooltip: true },
-        { title: "签核人员", key: "currentusername", align: "center", width: 60, tooltip: true },
         { title: "下一级签核人员", key: "nextusername", align: "center", width: 60, tooltip: true },
         { title: "分析单位", key: "unitcode", align: "center", width: 150, tooltip: true },
         { title: this.$t("name"), key: "name", align: "center", width: 100, tooltip: true },
