@@ -49,7 +49,7 @@
 <script>
 import { addReq,modifyReq } from "@/api/bill-manage/insight-detail";
 export default {
-  name: "insight-detail",
+  name: "insight-add-modify",
   props:{
     drawerFlag:{
         type:Boolean,

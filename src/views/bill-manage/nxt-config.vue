@@ -1,4 +1,4 @@
-/* Insight明细 */
+/* NXT比对配置 */
 <template>
   <div class="page-style">
   
@@ -22,41 +22,17 @@
                     <FormItem :label="$t('endTime')" prop="endTime">
                       <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
-                     <!-- 机种 -->
-                    <FormItem :label="$t('modelName')" prop="modelName">
-                        <Input v-model="req.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')"/>
+                     <!-- jobName -->
+                    <FormItem label="jobName" prop="jobname">
+                        <Input v-model.trim="req.jobname" :placeholder="$t('pleaseEnter') + 'jobname'"  />
                     </FormItem>
                     <!-- 线体 -->
                     <FormItem label="线体" prop="lineName">
                         <Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + '线体'"  />
                     </FormItem>
-                    <!-- EE Code -->
-                    <FormItem label="EE Code" prop="eeCode">
-                        <Input v-model.trim="req.eeCode" :placeholder="$t('pleaseEnter') + 'EE Code'"  />
-                    </FormItem>
-                    <!-- 料号 -->
-                    <FormItem label="料号" prop="partName">
-                        <Input v-model.trim="req.partName" :placeholder="$t('pleaseEnter') + '料号'"  />
-                    </FormItem>
-                    <!-- 脚号 -->
-                    <FormItem label="脚号" prop="infoCode">
-                        <Input v-model.trim="req.infoCode" :placeholder="$t('pleaseEnter') + '脚号'"  />
-                    </FormItem>
-                    <!-- 品名 -->
-                    <FormItem label="品名" prop="mateType">
-                        <Input v-model.trim="req.mateType" :placeholder="$t('pleaseEnter') + '品名'"  />
-                    </FormItem>
-                    <!-- 路由-->
-                    <FormItem label="路由" prop="origin">
-                        <Input v-model.trim="req.origin" :placeholder="$t('pleaseEnter') + '路由'"  />
-                    </FormItem>
-                    <!-- 状态 -->
-                    <FormItem label="状态" prop="actionFlag">
-                        <Input v-model.trim="req.actionFlag" :placeholder="$t('pleaseEnter') + '状态'"  />
-                    </FormItem>
-                    <!-- 生产地 -->
-                    <FormItem label="生产地" prop="site">
-                        <Input v-model.trim="req.site" :placeholder="$t('pleaseEnter') + '生产地'"  />
+                    <!-- Refdes -->
+                    <FormItem label="Refdes" prop="refdes">
+                        <Input v-model.trim="req.refdes" :placeholder="$t('pleaseEnter') + 'Refdes'"  />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -93,14 +69,14 @@
 </template>
 
 <script>
-import { getpagelistReq ,attendanceInsightUploadUrl } from "@/api/bill-manage/insight-detail";
+import { getpagelistReq ,attendanceInsightUploadUrl } from "@/api/bill-manage/nxt-config";
 import {  getButtonBoolean,formatDate, renderDate } from "@/libs/tools";
 import UploadCustom from "@/components/upload-custom";
-import AddModify from "./insight-detail/add-modify.vue";
+import AddModify from "./nxt-config/add-modify.vue";
 
 
 export default {
-  name: "insight-detail",
+  name: "nxt-config",
   components: { UploadCustom, AddModify },
   data () {
     return {
@@ -117,15 +93,9 @@ export default {
       req: {
         startTime: "",
         endTime: "",
-        modelName: "",
-        lineName: "",
-        eeCode: "",
-        partName: "",
-        infoCode: "",
-        mateType: "",
-        origin: "",
-        actionFlag: "",
-        site: "",
+        jobname: "",
+        linename: "",
+        refdes: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -135,15 +105,9 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: "机种", key: "modelName", align: "center", minWidth: 140, tooltip: true },
-        { title: "EE Code", key: "eeCode", align: "center", minWidth: 140, tooltip: true },
-        { title: "线体", key: "lineName", align: "center", minWidth: 140, tooltip: true },
-        { title: "料号", key: "partName", align: "center", minWidth: 140, tooltip: true },
-        { title: "脚号", key: "infoCode", align: "center", minWidth: 140, tooltip: true },
-        { title: "品名", key: "mateType", align: "center", minWidth: 140, tooltip: true },
-        { title: "路由", key: "origin", align: "center", minWidth: 140, tooltip: true },
-        { title: "状态", key: "actionFlag", align: "center", minWidth: 140, tooltip: true },
-        { title: "生产地", key: "site", align: "center", minWidth: 140, tooltip: true },
+        { title: "jobName", key: "jobname", align: "center", minWidth: 140, tooltip: true },
+        { title: "线体", key: "linename", align: "center", minWidth: 140, tooltip: true },
+        { title: "Refdes", key: "refdes", align: "center", minWidth: 140, tooltip: true },
         { title: "创建人", key: "createUserName", align: "center", minWidth: 120, tooltip: true },
         { title: "创建时间", key: "createDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
         { title: "修改人", key: "modifyUserName", align: "center", minWidth: 120, tooltip: true },
@@ -174,19 +138,19 @@ export default {
     pageLoad () {
         this.data = [];
         this.tableConfig.loading = false;
-        const { startTime, endTime,modelName,lineName,eeCode,partName,infoCode,mateType,origin,actionFlag,site} = this.req;
+        const { startTime, endTime,jobname,linename,refdes} = this.req;
         this.$refs.searchReq.validate((validate) => {
             if (validate) {
             this.tableConfig.loading = true;
             let obj = {
-                orderField: "modelName", // 排序字段
+                orderField: "jobname", // 排序字段
                 ascending: true, // 是否升序
                 pageSize: this.req.pageSize, // 分页大小
                 pageIndex: this.req.pageIndex, // 当前页码
                 data: {
                     startTime: formatDate(startTime),
                     endTime: formatDate(endTime),
-                    modelName,lineName,eeCode,partName,infoCode,mateType,origin,actionFlag,site
+                   jobname,linename,refdes
                 },
             };
             getpagelistReq(obj).then((res) => {
