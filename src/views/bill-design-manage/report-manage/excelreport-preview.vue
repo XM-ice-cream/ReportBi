@@ -6,12 +6,12 @@
         <Content class="content">
             <!-- 查询参数 -->
           <div class="params_search">
-             <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
+             <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer style="z-index:999">
                 <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                      <Form ref="submitReq" :label-width="80" :label-colon="true">
+                      <Form ref="submitReq" :label-width="80" :label-colon="true" style="max-height: 20rem;overflow: auto;">
                         <template v-for="item in tableData2" >
                             <span class="title" >{{item.title}}</span>
                             <template v-for="subitem in item.children">
@@ -37,12 +37,12 @@
                                 <Input v-else v-model.trim="subitem.value" type="text" clearable />
                             </FormItem>
                             </template>
-                        </template>
-                            <div class="poptip-style-button">
+                        </template>                           
+                        </Form>
+                        <div class="poptip-style-button">
                             <Button @click="resetClick">{{ $t("reset") }}</Button>
                             <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
-                            </div>
-                        </Form>
+                        </div>
                 </div>
             </Poptip>
           </div>

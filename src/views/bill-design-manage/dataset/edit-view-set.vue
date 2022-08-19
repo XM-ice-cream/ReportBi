@@ -164,11 +164,11 @@ export default {
       ruleValidate: {
         setName: [
           { required: true, message: "数据集名称必填", trigger: "blur" },
-          { validator:validateChinese,trigger:"change"}
+        //   { validator:validateChinese,trigger:"change"}
         ],
         setCode: [
           { required: true, message: "数据集编码必填", trigger: "change" },
-        //   { validator: validateEngOrNum, trigger: "change" },
+          { validator: validateEngOrNum, trigger: "change" },
         ],
         sourceCode: [
           { required: true, message: "数据源必选", trigger: "change" },
