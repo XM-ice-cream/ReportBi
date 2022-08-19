@@ -1,7 +1,7 @@
 <template>
    <!-- 右侧抽屉 Form表单 -->
     <Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-      <Form ref="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+      <Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
         <!-- 机种 -->
         <FormItem :label="$t('modelName')" prop="modelName">
             <Input v-model="submitData.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')"/>
@@ -55,6 +55,10 @@ export default {
         type:Boolean,
         default:false
     },
+     isAdd:{
+        type:Boolean,
+        default:false
+    },
     selectObj:{
         type:Object,
         default:()=>null
@@ -66,14 +70,14 @@ export default {
   },
   watch:{
     drawerFlag(newVal){
-        if(newVal){
+        //弹窗开启 及编辑时 赋值
+        if(newVal && !this.isAdd){
             this.submitData = {...this.selectObj};
     }
   }
   },
   data () {
     return {
-      drawerTitle:"新增",
       submitData:{
         id:"",
         modelName: "",
@@ -99,7 +103,7 @@ export default {
           const obj = {
              modelName,lineName,eeCode,partName,infoCode,mateType,origin,actionFlag,site,id
           }
-          const requestApi = id?modifyReq:addReq;
+          const requestApi = this.isAdd?addReq:modifyReq;
           requestApi(obj).then((res) => {
             if (res.code === 200) {
               this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
@@ -110,28 +114,10 @@ export default {
         }
       });
     },
-     // 点击新增按钮触发
-    addClick () {
-      this.selectObj = null;
-      this.drawerFlag = true;
-      this.drawerTitle = this.$t("add");
-    },
-     // 点击编辑按钮触发
-    editClick () {
-      if (this.selectObj) {
-        let {
-          modelName,lineName,eeCode,partName,infoCode,mateType,origin,actionFlag,site,id
-        } = this.selectObj;
-        this.submitData = {
-           modelName,lineName,eeCode,partName,infoCode,mateType,origin,actionFlag,site,id
-        };
-        this.drawerFlag = true;
-        this.drawerTitle = this.$t("edit");
-      } else this.$Msg.warning(this.$t("oneData"));
-    },
      // 左侧抽屉取消
     cancelClick () {
-      this.$emit("update:drawerFlag",false)
+      this.$emit("update:drawerFlag",false);
+      this.$refs.submitData.resetFields();
     },
   },
 };

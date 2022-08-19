@@ -8,7 +8,7 @@ export const getpagelistReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl: window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/nxtjobbom/v1/nxtjobbom/getnxtjobbompagelist',
+        url: '/api/reportcenter/nxtjobbom/v1/nxtjobbom/getpagelist',
         method: 'post',
         data
     })
@@ -18,7 +18,7 @@ export const addReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl: window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/nxtjobbom/v1/nxtjobbom/addnxtjobbom',
+        url: '/api/reportcenter/nxtjobbom/v1/nxtjobbom/add',
         method: 'post',
         data
     })
@@ -28,7 +28,7 @@ export const modifyReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl: window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/nxtjobbom/v1/nxtjobbom/modifynxtjobbom',
+        url: '/api/reportcenter/nxtjobbom/v1/nxtjobbom/modify',
         method: 'put',
         data
     })

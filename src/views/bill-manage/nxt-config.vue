@@ -52,7 +52,7 @@
       </Card>
     </div>
     <!-- 新增 、编辑 -->
-    <AddModify :drawerFlag.sync="drawerFlag" :drawerTitle = "drawerTitle" :selectObj="selectObj" @pageLoad = "pageLoad"/>
+    <AddModify :drawerFlag.sync="drawerFlag" :isAdd = "isAdd" :drawerTitle = "drawerTitle" :selectObj="selectObj" @pageLoad = "pageLoad"/>
     <!-- 批量导入 -->
      <Modal
         v-model="modalFlag"
@@ -87,6 +87,7 @@ export default {
       drawerFlag:false,
       modalFlag:false,//批量上传
       drawerTitle:"新增",
+      isAdd:false,
       selectObj:null,// 表格选中数据
       data: [], // 表格数据
       btnData: [],
@@ -185,7 +186,7 @@ export default {
     },
      // 点击新增按钮触发
     addClick () {
-      this.selectObj = null;
+      this.isAdd = true;
       this.drawerFlag = true;
       this.drawerTitle = this.$t("add");
       
@@ -195,6 +196,7 @@ export default {
       if (this.selectObj) {
         this.drawerFlag = true;
         this.drawerTitle = this.$t("edit");
+         this.isAdd = false;
       } else this.$Msg.warning(this.$t("oneData"));
     },
      // 右侧弹窗打开

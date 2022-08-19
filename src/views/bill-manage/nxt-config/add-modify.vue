@@ -1,13 +1,13 @@
 <template>
    <!-- 右侧抽屉 Form表单 -->
     <Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-      <Form ref="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+      <Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
          <!-- jobName -->
         <FormItem label="jobName" prop="jobname">
             <Input v-model.trim="submitData.jobname" :placeholder="$t('pleaseEnter') + 'jobname'"  />
         </FormItem>
         <!-- 线体 -->
-        <FormItem label="线体" prop="lineName">
+        <FormItem label="线体" prop="linename">
             <Input v-model.trim="submitData.linename" :placeholder="$t('pleaseEnter') + '线体'"  />
         </FormItem>
         <!-- Refdes -->
@@ -31,6 +31,10 @@ export default {
         type:Boolean,
         default:false
     },
+     isAdd:{
+        type:Boolean,
+        default:false
+    },
     selectObj:{
         type:Object,
         default:()=>null
@@ -42,14 +46,13 @@ export default {
   },
   watch:{
     drawerFlag(newVal){
-        if(newVal){
+        if(newVal&&!this.isAdd){
             this.submitData = {...this.selectObj};
-    }
+        }
   }
   },
   data () {
     return {
-      drawerTitle:"新增",
       submitData:{
         id:"",
         jobname: "",
@@ -69,7 +72,7 @@ export default {
           const obj = {
              jobname,linename,refdes,id
           }
-          const requestApi = id?modifyReq:addReq;
+          const requestApi = this.isAdd?addReq:modifyReq;
           requestApi(obj).then((res) => {
             if (res.code === 200) {
               this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
@@ -80,28 +83,10 @@ export default {
         }
       });
     },
-     // 点击新增按钮触发
-    addClick () {
-      this.selectObj = null;
-      this.drawerFlag = true;
-      this.drawerTitle = this.$t("add");
-    },
-     // 点击编辑按钮触发
-    editClick () {
-      if (this.selectObj) {
-        let {
-          jobname,linename,refdes,id
-        } = this.selectObj;
-        this.submitData = {
-           jobname,linename,refdes,id
-        };
-        this.drawerFlag = true;
-        this.drawerTitle = this.$t("edit");
-      } else this.$Msg.warning(this.$t("oneData"));
-    },
      // 左侧抽屉取消
     cancelClick () {
-      this.$emit("update:drawerFlag",false)
+      this.$emit("update:drawerFlag",false);
+      this.$refs.submitData.resetFields();
     },
   },
 };

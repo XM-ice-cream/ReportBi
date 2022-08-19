@@ -3,7 +3,7 @@
   <div class="page-style">
     <!-- 右侧抽屉 Form表单 -->
     <Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-      <Form ref="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+      <Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
         <!-- 机种 -->
         <FormItem :label="$t('modelName')" prop="modelName">
             <Input v-model="submitData.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')"/>
@@ -88,6 +88,7 @@ export default {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       drawerFlag:false,
       drawerTitle:"新增",
+      isAdd:false,
       selectObj:null,// 表格选中数据
       data: [], // 表格数据
       btnData: [],
@@ -184,7 +185,7 @@ export default {
              enabled,
              id
           }
-          const requestApi = id?modifyReq:addReq;
+          const requestApi = this.isAdd?addReq:modifyReq;
           requestApi(obj).then((res) => {
             if (res.code === 200) {
               this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
@@ -197,7 +198,7 @@ export default {
     },
      // 点击新增按钮触发
     addClick () {
-      this.selectObj = null;
+      this.isAdd = true;
       this.drawerFlag = true;
       this.drawerTitle = this.$t("add");
       
@@ -217,6 +218,7 @@ export default {
           enabled,
           id
         };
+        this.isAdd = false;
         this.drawerFlag = true;
         this.drawerTitle = this.$t("edit");
       } else this.$Msg.warning(this.$t("oneData"));
@@ -232,6 +234,7 @@ export default {
      // 左侧抽屉取消
     cancelClick () {
       this.drawerFlag = false;
+      this.$refs.submitData.resetFields();
     },
     // 自动改变表格高度
     autoSize () {
