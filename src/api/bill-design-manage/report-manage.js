@@ -69,7 +69,7 @@ export const getExcelByReportcodeReq = data => {
 //Excel 预览
 export const getExcelPreviewReq = data => {
     return requestCenter({
-        timeout: 1000 * 60 * 5, //最长等待五分钟
+        timeout: 1000 * 60 * 20, //最长等待20分钟
         baseUrl: window.localStorage.getItem("reportDesignIp"),
         url: '/api/autoreportcenter/anonymous/v1/reportexcel/preview',
         method: 'post',

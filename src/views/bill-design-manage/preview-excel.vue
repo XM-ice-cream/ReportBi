@@ -99,9 +99,9 @@ export default {
 
     };
   },
-  mounted () {
+  mounted() {
     this.getRoleBtn();
-    this.pageLoad();
+    
   },
   // 导航离开该组件的对应路由时调用
   beforeRouteLeave (to, from, next) {
@@ -127,6 +127,7 @@ export default {
           reportType: this.req.reportType,
           reportName: this.req.reportName,
           reportCode: this.req.reportCode,
+          codeList:this.roleBtn.toString()
         },
       };
       getpagelistReq(obj).then((res) => {
@@ -167,8 +168,8 @@ export default {
          const obj = {
             orderField: this.pageConfig.orderField, // 排序字段
             ascending: true, // 是否升序
-            pageSize:  this.pageConfig.pageSize, // 分页大小
-            pageIndex:  this.pageConfig.pageIndex, // 当前页码
+            pageSize:  9999, // 分页大小
+            pageIndex:  1, // 当前页码
             data: {
                 id: '',
                 parentId: this.$store.state.menuId,
@@ -181,7 +182,10 @@ export default {
         }
         getpagelisttreeReq(obj).then(res=>{
             if(res.code===200){
-                this.roleBtn = res.result.data.map(item=>item.name);
+                console.log( res.result.data);
+                const data = res.result.data;
+                this.roleBtn = data.length?data.map(item=>item.name):['a'];
+                this.pageLoad();
             }
         })
     },

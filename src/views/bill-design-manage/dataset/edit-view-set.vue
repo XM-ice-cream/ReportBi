@@ -168,7 +168,7 @@ export default {
         ],
         setCode: [
           { required: true, message: "数据集编码必填", trigger: "change" },
-          { validator: validateEngOrNum, trigger: "change" },
+        //   { validator: validateEngOrNum, trigger: "change" },
         ],
         sourceCode: [
           { required: true, message: "数据源必选", trigger: "change" },
