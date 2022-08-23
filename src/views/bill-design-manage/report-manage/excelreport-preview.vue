@@ -357,7 +357,7 @@ export default {
 
     i {
       color: #6c6666;
-      font-size: 1.12rem;
+      font-size: 1.62rem;
       margin-right: 0.3rem;
     }
   }

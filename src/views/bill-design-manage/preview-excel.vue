@@ -28,7 +28,7 @@
         <!-- 预览Card -->
         <div class="previewCard">
           <template v-for="item in data">
-            <div class="cardCell" title="点击查看" @click="preview(item.reportCode)" >
+            <div class="cardCell" title="点击查看" @click="preview(item.reportCode,item.reportName)" >
               <span class="title">
                 <span class="circle">
                   <Icon type="ios-albums" />
@@ -140,17 +140,17 @@ export default {
       }).catch();
     },
     //设计
-    design (reportCode) {
-      const href = this.skipUrl(this.req.reportType + 'Design', reportCode);
+    design (reportCode,reportName) {
+      const href = this.skipUrl(this.req.reportType + 'Design', reportCode,reportName);
       window.open(href, '_blank');
     },
     // 预览
-    preview (reportCode) {
-      const href = this.skipUrl(this.req.reportType + 'Preview', reportCode);
+    preview (reportCode,reportName) {
+      const href = this.skipUrl(this.req.reportType + 'Preview', reportCode,reportName);
       window.open(href, '_blank');
     },
     //跳转路径
-    skipUrl (key, reportCode) {
+    skipUrl (key, reportCode,reportName) {
       const obj = {
         excelPreview: '/bill-design-manage/excelreport-preview',
         largescreenPreview: '/bill-design-manage/screenreport-preview',
@@ -159,7 +159,7 @@ export default {
       }
       const { href } = this.$router.resolve({
         path: obj[key],
-        query: { reportCode }
+        query: { reportCode,reportName }
       });
       return href;
     },

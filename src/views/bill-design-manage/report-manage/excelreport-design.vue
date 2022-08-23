@@ -454,7 +454,8 @@ export default {
       const { href } = this.$router.resolve({
         path: '/bill-design-manage/excelreport-preview',
         query: {
-          reportCode: this.reportCode
+          reportCode: this.reportCode,
+          reportName: this.$route.query.reportName
         }
       });
       window.open(href, '_blank');
@@ -550,6 +551,9 @@ export default {
 </script>
  <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
 <style>
+.luckysheet_info_detail div.luckysheet_info_detail_back,.luckysheet_info_detail_save,.luckysheet_info_detail_update{
+    display:none;
+}
 </style>
 <style lang="less" scoped>
 .sider {
@@ -617,7 +621,7 @@ export default {
   .push_btn {
     position: absolute;
     top: 15px;
-    right: 13%;
+    right: 4%;
     z-index: 99;
     i {
       color: #6c6666;
