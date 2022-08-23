@@ -46,6 +46,9 @@
                 </div>
             </Poptip>
           </div>
+          <div class="report-title">
+            {{$route.query.reportName}}
+          </div>
           <!-- 下载 -->
           <div class="push_btn">
             <Tooltip class="item" effect="dark" content="导出excel" placement="bottom-start">
@@ -286,13 +289,13 @@ export default {
     // 选择第几页
     pageChange (index) {
       this.req.requestCount = index
-      this.searchClick()
+      this.pageLoad()
     },
     // 选择一页几条数据
     pageSizeChange (index) {
       this.req.requestCount = 1
       this.req.pageSize = index
-      this.searchClick()
+      this.pageLoad()
     }
   },
   mounted () {
@@ -326,6 +329,9 @@ export default {
 .ivu-modal-wrap {
   z-index: 910 !important;
 }
+.luckysheet_info_detail div.luckysheet_info_detail_back,.luckysheet_info_detail_save,.luckysheet_info_detail_update{
+    display:none;
+}
 </style>
 <style lang="less" scoped>  
 .title {
@@ -347,7 +353,7 @@ export default {
     position: absolute;
     z-index: 100;
     top: 15px;
-    right: 13%;
+    right: 1%;
 
     i {
       color: #6c6666;
@@ -359,7 +365,17 @@ export default {
     position: absolute;
     z-index: 100;
     top: 15px;
-    left: 5%;
+    left: 2%;
+  }
+  .report-title{
+    width: 20%;
+    font-size: 1.14rem;
+    margin: 0 auto;
+    font-weight: 600;
+    text-align: center;
+    position: absolute;
+    z-index: 100;
+    left: 40%;
   }
 }
 

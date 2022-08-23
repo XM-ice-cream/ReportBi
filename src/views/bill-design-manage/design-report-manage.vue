@@ -335,16 +335,18 @@ export default {
     //设计
     design (data) {
       this.selectObj = { ...data };
-      const href = this.skipUrl(data.reportType + 'Design', this.selectObj.reportCode);
+     const { reportCode,reportName } = data;
+      const href = this.skipUrl(data.reportType + 'Design', reportCode,reportName);
       window.open(href, '_blank');
     },
     // 预览
     preview (data) {
       this.selectObj = { ...data };
-      const href = this.skipUrl(data.reportType + 'Preview', this.selectObj.reportCode);
+      const { reportCode,reportName } = data;
+      const href = this.skipUrl(data.reportType + 'Preview', reportCode,reportName);
       window.open(href, '_blank');
     },
-    skipUrl (key, reportCode) {
+    skipUrl (key, reportCode,reportName) {
       const obj = {
         excelPreview: '/bill-design-manage/excelreport-preview',
         largescreenPreview: '/bill-design-manage/screenreport-preview',
@@ -353,7 +355,7 @@ export default {
       }
       const { href } = this.$router.resolve({
         path: obj[key],
-        query: { reportCode }
+        query: { reportCode ,reportName}
       });
       return href;
     },
