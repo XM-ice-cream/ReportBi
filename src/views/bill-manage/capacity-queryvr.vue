@@ -342,6 +342,22 @@ export default {
           align: "center",
           ellipsis: true,
           tooltip: true,
+        }, 
+         {
+          title: "维修后良率",
+          key: "yield_Rate2",
+          width: 80,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
+        }, 
+         {
+          title: "报废数",
+          key: "scrapQty",
+          width: 80,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
         },
         {
           title: this.$t("startTime"),
