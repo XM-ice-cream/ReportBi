@@ -57,7 +57,6 @@
      <Modal
         v-model="modalFlag"
         title="批量导入"
-        @on-ok="importSubmitClick"
         @on-cancel="cancelClick">
        <upload-custom class="upload-con" :uploadUrl="uploadUrl" :uploadHeight="33" uploadIcon="ios-cloud-upload-outline" :uploadFormat="['xlsx']" @upload-success="uploadSuccess">
           <div slot="button">
@@ -69,7 +68,7 @@
 </template>
 
 <script>
-import { getpagelistReq ,attendanceInsightUploadUrl } from "@/api/bill-manage/nxt-config";
+import { getpagelistReq ,attendanceNxtUploadUrl } from "@/api/bill-manage/nxt-config";
 import {  getButtonBoolean,formatDate, renderDate } from "@/libs/tools";
 import UploadCustom from "@/components/upload-custom";
 import AddModify from "./nxt-config/add-modify.vue";
@@ -83,7 +82,7 @@ export default {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
-      uploadUrl: attendanceInsightUploadUrl(), //批量导入Excel文件
+      uploadUrl: attendanceNxtUploadUrl(), //批量导入Excel文件
       drawerFlag:false,
       modalFlag:false,//批量上传
       drawerTitle:"新增",
@@ -144,8 +143,8 @@ export default {
             if (validate) {
             this.tableConfig.loading = true;
             let obj = {
-                orderField: "jobname", // 排序字段
-                ascending: true, // 是否升序
+                orderField: "createDate", // 排序字段
+                ascending: false, // 是否升序
                 pageSize: this.req.pageSize, // 分页大小
                 pageIndex: this.req.pageIndex, // 当前页码
                 data: {
@@ -167,12 +166,11 @@ export default {
             }
         });
     },
-    //批量导入
-    importSubmitClick(){
-
-    },
      uploadSuccess () {
+       this.searchClick ();//刷新
       this.$Message.success(`${this.$t("import")}${this.$t("success")}`);
+      //关闭弹框
+      this.modalFlag = false;
     },
     //下载模板
     download () {

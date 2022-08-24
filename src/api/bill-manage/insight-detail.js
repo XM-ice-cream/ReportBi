@@ -34,4 +34,4 @@ export const modifyReq = data => {
     })
 }
 // 批量导入Excel文件
-export const attendanceInsightUploadUrl = () => `${window.localStorage.getItem("reportip")}/api/usercenter/v1/carduser/upload`
+export const attendanceInsightUploadUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/insight/v1/insightdetail/upload`

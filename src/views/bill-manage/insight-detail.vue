@@ -81,7 +81,6 @@
      <Modal
         v-model="modalFlag"
         title="批量导入"
-        @on-ok="importSubmitClick"
         @on-cancel="cancelClick">
        <upload-custom class="upload-con" :uploadUrl="uploadUrl" :uploadHeight="33" uploadIcon="ios-cloud-upload-outline" :uploadFormat="['xlsx']" @upload-success="uploadSuccess">
           <div slot="button">
@@ -203,12 +202,12 @@ export default {
             }
         });
     },
-    //批量导入
-    importSubmitClick(){
 
-    },
      uploadSuccess () {
+      this.searchClick ();//刷新
       this.$Message.success(`${this.$t("import")}${this.$t("success")}`);
+      //关闭弹框
+      this.modalFlag = false;
     },
     //下载模板
     download () {

@@ -34,4 +34,4 @@ export const modifyReq = data => {
     })
 }
 // 批量导入Excel文件
-export const attendanceInsightUploadUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/nxtjobbom/v1/nxtjobbom/upload`
+export const attendanceNxtUploadUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/nxtjobbom/v1/nxtjobbom/upload`
