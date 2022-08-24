@@ -130,6 +130,10 @@ export default {
     };
   },
   activated () {
+    console.log(this.$route.query.sourceCode);
+    if(this.$route.query.sourceCode){
+        this.req.sourceCode = this.$route.query.sourceCode;
+    }
     this.pageLoad();
     this.autoSize();
     this.getDataSourceList();

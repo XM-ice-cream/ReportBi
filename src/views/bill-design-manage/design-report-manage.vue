@@ -170,6 +170,7 @@ export default {
         reportCode: "",
         reportAuthor: "",
         reportDesc: "",
+        setCode:"",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -219,6 +220,9 @@ export default {
     };
   },
   activated () {
+    if(this.$route.query.setCode){
+        this.req.setCode = this.$route.query.setCode;
+    }
     this.pageLoad();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
@@ -233,20 +237,21 @@ export default {
     // 点击搜索按钮触发
     searchClick () {
       this.req.pageIndex = 1;
+      this.req.setCode = "";
       this.pageLoad();
     },
     // 获取分页列表数据
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = true;
-      const { reportType, reportName, reportAuthor, reportCode } = this.req
+      const { reportType, reportName, reportAuthor, reportCode,setCode } = this.req
       let obj = {
         orderField: "reportType", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
         data: {
-          reportType, reportName, reportAuthor, reportCode
+          reportType, reportName, reportAuthor, reportCode,setCode
         },
       };
       getpagelistReq(obj).then((res) => {

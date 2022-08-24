@@ -102,6 +102,7 @@
       <div slot="footer" class="dialog-footer">
         <Button @click="closeDialog">取消</Button>
         <Button type="primary" @click="submit('form')">保存</Button>
+        <Button type="primary" @click="submit('form',true)">保存并跳转至报表设计管理</Button>
       </div>
     </Modal>
     <Modal :title="title" v-model="dialogPermissionVisible" :mask-closable="false" :closable="true" width="60%">
@@ -409,7 +410,7 @@ export default {
       }
       this.tableData.splice(index+1,0,obj);
     },
-    async submit (formName) {
+    async submit (formName,isSkip=false) {
       this.formData.setType = this.setType;
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
@@ -431,8 +432,12 @@ export default {
               return;
             }
             this.$Message.success("提交成功！");
+             if(isSkip) {
+                this.$router.push({name: 'design-report-manage',query: {setCode: this.formData.setCode}})
+            }
             this.$emit("refreshList");
             this.closeDialog();
+           
           } else {
             this.$Message.error("请先测试预览，操作成功后便可保存！");
             return;
