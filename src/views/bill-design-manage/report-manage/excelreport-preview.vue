@@ -12,8 +12,8 @@
                 <div class="poptip-style-content" slot="content">
                   <Form ref="submitReq" :label-width="80" :label-colon="true">
                     <template v-for="(item) in tableData2">
-                      <template v-for="(subitem,subindex) in item.children">
-                        <FormItem :label='subitem.name' :key="item.name+subindex" :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                      <template v-for="(subitem,subindex) in item.children" :key="item.name+subindex">
+                        <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                           <!-- 字符串 -->
                           <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable />
                           <!-- 布尔 true/false/0/1-->
@@ -186,19 +186,29 @@ export default {
         //合并单元格 
         const colspan = `${mc?.cs || 1}`;
         const rowspan = `${mc?.rs || 1}`;
+        if (colspan > 1&&rowspan > 1) {
+            for (let i = 0; i < colspan; i++) {
+                for(let j =0;j<rowspan;j++){
+                    if (!this.tableHtml[r+j]) this.tableHtml[r+j] = [];
+                    if (!this.tableHtml[r+j][c + i]) this.tableHtml[r+j][c + i] = {};
+                    this.tableHtml[r+j][c + i] = { ...this.tableHtml[r][c + i], rowspan: 0};
+                }
+            }
+        }else{
         if (colspan > 1) {
-          for (let i = 1; i < colspan; i++) {
-            if (!this.tableHtml[r]) this.tableHtml[r] = [];
-            if (!this.tableHtml[r][c + i]) this.tableHtml[r][c + i] = {};
-            this.tableHtml[r][c + i] = { ...this.tableHtml[r][c + i], rowspan: 0 }
-          }
+            for (let i = 1; i < colspan; i++) {
+                if (!this.tableHtml[r]) this.tableHtml[r] = [];
+                if (!this.tableHtml[r][c + i]) this.tableHtml[r][c + i] = {};
+                this.tableHtml[r][c + i] = { ...this.tableHtml[r][c + i], rowspan: 0 }
+             }
         }
-        if (rowspan > 0) {
-          for (let i = 1; i < rowspan; i++) {
-            if (!this.tableHtml[r + i]) this.tableHtml[r + i] = [];
-            if (!this.tableHtml[r + i][c]) this.tableHtml[r + i][c] = {};
-            this.tableHtml[r + i][c] = { ...this.tableHtml[r + i][c], rowspan: 0 }
-          }
+        if (rowspan > 1) {
+            for (let i = 1; i < rowspan; i++) {
+                if (!this.tableHtml[r + i]) this.tableHtml[r + i] = [];
+                if (!this.tableHtml[r + i][c]) this.tableHtml[r + i][c] = {};
+                this.tableHtml[r + i][c] = { ...this.tableHtml[r + i][c], rowspan: 0 };
+            }
+        }
         }
         //td 内部div样式
         let divStyle = `width:${width * colspan}px;height:${height * rowspan}px;`;//宽高
