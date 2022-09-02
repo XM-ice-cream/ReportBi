@@ -301,6 +301,7 @@ export default {
   mounted () {
     this.$nextTick(() => {
       this.req.reportCode = this.$route.query.reportCode;
+      document.title =  this.$route.query.reportName
       this.tableData2 = [];
       this.getParams();
       this.createSheet ();
