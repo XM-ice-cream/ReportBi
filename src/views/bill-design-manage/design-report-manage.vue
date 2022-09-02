@@ -8,38 +8,42 @@
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <!-- 报表名称 -->
           <FormItem :label="$t('reportName')" prop="reportName">
-            <Input v-model.trim="submitData.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')" />
+            <Input v-model.trim="submitData.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')" cleabler/>
           </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <!-- 报表编码 -->
           <FormItem :label="$t('reportCode')" prop="reportCode">
-            <Input v-model.trim="submitData.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')" v-if="this.isAdd" />
+            <Input v-model.trim="submitData.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')" v-if="this.isAdd" cleabler/>
             <span v-else>{{ submitData.reportCode }}</span>
           </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-          <!-- 报表类型 -->
-          <FormItem :label="$t('reportType')" prop="reportType">
-            <Select v-model="submitData.reportType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer v-if="this.isAdd">
-              <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
-                {{ item.detailName }}
-              </Option>
-            </Select>
-            <span v-else>{{ submitData.reportType }}</span>
-          </FormItem>
+            <!-- 报表类型 -->
+            <FormItem :label="$t('reportType')" prop="reportType">
+                <Select v-model="submitData.reportType" clearable :placeholder="$t('pleaseSelect') + $t('status')" cleabler transfer v-if="this.isAdd">
+                <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
+                    {{ item.detailName }}
+                </Option>
+                </Select>
+                <span v-else>{{ submitData.reportType }}</span>
+            </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-          <!-- 制作人 -->
-          <FormItem :label="$t('reportAuthor')" prop="reportAuthor">
-            <Input v-model.trim="submitData.reportAuthor" :placeholder="$t('pleaseEnter') + $t('reportAuthor')" />
-          </FormItem>
+            <!-- 报表分类 -->
+            <FormItem label="报表分类" prop="remark">
+                <Select v-model="submitData.remark" clearable :placeholder="$t('pleaseSelect') +'报表分类'" transfer cleabler>
+                    <Option v-for="(item, i) in remarkList" :value="item.detailName" :key="i">
+                        {{ item.detailName }}
+                    </Option>
+                </Select>
+            </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-          <!-- 描述 -->
-          <FormItem :label="$t('reportDesc')" prop="reportDesc">
-            <Input v-model.trim="submitData.reportDesc" :placeholder="$t('pleaseEnter') + $t('reportDesc')" />
-          </FormItem>
+            <!-- 描述 -->
+            <FormItem :label="$t('reportDesc')" prop="reportDesc">
+                <Input v-model.trim="submitData.reportDesc" :placeholder="$t('pleaseEnter') + $t('reportDesc')" cleabler/>
+            </FormItem>
           </Col>
           <Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <!-- 状态 -->
@@ -72,7 +76,7 @@
                   <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
                     <!-- 报表类型 -->
                     <FormItem :label="$t('reportType')" prop="reportType">
-                      <Select v-model="req.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')" transfer>
+                      <Select v-model="req.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')" transfer cleabler>
                         <Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
                           {{ item.detailName }}
                         </Option>
@@ -80,15 +84,23 @@
                     </FormItem>
                     <!-- 报表名称 -->
                     <FormItem :label="$t('reportName')" prop="reportName">
-                      <Input v-model="req.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')" @on-search="searchClick" />
+                      <Input v-model="req.reportName" :placeholder="$t('pleaseEnter') + $t('reportName')" @on-search="searchClick" cleabler/>
                     </FormItem>
                     <!-- 报表编码 -->
                     <FormItem :label="$t('reportCode')" prop="reportCode">
-                      <Input v-model="req.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')" @on-search="searchClick" />
+                      <Input v-model="req.reportCode" :placeholder="$t('pleaseEnter') + $t('reportCode')" @on-search="searchClick" cleabler/>
+                    </FormItem>
+                    <!-- 报表分类 -->
+                    <FormItem label="报表分类" prop="remark">
+                        <Select v-model="req.remark" clearable :placeholder="$t('pleaseSelect') +'报表分类'" transfer cleabler>
+                            <Option v-for="(item, i) in remarkList" :value="item.detailName" :key="i">
+                                {{ item.detailName }}
+                            </Option>
+                        </Select>
                     </FormItem>
                     <!-- 制作人 -->
                     <FormItem :label="$t('reportAuthor')" prop="reportAuthor">
-                      <Input v-model="req.reportAuthor" :placeholder="$t('pleaseEnter') + $t('reportAuthor')" @on-search="searchClick" />
+                      <Input v-model="req.reportAuthor" :placeholder="$t('pleaseEnter') + $t('reportAuthor')" @on-search="searchClick" cleabler/>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -138,6 +150,7 @@ import excelreportDesign from './report-manage/excelreport-design.vue';
 import ExcelreportPreview from './report-manage/excelreport-preview.vue';
 import ScreenreportDesign from './report-manage/screenreport-design.vue';
 import ScreenreportPreview from './report-manage/screenreport-preview.vue';
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 
 export default {
   components: { excelreportDesign, ExcelreportPreview, ScreenreportDesign, ScreenreportPreview },
@@ -148,6 +161,7 @@ export default {
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
+      remarkList:[],//报表类型下拉
       drawerTitle: this.$t("add"),
       btnData: [],
       isAdd: true,
@@ -161,7 +175,8 @@ export default {
         reportDesc: "",
         reportType: "",
         reportAuthor: "",
-        reportName: ""
+        reportName: "",
+        remark:"",//报表类型
       },
       drawerFlag: false,
       req: {
@@ -171,6 +186,7 @@ export default {
         reportAuthor: "",
         reportDesc: "",
         setCode:"",
+        remark:"",//报表类型
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -189,6 +205,7 @@ export default {
         { title: this.$t("reportCode"), key: "reportCode", align: "center", tooltip: true, },
         { title: this.$t("reportType"), key: "reportType", align: "center", slot: "reportType", width: 120 },
         { title: this.$t("reportAuthor"), key: "reportAuthor", align: "center", tooltip: true },
+        { title:"报表分类",key:"remark",align:"center",tooltip:true},
         { title: this.$t("dataSetDesc"), key: "reportDesc", align: "center", tooltip: true, },
         { title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
         { title: this.$t("operator"), slot: "operator", align: "center", width: '100' },
@@ -224,6 +241,7 @@ export default {
         this.req.setCode = this.$route.query.setCode;
     }
     this.pageLoad();
+    this.getDataItemData();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
     getButtonBoolean(this, this.btnData);
@@ -244,14 +262,14 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = true;
-      const { reportType, reportName, reportAuthor, reportCode,setCode } = this.req
+      const { reportType, reportName, reportAuthor, reportCode,setCode,remark } = this.req
       let obj = {
         orderField: "reportType", // 排序字段
         ascending: true, // 是否升序
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
         data: {
-          reportType, reportName, reportAuthor, reportCode,setCode
+          reportType, reportName, reportAuthor, reportCode,setCode,remark
         },
       };
       getpagelistReq(obj).then((res) => {
@@ -273,8 +291,8 @@ export default {
     // 点击编辑按钮触发
     editClick () {
       if (this.selectObj) {
-        let { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled } = this.selectObj;
-        this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled };
+        let { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled ,remark} = this.selectObj;
+        this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled,remark };
         this.drawerFlag = true;
         this.isAdd = false;
         this.drawerTitle = this.$t("edit");
@@ -350,6 +368,20 @@ export default {
       const { reportCode,reportName } = data;
       const href = this.skipUrl(data.reportType + 'Preview', reportCode,reportName);
       window.open(href, '_blank');
+    },
+     // 获取业务数据
+    async getDataItemData () {
+      this.remarkList = await this.getDataItemDetailList("reportDesignType"); // 获取站点数据
+    },
+     // 获取数据字典数据
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) {
+          arr = res.result || [];
+        }
+      });
+      return arr;
     },
     skipUrl (key, reportCode,reportName) {
       const obj = {

@@ -13,16 +13,28 @@
                 <Radio label="largescreen">大屏</Radio>
               </RadioGroup>
             </FormItem>
+             <!-- 报表分类 -->
+            <FormItem label="报表分类" prop="remark">
+                <Select v-model="req.remark" clearable :placeholder="$t('pleaseSelect') +'报表分类'" transfer cleabler @on-change='searchClick'>
+                    <Option v-for="(item, i) in remarkList" :value="item.detailName" :key="i">
+                        {{ item.detailName }}
+                    </Option>
+                </Select>
+            </FormItem>
             <!-- 报表名称 -->
             <FormItem :label="$t('reportName')" prop="reportName">
-              <Input v-model="req.reportName" clearable :placeholder="$t('pleaseEnter') + $t('reportName')" @on-search="searchClick" />
+              <Input v-model="req.reportName" clearable :placeholder="$t('pleaseEnter') + $t('reportName')" />
             </FormItem>
             <!-- 报表编码 -->
             <FormItem :label="$t('reportCode')" prop="reportCode">
-              <Input v-model="req.reportCode" clearable :placeholder="$t('pleaseEnter') + $t('reportCode')" @on-search="searchClick" />
+              <Input v-model="req.reportCode" clearable :placeholder="$t('pleaseEnter') + $t('reportCode')"/>
             </FormItem>
-            <!-- 按钮 -->
-            <Button type="primary" @click="searchClick()">{{ $t("query") }}</Button>
+           
+            <FormItem>
+                <!-- 按钮 -->
+                <Button type="primary" @click="searchClick()">{{ $t("query") }}</Button>
+            </FormItem>
+           
           </Form>
         </div>
         <!-- 预览Card -->
@@ -79,7 +91,8 @@
 <script>
 import { formatDate } from "@/libs/tools";
 import { getpagelistReq } from "@/api/bill-design-manage/report-manage";
-import { getpagelisttreeReq } from '@/api/organize-manager/authorize-manager/menu-manager'
+import { getpagelisttreeReq } from '@/api/organize-manager/authorize-manager/menu-manager';
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 export default {
   components: {},
   name: "previewExcel",
@@ -94,6 +107,7 @@ export default {
         reportName: '',
         reportCode: '',
         reportType: 'excel',
+        remark:'',
         ...this.$config.pageConfig,
       }, //查询数据
 
@@ -101,6 +115,7 @@ export default {
   },
   mounted() {
     this.getRoleBtn();
+    this.getDataItemData();
     
   },
   // 导航离开该组件的对应路由时调用
@@ -117,6 +132,7 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.data = [];
+      const { reportType ,reportName,reportCode,remark} = this.req;
       //   this.tableConfig.loading = true;
       let obj = {
         orderField: "reportType", // 排序字段
@@ -124,9 +140,10 @@ export default {
         pageSize: this.req.pageSize, // 分页大小
         pageIndex: this.req.pageIndex, // 当前页码
         data: {
-          reportType: this.req.reportType,
-          reportName: this.req.reportName,
-          reportCode: this.req.reportCode,
+          reportType,
+          reportName,
+          reportCode,
+          remark,
           codeList:this.roleBtn.toString()
         },
       };
@@ -188,6 +205,20 @@ export default {
                 this.pageLoad();
             }
         })
+    },
+      // 获取业务数据
+    async getDataItemData () {
+      this.remarkList = await this.getDataItemDetailList("reportDesignType"); // 获取站点数据
+    },
+     // 获取数据字典数据
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) {
+          arr = res.result || [];
+        }
+      });
+      return arr;
     },
 
     // 选择第几页
