@@ -114,6 +114,8 @@ export default {
                 const setNames = res.result.setNames.split("|");
                 // 渲染查询表单
                 this.tableData2 = this.getParamsList(setParam,setCodes,setNames);
+                //清空数据
+                this. resetClick();
             }
         })
     },
@@ -253,10 +255,12 @@ export default {
     },
     //重置
     resetClick(){
-        console.log(this.tableData2);
         this.tableData2.map(item=>{
             item.children.map(cItem=>{
-                cItem.value = "";
+                if(cItem.type!=='Boolean'){
+                     cItem.value = "";
+                }
+               
             })
         })
     },
