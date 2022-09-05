@@ -1955,6 +1955,8 @@ export default {
     'insight-manage': 'insight管理',
     'productivity-report': '生产报表',
     'tooling-report': '磨具报表',
+    'maverick-report':'Maverick报表',
+    'maverick-email-setting':'Maverick预警邮箱设定',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
