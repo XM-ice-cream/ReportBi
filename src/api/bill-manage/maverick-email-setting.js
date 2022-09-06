@@ -26,7 +26,7 @@ export const modifyReq = data => {
     return requestCenter({
         loading: true,
         baseUrl:window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/foxlog/v1/maverickemail/Update',
+        url: '/api/reportcenter/foxlog/v1/maverickemail/update',
         method: 'post',
         data
     })
@@ -36,7 +36,7 @@ export const deleteReq = data => {
     return requestCenter({
         loading: true,
         baseUrl:window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/foxlog/v1/maverickemail/Delete',
+        url: '/api/reportcenter/foxlog/v1/maverickemail/delete',
         method: 'post',
         data
     })

@@ -19,7 +19,7 @@ export const modifyReq = data => {
     return requestCenter({
         loading: true,
         baseUrl: window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/anonymous/v1/Maverick/UpdateStatu',
+        url: '/api/reportcenter/anonymous/v1/maverick/updatestatu',
         method: 'post',
         data
     })
@@ -29,7 +29,7 @@ export const getMailDepartReq = data => {
     return requestCenter({
         loading: true,
         baseUrl: Window.localStorage.getItem("reportip"),
-        url: '/api/reportcenter/anonymous/v1/maverick/GetMailDepart',
+        url: '/api/reportcenter/anonymous/v1/maverick/getmaildepart',
         method: 'get',
         data
     })

@@ -5,7 +5,7 @@ import { requestCenter } from '@/libs/request'
 export const getpagelistReq = data => {
     return requestCenter({
         timeout: 0,
-        baseUrl:"http://10.32.44.112:5700"|| window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/foxlog/v1/maverickyieldinfo/getyieldinfo',
         method: 'post',
         data
@@ -15,7 +15,7 @@ export const getpagelistReq = data => {
 export const getLineReq = data => {
     return requestCenter({
         loading: true,
-        baseUrl:"http://10.32.44.112:5700"||window.localStorage.getItem("reportip"),
+        baseUrl:window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/foxlog/v1/maverickyieldinfo/getline',
         method: 'get',
         params:data
