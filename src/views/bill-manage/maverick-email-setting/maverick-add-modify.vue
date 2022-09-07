@@ -9,7 +9,7 @@
             </Select>
         </FormItem>
         <!-- 群组名称 -->
-        <FormItem label="群组类型" prop="grouP_NAME">
+        <FormItem label="群组名称" prop="grouP_NAME">
             <Input v-model.trim="submitData.grouP_NAME" :placeholder=" $t('pleaseEnter') +'群组名称' " clearable/>
         </FormItem>
         <!-- 群组线体 -->

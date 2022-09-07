@@ -179,7 +179,7 @@ export default {
     },
     //获取邮件群组
     getMailDepart () {
-      getMailDepartReq().then(res => {
+      getMailDepartReq({}).then(res => {
         if (res.code === 200) {
           this.mailDepartArry = res.result;
         }

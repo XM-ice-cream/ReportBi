@@ -28,9 +28,9 @@ export const modifyReq = data => {
 export const getMailDepartReq = data => {
     return requestCenter({
         loading: true,
-        baseUrl: Window.localStorage.getItem("reportip"),
+        baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/anonymous/v1/maverick/getmaildepart',
         method: 'get',
-        data
+        params:data
     })
 }
