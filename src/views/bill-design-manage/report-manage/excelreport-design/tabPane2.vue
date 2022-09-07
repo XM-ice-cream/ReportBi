@@ -2,7 +2,7 @@
 <template>
   <Tabs size="small" v-if="type===2" class="tabPane2">
     <TabPane label="单元格元素" name="first" size="small">
-      <Form ref="rightForm" :model="rightForm" :label-width="60" style="padding: 0 0.5rem">
+      <Form ref="rightForm" :model="rightForm" :label-width="80" style="padding: 0 0.5rem">
         <!-- <FormItem label="单元格">
           <label>{{rightForm.coordinate}}</label>
         </FormItem> -->
@@ -22,11 +22,9 @@
         <FormItem label="过滤条件" v-if='rightForm.label&&rightForm.label.indexOf("#")>-1'>
           <Button long @click="filterClick">编辑</Button>
         </FormItem>
-        <Divider>补充空白数据</Divider>
         <!-- 补充空白行 -->
-        <FormItem label="数据倍数">
-          <Checkbox v-model="rightForm.isFill"> </Checkbox>
-          <InputNumber v-model="rightForm.fillValue" class="inputNumber" v-if="rightForm.isFill" placeholder="请输入填充倍数" />
+        <FormItem label="数据总行数">
+          <InputNumber v-model="rightForm.blankNum" class="inputNumber" placeholder="请输入数据总行数" clearable @on-change="autoChangeFunc"/>
         </FormItem>
 
       </Form>

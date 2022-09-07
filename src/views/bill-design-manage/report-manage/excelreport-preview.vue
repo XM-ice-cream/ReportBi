@@ -12,7 +12,7 @@
                 <div class="poptip-style-content" slot="content">
                   <Form ref="submitReq" :label-width="80" :label-colon="true">
                     <template v-for="(item) in tableData2">
-                      <template v-for="(subitem,subindex) in item.children" :key="item.name+subindex">
+                      <template v-for="(subitem,subindex) in item.children" >
                         <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                           <!-- 字符串 -->
                           <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable />

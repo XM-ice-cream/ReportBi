@@ -294,10 +294,12 @@ export default {
     },
     //更新单元格信息，扩展、排序...
     autoChangeFunc (right) {
-      const { r, c, cellAttribute } = right;
-      console.log(right);
-      luckysheet.setCellValue(r, c, { ...right, });
-      this.imageExpendUpdate(cellAttribute.expend.expend, r, c, "expend");
+      const { r, c, cellAttribute,cell } = right;
+     if(r&&c) {
+        luckysheet.setCellValue(r, c, { ...right, });
+        // luckysheet.setSheetAdd({blankNum:cell.blankNum});
+       this.imageExpendUpdate(cellAttribute.expend.expend, r, c, "expend");
+     }
     },
 
     async detail (setCode) {
@@ -325,6 +327,7 @@ export default {
     async save () {
       //设定传参
       this.reportExcelDto = this.setReportExcelDto();
+      console.log("reportExcelDto",this.reportExcelDto);
       //   return;
       const requestReq = this.reportId == null ? insertExcelReportReq : modifyExcelReportReq;
       this.reportExcelDto.id = this.reportId || null;
