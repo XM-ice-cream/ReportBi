@@ -336,16 +336,16 @@ export default {
           tooltip: true,
         },
         {
-          title: this.$t("yield_Rate"),
-          key: "yield_Rate",
+          title: "维修前良率",
+          key: "firstyielD_RATE",
           width: 80,
           align: "center",
           ellipsis: true,
           tooltip: true,
         }, 
-         {
+        {
           title: "维修后良率",
-          key: "yield_Rate2",
+          key: "yield_Rate",
           width: 80,
           align: "center",
           ellipsis: true,
