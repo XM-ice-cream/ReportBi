@@ -12,11 +12,15 @@
             <Option v-for="item in showTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
           <!-- 分组为普通的 -->
-          <Select v-model="rightForm.showTypeValue" size="small" transfer v-if="rightForm.showType==='group'" class="showtype" @on-change="autoChangeFunc">
+          <Select v-model="rightForm.showTypeValue" size="small" transfer v-if="['group'].includes(rightForm.showType)" class="showtype" @on-change="autoChangeFunc">
             <Option v-for="item in showTypeList[0].children" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
           <!-- 分组为高级 -->
           <div v-if="rightForm.showTypeValue==='high'" class="showtypebtn" @click="userDefinedClick">自定义</div>
+          <!-- 分组为汇总的 -->
+          <Select v-model="rightForm.showTypeValue" size="small" transfer v-if="['summary'].includes(rightForm.showType)" class="showtype" @on-change="autoChangeFunc">
+            <Option v-for="item in showTypeList[2].children" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
         <!-- 常量不设定过滤值 -->
         <FormItem label="过滤条件" v-if='rightForm.label&&rightForm.label.indexOf("#")>-1'>
@@ -81,7 +85,14 @@ export default {
           value: "list"
         }, {
           label: "汇总",
-          value: "summary"
+          value: "summary",
+          children: [
+            { label: "求和", value: "sum" },
+            { label: "平均", value: "avg" },
+            { label: "最大值", value: "max" },
+            { label: "最小值", value: "min" },
+            { label: "个数", value: "count" }
+          ]
         }
       ]
     }

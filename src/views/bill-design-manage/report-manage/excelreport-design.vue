@@ -73,6 +73,7 @@ export default {
       reportCode: '',
       draggableFieldLabel: '',//拖拽的文本内容
       sheetData: '',
+      blankNum:1,//空白格
       rightForm: {
         coordinate: "",
         value: "",
@@ -297,7 +298,7 @@ export default {
       const { r, c, cellAttribute,cell } = right;
      if(r&&c) {
         luckysheet.setCellValue(r, c, { ...right, });
-        // luckysheet.setSheetAdd({blankNum:cell.blankNum});
+        this.blankNum = cell.blankNum; //存储空白格值
        this.imageExpendUpdate(cellAttribute.expend.expend, r, c, "expend");
      }
     },
@@ -355,6 +356,7 @@ export default {
         const { celldata } = item;
         jsonData[itemIndex].relationList = [];
         jsonData[itemIndex].data = [];
+        jsonData[itemIndex].blankNum = this.blankNum;//空白格
         for (let i = celldata.length - 1; i >= 0; i--) {
           //说明为静态数据，不判断父子格
           const v = jsonData[itemIndex].celldata[i].v;
