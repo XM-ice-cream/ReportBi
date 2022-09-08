@@ -73,7 +73,7 @@
         <Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
           <template slot-scope="{ row }" slot="image">
             <!-- <Button style="height:16px" v-if="row.fileFullName" type="primary" size="small" @click="previewImage(row.fileFullName)">{{ $t("preview") }}</Button> -->
-            <Button style="height:16px;margin-left:5px" v-if="row.fileFullName" type="primary" size="small" @click="downloadImage(row.fileFullName)">{{ $t("download") }}
+            <Button style="height:16px;margin-left:5px" v-if="row.fileFullName" type="primary" size="small" @click="downloadImage(row.fileFullName,row.id)">{{ $t("download") }}
             </Button>
           </template>
         </Table>
@@ -161,9 +161,9 @@ export default {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
       }
     },
-    downloadImage (fileFullName) {
+    downloadImage (fileFullName,id) {
       if (this.req.AOIRreviewFile) {
-        let imgurl = this.req.AOIRreviewFile + "/download?filefullname=" + fileFullName; // 获取图片地址
+        let imgurl = this.req.AOIRreviewFile + "/download?id=" + id; // 获取图片地址
         Spin.show();
         axios
           .get(imgurl, { responseType: "blob" })
