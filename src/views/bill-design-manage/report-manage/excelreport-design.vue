@@ -485,6 +485,7 @@ export default {
             dataSetParam[paramName] = value.sampleItem;
             dataSetParam[paramName + 'required'] = value.requiredFlag;
             dataSetParam[paramName + 'type'] = value.paramType;
+            dataSetParam[paramName + 'paramAstrict'] = value.paramAstrict;
           });
           setParams[code.setCode] = dataSetParam;
         }

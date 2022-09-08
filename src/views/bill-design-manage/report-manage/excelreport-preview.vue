@@ -13,7 +13,7 @@
                 <div class="poptip-style-content" slot="content">
                       <Form ref="submitReq" :label-width="80" :label-colon="true" style="max-height: 20rem;overflow: auto;">
                         <template v-for="item in tableData2" >
-                            <span class="title" >{{item.title}}</span>
+                            <span class="title" >{{item.title}}  </span>
                             <template v-for="subitem in item.children">
                             <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                                 <!-- 字符串 -->
@@ -33,6 +33,17 @@
                                 <Input v-else-if="subitem.type==='Array'" type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" clearable />
                                 <!-- 时间 -->
                                 <DatePicker v-else-if="subitem.type==='DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+                               
+                                 <!-- 下拉框 -->
+                                <v-selectpage v-else-if="subitem.type==='Select'" class="select-page-style" v-model="subitem.value" transfer  :params="{setCode: subitem.paramAstrict }" key-field="value" show-field="value" :data="getValueBySetcodePageListUrl"  :result-format="
+                                    (res) => {
+                                        return {
+                                        totalRow: res.total,
+                                        list: res.data || [],
+                                        };
+                                    }
+                                    ">
+                                </v-selectpage>
                                 <!-- 其余类型 -->
                                 <Input v-else v-model.trim="subitem.value" type="text" clearable />
                             </FormItem>
@@ -71,6 +82,7 @@
 import { getExcelPreviewReq,getParamsReq, exportReq } from '@/api/bill-design-manage/report-manage'
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
+import {  getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
 
 export default {
   name: "excelreport-preview",
@@ -80,6 +92,7 @@ export default {
       sheetData: [{ row: 30, column: 26}],//初始化默认显示30行 26列
       tableData2: [],
       searchPoptipModal: false,
+      getValueBySetcodePageListUrl:getValueBySetcodePageListUrl(),
       req: {
         reportCode: "",
         setParam: "",
@@ -126,7 +139,11 @@ export default {
       
     },
     async pageLoad(){
-        this.dateFormate();  // 左侧查询参数--时间格式化 
+        // 左侧查询参数--时间格式化 
+      if(this.dateFormate()){
+        this.$Message.error("超出最大查询时间差,请重新选择");
+        return;
+      }  ;  
         //左侧查询参数 --必要参数接收
         const arr = this.toObject(this.tableData2);
         this.req.setParam = JSON.stringify(arr);
@@ -232,8 +249,8 @@ export default {
       for (const i in extendObj) {
         const children = [];
         for (const y in extendObj[i]) {
-          if (!y.endsWith('required') && !y.endsWith('type')) {
-            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
+          if (!y.endsWith('required') && !y.endsWith('type')&& !y.endsWith('paramAstrict')) {
+            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] ,paramAstrict:extendObj[i][y+'paramAstrict']});
             this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
           }
         }
@@ -243,6 +260,7 @@ export default {
         })
         extendArry.push({ name: i, children: children,title:setNames[index] });
       }
+      console.log("extendArry",extendArry);
       return extendArry;
     },
     // Excel导出
@@ -266,13 +284,23 @@ export default {
     },
     //时间格式化
     dateFormate () {
-      this.tableData2.forEach((item, itemIndex) => {
-        item.children.forEach((o, oIndex) => {
+       let flag=false;
+      this.tableData2.map(item => {
+        item.children.map((o ,index)=> {
           if (o.type === 'DateTime') {
-            this.tableData2[itemIndex].children[oIndex].value = formatDate(o.value)
+            o.value = formatDate(o.value);
+            if(item.children[index -1]?.type==='DateTime') {
+               const preTime =  item.children[index-1].value;
+               const diff = new Date(o.value).getTime() - new Date(preTime).getTime();
+               const day = Math.floor(diff/(24*3600*1000));
+               if(day > item.children[index-1].paramAstrict){
+                  flag = true;
+               }
+            }
           }
         })
       })
+      return flag;
     },
     // 表单封装json
     toObject (val) {

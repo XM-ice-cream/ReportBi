@@ -62,27 +62,60 @@
                 <Button type="primary" v-if="tableData.length == 0" size="small" @click="addRow(-1)">添加
                 </Button>
                 <Table :data="tableData" border :columns="columns" :max-height="350" style="width: 100%">
+                    <!-- 参数名 -->
                   <template slot-scope="{index}" slot="paramName">
                     <Input v-model.trim="tableData[index].paramName" clearable />
                   </template>
+                  <!-- 描述 -->
                   <template slot-scope="{index}" slot="paramDesc">
                     <Input v-model.trim="tableData[index].paramDesc" clearable />
                   </template>
+                  <!-- 数据类型 -->
                   <template slot-scope="{index}" slot="paramType">
-                    <Select v-model.trim="tableData[index].paramType" clearable transfer>
+                    <Select v-model.trim="tableData[index].paramType" clearable transfer @on-change="changeParamAstrict(index)">
                       <Option v-for="item in paramTypeList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
                     </Select>
                   </template>
+                  <!-- 数据限制-->
+                  <template slot-scope="{index}" slot="paramAstrict">
+                    <!-- 数据类型为 下拉框 -->
+                    <v-selectpage class="select-page-style" v-if="tableData[index].paramType=='Select'" key-field="setCode"  placeholder="请选择对应数据集"  show-field="setName" :data="setCodePageListUrl" v-model="tableData[index].paramAstrict"   :result-format="
+                        (res) => {
+                            return {
+                            totalRow: res.total,
+                            list: res.data || [],
+                            };
+                        }
+                        "
+                        >
+                    </v-selectpage>
+                    <!-- 时间限制长度 -->
+                    <InputNumber  v-model.trim="tableData[index].paramAstrict" v-if="tableData[index].paramType=='DateTime'" placeholder="请输入最长的时间差（天）"  clearable />
+                  </template>
+                  <!-- 示例值 -->
                   <template slot-scope="{index}" slot="sampleItem">
+                    <!-- 时间 -->
                     <DatePicker v-if="tableData[index].paramType=='DateTime'" v-model.trim="tableData[index].sampleItem" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
                     <!-- 数组为文本框 -->
                     <Input type='textarea' :autosize="{minRows: 2,maxRows: 5}" v-else-if="tableData[index].paramType=='Array'" v-model.trim="tableData[index].sampleItem" clearable></Input>
+                     <!-- 数据类型为 下拉框 -->
+                     <v-selectpage class="select-page-style" v-model ="tableData[index].sampleItem" transfer v-else-if="tableData[index].paramType=='Select'&&tableData[index].paramAstrict" :params="{setCode: tableData[index].paramAstrict }" key-field="value" show-field="value" :data="getValueBySetcodePageListUrl"  :result-format="
+                        (res) => {
+                            return {
+                            totalRow: res.total,
+                            list: res.data || [],
+                            };
+                        }
+                        ">
+                    </v-selectpage>
                     <Input v-model.trim="tableData[index].sampleItem" v-else clearable />
                   </template>
+                  <!-- 校验 -->
                   <template slot-scope="{row,index}" slot="mandatory">
                     <Checkbox v-model="tableData[index].mandatory" @on-change="Mandatory(index)">必选 </Checkbox>
                     <!-- <Button type="primary" icon="el-icon-plus" @click="permissionClick(row, index)"> 高级规则</Button> -->
                   </template>
+                  <!-- 操作 -->
                   <template slot-scope="{row,index}" slot="operator">
                     <Button type="text" size="small" @click.native.prevent="cutOutRow(index, tableData)">删除</Button>
                     <Button type="text" size="small" @click="addRow(index,row)">追加</Button>
@@ -125,6 +158,8 @@ import {
   insertDatacollectReq,
   modifyDatacollectReq,
   getDeatilByIdReq,
+  setCodePageListUrl,
+  getValueBySetcodePageListUrl
 } from "@/api/bill-design-manage/data-set.js";
 import Dictionary from "@/components/dictionary/index";
 // import { codemirror } from "vue-codemirror"; // 引入codeMirror全局实例
@@ -161,6 +196,8 @@ export default {
       dialogFormVisibleTitle: "",
       dialogPermissionVisible: false,
       dialogSwitchVisible: false,
+      setCodePageListUrl:setCodePageListUrl(),//获取索引数据集
+      getValueBySetcodePageListUrl:getValueBySetcodePageListUrl(),//对应数据集第一个字段的值
       title: "自定义高级规则",
       ruleValidate: {
         setName: [
@@ -210,6 +247,10 @@ export default {
           slot: "paramType",
         },
         {
+            title:"数据限制",
+            slot:"paramAstrict",
+        },
+        {
           title: "示例值",
           slot: "sampleItem",
         },
@@ -252,6 +293,10 @@ export default {
         {
           sourceName: "布尔",
           sourceCode: "Boolean",
+        },
+        {
+          sourceName: "下拉框",
+          sourceCode: "Select",
         },
       ],
       isAdd: true,
@@ -397,6 +442,11 @@ export default {
     Mandatory (val) {
       this.tableData[val].requiredFlag = !this.tableData[val].mandatory ? 0 : 1;
     },
+    //改变数据限制默认值
+    changeParamAstrict(index){
+        this.tableData[index].paramAstrict ="";
+        this.tableData[index].sampleItem ="";
+    },
     // 追加
     addRow (index) {
         const obj = {
@@ -404,6 +454,7 @@ export default {
         paramDesc: "",
         paramType: "",
         sampleItem: "",
+        paramAstrict:"",
         mandatory: true,
         requiredFlag: 1,
         validationRules: `function verification(data){\n\t//自定义脚本内容\n\t//可返回true/false单纯校验键入的data正确性\n\t//可返回文本，实时替换,比如当前时间等\n\t//return "2099-01-01 00:00:00";\n\treturn true;\n}`,
