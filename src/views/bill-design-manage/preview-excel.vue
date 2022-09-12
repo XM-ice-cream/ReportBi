@@ -15,7 +15,7 @@
             </FormItem>
              <!-- 报表分类 -->
             <FormItem label="报表分类" prop="remark">
-                <Select v-model="req.remark" clearable :placeholder="$t('pleaseSelect') +'报表分类'" transfer cleabler @on-change='searchClick'>
+                <Select v-model="req.remark" clearable :placeholder="$t('pleaseSelect') +'报表分类'" transfer filterable cleabler @on-change='searchClick' style="width:200px">
                     <Option v-for="(item, i) in remarkList" :value="item.detailName" :key="i">
                         {{ item.detailName }}
                     </Option>
