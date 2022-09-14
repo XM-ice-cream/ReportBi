@@ -30,7 +30,7 @@
           <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
           <FormItem label="查询SQL">
             <div class="codemirror">
-              <monaco-editor v-model.trim="formData.dynSentence" language="sql"  />
+              <monaco-editor v-model.trim="formData.dynSentence" language="sql"  v-if="visib"/>
             </div>
           </FormItem>
           </Col>
@@ -162,13 +162,13 @@ import {
   getValueBySetcodePageListUrl
 } from "@/api/bill-design-manage/data-set.js";
 import Dictionary from "@/components/dictionary/index";
+import MonacoEditor from "@/components/monaco-editor/monaco-editor.vue";
 // import { codemirror } from "vue-codemirror"; // 引入codeMirror全局实例
 import "codemirror/mode/sql/sql.js";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css"; // 核心样式
 import "codemirror/theme/cobalt.css"; // 引入主题后还需要在 options 中指定主题才会生效
 import vueJsonEditor from "vue-json-editor";
-import MonacoEditor from "./monaco-editor.vue";
 import { validateEngOrNum ,validateChinese} from "@/libs/validate";
 import { formatDate } from "@/libs/tools";
 export default {
