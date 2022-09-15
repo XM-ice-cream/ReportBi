@@ -1957,6 +1957,7 @@ export default {
     'tooling-report': '磨具报表',
     'maverick-report':'Maverick报表',
     'maverick-email-setting':'Maverick预警邮箱设定',
+    'test-yield-report':'测试良率报表',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
