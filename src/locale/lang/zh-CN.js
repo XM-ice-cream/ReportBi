@@ -1958,6 +1958,7 @@ export default {
     'maverick-report':'Maverick报表',
     'maverick-email-setting':'Maverick预警邮箱设定',
     'test-yield-report':'测试良率报表',
+    'epm-config':'EPM上下限配置',
     // <!--------------------------------Button Name----------------------------------------->
     '/page': '条/页',
     add: '新增',
