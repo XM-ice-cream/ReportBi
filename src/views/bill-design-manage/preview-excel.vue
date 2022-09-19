@@ -7,12 +7,12 @@
         <div slot="title">
           <Form ref="searchReq" :model="req" inline :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
             <!-- 类型 -->
-            <FormItem :label="$t('reportType')" prop="reportType">
+            <!-- <FormItem :label="$t('reportType')" prop="reportType">
               <RadioGroup v-model="req.reportType" type="button" button-style="solid" @on-change='searchClick'>
                 <Radio label="excel">Excel</Radio>
                 <Radio label="largescreen">大屏</Radio>
               </RadioGroup>
-            </FormItem>
+            </FormItem> -->
              <!-- 报表分类 -->
             <FormItem label="报表分类" prop="remark">
                 <Select v-model="req.remark" clearable :placeholder="$t('pleaseSelect') +'报表分类'" transfer filterable cleabler @on-change='searchClick' style="width:200px">
@@ -58,24 +58,29 @@
                 </span> -->
               </span>
               <div class="content">
-                <div>
-                  报表类型: <span class="value" style="color: #41ce27;">
+                <!-- <div>
+                  报表类型： <span class="value" style="color: #41ce27;">
                     <template v-if="item.reportType==='excel'">Excel报表</template>
                     <template v-else>大屏报表</template>
                   </span>
+                </div> -->
+                <div>
+                  报表类别：  <span class="value" :title="item.remark" style="font-weight: bold;">
+                    {{item.remark}}
+                  </span>
                 </div>
                 <div>
-                  报表编码: <span class="value type" :title="item.reportCode">
+                  报表编码：  <span class="value" :title="item.reportCode">
                     {{item.reportCode}}
                   </span>
                 </div>
                 <div>
-                  创建时间: <span class="value" :title="formatDate(item.createDate)">
+                  创建时间：  <span class="value" :title="formatDate(item.createDate)">
                     {{formatDate(item.createDate)}}
                   </span>
                 </div>
                 <div>
-                  修改时间: <span class="value" :title="formatDate(item.modifyDate)">{{formatDate(item.modifyDate)}}</span>
+                  修改时间：  <span class="value" :title="formatDate(item.modifyDate)">{{formatDate(item.modifyDate)}}</span>
                 </div>
               </div>
             </div>
@@ -249,50 +254,53 @@ export default {
   overflow-y: scroll;
   overflow-x: hidden;
   align-content: flex-start;
+  background-color: #f5f7f9;
   .cardCell {
-    width: 24rem;
+    width: 19rem;
     /* background: #ccc; */
-    border: 1px solid #e0e6f1;
+    border: 1px solid #fafcff;
     box-shadow: 3px 5px 7px #d0dbf194;
     padding: 0.3rem;
     margin: 0.6rem 0.95rem;
     position: relative;
-    background: #f0f5ff;
+    background: #fff;
     border-radius: 12px;
     cursor: pointer;
     .title {
-      display: inline-block;
-      padding: 0.1rem;
-      margin: 0.2rem;
-      /* margin-left: 0.2rem; */
-      padding-bottom: 0.9rem;
-      /* border: 2px solid #8adbcc; */
-      /* border-radius: 3px; */
-      /* border-left: none; */
-      font-size: 0.92rem;
-      color: #3a3b3ae0;
-      font-weight: 600;
-      width: 100%;
-      //   border-bottom: 1px solid #cccccc8f;
+        width: 100%;
+        height: 4rem;
+        line-height: 3rem;
+        display: inline-block;
+        padding: 0.1rem;
+        margin: 0.2rem;
+        padding-bottom: 0.9rem;
+        font-size: 0.92rem;
+        color: #3a3b3ae0;
+        font-weight: 600;
       //圆圈
       .circle {
         width: 3rem;
         height: 3rem;
         line-height: 3rem;
-        background: #b6c7e9;
+        background: #52d8a0;
         /* padding: 0.3rem; */
         display: inline-block;
         text-align: center;
         border-radius: 50%;
-        margin-right: 0.5rem;
+        margin-right: 0.7rem;
+        position: relative;
         i {
-          font-size: 1.72rem;
-          color: #fff;
+            font-size: 1.72rem;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
       }
       //标题名
       .name {
-        width: 15rem;
+        width: calc(100% - 4rem);
         overflow: hidden;
         display: inline-block;
         text-overflow: ellipsis;
@@ -320,37 +328,24 @@ export default {
         }
       }
     }
-    .content {
-      width: 100%;
-      /* text-align: center; */
-      line-height: 1.7rem;
-      /* position: absolute; */
-      /* margin-bottom: 0px; */
-      /* bottom: 1.3rem; */
-      padding: 0.2rem 1rem;
-      margin-right: 0.5rem;
-      .type {
-        background: #5fafb3;
-        color: #fff;
+    .content {      
+        margin-left: 3.8rem;
+        line-height: 1.7rem;
+        padding-bottom: 1rem;
+
+      div{
+        padding:0.1rem
       }
       .value {
         display: inline-block;
-        width: 8rem;
-        text-align: center;
+        width: calc(100% - 4rem);
+        text-align: left;
         border-radius: 10px;
         float: right;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         padding: 0 0.5rem;
-      }
-      .dot {
-        display: inline-block;
-        width: 45%;
-        /* border: 1px solid #ccc; */
-        text-align: center;
-        float: left;
-        color: #4c83ff;
       }
     }
   }
