@@ -416,8 +416,20 @@ export default {
 </script>
 
 <style scoped lang='less'>
+
 .tableBtn {
-  padding: 0 0.2rem;
-  color: #1890ff;
+    display: inline-block;
+    padding: 0.2rem;
+    color: #1890ff;
+    background: #f5f5f5;
+   
+    border-radius: 0.2rem;
+    box-shadow: 0px 2px 3px #ccc;
+    cursor: pointer;
+    &:active{
+        background: #40e49f;
+        color:#fff;
+        box-shadow: none;
+    }
 }
 </style>
