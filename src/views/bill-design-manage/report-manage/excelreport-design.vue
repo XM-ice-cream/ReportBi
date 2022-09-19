@@ -486,6 +486,7 @@ export default {
             dataSetParam[paramName + 'required'] = value.requiredFlag;
             dataSetParam[paramName + 'type'] = value.paramType;
             dataSetParam[paramName + 'paramAstrict'] = value.paramAstrict;
+            dataSetParam[paramName + 'paramDesc'] = value.paramDesc; //参数名称
           });
           setParams[code.setCode] = dataSetParam;
         }

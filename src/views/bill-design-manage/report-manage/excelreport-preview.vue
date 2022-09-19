@@ -15,7 +15,7 @@
                         <template v-for="item in tableData2" >
                             <span class="title" >{{item.title}}  </span>
                             <template v-for="subitem in item.children">
-                            <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                            <FormItem :label='subitem.paramDesc'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                                 <!-- 字符串 -->
                                 <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable @keyup.native.enter="searchClick()"/>
                                 <!-- 布尔 true/false/0/1-->
@@ -249,8 +249,8 @@ export default {
       for (const i in extendObj) {
         const children = [];
         for (const y in extendObj[i]) {
-          if (!y.endsWith('required') && !y.endsWith('type')&& !y.endsWith('paramAstrict')) {
-            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] ,paramAstrict:extendObj[i][y+'paramAstrict']});
+          if (!y.endsWith('required') && !y.endsWith('type')&& !y.endsWith('paramAstrict')&&!y.endsWith('paramDesc')) {
+            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] ,paramAstrict:extendObj[i][y+'paramAstrict'],paramDesc:extendObj[i][y+'paramDesc']});
             this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
           }
         }
