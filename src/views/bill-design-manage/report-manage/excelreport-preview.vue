@@ -53,7 +53,12 @@
               <template v-for="(item,index) in itemTr">
                 <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan||1" :rowspan="item.rowspan||1" :key="index">
                   <div :title="item.value" :style="item.divStyle">
-                    {{item.value}}
+                   <template v-if="item.valueType==='image'">
+                     <img :src="item.value" />
+                   </template> 
+                    <template v-else>
+                        {{item.value}}
+                    </template>
                   </div>
                 </td>
                 <td v-if="!item" :key="index" style="width:75px;height:18px"></td>
@@ -162,6 +167,7 @@ export default {
       //   this.htm = "<table class='table tableScroll' id='exceltable'>";
       let { celldata, config, frozen } = data[0];
       this.tableHtml = [];
+      console.log(celldata);
       // 处理表格单元格样式
       celldata.forEach(item => {
         const { r, c } = item;
@@ -169,7 +175,7 @@ export default {
         if (!this.tableHtml[r]) this.tableHtml[r] = [];
         if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
 
-        const { v, bg, bl, fc, ht, vt, mc, fs } = item.v; //获取样式
+        const { v, bg, bl, fc, ht, vt, mc, fs,valueType } = item.v; //获取样式
         const { columnlen, rowlen, borderInfo } = config;//边框
         let style = "";
         //   宽高
@@ -213,9 +219,9 @@ export default {
         //td 内部div样式
         let divStyle = `width:${width * colspan}px;height:${height * rowspan}px;`;//宽高
         divStyle += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;`;//超出文字省略
-        if (ht) divStyle += `justify-content:${ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
-        if (vt) divStyle += `align-items:${vt == 0 ? 'center' : (vt == 2 ? 'right' : 'left')};;`;//垂直居中
-        this.tableHtml[r][c] = { style, colspan, rowspan, divStyle, value: v };
+        if (ht) divStyle += `justify-content:${ ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
+        if (vt) divStyle += `align-items:${ vt == 0 ? 'center' : (vt == 2 ? 'right' : 'left')};;`;//垂直居中
+        this.tableHtml[r][c] = { style, colspan, rowspan, divStyle,valueType, value: v };
       })
       console.log(this.tableHtml);
     },
