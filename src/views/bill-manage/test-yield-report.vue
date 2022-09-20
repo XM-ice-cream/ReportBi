@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { getpagelistReq, exportReq } from "@/api/bill-manage/test-yield-report";
+import { getpagelistReq, exportReq, getModelListReq, getConfigListReq, getProcessListReq } from "@/api/bill-manage/test-yield-report";
 import { getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
 
 export default {
@@ -67,6 +67,9 @@ export default {
       data: [], // 表格数据
       btnData: [],
       categoryList: [],// 类别下拉框
+      modelPageList: [],//机种下拉框
+      configPageList: [],//config下拉框
+      processPageList: [],//站点下拉框
       req: {
         startTime: "",
         endTime: "",
@@ -85,19 +88,17 @@ export default {
             return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
           },
         },
-        { title: '站点', key: "station", align: "center" ,minWidth:200,tooltip: true},
-        { title: "总量", key: "input", align: "center",minWidth:100,tooltip: true, },
-        { title: '复测量', key: "retest", align: "center",minWidth:100 ,tooltip: true,},
-        { title: '失败量', key: "fail", align: "center",minWidth:100,tooltip: true, },
+        { title: 'Station', key: "station", align: "center" ,minWidth:200,tooltip: true},
+        { title: "Input", key: "input", align: "center",minWidth:100,tooltip: true, },
         { title: "PASS_1A", key: "pass_1A", align: "center", minWidth: 60  },
         { title: 'FAIL_1A', key: "fail_1A", align: "center", minWidth: 60 },
         { title: 'PASS_2A', key: "pass_2A", align: "center", minWidth: 60 },
         { title: "FAIL_2A", key: "fail_2A", align: "center", minWidth: 60 },
         { title: "PASS_3A", key: "pass_3A", align: "center" , minWidth: 60},
         { title: "FAIL_3A", key: "fail_3A", align: "center", minWidth:60 },
-        { title: "一次通过率", key: "fpyr", align: "center", minWidth: 100 },
-        { title: "通过率", key: "engineeringYield", align: "center", minWidth: 100 },
-        { title: "复测率", key: "retestRate", align: "center", minWidth: 100 },
+        { title: "FPYR", key: "fpyr", align: "center", minWidth: 100 },
+        { title: "EngineeringYield", key: "engineeringYield", align: "center", minWidth: 100 },
+        { title: "RetestRate", key: "retestRate", align: "center", minWidth: 100 },
       ], // 表格数据
       ruleValidate:{
         startTime:[

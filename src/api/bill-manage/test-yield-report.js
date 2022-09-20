@@ -26,3 +26,33 @@ export const exportReq = data => {
         data
     })
 }
+// 查询机种下拉框
+export const getModelListReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/anonymous/v1/testyield/getmodellist',
+        method: 'post',
+        data
+    })
+}
+// 查询Config下拉框
+export const getConfigListReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/anonymous/v1/testyield/getconfiglist',
+        method: 'post',
+        data
+    })
+}
+// 查询站点下拉框
+export const getProcessListReq = data => {
+    return requestCenter({
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/anonymous/v1/testyield/getprocesslist',
+        method: 'post',
+        data
+    })
+}
