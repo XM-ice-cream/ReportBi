@@ -15,23 +15,84 @@
                   <Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick" :rules="ruleValidate">
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
-                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime" @on-change="changeSelectPage('modelName')"></DatePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
-                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
+                      <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime" @on-change="changeSelectPage('modelName')"></DatePicker>
                     </FormItem>
                     <!-- 机种名称 -->
                     <FormItem :label="$t('modelName')" prop="modelName">
-                      <Input v-model="req.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')" />
+                      <v-selectpage
+                        class="select-page-style"
+                        key-field="name"
+                        show-field="name"
+                        v-model="req.modelName"
+                        ref="modelName"
+                        v-if="isModelName&&searchPoptipModal"
+                        :data="modelPageListUrl"
+                        :placeholder="$t('pleaseEnter') +  $t('modelName')"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime) }"
+                        :result-format="
+                            (res) => {
+                            return {
+                                totalRow: res.total,
+                                list: res.data || [],
+                            };
+                            }
+                        "
+                         @values="changeSelectPage('buildConfig')"
+                        >                   
+                    </v-selectpage>
                     </FormItem>
                     <!-- Config -->
                     <FormItem :label="$t('buildConfig')" prop="buildConfig">
-                      <Input v-model="req.buildConfig" :placeholder="$t('pleaseEnter') + $t('buildConfig')" />
+                      <v-selectpage
+                        class="select-page-style"
+                        key-field="name"
+                        show-field="name"
+                        v-model="req.buildConfig"
+                        ref="buildConfig"
+                        multiple
+                        v-if="isBuildConfig&&searchPoptipModal"
+                        :data="configPageListUrl"
+                        :placeholder="$t('pleaseEnter') +  $t('buildConfig')"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,orderField:'modelName'}"
+                        :result-format="
+                            (res) => {
+                            return {
+                                totalRow: res.total,
+                                list: res.data || [],
+                            };
+                            }
+                        "
+                        @values="changeSelectPage('processName')"
+                        >                   
+                    </v-selectpage>
                     </FormItem>
                     <!-- 制程 -->
                     <FormItem :label="$t('processName')" prop="processName">
-                      <Input v-model="req.processName" :placeholder="$t('pleaseEnter') + $t('processName')" />
+                      <v-selectpage
+                        class="select-page-style"
+                        key-field="name"
+                        show-field="name"
+                        v-model="req.processName"
+                        ref="processName"
+                        multiple
+                        v-if="isProcessName&&searchPoptipModal"
+                        :data="processPageListUrl"
+                        :placeholder="$t('pleaseEnter') +  $t('processName')"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,config:req.buildConfig}"
+                        :result-format="
+                            (res) => {
+                            return {
+                                totalRow: res.total,
+                                list: res.data || [],
+                            };
+                            }
+                        "
+                        >                   
+                    </v-selectpage>
                     </FormItem>                   
                   </Form>
                   <div class="poptip-style-button">
@@ -54,7 +115,7 @@
 </template>
 
 <script>
-import { getpagelistReq, exportReq } from "@/api/bill-manage/test-yield-report";
+import { getpagelistReq, exportReq,modelPageListUrl,configPageListUrl,processPageListUrl } from "@/api/bill-manage/test-yield-report";
 import { getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
 
 export default {
@@ -62,8 +123,15 @@ export default {
   data () {
     return {
       searchPoptipModal: false,
+      isModelName:true,
+      isBuildConfig:true,
+      isProcessName:true,
+      formatDate:formatDate,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
+      modelPageListUrl:modelPageListUrl(),
+      configPageListUrl:configPageListUrl(),
+      processPageListUrl:processPageListUrl(),
       data: [], // 表格数据
       btnData: [],
       categoryList: [],// 类别下拉框
@@ -162,26 +230,61 @@ export default {
             })
                 .catch(() => (this.tableConfig.loading = false));
             this.searchPoptipModal = false;
+            
             }
         });
     },
     // 导出
     exportClick () {
       let { startTime, endTime,  modelName,buildConfig,processName } = this.req;
-        let obj = {
-          startTime: formatDate(startTime),
-          endTime: formatDate(endTime),
-          modelName,buildConfig,processName
-        };
-        exportReq(obj).then((res) => {
-          let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-          const fileName = `${this.$t("test-yield-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
-          exportFile(blob, fileName);
-        });
+      this.$refs.searchReq.validate((validate) => {
+            if (validate) {
+                let obj = {
+                startTime: formatDate(startTime),
+                endTime: formatDate(endTime),
+                modelName,buildConfig,processName
+                };
+                exportReq(obj).then((res) => {
+                let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+                const fileName = `${this.$t("test-yield-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+                exportFile(blob, fileName);
+                });
+            }
+        })
+    },
+    //联动下拉框
+    changeSelectPage(type){
+        switch (type) {
+            case 'modelName':
+                this.isModelName = false;
+                break;
+            case 'buildConfig':
+                this.isBuildConfig = false;
+                break;
+            case 'processName':
+                this.isProcessName = false;
+                break;
+            default:
+                break;
+        }
+        
+        this.$nextTick(()=>{
+            this.isModelName = true;
+            this.isBuildConfig = true;
+            this.isProcessName = true;
+        })
     },
     // 点击重置按钮触发
     resetClick () {
+      this.searchPoptipModal = false;
       this.$refs.searchReq.resetFields();
+      this.$refs.modelName.remove();
+      this.$refs.buildConfig.remove();
+      this.$refs.processName.remove();
+    //   this.searchClick()
+      this.$nextTick(() => {
+        this.searchPoptipModal = true;
+      });
     },
     // 自动改变表格高度
     autoSize () {

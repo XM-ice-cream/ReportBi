@@ -26,3 +26,9 @@ export const exportReq = data => {
         data
     })
 }
+// 机种列表 分页查询
+export const modelPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/testyield/getmodellist`
+// config 分页查询
+export const configPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/testyield/getconfiglist`
+// 站点 分页查询
+export const processPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/testyield/getprocesslist`
