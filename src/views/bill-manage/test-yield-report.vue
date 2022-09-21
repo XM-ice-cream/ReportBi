@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { getpagelistReq, exportReq } from "@/api/bill-manage/test-yield-report";
+import { getpagelistReq, exportReq,modelPageListUrl,configPageListUrl,processPageListUrl } from "@/api/bill-manage/test-yield-report";
 import { getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
 
 export default {
