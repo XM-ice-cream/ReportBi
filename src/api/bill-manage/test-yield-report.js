@@ -32,3 +32,7 @@ export const modelPageListUrl = () => `${window.localStorage.getItem("reportip")
 export const configPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/testyield/getconfiglist`
 // 站点 分页查询
 export const processPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/testyield/getprocesslist`
+// projectVersion 分页查询
+export const projectVersionPageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/testyield/getprojectversionlist`
+// buildType 分页查询
+export const buildTypePageListUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/anonymous/v1/testyield/getbuildtypelist`

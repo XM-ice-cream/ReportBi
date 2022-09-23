@@ -43,7 +43,7 @@
                         "
                          @values="changeSelectPage('buildConfig')"
                         >                   
-                    </v-selectpage>
+                      </v-selectpage>
                     </FormItem>
                     <!-- Config -->
                     <FormItem :label="$t('buildConfig')" prop="buildConfig">
@@ -68,7 +68,7 @@
                         "
                         @values="changeSelectPage('processName')"
                         >                   
-                    </v-selectpage>
+                      </v-selectpage>
                     </FormItem>
                     <!-- 制程 -->
                     <FormItem :label="$t('processName')" prop="processName">
@@ -91,9 +91,59 @@
                             };
                             }
                         "
+                        @values="changeSelectPage('projectVersion')"
                         >                   
-                    </v-selectpage>
-                    </FormItem>                   
+                      </v-selectpage>
+                    </FormItem>
+                    <!-- 测试阶段 -->
+                    <FormItem label="ProjectVersion" prop="projectVersion">
+                      <v-selectpage
+                        class="select-page-style"
+                        key-field="name"
+                        show-field="name"
+                        v-model="req.projectVersion"
+                        ref="projectVersion"
+                        multiple
+                        v-if="isProjectVersion&&searchPoptipModal"
+                        :data="projectVersionPageListUrl"
+                        :placeholder="$t('pleaseEnter') +  'ProjectVersion'"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,config:req.buildConfig,processName:req.processName}"
+                        :result-format="
+                            (res) => {
+                            return {
+                                totalRow: res.total,
+                                list: res.data || [],
+                            };
+                            }
+                        "
+                        @values="changeSelectPage('buildType')"
+                        >                   
+                      </v-selectpage>
+                    </FormItem>
+                    <!-- BuildType -->
+                    <FormItem label="BuildType" prop="buildType">
+                      <v-selectpage
+                        class="select-page-style"
+                        key-field="name"
+                        show-field="name"
+                        v-model="req.buildType"
+                        ref="buildType"
+                        multiple
+                        v-if="isBuildType&&searchPoptipModal"
+                        :data="buildTypePageListUrl"
+                        :placeholder="$t('pleaseEnter') +  'BuildType'"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,config:req.buildConfig,processName:req.processName,projectVersion:req.projectVersion}"
+                        :result-format="
+                            (res) => {
+                            return {
+                                totalRow: res.total,
+                                list: res.data || [],
+                            };
+                            }
+                        "
+                        >                   
+                      </v-selectpage>
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -115,7 +165,7 @@
 </template>
 
 <script>
-import { getpagelistReq, exportReq,modelPageListUrl,configPageListUrl,processPageListUrl } from "@/api/bill-manage/test-yield-report";
+import { getpagelistReq, exportReq,modelPageListUrl,configPageListUrl,processPageListUrl,projectVersionPageListUrl,buildTypePageListUrl } from "@/api/bill-manage/test-yield-report";
 import { getButtonBoolean, formatDate, exportFile} from "@/libs/tools";
 
 export default {
@@ -126,24 +176,32 @@ export default {
       isModelName:true,
       isBuildConfig:true,
       isProcessName:true,
+      isProjectVersion:true,
+      isBuildType:true,
       formatDate:formatDate,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
       modelPageListUrl:modelPageListUrl(),
       configPageListUrl:configPageListUrl(),
       processPageListUrl:processPageListUrl(),
+      projectVersionPageListUrl:projectVersionPageListUrl(),
+      buildTypePageListUrl:buildTypePageListUrl(),
       data: [], // 表格数据
       btnData: [],
       categoryList: [],// 类别下拉框
       modelPageList: [],//机种下拉框
       configPageList: [],//config下拉框
       processPageList: [],//站点下拉框
+      projectVersionPageList: [],//projectVersion下拉框
+      buildTypePageList: [],//buildType下拉框
       req: {
         startTime: "",
         endTime: "",
         modelName: "",//机种
         buildConfig: "",//config
         processName: "",//制程
+        projectVersion: "",//projectVersion
+        buildType: "",//buildType
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -203,7 +261,7 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, modelName,buildConfig,processName } = this.req;
+      let { startTime, endTime, modelName,buildConfig,processName,projectVersion,buildType } = this.req;
         this.$refs.searchReq.validate((validate) => {
             if (validate) {
             this.tableConfig.loading = true;
@@ -217,7 +275,9 @@ export default {
                 endTime: formatDate(endTime),
                 modelName,
                 buildConfig,
-                processName
+                processName,
+                projectVersion,
+                buildType
                 },
             };
 
@@ -237,13 +297,13 @@ export default {
     },
     // 导出
     exportClick () {
-      let { startTime, endTime,  modelName,buildConfig,processName } = this.req;
+      let { startTime, endTime,  modelName,buildConfig,processName,projectVersion,buildType } = this.req;
       this.$refs.searchReq.validate((validate) => {
             if (validate) {
                 let obj = {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
-                modelName,buildConfig,processName
+                modelName,buildConfig,processName,projectVersion,buildType
                 };
                 exportReq(obj).then((res) => {
                 let blob = new Blob([res], { type: "application/vnd.ms-excel" });
@@ -265,6 +325,12 @@ export default {
             case 'processName':
                 this.isProcessName = false;
                 break;
+            case 'projectVersion':
+                this.isProjectVersion = false;
+                break;
+            case 'buildType':
+                this.isBuildType = false;
+                break;
             default:
                 break;
         }
@@ -273,6 +339,8 @@ export default {
             this.isModelName = true;
             this.isBuildConfig = true;
             this.isProcessName = true;
+            this.isProjectVersion = true;
+            this.isBuildType = true;
         })
     },
     // 点击重置按钮触发
@@ -282,6 +350,8 @@ export default {
       this.$refs.modelName.remove();
       this.$refs.buildConfig.remove();
       this.$refs.processName.remove();
+      this.$refs.projectVersion.remove();
+      this.$refs.buildType.remove();
     //   this.searchClick()
       this.$nextTick(() => {
         this.searchPoptipModal = true;
