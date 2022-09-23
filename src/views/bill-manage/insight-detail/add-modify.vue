@@ -38,6 +38,13 @@
         <FormItem label="生产地" prop="site">
             <Input v-model.trim="submitData.site" :placeholder="$t('pleaseEnter') + '生产地'"  />
         </FormItem>
+         <!-- 类别 -->
+         <FormItem label="类别" prop="refdes_Gategory">
+            <!-- <Input v-model.trim="submitData.refdes_Gategory" :placeholder="$t('pleaseEnter') + '生产地'"  /> -->
+            <Select v-model="submitData.refdes_Gategory" clearable>
+                <Option v-for="item in refdesGategoryList" :value="item" :key="item">{{ item }}</Option>
+            </Select>
+        </FormItem>
         <!-- 按钮 -->
         <FormItem>
           <drawer-button :text="drawerTitle" @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
@@ -89,7 +96,8 @@ export default {
         origin: "",
         actionFlag: "",
         site: "",
-      }
+      },
+      refdesGategoryList:['All','B','T']
     };
   },
   activated () {

@@ -1,4 +1,4 @@
-/* Insight明细 */
+/* Insight IC */
 <template>
   <div class="page-style">
   
@@ -26,37 +26,13 @@
                     <FormItem :label="$t('modelName')" prop="modelName">
                         <Input v-model="req.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')"/>
                     </FormItem>
-                    <!-- 线体 -->
-                    <FormItem label="线体" prop="lineName">
-                        <Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + '线体'"  />
+                    <!-- 客户机种 -->
+                    <FormItem label="客户机种" prop="customerModelName">
+                        <Input v-model.trim="req.customerModelName" :placeholder="$t('pleaseEnter') + '客户机种'"  />
                     </FormItem>
-                    <!-- EE Code -->
-                    <FormItem label="EE Code" prop="eeCode">
-                        <Input v-model.trim="req.eeCode" :placeholder="$t('pleaseEnter') + 'EE Code'"  />
-                    </FormItem>
-                    <!-- 料号 -->
-                    <FormItem label="料号" prop="partName">
-                        <Input v-model.trim="req.partName" :placeholder="$t('pleaseEnter') + '料号'"  />
-                    </FormItem>
-                    <!-- 脚号 -->
-                    <FormItem label="脚号" prop="infoCode">
-                        <Input v-model.trim="req.infoCode" :placeholder="$t('pleaseEnter') + '脚号'"  />
-                    </FormItem>
-                    <!-- 品名 -->
-                    <FormItem label="品名" prop="mateType">
-                        <Input v-model.trim="req.mateType" :placeholder="$t('pleaseEnter') + '品名'"  />
-                    </FormItem>
-                    <!-- 路由-->
-                    <FormItem label="路由" prop="origin">
-                        <Input v-model.trim="req.origin" :placeholder="$t('pleaseEnter') + '路由'"  />
-                    </FormItem>
-                    <!-- 状态 -->
-                    <FormItem label="状态" prop="actionFlag">
-                        <Input v-model.trim="req.actionFlag" :placeholder="$t('pleaseEnter') + '状态'"  />
-                    </FormItem>
-                    <!-- 生产地 -->
-                    <FormItem label="生产地" prop="site">
-                        <Input v-model.trim="req.site" :placeholder="$t('pleaseEnter') + '生产地'"  />
+                    <!-- IC 脚位 -->
+                    <FormItem label="IC 脚位" prop="refdes">
+                        <Input v-model.trim="req.refdes" :placeholder="$t('pleaseEnter') + 'IC 脚位'"  />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -78,7 +54,7 @@
     <!-- 新增 、编辑 -->
     <AddModify :drawerFlag.sync="drawerFlag" :isAdd = "isAdd" :drawerTitle = "drawerTitle" :selectObj="selectObj" @pageLoad = "pageLoad"/>
     <!-- 批量导入 -->
-     <Modal
+    <Modal
         v-model="modalFlag"
         title="批量导入"
         @on-cancel="cancelClick">
@@ -92,21 +68,21 @@
 </template>
 
 <script>
-import { getpagelistReq ,attendanceInsightUploadUrl } from "@/api/bill-manage/insight-detail";
+import { getpagelistReq ,attendanceInsightUploadUrl } from "@/api/bill-manage/insight-ic.js";
 import {  getButtonBoolean,formatDate, renderDate } from "@/libs/tools";
+import AddModify from "./insight-ic/add-modify.vue";
 import UploadCustom from "@/components/upload-custom";
-import AddModify from "./insight-detail/add-modify.vue";
 
 
 export default {
-  name: "insight-detail",
-  components: { UploadCustom, AddModify },
+  name: "insight-ic",
+  components: {  AddModify,UploadCustom },
   data () {
     return {
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
-      uploadUrl: attendanceInsightUploadUrl(), //批量导入Excel文件
+      uploadUrl:attendanceInsightUploadUrl(),
       drawerFlag:false,
       modalFlag:false,//批量上传
       drawerTitle:"新增",
@@ -115,17 +91,11 @@ export default {
       data: [], // 表格数据
       btnData: [],
       req: {
+        modelName: "",
+        customerModelName: "",
+        refdes: "",
         startTime: "",
         endTime: "",
-        modelName: "",
-        lineName: "",
-        eeCode: "",
-        partName: "",
-        infoCode: "",
-        mateType: "",
-        origin: "",
-        actionFlag: "",
-        site: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -136,15 +106,8 @@ export default {
           },
         },
         { title: "机种", key: "modelName", align: "center", minWidth: 140, tooltip: true },
-        { title: "EE Code", key: "eeCode", align: "center", minWidth: 140, tooltip: true },
-        { title: "线体", key: "lineName", align: "center", minWidth: 140, tooltip: true },
-        { title: "料号", key: "partName", align: "center", minWidth: 140, tooltip: true },
-        { title: "脚号", key: "infoCode", align: "center", minWidth: 140, tooltip: true },
-        { title: "品名", key: "mateType", align: "center", minWidth: 140, tooltip: true },
-        { title: "路由", key: "origin", align: "center", minWidth: 140, tooltip: true },
-        { title: "状态", key: "actionFlag", align: "center", minWidth: 140, tooltip: true },
-        { title: "生产地", key: "site", align: "center", minWidth: 140, tooltip: true },
-        { title: "分类", key: "refdes_Gategory", align: "center", minWidth: 140, tooltip: true },
+        { title: "客户机种", key: "customerModelName", align: "center", minWidth: 140, tooltip: true },
+        { title: "IC脚位", key: "refdes", align: "center", minWidth: 140, tooltip: true },
         { title: "创建人", key: "createUserName", align: "center", minWidth: 120, tooltip: true },
         { title: "创建时间", key: "createDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
         { title: "修改人", key: "modifyUserName", align: "center", minWidth: 120, tooltip: true },
@@ -175,7 +138,7 @@ export default {
     pageLoad () {
         this.data = [];
         this.tableConfig.loading = false;
-        const { startTime, endTime,modelName,lineName,eeCode,partName,infoCode,mateType,origin,actionFlag,site} = this.req;
+        const { startTime, endTime,modelName,customerModelName,refdes} = this.req;
         this.$refs.searchReq.validate((validate) => {
             if (validate) {
             this.tableConfig.loading = true;
@@ -187,7 +150,7 @@ export default {
                 data: {
                     startTime: formatDate(startTime),
                     endTime: formatDate(endTime),
-                    modelName,lineName,eeCode,partName,infoCode,mateType,origin,actionFlag,site
+                    modelName,customerModelName,refdes
                 },
             };
             getpagelistReq(obj).then((res) => {
@@ -202,23 +165,6 @@ export default {
             this.searchPoptipModal = false;
             }
         });
-    },
-
-     uploadSuccess () {
-      this.searchClick ();//刷新
-      this.$Message.success(`${this.$t("import")}${this.$t("success")}`);
-      //关闭弹框
-      this.modalFlag = false;
-    },
-    //下载模板
-    download () {
-      downloadReq().then((res) => {
-        let blob = new Blob([res], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        const fileName = this.$t("attendanceTemplate") + ".xlsx"; // 自定义文件名
-        exportFile(blob, fileName);
-      });
     },
      // 点击新增按钮触发
     addClick () {
@@ -236,8 +182,14 @@ export default {
       } else this.$Msg.warning(this.$t("oneData"));
     },
      // 右侧弹窗打开
-    importClick () {
+     importClick () {
       this.modalFlag= true;
+    },
+    uploadSuccess () {
+      this.searchClick ();//刷新
+      this.$Message.success(`${this.$t("import")}${this.$t("success")}`);
+      //关闭弹框
+      this.modalFlag = false;
     },
     // 某一行高亮时触发
     currentClick (currentRow) {

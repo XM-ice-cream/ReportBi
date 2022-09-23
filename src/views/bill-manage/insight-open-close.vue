@@ -3,14 +3,80 @@
   <div class="page-style">
     <!-- 右侧抽屉 Form表单 -->
     <Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-      <Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+      <Form ref="submitData" :model="submitData" :label-width="120" :label-colon="true" @submit.native.prevent>
         <!-- 机种 -->
         <FormItem :label="$t('modelName')" prop="modelName">
             <Input v-model="submitData.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')"/>
         </FormItem>
+         <!-- 客户机种 -->
+         <FormItem label="客户机种" prop="customerModelName">
+            <Input v-model="submitData.customerModelName" :placeholder="$t('pleaseEnter') + '客户机种'"/>
+        </FormItem>
+         <!-- 上传站点 -->
+         <FormItem label="上传站点" prop="uploadStepName">
+            <Input v-model="submitData.uploadStepName" :placeholder="$t('pleaseEnter') + '上传站点'"/>
+        </FormItem>
         <!-- EE Code -->
         <FormItem label="EE Code" prop="eeCode">
             <Input v-model.trim="submitData.eeCode" :placeholder="$t('pleaseEnter') + 'EE Code'"  />
+        </FormItem>
+        <!-- 上传脚位-->
+        <FormItem label="上传脚位" prop="isUploadRefdes">
+            <i-switch size="large" v-model="submitData.isUploadRefdes" :true-value="1" :false-value="0">
+                <span slot="open">{{ $t("yes") }}</span>
+                <span slot="close">{{ $t("no") }}</span>
+            </i-switch>
+        </FormItem>
+         <!-- 脚位分类 -->
+         <FormItem label="脚位分类" prop="refdes_Gategory">
+            <!-- <Input v-model.trim="submitData.refdes_Gategory" :placeholder="$t('pleaseEnter') + '脚位分类'"  /> -->
+            <Select v-model="submitData.refdes_Gategory" clearable>
+                <Option v-for="item in refdesGategoryList" :value="item" :key="item">{{ item }}</Option>
+            </Select>
+        </FormItem>
+        <!-- Check脚位-->
+        <FormItem label="Check脚位" prop="isCheckRefdes">
+            <i-switch size="large" v-model="submitData.isCheckRefdes" :true-value="1" :false-value="0">
+                <span slot="open">{{ $t("yes") }}</span>
+                <span slot="close">{{ $t("no") }}</span>
+            </i-switch>
+        </FormItem>
+         <!-- 上传辅耗材-->
+         <FormItem label="上传辅耗材" prop="isUploadConsumable">
+            <i-switch size="large" v-model="submitData.isUploadConsumable" :true-value="1" :false-value="0">
+                <span slot="open">{{ $t("yes") }}</span>
+                <span slot="close">{{ $t("no") }}</span>
+            </i-switch>
+        </FormItem>
+        <!-- 上传过站Tooling-->
+        <FormItem label="上传过站Tooling" prop="isUploadTrackTooling">
+            <i-switch size="large" v-model="submitData.isUploadTrackTooling" :true-value="1" :false-value="0">
+                <span slot="open">{{ $t("yes") }}</span>
+                <span slot="close">{{ $t("no") }}</span>
+            </i-switch>
+        </FormItem>
+        <!-- 上传IC料件码-->
+        <FormItem label="上传IC料件码" prop="isUploadICItemCode">
+            <i-switch size="large" v-model="submitData.isUploadICItemCode" :true-value="1" :false-value="0">
+                <span slot="open">{{ $t("yes") }}</span>
+                <span slot="close">{{ $t("no") }}</span>
+            </i-switch>
+        </FormItem>
+        <!-- 客户线体 -->
+        <FormItem label="客户线体" prop="lineName">
+            <Input v-model.trim="submitData.lineName" :placeholder="$t('pleaseEnter') + '客户线体'"  />
+        </FormItem>
+        <!-- 路由 -->
+        <FormItem label="路由" prop="origin">
+            <Input v-model.trim="submitData.origin" :placeholder="$t('pleaseEnter') + '路由'"  />
+        </FormItem>
+        <!-- 状态 -->
+        <FormItem label="状态" prop="actionFlag">
+            <Input v-model.trim="submitData.actionFlag" :placeholder="$t('pleaseEnter') + '状态'"  />
+        </FormItem>
+        <!-- 生产地 -->
+        <FormItem label="生产地" prop="site">
+            <Input v-model.trim="submitData.site" :placeholder="$t('pleaseEnter') + '生产地'"  />
         </FormItem>
         <!-- Enabled-->
          <FormItem :label="$t('enabled')" prop="enabled">
@@ -50,9 +116,13 @@
                     <FormItem :label="$t('modelName')" prop="modelName">
                       <Input v-model="req.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')"/>
                     </FormItem>
+                     <!-- 客户机种 -->
+                     <FormItem label="客户机种" prop="customerModelName">
+                      <Input v-model="req.customerModelName" :placeholder="$t('pleaseEnter') + '客户机种'"/>
+                    </FormItem>
                     <!-- EE Code -->
                     <FormItem label="EE Code" prop="eeCode">
-                      <Input v-model.trim="req.panelNo" :placeholder="$t('pleaseEnter') + 'EE Code'"  />
+                      <Input v-model.trim="req.eeCode" :placeholder="$t('pleaseEnter') + 'EE Code'"  />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -96,6 +166,7 @@ export default {
         startTime: "",
         endTime: "",
         modelName: "", //机种
+        customerModelName:"",
         eeCode: "",
         ...this.$config.pageConfig,
       }, //查询数据
@@ -108,6 +179,18 @@ export default {
         },
         { title: "机种", key: "modelName", align: "center", minWidth: 140, tooltip: true },
         { title: "EE Code", key: "eeCode", align: "center", minWidth: 140, tooltip: true },
+        { title: "客户机种", key: "customerModelName", align: "center", minWidth: 140, tooltip: true },
+        { title: "上传站点", key: "uploadStepName", align: "center", minWidth: 140, tooltip: true },
+        { title: "上传脚位", key: "isUploadRefdes", align: "center", minWidth: 140, tooltip: true },
+        { title: "脚位分类", key: "refdes_Gategory", align: "center", minWidth: 140, tooltip: true },
+        { title: "Check脚位", key: "isCheckRefdes", align: "center", minWidth: 140, tooltip: true },
+        { title: "上传辅耗材", key: "isUploadConsumable", align: "center", minWidth: 140, tooltip: true },
+        { title: "上传过站Tooling", key: "isUploadTrackTooling", align: "center", minWidth: 140, tooltip: true },
+        { title: "上传IC料件码", key: "isUploadICItemCode", align: "center", minWidth: 140, tooltip: true },
+        { title: "客户线体", key: "lineName", align: "center", minWidth: 140, tooltip: true },
+        { title: "路由", key: "origin", align: "center", minWidth: 140, tooltip: true },
+        { title: "状态", key: "actionFlag", align: "center", minWidth: 140, tooltip: true },
+        { title: "生产地", key: "site", align: "center", minWidth: 140, tooltip: true },
         { title: "创建人", key: "createUserName", align: "center", minWidth: 120, tooltip: true },
         { title: "创建时间", key: "createDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
         { title: "修改人", key: "modifyUserName", align: "center", minWidth: 120, tooltip: true },
@@ -115,11 +198,24 @@ export default {
         { title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
       ], // 表格数据
       submitData:{
-        id:"",
-        modelName: "", //机种
-        eeCode: ""  ,
-        enabled:0     
-      }
+        modelName: "",
+        customerModelName: "",
+        uploadStepName: "",
+        eeCode: "",
+        isUploadRefdes: 0,
+        refdes_Gategory: "",
+        isCheckRefdes: 0,
+        isUploadConsumable: 0,
+        isUploadTrackTooling: 0,
+        isUploadICItemCode: 0,
+        lineName: "",
+        origin: "",
+        actionFlag: "",
+        site: "",
+        enabled: 0,
+        id: ""  
+      },
+      refdesGategoryList:['All','B','T']
     };
   },
   activated () {
@@ -145,7 +241,7 @@ export default {
     pageLoad () {
         this.data = [];
         this.tableConfig.loading = false;
-        const { startTime, endTime,modelName,eeCode} = this.req;
+        const { startTime, endTime,modelName,eeCode,customerModelName} = this.req;
         this.$refs.searchReq.validate((validate) => {
             if (validate) {
             this.tableConfig.loading = true;
@@ -159,6 +255,7 @@ export default {
                     endTime: formatDate(endTime),
                     modelName,
                     eeCode,
+                    customerModelName
                 },
             };
             getpagelistReq(obj).then((res) => {
@@ -178,12 +275,9 @@ export default {
     submitClick (isClose = false) {      
       this.$refs.submitData.validate((validate) => {
         if (validate) {
-          const { modelName,eeCode,enabled,id} = this.submitData;
+          const { modelName,customerModelName, uploadStepName, eeCode,isUploadRefdes, refdes_Gategory,isCheckRefdes,isUploadConsumable, isUploadTrackTooling,isUploadICItemCode, lineName, origin,actionFlag,site, enabled,id  } = this.submitData;
           const obj = {
-             modelName,
-             eeCode,
-             enabled,
-             id
+            modelName,customerModelName, uploadStepName, eeCode,isUploadRefdes, refdes_Gategory,isCheckRefdes,isUploadConsumable, isUploadTrackTooling,isUploadICItemCode, lineName, origin,actionFlag,site, enabled,id
           }
           const requestApi = this.isAdd?addReq:modifyReq;
           requestApi(obj).then((res) => {
@@ -207,16 +301,10 @@ export default {
     editClick () {
       if (this.selectObj) {
         let {
-          modelName,
-          eeCode,
-          enabled,
-          id
+            modelName,customerModelName, uploadStepName, eeCode,isUploadRefdes, refdes_Gategory,isCheckRefdes,isUploadConsumable, isUploadTrackTooling,isUploadICItemCode, lineName, origin,actionFlag,site, enabled,id
         } = this.selectObj;
         this.submitData = {
-         modelName,
-          eeCode,
-          enabled,
-          id
+            modelName,customerModelName, uploadStepName, eeCode,isUploadRefdes, refdes_Gategory,isCheckRefdes,isUploadConsumable, isUploadTrackTooling,isUploadICItemCode, lineName, origin,actionFlag,site, enabled,id
         };
         this.isAdd = false;
         this.drawerFlag = true;
