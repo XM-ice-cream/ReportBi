@@ -38,7 +38,7 @@
               </Poptip>
             </i-col>
             <i-col span="18" style="text-align: right;">
-              <button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="" @on-delete-click="deleteClick" @on-copy-click="copyClick"></button-custom>
+              <button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick" @on-copy-click="copyClick"></button-custom>
             </i-col>
           </Row>
         </div>
