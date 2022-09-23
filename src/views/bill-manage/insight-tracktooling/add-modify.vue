@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { addReq,modifyReq } from "@/api/bill-manage/insight-ic";
+import { addReq,modifyReq } from "@/api/bill-manage/insight-tracktooling";
 export default {
   name: "insight-tracktooling-add-modify",
   props:{
