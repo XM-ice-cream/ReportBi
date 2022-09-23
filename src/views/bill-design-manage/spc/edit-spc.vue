@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal :title="isAdd?'新增':'编辑'" :mask-closable="false" :closable="true" v-model="dialogFormVisible" fullscreen :before-close="closeDialog">
+    <Modal :title="modalTitle" :mask-closable="false" :closable="true" v-model="dialogFormVisible" fullscreen :before-close="closeDialog">
       <Form ref="form" :model="formData" :rules="ruleValidate" :label-width="130" style="height:100%">
         <Row :gutter="10">
             <!-- 模板名称 -->
@@ -17,7 +17,7 @@
           </Col>
           <!-- 中心sql -->
           <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
-            <FormItem label="mainSQL">
+            <FormItem label="mainSQL" prop="mainSQL">
                 <div class="codemirror">
                     <monaco-editor v-model.trim="formData.mainSQL" language="sql" v-if="dialogFormVisible"  />
                 </div>
@@ -25,7 +25,7 @@
           </Col>
           <!-- 量测值sql -->
           <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
-            <FormItem label="measurementSQL">
+            <FormItem label="measurementSQL" prop="measurementSQL">
                 <div class="codemirror">
                     <monaco-editor v-model.trim="formData.measurementSQL" language="sql" v-if="dialogFormVisible" />
                 </div>
@@ -46,7 +46,7 @@
           </Col>
           <!-- 过滤值sql -->
           <Col :xs="24" :sm="20" :md="22" :lg="22" :xl="22" class="code-mirror-form">
-            <FormItem label="filterKeySQL">
+            <FormItem label="filterKeySQL" prop="filterKeySQL">
                 <div class="codemirror">
                     <monaco-editor v-model.trim="formData.filterKeySQL" language="sql"  v-if="dialogFormVisible"/>
                 </div>
@@ -141,6 +141,7 @@ export default {
   },
   data () {
     return {
+      modalTitle:"",
       formData: {
         channelName: "",//模板名称
         channelParameter: "",//模板参数
@@ -154,7 +155,7 @@ export default {
         isDataKey: 0,//是否全星
         dataKeySQL: "/*示例:SELECT DISTINCT '*','*','*',D.PANELNO,D.INPROCESSTIME,D.OUTPROCESSTIME,'*','*','*','*'\nFROM GITEA.WF_SAMPLING_CHECK_LOG A\nINNER JOIN GITEA.WF_PROCESS B ON A.PROCESSID=B.ID\nINNER JOIN GITEA.MC_MODEL C ON A.MODELID=C.ID\nINNER JOIN GITEA.WF_UNITINFOTRAVEL D ON A.PROCESSID=D.CURPROCESSID AND A.UNITID=D.UNITID\nWHERE A.PARAMETER=@PARAMETER \nAND B.NAME=@NAME\nAND C.MODELNAME=@MODELNAME\nAND A.UNITID=@UNITID\nAND ROWNUM=1*/",//datakeysql
         dataKeyQuery: "",//datakey查询
-        updateSQL: "/*示例:UPDATE GITEA.WF_SAMPLING_CHECK_LOG SET REMARK='Y'\nWHERE PARAMETER=@PARAMETER \nAND PROCESSID=@NAME\nAND MODELID=@MODELNAME\nAND UNITID=@UNITID*/",//更新状态sql
+        updateSQL: "/*示例:UPDATE GITEA.WF_SAMPLING_CHECK_LOG SET REMARK='Y'\nWHERE PARAMETER=@PARAMETER\nAND PROCESSID=@PROCESSID\nAND MODELID=@MODELID\nAND UNITID=@UNITID*/",//更新状态sql
         updateQuery: "",//
         enabled: 0,
         remark: ""
@@ -163,19 +164,58 @@ export default {
       dialogFormVisible: false,
       dialogFormVisibleTitle: "",
       ruleValidate: {
-        // setName: [
-        //   { required: true, message: "数据集名称必填", trigger: "blur" },
-        // ],
+        channelName: [
+          { required: true, message: "模板名称必填", trigger: "blur" },
+        ],
+        channelParameter:[
+             { required: true, message: "模板参数必填", trigger: "blur" },
+        ],
+        mainSQL:[
+             { required: true, message: "中心sql必填", trigger: "blur" },
+        ],
+        measurementSQL:[
+             { required: true, message: "量测值sql必填", trigger: "blur" },
+        ],
+        measurementQuery:[
+             { required: true, message: "量测值查询条件必填", trigger: "blur" },
+        ],
+        measurementField:[
+             { required: true, message: "量测值字段必填", trigger: "blur" },
+        ],
+        filterKeySQL:[
+             { required: true, message: "过滤值SQL 必填", trigger: "blur" },
+        ],
+        filterKeyQuery:[
+             { required: true, message: "过滤值查询条件必填", trigger: "blur" },
+        ],
+        filterKeyField:[
+             { required: true, message: "过滤值字段必填", trigger: "blur" },
+        ],
+        dataKeySQL:[
+             { required: true, message: "dataKeySQL必填", trigger: "blur" },
+        ],
+        dataKeyQuery:[
+             { required: true, message: "datakey查询必填", trigger: "blur" },
+        ],
+        updateSQL:[
+             { required: true, message: "updateSQL必填", trigger: "blur" },
+        ],
+        updateQuery:[
+             { required: true, message: "update查询必填", trigger: "blur" },
+        ],
+
       },
       isAdd: true,
+      spcType:"",
     };
   },
   methods: {
     // 编辑数据集,获取单条数据详情
-    pageLoad (row, isAdd) {
-      this.isAdd = isAdd;      
+    pageLoad (row, isAdd,type="") {
+      this.modalTitle = isAdd?'新增':(type?'复制':'编辑');
+      this.isAdd = isAdd;   
+      this.spcType = type;  //复制 copy 
       this.formData = { ...this.formData,...row};
-      console.log(" this.formData", this.formData);
       this.$nextTick(()=>{
         this.dialogFormVisible = true;
       })
@@ -188,13 +228,13 @@ export default {
       this.formData.measurementSQL= "/*示例:SELECT A.UNITID,A.PARAMETER,A.CHECKVALUE,B.NAME,C.MODELNAME\nFROM GITEA.WF_SAMPLING_CHECK_LOG A\nINNER JOIN GITEA.WF_PROCESS B ON A.PROCESSID=B.ID\nINNER JOIN GITEA.MC_MODEL C ON A.MODELID=C.ID\nWHERE A.PARAMETER=@PARAMETER \nAND B.NAME=@NAME\nAND C.MODELNAME=@MODELNAME\nAND A.UNITID=@UNITID*/",//量测值sql;
       this.formData.filterKeySQL="/*示例:SELECT DISTINCT D.EQPID,C.MODELNAME,D.CURPROCESSNAME\nFROM GITEA.WF_SAMPLING_CHECK_LOG A\nINNER JOIN GITEA.WF_PROCESS B ON A.PROCESSID=B.ID\nINNER JOIN GITEA.MC_MODEL C ON A.MODELID=C.ID\nINNER JOIN GITEA.WF_UNITINFOTRAVEL D ON A.PROCESSID=D.CURPROCESSID AND A.UNITID=D.UNITID\nWHERE A.PARAMETER=@PARAMETER \nAND B.NAME=@NAME\nAND C.MODELNAME=@MODELNAME\nAND A.UNITID=@UNITID\nAND ROWNUM=1*/";//过滤值sql;
       this.formData.dataKeySQL="/*示例:SELECT DISTINCT '*','*','*',D.PANELNO,D.INPROCESSTIME,D.OUTPROCESSTIME,'*','*','*','*'\nFROM GITEA.WF_SAMPLING_CHECK_LOG A\nINNER JOIN GITEA.WF_PROCESS B ON A.PROCESSID=B.ID\nINNER JOIN GITEA.MC_MODEL C ON A.MODELID=C.ID\nINNER JOIN GITEA.WF_UNITINFOTRAVEL D ON A.PROCESSID=D.CURPROCESSID AND A.UNITID=D.UNITID\nWHERE A.PARAMETER=@PARAMETER \nAND B.NAME=@NAME\nAND C.MODELNAME=@MODELNAME\nAND A.UNITID=@UNITID\nAND ROWNUM=1*/";//datakeysql;
-      this.formData.updateSQL="/*示例:UPDATE GITEA.WF_SAMPLING_CHECK_LOG SET REMARK='Y'\nWHERE PARAMETER=@PARAMETER \nAND PROCESSID=@NAME\nAND MODELID=@MODELNAME\nAND UNITID=@UNITID*/";//更新状态sql;
+      this.formData.updateSQL="/*示例:UPDATE GITEA.WF_SAMPLING_CHECK_LOG SET REMARK='Y'\nWHERE PARAMETER=@PARAMETER\nAND PROCESSID=@PROCESSID\nAND MODELID=@MODELID\nAND UNITID=@UNITID*/";//更新状态sql;
     },
     // 提交  
     async submit () {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
-                const requestApi = this.isAdd ? addReq : modifyReq;
+                const requestApi = this.isAdd ? addReq :(this.spcType? addReq: modifyReq);
                 const { code, message } = await requestApi(this.formData);
                 if (code=== 200) {
                     this.$Message.success("提交成功！");
@@ -202,7 +242,7 @@ export default {
                     this.closeDialog();   
                 
                 }else{
-                    this.$Message.error(message);
+                    this.$Message.error(`提交失败！${message}`);
                 }
             }
       });
