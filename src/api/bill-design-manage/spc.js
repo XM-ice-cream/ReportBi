@@ -26,7 +26,7 @@ export const deleteReq = data => {
     return requestCenter({
         baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/autospcconfig/v1/autospcconfig/delete',
-        method: 'post',
+        method: 'put',
         data
     })
 }
