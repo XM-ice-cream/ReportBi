@@ -109,8 +109,10 @@ export default {
         { title: "BoxNo", key: "boxNo", align: "center", width: 160, tooltip: true },
         { title: "CartonNo", key: "cartonNo", align: "center", width: 160, tooltip: true },
         { title: "PalletNo", key: "palletNo", align: "center", tooltip: true },
+        { title: '出货时间', key: "wadat_ist", align: "center", width: 130, tooltip: true, render: renderDate },
+        { title: "出货单号", key: "vbeln", align: "center", width: 160, tooltip: true },
         { title: this.$t("shipAddress"), key: "shiptoName", align: "center", width: 150, tooltip: true },
-        { title: this.$t("status"), key: "currentStatus", align: "center", width: 60, tooltip: true },
+        { title: this.$t("status"), key: "currentStatus", align: "center", width: 60, tooltip: true },      
         { title: this.$t("OutProcessTime"), key: "outProcessTime", align: "center", width: 130, tooltip: true, render: renderDate },
         { title: this.$t("createUser"), key: "createUserId", align: "center", width: 70, tooltip: true },
       ], // 表格数据
