@@ -41,57 +41,7 @@
                             };
                             }
                         "
-                         @values="changeSelectPage('buildConfig')"
-                        >                   
-                      </v-selectpage>
-                    </FormItem>
-                    <!-- Config -->
-                    <FormItem :label="$t('buildConfig')" prop="buildConfig">
-                      <v-selectpage
-                        class="select-page-style"
-                        key-field="name"
-                        show-field="name"
-                        v-model="req.buildConfig"
-                        ref="buildConfig"
-                        multiple
-                        v-if="isBuildConfig&&searchPoptipModal"
-                        :data="configPageListUrl"
-                        :placeholder="$t('pleaseEnter') +  $t('buildConfig')"
-                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,orderField:'modelName'}"
-                        :result-format="
-                            (res) => {
-                            return {
-                                totalRow: res.total,
-                                list: res.data || [],
-                            };
-                            }
-                        "
-                        @values="changeSelectPage('processName')"
-                        >                   
-                      </v-selectpage>
-                    </FormItem>
-                    <!-- 制程 -->
-                    <FormItem :label="$t('processName')" prop="processName">
-                      <v-selectpage
-                        class="select-page-style"
-                        key-field="name"
-                        show-field="name"
-                        v-model="req.processName"
-                        ref="processName"
-                        multiple
-                        v-if="isProcessName&&searchPoptipModal"
-                        :data="processPageListUrl"
-                        :placeholder="$t('pleaseEnter') +  $t('processName')"
-                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,config:req.buildConfig}"
-                        :result-format="
-                            (res) => {
-                            return {
-                                totalRow: res.total,
-                                list: res.data || [],
-                            };
-                            }
-                        "
-                        @values="changeSelectPage('projectVersion')"
+                         @values="changeSelectPage('projectVersion')"
                         >                   
                       </v-selectpage>
                     </FormItem>
@@ -107,7 +57,7 @@
                         v-if="isProjectVersion&&searchPoptipModal"
                         :data="projectVersionPageListUrl"
                         :placeholder="$t('pleaseEnter') +  'ProjectVersion'"
-                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,config:req.buildConfig,processName:req.processName}"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName}"
                         :result-format="
                             (res) => {
                             return {
@@ -132,7 +82,57 @@
                         v-if="isBuildType&&searchPoptipModal"
                         :data="buildTypePageListUrl"
                         :placeholder="$t('pleaseEnter') +  'BuildType'"
-                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,config:req.buildConfig,processName:req.processName,projectVersion:req.projectVersion}"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,projectVersion:req.projectVersion}"
+                        :result-format="
+                            (res) => {
+                            return {
+                                totalRow: res.total,
+                                list: res.data || [],
+                            };
+                            }
+                        "
+                        @values="changeSelectPage('buildConfig')"
+                        >                   
+                      </v-selectpage>
+                    </FormItem>
+                    <!-- Config -->
+                    <FormItem :label="$t('buildConfig')" prop="buildConfig">
+                      <v-selectpage
+                        class="select-page-style"
+                        key-field="name"
+                        show-field="name"
+                        v-model="req.buildConfig"
+                        ref="buildConfig"
+                        multiple
+                        v-if="isBuildConfig&&searchPoptipModal"
+                        :data="configPageListUrl"
+                        :placeholder="$t('pleaseEnter') +  $t('buildConfig')"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,projectVersion:req.projectVersion,buildType:req.buildType}"
+                        :result-format="
+                            (res) => {
+                            return {
+                                totalRow: res.total,
+                                list: res.data || [],
+                            };
+                            }
+                        "
+                        @values="changeSelectPage('processName')"
+                        >                   
+                      </v-selectpage>
+                    </FormItem>
+                    <!-- 制程 -->
+                    <FormItem :label="$t('processName')" prop="processName">
+                      <v-selectpage
+                        class="select-page-style"
+                        key-field="name"
+                        show-field="name"
+                        v-model="req.processName"
+                        ref="processName"
+                        multiple
+                        v-if="isProcessName&&searchPoptipModal"
+                        :data="processPageListUrl"
+                        :placeholder="$t('pleaseEnter') +  $t('processName')"
+                        :params="{ startTime:formatDate(req.startTime),endTime: formatDate(req.endTime),modelName:req.modelName,projectVersion:req.projectVersion,buildType:req.buildType,config:req.buildConfig}"
                         :result-format="
                             (res) => {
                             return {
