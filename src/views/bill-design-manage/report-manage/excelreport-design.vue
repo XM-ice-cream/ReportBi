@@ -39,6 +39,7 @@
               <Icon type="md-eye" />
             </Button>
           </Tooltip>
+          <!-- <Icon custom="iconfont luckysheet-iconfont-hanshu" style="margin-right:5px" /> -->
 
         </div>
         <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
@@ -52,6 +53,7 @@
     <!-- 数据集管理弹框 -->
     <!-- <dataset-manage ref = "datasetmanage"/> -->
     <dataset-manage ref="datasetmanage" />
+    <function-manage ref="functionmanage"  :formData="rightForm" @autoChangeFunc="autoChangeFunc"/>
   </div>
 </template>
 
@@ -62,10 +64,11 @@ import { getExcelByReportcodeReq, insertExcelReportReq, modifyExcelReportReq } f
 import draggable from "vuedraggable";
 import RightTabPane from './excelreport-design/right-tabPane.vue';
 import DatasetManage from './excelreport-design/dataset-manage.vue';
+import FunctionManage from "./excelreport-design/function-manage.vue";
 
 export default {
   name: "excelreport-design",
-  components: { draggable, RightTabPane, DatasetManage },
+  components: { draggable, RightTabPane, DatasetManage, FunctionManage },
   data () {
     return {
       dataSet: [],
@@ -197,8 +200,17 @@ export default {
       options.data = this.sheetData;
       this.$nextTick(() => {
         $(function () {
-          luckysheet.create(options);
+          luckysheet.create(options);          
         })
+        document.getElementById("luckysheet-wa-functionbox-fx").addEventListener("click", function(){
+           
+           //点击原本函数弹框的取消按钮
+        //   document.getElementById("luckysheet-modal-dialog-mask").style.display = "none";           
+        //    document.getElementById("luckysheet-search-formula").style.display = "none";
+           document.getElementsByClassName("luckysheet-model-close-btn")[0].click();
+             that.$refs.functionmanage.outerVisible = true;
+             that.$refs.functionmanage.getDataItemData(); // 数据字典
+       });
       })
     },
 
@@ -252,7 +264,7 @@ export default {
       }
       if (value) {
         window.luckysheet.setCellValue(r, c, { ...this.rightForm });
-        this.imageExpendUpdate(this.rightForm.cellAttribute.expend.expend, r, c, "expend");
+        // this.imageExpendUpdate(this.rightForm.cellAttribute.expend.expend, r, c, "expend");
       }
     },
     //更新扩展方向图片
@@ -294,12 +306,16 @@ export default {
       this.draggableFieldLabel = "#{" + this.setCode + "." + fieldLabel + "}";
     },
     //更新单元格信息，扩展、排序...
-    autoChangeFunc (right) {
+    autoChangeFunc (right) {       
       const { r, c, cellAttribute,cell } = right;
-     if(r&&c) {
-        luckysheet.setCellValue(r, c, { ...right, });
+     if(r!==undefined&&c!==undefined) {
+        luckysheet.setCellValue(r, c, {...right});
+        this.$nextTick(()=>{
+            luckysheet.refresh();
+            luckysheet.getCellValue(r, c);
+        }) 
         this.blankNum = cell.blankNum; //存储空白格值
-       this.imageExpendUpdate(cellAttribute.expend.expend, r, c, "expend");
+    //    this.imageExpendUpdate(cellAttribute.expend.expend, r, c, "expend");
      }
     },
 
@@ -343,7 +359,7 @@ export default {
     //设定传参
     setReportExcelDto () {
       //删除父格方向图片
-      this.imageParentUpdate();
+    //   this.imageParentUpdate();
 
       let jsonData = luckysheet.getAllSheets();
       console.log("jsonData", jsonData);
@@ -483,7 +499,7 @@ export default {
         if (expend === "portrait" && v && v.indexOf("#") !== -1) {
           leftParentValue = { label: `${r},${i}`, value: `${r},${i}` };
           // 添加图片父箭头
-          this.imageParentUpdate("leftParent", r, i, "parent");
+        //   this.imageParentUpdate("leftParent", r, i, "parent");
           break;
         }
       }
@@ -495,7 +511,7 @@ export default {
         if (expend === "cross" && v && v.indexOf("#") !== -1) {
           topParentValue = { label: `${i},${c}`, value: `${i},${c}` };
           // 添加图片父箭头
-          this.imageParentUpdate("topParent", i, c, "parent");
+        //   this.imageParentUpdate("topParent", i, c, "parent");
           break;
         }
       }
@@ -535,6 +551,9 @@ export default {
 </script>
  <style src="../../../../public/luckysheet/assets/iconfont/iconfont.css" />
 <style>
+    #luckysheet_info_detail_title,#luckysheet_info_detail_update,#luckysheet_info_detail_save{
+        display: none;
+    }
 </style>
 <style lang="less" scoped>
 .sider {

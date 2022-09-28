@@ -132,7 +132,7 @@ import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css"; // 核心样式
 import "codemirror/theme/cobalt.css"; // 引入主题后还需要在 options 中指定主题才会生效
 import vueJsonEditor from "vue-json-editor";
-import MonacoEditor from "./monaco-editor.vue";
+import MonacoEditor from "@/components/monaco-editor/monaco-editor.vue";
 import { validateEngOrNum } from "@/libs/validate";
 import { formatDate } from "@/libs/tools";
 export default {

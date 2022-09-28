@@ -33,8 +33,8 @@
             </div>
           </TabPane>
           <TabPane label="对应关系" :index="2" name="对应关系" v-if="dataSetDataList.length>0">
-            <template v-for="(item,index) in dataSetDataList">
-              <Form :label-width="80" :label-colon="true" :key="index" inline>
+            <template v-for="(item,index) in dataSetDataList" >
+              <Form :label-width="80" :label-colon="true"  inline>
                 <FormItem label="数据集1">
                   <Select v-model="dataSetDataList[index].setName" clearable filterable transfer @on-change="setCodeChange(index)">
                     <Option v-for="(dataBaseItem, dataBaseIndex) in dataBaseList" :value="dataBaseItem.setName" :key="dataBaseIndex">
@@ -57,8 +57,8 @@
             </template>
           </TabPane>
           <TabPane label="关联参数" :index="3" name="关联参数" v-if="dataSetDataList.length>0">
-            <template v-for="(item,itemIndex) in dataSetDataList">
-              <table :key="itemIndex" style="width: 100%;" class="connection-table">
+            <template v-for="(item,itemIndex) in dataSetDataList" >
+              <table  style="width: 100%;" class="connection-table">
                 <tr>
                   <th>{{item.setName}}</th>
                   <th>操作符</th>
