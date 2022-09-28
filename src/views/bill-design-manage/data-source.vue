@@ -65,7 +65,7 @@
           <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
           <!-- 请求路径 -->
           <FormItem label="连接串" prop="sourceConnect">
-            <Input v-model.trim="submitData.sourceConnect" :placeholder="$t('pleaseEnter') + '连接串'" />
+            <Input type="password" v-model.trim="submitData.sourceConnect" :placeholder="$t('pleaseEnter') + '连接串'" />
           </FormItem>
           </Col>
         </Row>
@@ -86,7 +86,8 @@
       <div slot="footer">
         <Button size="small" @click="cancelClick">取消</Button>
         <Button size="small" @click="testClick" class="testBtn">测试</Button>
-        <Button size="small" @click="submitClick">确定</Button>
+        <Button size="small" @click="submitClick">保存</Button>
+         <Button size="small" @click="submitClick(true)">保存并跳转至数据集</Button>
       </div>
     </Modal>
     <!-- 页面表格 -->
@@ -276,7 +277,7 @@ export default {
       } else this.$Msg.warning(this.$t("oneData"));
     },
     //提交
-    submitClick () {
+    submitClick (isSkip=false) {
       this.$refs.submitReq.validate((validate) => {
         if (validate) {
           let obj = { ...this.submitData };
@@ -284,8 +285,13 @@ export default {
           request.then((res) => {
             if (res.code === 200) {
               this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+               //跳转至数据集
+              if(isSkip){
+                 this.$router.push({name: 'dataset',query: {sourceCode: this.submitData.sourceCode}})
+              }
               this.pageLoad();//刷新表格
               this.cancelClick();
+             
             } else
               this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + res.message);
           });

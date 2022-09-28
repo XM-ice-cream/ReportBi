@@ -1,27 +1,9 @@
 <template>
-  <div ref="editor" class="main"></div>
+  <div ref="editor" class="main" style="height:400px"></div>
 </template>
 
 <script>
 import * as monaco from "monaco-editor";
-// import createSqlCompleter from "./util/sql-completion";
-// import createJavascriptCompleter from "./util/javascript-completion";
-// import registerLanguage from "./util/log-language";
-const global = {};
-
-// const getHints = model => {
-//   let id = model.id.substring(6);
-//   return (global[id] && global[id].hints) || [];
-// };
-// monaco.languages.registerCompletionItemProvider(
-//   "sql",
-//   createSqlCompleter(getHints)
-// );
-// monaco.languages.registerCompletionItemProvider(
-//   "javascript",
-//   createJavascriptCompleter(getHints)
-// );
-// registerLanguage(monaco);
 export default {
   props: {
     options: {
@@ -64,12 +46,12 @@ export default {
   mounted () {
     this.initEditor();
     global[this.editorInstance._id] = this;
-    window.addEventListener("resize", this.layout);
+    window.addEventListener('resize', () =>  this.layout);
   },
   destroyed () {
     this.editorInstance.dispose();
     global[this.editorInstance._id] = null;
-    window.removeEventListener("resize", this.layout);
+    window.addEventListener('resize', () =>  this.layout);
   },
   methods: {
     layout () {
@@ -84,7 +66,7 @@ export default {
       this.onValueChange();
     },
     getOptions () {
-      let props = { value: this.value };
+      let props = { value: this.value,};
       this.language !== undefined && (props.language = this.language);
       console.log(this.defaultOptions);
       let options = Object.assign({}, this.defaultOptions, this.options, props);
@@ -103,7 +85,7 @@ export default {
 
       this.editorInstance = monaco.editor.create(
         this.$refs.editor,
-        this.getOptions()
+        this.getOptions(),
       );
       this.editorInstance.onContextMenu(e => {
         this.$emit("contextmenu", e);
@@ -126,4 +108,9 @@ export default {
 .main /deep/ .view-lines * {
   font-family: Consolas, "Courier New", monospace !important;
 }
+/* :deep(.monaco-editor){
+    color: #d4d4d4;
+    width: 100% !important;
+    height: 400px !important;
+} */
 </style>

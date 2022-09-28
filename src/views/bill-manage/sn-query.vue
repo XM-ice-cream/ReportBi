@@ -57,6 +57,16 @@
                     <FormItem :label="$t('stepName')" prop="curprocessname">
                       <Input v-model.trim="req.curprocessname" :placeholder="$t('pleaseEnter') + $t('stepName')" />
                     </FormItem>
+                    <!-- 箱号 -->
+                     <FormItem label="箱号" prop="cartonNo">
+                      <Input v-model.trim="req.cartonNo " :placeholder="$t('pleaseEnter') + '箱号'" />
+                    </FormItem>
+                    <!-- 当前状态 -->
+                     <FormItem label="当前状态">
+                        <Select v-model="req.currentStatus " clearable transfer>
+                            <Option v-for="(item,index) in currentStatusList" :value="item" :key="index">{{ item }}</Option>
+                        </Select>
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -90,6 +100,7 @@ export default {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       data: [], // 表格数据
       btnData: [],
+      currentStatusList:["Hold","Pass","Scrap","DryBox","Defect"],
       req: {
         startTime: "",
         endTime: "",
@@ -102,6 +113,8 @@ export default {
         buildConfig: "",
         curprocessname: "",
         isHistory: false,
+        cartonNo:"",//箱号
+        currentStatus:"",//当前状态
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -206,6 +219,8 @@ export default {
         buildConfig,
         curprocessname,
         isHistory,
+        currentStatus,
+        cartonNo
       } = this.req;
       if (
         (startTime && endTime) ||
@@ -243,6 +258,8 @@ export default {
                 buildConfig,
                 curprocessname,
                 isHistory,
+                currentStatus,
+                cartonNo
               },
             };
             getpagelistReq(obj)
@@ -277,6 +294,8 @@ export default {
         buildConfig,
         curprocessname,
         isHistory,
+        currentStatus,
+        cartonNo
       } = this.req;
       if (
         (startTime && endTime) ||
@@ -305,6 +324,8 @@ export default {
           buildConfig,
           curprocessname,
           isHistory,
+          currentStatus,
+          cartonNo
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });

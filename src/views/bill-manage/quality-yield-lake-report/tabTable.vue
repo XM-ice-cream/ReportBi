@@ -15,7 +15,7 @@
 
 <script>
 import { getinputsReq, exportReq } from "@/api/bill-manage/quality-yield-lake-report";
-import { exportFile, formatDate } from "@/libs/tools";
+import { exportFile, formatDate,renderDate } from "@/libs/tools";
 
 export default {
   name: "tabTable",
@@ -57,14 +57,14 @@ export default {
         }, {
           title: '小条码',
           key: "unitid",
-          minWidth: 120,
+          minWidth: 150,
           ellipsis: true,
           tooltip: true,
           align: "center",
         }, {
           title: '大条码',
           key: "panelno",
-          minWidth: 120,
+          minWidth: 150,
           ellipsis: true,
           tooltip: true,
           align: "center",
@@ -103,6 +103,42 @@ export default {
           ellipsis: true,
           tooltip: true,
           align: "center",
+        }, {
+          title: '不良描述',
+          key: "description",
+          minWidth: 150,
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
+        },{
+          title: '不良代码',
+          key: "defectcode",
+          minWidth: 120,
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
+        }, {
+          title: '不良位置',
+          key: "location",
+          minWidth: 120,
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
+        }, {
+          title: '不良时间',
+          key: "createdate",
+          minWidth: 120,
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
+          render:renderDate
+        }, {
+          title: '维修状态',
+          key: "rpstatus",
+          minWidth: 120,
+          ellipsis: true,
+          tooltip: true,
+          align: "center",
         },
       ], // 表格数据
     };
@@ -114,6 +150,9 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = true;
+      if(this.queryObj.type!=="alldefect" && this.queryObj.type!=="lastdefect" ){
+      this.columns =  this.columns.filter(item=>!["rpstatus","createdate","location","defectcode","defectcode","description"].includes(item.key))
+      }
       let obj = {
         orderField: "Panel", // 排序字段
         ascending: true, // 是否升序

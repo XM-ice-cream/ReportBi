@@ -112,7 +112,7 @@ export default {
           getlistReq(obj).then((res) => {
             this.tableConfig.loading = false;
             if (res.code === 200) {
-              this.data = res.result;
+              this.data = res?.result||[];
             }
           }).catch(() => (this.tableConfig.loading = false));
           this.searchPoptipModal = false;

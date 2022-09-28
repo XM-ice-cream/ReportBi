@@ -1,7 +1,3 @@
-/**
- * Created by jiachenpan on 16/11/18.
- */
-
 export function isvalidUsername(str) {
     const valid_map = ['admin', 'editor']
     return valid_map.indexOf(str.trim()) >= 0
@@ -39,6 +35,19 @@ export function validateEngOrNum(rule, value, callback) {
     } else {
         if (!reg.test(value)) {
             callback(new Error('英文字母、数字或下划线'));
+        } else {
+            callback();
+        }
+    }
+}
+/*中文验证*/
+export function validateChinese(rule, value, callback) {
+    const reg = /^[_0-9\u4E00-\u9FA5]+$/;
+    if (value == '' || value == undefined || value == null) {
+        callback();
+    } else {
+        if (!reg.test(value)) {
+            callback(new Error('中文、数字或下划线'));
         } else {
             callback();
         }

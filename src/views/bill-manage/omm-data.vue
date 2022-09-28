@@ -33,6 +33,22 @@
                     <FormItem :label="$t('category')" prop="category">
                       <Input v-model.trim="req.category" :placeholder="$t('pleaseEnter') + $t('category')" />
                     </FormItem>
+                    <!-- 条形码 -->
+                    <FormItem :label="$t('barCode')" prop="barCode">
+                      <Input v-model.trim="req.barCode" placeholder="请输入条形码,多个以英文逗号或空格分隔" />
+                    </FormItem>
+                    <!-- 参数2 -->
+                    <FormItem label="参数2" prop="opt2">
+                      <Input v-model.trim="req.opt2" :placeholder="$t('pleaseEnter') + '参数2'" />
+                    </FormItem>
+                    <!-- 参数3 -->
+                    <FormItem label="参数3" prop="opt3">
+                      <Input v-model.trim="req.opt3" :placeholder="$t('pleaseEnter') + '参数3'" />
+                    </FormItem>
+                    <!-- 参数4 -->
+                    <FormItem label="参数4" prop="opt4">
+                      <Input v-model.trim="req.opt4" :placeholder="$t('pleaseEnter') + '参数4'" />
+                    </FormItem>
                   </Form>
                   <div class="poptip-style-button">
                     <Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -56,7 +72,7 @@
 
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/omm-data";
-import { getButtonBoolean, formatDate, exportFile, renderDate } from "@/libs/tools";
+import { getButtonBoolean, formatDate, exportFile, renderDate, commaSplitString } from "@/libs/tools";
 import { getlistReq as getdataitemlistReq } from "@/api/system-manager/data-item";
 export default {
   name: "omm-data",
@@ -72,6 +88,10 @@ export default {
         endTime: "",
         stationType: "",
         category: "",
+        barCode: "",//条形码
+        opt2: "",
+        opt3: "",
+        opt4: "",
         ...this.$config.pageConfig,
       }, //查询数据
       stationList: [],
@@ -87,6 +107,9 @@ export default {
         },
         { title: "站点", key: "station", align: "center", tooltip: true },
         { title: "类别", key: "category", align: "center", tooltip: true },
+        { title: "参数2", key: "opT2", align: "center", tooltip: true },
+        { title: "参数3", key: "opT3", align: "center", tooltip: true },
+        { title: "参数4", key: "opT4", align: "center", tooltip: true },
         { title: "设备ID", key: "eqpid", align: "center", tooltip: true },
         { title: "Barcode", key: "barcode", align: "center", width: 150, tooltip: true },
         { title: "编号", key: "faicode", align: "center", tooltip: true },
@@ -122,7 +145,7 @@ export default {
     pageLoad () {
       this.data = [];
       this.tableConfig.loading = false;
-      let { startTime, endTime, stationType, category } = this.req;
+      let { startTime, endTime, stationType, category, opt2, opt3, opt4, barCode } = this.req;
       if (stationType) {
         this.$refs.searchReq.validate((validate) => {
           if (validate) {
@@ -135,8 +158,12 @@ export default {
               data: {
                 startTime: formatDate(startTime),
                 endTime: formatDate(endTime),
+                barCode: commaSplitString(barCode).join(),
                 stationType,
                 category,
+                opt2,
+                opt3,
+                opt4,
               },
             };
             getpagelistReq(obj)
@@ -158,13 +185,17 @@ export default {
     },
     // 导出
     exportClick () {
-      let { startTime, endTime, stationType, category } = this.req;
+      let { startTime, endTime, stationType, category, opt2, opt3, opt4, barCode } = this.req;
       if (stationType) {
         let obj = {
           startTime: formatDate(startTime),
           endTime: formatDate(endTime),
+          barCode: commaSplitString(barCode).join(),
           stationType,
           category,
+          opt2,
+          opt3,
+          opt4,
         };
         exportReq(obj).then((res) => {
           let blob = new Blob([res], { type: "application/vnd.ms-excel" });

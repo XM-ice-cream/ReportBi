@@ -51,9 +51,12 @@ export default {
                     //报表管理索引
                     let billIndex = menuList.map(item => item.name).indexOf('bill-manage');
                     //去除模拟数据页面
-                    let filterMenuList = menuList[billIndex].children.filter(o => o.name !== "analog-data");
-                    // 重新赋值
-                    menuList[billIndex].children = filterMenuList;
+                    if(menuList[billIndex]?.children){
+                        let filterMenuList = menuList[billIndex].children.filter(o => o.name !== "analog-data");
+                        // 重新赋值
+                        menuList[billIndex].children = filterMenuList;
+                    }
+                   
                 }
 
 

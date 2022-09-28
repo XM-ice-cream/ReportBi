@@ -1,86 +1,94 @@
 <template>
-  <div class="page-style excel-preview">
-    <div class="comment">
-      <Card :bordered="false" dis-hover class="card-style">
-        <div slot="title">
-          <Row>
-            <i-col span="6">
-              <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-                <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
-                  {{ $t("selectQuery") }}
-                </Button>
-                <div class="poptip-style-content" slot="content">
-                  <Form ref="submitReq" :label-width="80" :label-colon="true">
-                    <template v-for="(item) in tableData2">
-                      <template v-for="(subitem,subindex) in item.children" >
-                        <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
-                          <!-- 字符串 -->
-                          <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable />
-                          <!-- 布尔 true/false/0/1-->
-                          <RadioGroup v-else-if="subitem.type==='Boolean'&&['true','false','0','1'].includes(subitem.value)" v-model="subitem.value">
-                            <template v-if="['true','false'].includes(subitem.value)">
-                              <Radio label="true">true</Radio>
-                              <Radio label="false">false</Radio>
-                            </template>
-                            <template v-if="['0','1'].includes(subitem.value)">
-                              <Radio label="0">0</Radio>
-                              <Radio label="1">1</Radio>
-                            </template>
-                          </RadioGroup>
-                          <!-- 数组 -->
-                          <Input v-else-if="subitem.type==='Array'" type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" clearable />
-                          <!-- 时间 -->
-                          <DatePicker v-else-if="subitem.type==='DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
-                          <!-- 其余类型 -->
-                          <Input v-else v-model.trim="subitem.value" type="text" clearable />
-                        </FormItem>
+    <div class="page-style excel-preview">
+      <div class="comment">
+        <Card :bordered="false" dis-hover class="card-style">
+          <div slot="title">
+            <Row class="content-top">
+                <!-- 查询条件 -->
+              <i-col span="6">
+                <Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
+                  <Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
+                    {{ $t("selectQuery") }}
+                  </Button>
+                  <div class="poptip-style-content" slot="content">
+                    <Form ref="submitReq" :label-width="80" :label-colon="true">
+                      <template v-for="(item) in tableData2">
+                        <template v-for="(subitem,subindex) in item.children" >
+                          <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                            <!-- 字符串 -->
+                            <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable />
+                            <!-- 布尔 true/false/0/1-->
+                            <RadioGroup v-else-if="subitem.type==='Boolean'&&['true','false','0','1'].includes(subitem.value)" v-model="subitem.value">
+                              <template v-if="['true','false'].includes(subitem.value)">
+                                <Radio label="true">true</Radio>
+                                <Radio label="false">false</Radio>
+                              </template>
+                              <template v-if="['0','1'].includes(subitem.value)">
+                                <Radio label="0">0</Radio>
+                                <Radio label="1">1</Radio>
+                              </template>
+                            </RadioGroup>
+                            <!-- 数组 -->
+                            <Input v-else-if="subitem.type==='Array'" type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" clearable />
+                            <!-- 时间 -->
+                            <DatePicker v-else-if="subitem.type==='DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+                            <!-- 其余类型 -->
+                            <Input v-else v-model.trim="subitem.value" type="text" clearable />
+                          </FormItem>
+                        </template>
                       </template>
-                    </template>
-                    <FormItem>
-                      <Button type="primary" @click="searchPreview(false)">查询</Button>
-                    </FormItem>
-
-                  </Form>
-                </div>
-              </Poptip>
-            </i-col>
-          </Row>
-        </div>
-        <!-- 表格 -->
-        <div class="data-table" :style="{height:(params.height+50)+'px'}">
-          <table class='table tableScroll' id='exceltable'>
-            <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr" style="height:18px">
-              <template v-for="(item,index) in itemTr">
-                <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan||1" :rowspan="item.rowspan||1" :key="index">
-                  <div :title="item.value" :style="item.divStyle">
-                   <template v-if="item.valueType==='image'">
-                     <img :src="item.value" />
-                   </template> 
-                    <template v-else>
-                        {{item.value}}
-                    </template>
+                      <FormItem>
+                        <Button type="primary" @click="searchPreview(false)">查询</Button>
+                      </FormItem>
+  
+                    </Form>
                   </div>
-                </td>
-                <td v-if="!item" :key="index" style="width:75px;height:18px"></td>
-              </template>
-
-            </tr>
-
-          </table>
-          <page-custom class="excel-page" :total="params.total" :totalPage="params.totalPage" :pageIndex="params.requestCount" :page-size="params.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
-        </div>
-
-      </Card>
+                </Poptip>
+              </i-col>
+              <!-- 标题 -->
+              <i-col span="12">
+                <div class="report-title">{{$route.query.reportName}}</div>
+              </i-col>
+              <!-- 下载 -->
+              <i-col span="6">
+                <Icon type="md-cloud-download" @click="download()"/>
+              </i-col>
+            </Row>
+          </div>
+          <!-- 表格 -->
+          <div class="data-table" :style="{height:(req.height+50)+'px'}">
+            <table class='table tableScroll' id='exceltable'>
+              <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr" style="height:18px">
+                <template v-for="(item,index) in itemTr">
+                  <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan||1" :rowspan="item.rowspan||1" :key="index">
+                    <div :title="item.value" :style="item.divStyle">
+                     <template v-if="item.valueType==='image'">
+                       <img :src="item.value" />
+                     </template> 
+                      <template v-else>
+                          {{item.value}}
+                      </template>
+                    </div>
+                  </td>
+                  <td v-if="!item" :key="index" style="width:75px;height:18px"></td>
+                </template>
+  
+              </tr>
+  
+            </table>
+            <page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+          </div>
+  
+        </Card>
+      </div>  
     </div>
-    <img :src="require('../../../assets/images/loading.gif')" v-if="loading" class="loading-img" />
-
-  </div>
-</template>
+  </template>
 
 <script>
-import { getExcelPreviewReq, exportReq } from '@/api/bill-design-manage/report-manage'
+import { getExcelPreviewReq,getParamsReq, exportReq } from '@/api/bill-design-manage/report-manage'
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
+import {  getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
 
 export default {
   name: "excelreport-preview",
@@ -90,13 +98,14 @@ export default {
       intervalData: '',
       options: {},
       sheet: {},
+      sheetData: [],
       reportId: null,
       reportName: null,
       dataSet: null,
       tableData2: [],
-      loading: false,
-      reportCode: '',
-      params: {
+      searchPoptipModal: false,
+      getValueBySetcodePageListUrl:getValueBySetcodePageListUrl(),
+      req: {
         reportCode: "",
         setParam: "",
         pageSize: 30, // 每页显示数
@@ -127,25 +136,25 @@ export default {
   methods: {
     async searchPreview (flag = true) {
 
-      if (!flag) this.params.requestCount = 1;  // 点击查询按钮
+      if (!flag) this.req.requestCount = 1;  // 点击查询按钮
 
       this.dateFormate();  // 左侧查询参数--时间格式化 
 
       //左侧查询参数 --必要参数接收
       const arr = this.toObject(this.tableData2)
-      this.params.setParam = JSON.stringify(arr)
+      this.req.setParam = JSON.stringify(arr)
       this.intervalPreview()  //每次都重新加载需要改成刷新
     },
     async intervalPreview () {
-      this.loading = true;
-      await getExcelPreviewReq(this.params).then(res => {
+        this.$Spin.show();
+      await getExcelPreviewReq(this.req).then(res => {
         if (res.code === 200) {
           let { jsonStr, setParam } = res.result;
           this.jsonStr = JSON.parse(jsonStr);
           // 查询参数
-          this.tableData2 = this.getParamsList(this.params.setParam, JSON.parse(setParam));
-          this.params = {
-            ...this.params,
+          this.tableData2 = this.getParamsList(this.req.setParam, JSON.parse(setParam));
+          this.req = {
+            ...this.req,
             total: this.jsonStr[this.jsonIndex].total,
             totalPage: this.jsonStr[this.jsonIndex].pageCount
           }
@@ -155,7 +164,7 @@ export default {
           this.$Message.error(res.message);
         }
         this.searchPoptipModal = false;
-      }).finally(() => (this.loading = false))
+      }).finally(() => (this.$Spin.hide()))
 
     },
     //获取表格
@@ -167,7 +176,6 @@ export default {
       //   this.htm = "<table class='table tableScroll' id='exceltable'>";
       let { celldata, config, frozen } = data[0];
       this.tableHtml = [];
-      console.log(celldata);
       // 处理表格单元格样式
       celldata.forEach(item => {
         const { r, c } = item;
@@ -223,7 +231,6 @@ export default {
         if (vt) divStyle += `align-items:${ vt == 0 ? 'center' : (vt == 2 ? 'right' : 'left')};;`;//垂直居中
         this.tableHtml[r][c] = { style, colspan, rowspan, divStyle,valueType, value: v };
       })
-      console.log(this.tableHtml);
     },
     //获取查询参数 并获得参数类型及是否必填
     getParamsList (setParam, setParam_parse) {
@@ -264,21 +271,31 @@ export default {
     },
     // Excel导出
     async download () {
-      exportReq(this.params).then((res) => {
+      exportReq(this.req).then((res) => {
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-        const fileName = this.params.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+        const fileName = this.req.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
         exportFile(blob, fileName);
       });
     },
     //时间格式化
     dateFormate () {
-      this.tableData2.forEach((item, itemIndex) => {
-        item.children.forEach((o, oIndex) => {
+       let flag=false;
+      this.tableData2.map(item => {
+        item.children.map((o ,index)=> {
           if (o.type === 'DateTime') {
-            this.tableData2[itemIndex].children[oIndex].value = formatDate(o.value)
+            o.value = formatDate(o.value);
+            if(item.children[index -1]?.type==='DateTime') {
+               const preTime =  item.children[index-1].value;
+               const diff = new Date(o.value).getTime() - new Date(preTime).getTime();
+               const day = Math.floor(diff/(24*3600*1000));
+               if(day > item.children[index-1].paramAstrict){
+                  flag = true;
+               }
+            }
           }
         })
       })
+      return flag;
     },
     // 表单封装json
     toObject (val) {
@@ -298,25 +315,24 @@ export default {
     },
     // 自动改变表格高度
     autoSize () {
-      this.params.height = document.body.clientHeight - 120;
+      this.req.height = document.body.clientHeight - 120;
     },
     // 选择第几页
     pageChange (index) {
-      this.params.requestCount = index
+      this.req.requestCount = index
       this.searchPreview()
     },
     // 选择一页几条数据
     pageSizeChange (index) {
-      this.params.requestCount = 1
-      this.params.pageSize = index
+      this.req.requestCount = 1
+      this.req.pageSize = index
       this.searchPreview()
     }
   },
   mounted () {
     this.$nextTick(() => {
-      this.reportCode = this.$route.query.reportCode;
-      this.params.reportCode = this.reportCode;
-      this.loading = true;
+      this.req.reportCode = this.$route.query.reportCode;
+      document.title =  this.$route.query.reportName
       this.tableData2 = [];
       this.searchPreview();
       this.autoSize();
@@ -334,13 +350,53 @@ export default {
   padding: 1rem;
 }
 </style>
-<style lang="less" scoped>
-.loading-img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+<style lang="less" scoped>  
+.title {
+    width: 100%;
+    height: 2rem;
+    color: #2369ed;
+    text-align: center;
+    line-height: 2rem;
+  }
+.content {
+  width: 90%;
+  height: 100%;
+  margin: 0 auto;
+  background-color: #efefef;
+  padding: 1rem 2rem;
+  position: relative;
+
+  .push_btn {
+    position: absolute;
+    z-index: 100;
+    top: 15px;
+    right: 1%;
+  }
+  .req_search{
+    position: absolute;
+    z-index: 100;
+    top: 15px;
+    left: 2%;
+  }
 }
+.content-top{
+    .report-title{
+        font-size: 1.14rem;
+        margin: 0 auto;
+        font-weight: 600;
+        text-align: center;
+        position: absolute;
+        z-index: 100;
+        left: 40%;
+    }
+    i{
+        color: #6c6666;
+        font-size: 1.62rem;
+        margin-right: 0.3rem;
+        float: right;
+    }
+}
+
 
 /deep/.ivu-modal-fullscreen .ivu-modal-body {
   width: 100%;
@@ -369,6 +425,6 @@ export default {
   //   width: 98%;
   position: absolute;
   bottom: 8px;
-  //   z-index: 9999;
+  z-index: 9999;
 }
 </style>

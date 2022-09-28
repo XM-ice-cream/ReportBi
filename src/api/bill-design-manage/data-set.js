@@ -75,3 +75,7 @@ export const getDeatilByIdReq = data => {
         data
     })
 }
+// 获取数据集信息表分页数据
+export const setCodePageListUrl =()=> `${window.localStorage.getItem("reportDesignIp")}/api/autoreportcenter/anonymous/v1/datacollect/getCodeList`
+//获取对应数据集的第一个字段的值
+export const getValueBySetcodePageListUrl = ()=>`${window.localStorage.getItem("reportDesignIp")}/api/autoreportcenter/anonymous/v1/datacollect/getFirstValues`

@@ -42,7 +42,7 @@
           <!-- <Icon custom="iconfont luckysheet-iconfont-hanshu" style="margin-right:5px" /> -->
 
         </div>
-        <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
+        <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:98%;left: 0px;top: 0.2rem;"></div>
         <div style="display:none"></div>
       </Content>
       <!-- 右侧基础配置 -->
@@ -335,7 +335,8 @@ export default {
       const { href } = this.$router.resolve({
         path: '/bill-design-manage/excelreport-preview',
         query: {
-          reportCode: this.reportCode
+          reportCode: this.reportCode,
+          reportName: this.$route.query.reportName
         }
       });
       window.open(href, '_blank');
@@ -465,6 +466,8 @@ export default {
             dataSetParam[paramName] = value.sampleItem;
             dataSetParam[paramName + 'required'] = value.requiredFlag;
             dataSetParam[paramName + 'type'] = value.paramType;
+            dataSetParam[paramName + 'paramAstrict'] = value.paramAstrict;
+            dataSetParam[paramName + 'paramDesc'] = value.paramDesc; //参数名称
           });
           setParams[code.setCode] = dataSetParam;
         }
@@ -562,19 +565,19 @@ export default {
   max-width: 300px !important;
   flex: 0 0 300px !important;
   height: 100%;
-  //   border: 2px solid #3d85c6;
   margin: 0 0.5rem;
-  /* padding: 0 0.5rem; */
-  background-color: transparent;
+  background-color:transparent;
   .title {
     width: 100%;
     height: 2rem;
     color: #1ec0d1;
     text-align: center;
-    margin: 0.2rem 0;
+    margin: 0.2rem 0 0;
     line-height: 2rem;
     font-weight: bold;
     font-size: 0.94rem;
+    background: #fff;
+    border-radius: 0 0 0 1.4rem;
   }
   .icon {
     height: 2rem;
@@ -587,7 +590,9 @@ export default {
   }
   .dblist {
     height: calc(100% - 5rem);
-    overflow-y: scroll;
+    overflow-y: scroll;    
+    background-color: #fff;
+    border-radius:1.4rem 0 0 0 ;
     .row {
       padding: 0.2rem;
       margin: 0 1.6rem 0.3rem;
@@ -608,20 +613,18 @@ export default {
   padding-right: 0.5rem;
 }
 .content {
-  width: calc(100% - 600px);
-  height: 100%;
-  background-color: #fff;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  margin-left: 0rem;
-  padding: 1rem;
+    width: calc(100% - 600px);
+    height: 100%;
+    background-color: #fff;
+    position: absolute;
+    overflow-x: visible !important;
+    margin-left: 300px;
+    margin-right: 300px;
   overflow-x: visible !important;
   .push_btn {
     position: absolute;
     top: 15px;
-    right: 13%;
+    right: 4%;
     z-index: 99;
     i {
       color: #6c6666;
@@ -651,7 +654,7 @@ export default {
 /deep/.layout,
 .ivu-layout {
   height: 100%;
-  background: #fff;
+  background: #efefef;
 }
 /deep/.ivu-collapse-simple {
   border-top: none;
@@ -664,6 +667,9 @@ export default {
 }
 /deep/.luckysheet-share-logo {
   display: none;
+}
+/deep/.ivu-layout-sider-children{
+    background-color: #fff;
 }
 
 /deep/ #luckysheet-row-count-show {

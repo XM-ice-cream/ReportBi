@@ -207,7 +207,7 @@ export default {
         { title: "Mura", key: "mura", align: "center", width: 140 },
         { title: "I16", key: "i16", align: "center", width: 140 },
         { title: "Fvi", key: "fvi", align: "center", width: 140 },
-        { title: "维修人员", key: "createUserName", width: 80, align: "center" },
+        { title: "维修人员", key: "repairUser", width: 80, align: "center" },
         { title: this.$t("modifyUser"), key: "modifyUserName", width: 80, align: "center" },
         {
           title: this.$t("modifyDate"),

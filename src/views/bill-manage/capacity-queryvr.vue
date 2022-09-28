@@ -14,12 +14,12 @@
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
                       <DatePicker style="width: 50%" transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
-                      <TimePicker transfer type="time" placeholder="Select time" style="width: 50%" v-model="req.startTime1"></TimePicker>
+                      <TimePicker transfer type="time" confirm placeholder="Select time" style="width: 50%" v-model="req.startTime1"></TimePicker>
                     </FormItem>
                     <!-- 结束时间 -->
                     <FormItem :label="$t('endTime')" prop="endTime">
                       <DatePicker transfer style="width: 50%" type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
-                      <TimePicker transfer type="time" placeholder="Select time" style="width: 50%" v-model="req.endTime1"></TimePicker>
+                      <TimePicker transfer type="time" confirm placeholder="Select time" style="width: 50%" v-model="req.endTime1"></TimePicker>
                     </FormItem>
                     <!-- 工单 -->
                     <FormItem :label="$t('workOrder')" prop="workOrder">
@@ -336,8 +336,24 @@ export default {
           tooltip: true,
         },
         {
-          title: this.$t("yield_Rate"),
+          title: "维修前良率",
+          key: "firstyielD_RATE",
+          width: 80,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
+        }, 
+        {
+          title: "维修后良率",
           key: "yield_Rate",
+          width: 80,
+          align: "center",
+          ellipsis: true,
+          tooltip: true,
+        }, 
+         {
+          title: "报废数",
+          key: "scrapQty",
           width: 80,
           align: "center",
           ellipsis: true,

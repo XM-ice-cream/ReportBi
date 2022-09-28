@@ -130,6 +130,10 @@ export default {
     };
   },
   activated () {
+    console.log(this.$route.query.sourceCode);
+    if(this.$route.query.sourceCode){
+        this.req.sourceCode = this.$route.query.sourceCode;
+    }
     this.pageLoad();
     this.autoSize();
     this.getDataSourceList();
@@ -296,11 +300,19 @@ export default {
 </script>
 <style lang='less' scope>
 .tableBtn {
-  padding: 0px 0.4rem;
-  color: #252ab099;
-  background: none;
-  border: none;
-  border-radius: 0.2rem;
+    display: inline-block;
+    padding: 0.4rem;
+    color: #181da1;
+    background: #f5f5f5;
+   
+    border-radius: 0.2rem;
+    box-shadow: 0px 2px 3px #ccc;
+    cursor: pointer;
+    &:active{
+        background: #40e49f;
+        color:#fff;
+        box-shadow: none;
+    }
 }
 </style>
 <style>
