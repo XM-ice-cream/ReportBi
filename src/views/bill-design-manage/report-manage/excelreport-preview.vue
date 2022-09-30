@@ -11,10 +11,11 @@
                     {{ $t("selectQuery") }}
                   </Button>
                   <div class="poptip-style-content" slot="content">
-                    <Form ref="submitReq" :label-width="80" :label-colon="true">
+                    <Form ref="submitReq" :label-width="80" :label-colon="true" class="submitForm">
                       <template v-for="(item) in tableData2">
+                        <span class="title" >{{item.title}}  </span>
                         <template v-for="(subitem,subindex) in item.children" >
-                          <FormItem :label='subitem.name'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
+                          <FormItem :label='subitem.paramDesc'  :prop='item.name+subitem.name' :rules="subitem.required == 1?  [{ required: true,message:'必填项' }]: [{ required: false }]">
                             <!-- 字符串 -->
                             <Input v-if="subitem.type==='String'" type="text" v-model.trim="subitem.value" clearable />
                             <!-- 布尔 true/false/0/1-->
@@ -32,16 +33,26 @@
                             <Input v-else-if="subitem.type==='Array'" type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model.trim="subitem.value" clearable />
                             <!-- 时间 -->
                             <DatePicker v-else-if="subitem.type==='DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+                            <!-- 下拉框 -->
+                            <v-selectpage v-else-if="subitem.type==='Select'" class="select-page-style" v-model="subitem.value" transfer  :params="{setCode: subitem.paramAstrict }" key-field="value" show-field="value" :data="getValueBySetcodePageListUrl"  :result-format="
+                                (res) => {
+                                    return {
+                                    totalRow: res.total,
+                                    list: res.data || [],
+                                    };
+                                }
+                                ">
+                            </v-selectpage>
                             <!-- 其余类型 -->
                             <Input v-else v-model.trim="subitem.value" type="text" clearable />
                           </FormItem>
                         </template>
-                      </template>
-                      <FormItem>
-                        <Button type="primary" @click="searchPreview(false)">查询</Button>
-                      </FormItem>
-  
+                      </template>  
                     </Form>
+                    <div class="poptip-style-button">
+                        <Button @click="resetClick">{{ $t("reset") }}</Button>
+                        <Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
+                    </div>
                   </div>
                 </Poptip>
               </i-col>
@@ -56,7 +67,7 @@
             </Row>
           </div>
           <!-- 表格 -->
-          <div class="data-table" :style="{height:(req.height+50)+'px'}">
+          <div class="data-table" style="height:100%">
             <table class='table tableScroll' id='exceltable'>
               <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr" style="height:18px">
                 <template v-for="(item,index) in itemTr">
@@ -95,13 +106,7 @@ export default {
   components: { draggable },
   data () {
     return {
-      intervalData: '',
-      options: {},
-      sheet: {},
-      sheetData: [],
-      reportId: null,
-      reportName: null,
-      dataSet: null,
+      sheetData: [{ row: 30, column: 26}],//初始化默认显示30行 26列
       tableData2: [],
       searchPoptipModal: false,
       getValueBySetcodePageListUrl:getValueBySetcodePageListUrl(),
@@ -115,70 +120,85 @@ export default {
         total: 0, //  总条数
         totalPage: 0, //  总页数,
         sheetIndex: '',//sheet 当前激活索引
-        height: "120",//表格高度
+        elapsedMilliseconds:0,
         // ...this.$config.pageConfig,
       },
       jsonStr: [], // json数据
       jsonIndex: 0, // json索引
       // 验证实体
       ruleValidate: {},
-      searchPoptipModal: false,
-      htm: "",
-      tdIndex: 0,
       tableHtml: []
     };
   },
-  // 导航离开该组件的对应路由时调用
-  beforeRouteLeave (to, from, next) {
-    this.searchPoptipModal = false;
-    next();
-  },
   methods: {
-    async searchPreview (flag = true) {
 
-      if (!flag) this.req.requestCount = 1;  // 点击查询按钮
-
-      this.dateFormate();  // 左侧查询参数--时间格式化 
-
-      //左侧查询参数 --必要参数接收
-      const arr = this.toObject(this.tableData2)
-      this.req.setParam = JSON.stringify(arr)
-      this.intervalPreview()  //每次都重新加载需要改成刷新
-    },
-    async intervalPreview () {
-        this.$Spin.show();
-      await getExcelPreviewReq(this.req).then(res => {
-        if (res.code === 200) {
-          let { jsonStr, setParam } = res.result;
-          this.jsonStr = JSON.parse(jsonStr);
-          // 查询参数
-          this.tableData2 = this.getParamsList(this.req.setParam, JSON.parse(setParam));
-          this.req = {
-            ...this.req,
-            total: this.jsonStr[this.jsonIndex].total,
-            totalPage: this.jsonStr[this.jsonIndex].pageCount
-          }
-          // 渲染表格
-          this.getTable(this.jsonStr);
-        } else {
-          this.$Message.error(res.message);
+    // 获取查询参数
+    async getParams(){
+        const obj = {
+            reportCode: this.req.reportCode,
+            sheetIndex:"",
         }
-        this.searchPoptipModal = false;
-      }).finally(() => (this.$Spin.hide()))
-
+      await  getParamsReq(obj).then(res=>{
+            if(res.code===200){
+                const setParam =JSON.parse( res.result.setParam);
+                const setCodes = res.result.setCodes.split("|");
+                const setNames = res.result.setNames.split("|");
+                // 渲染查询表单
+                this.tableData2 = this.getParamsList(setParam,setCodes,setNames);
+                //清空数据
+                this. resetClick();
+            }
+        })
     },
-    //获取表格
-    getTable (data) {
+
+    async searchClick () {
+      this.req.requestCount = 1;  // 点击查询按钮 
+      this.pageLoad();
+      
+    },
+    async pageLoad(){
+        // 左侧查询参数--时间格式化 
+      if(this.dateFormate()){
+        this.$Message.error("超出最大查询时间差,请重新选择");
+        return;
+      }  ;  
+        //左侧查询参数 --必要参数接收
+        const arr = this.toObject(this.tableData2);
+        this.req.setParam = JSON.stringify(arr);
+        this.$Spin.show();
+        
+        await getExcelPreviewReq(this.req).then(res => {
+            if (res.code === 200) { 
+                this.jsonStr  = JSON.parse(res.result.jsonStr);           
+                this.req = {
+                    ...this.req,
+                    total: this.jsonStr[this.jsonIndex].total,
+                    totalPage: this.jsonStr[this.jsonIndex].pageCount,
+                    elapsedMilliseconds: res.elapsedMilliseconds
+                }
+               // 渲染表格
+                 this.getTable(this.jsonStr);
+            } else {
+            this.$Message.error(res.message);
+            this.sheetData = [{}];
+            }
+        }).finally(()=>{   this.searchPoptipModal = false; this.$Spin.hide();})
+    },
+   
+    //初始化表格
+     getTable (data) {
       if (!data[0].celldata.length) {
         this.$Message.warning("查询结果为空");
         return;
       }
       //   this.htm = "<table class='table tableScroll' id='exceltable'>";
       let { celldata, config, frozen } = data[0];
+      console.log("冻结",frozen);
       this.tableHtml = [];
       // 处理表格单元格样式
       celldata.forEach(item => {
         const { r, c } = item;
+        
 
         if (!this.tableHtml[r]) this.tableHtml[r] = [];
         if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
@@ -197,6 +217,7 @@ export default {
         if (fc) style += `color:${fc};`;//字体颜色
         if (fs) style += `font-size:${fs}px;`;//文字大小
         if (border) style += `border:${border};`;//边框
+        if (frozen?.type&&r==0)  style += "position:sticky;top:0";//冻结首行
         //合并单元格 
         const colspan = `${mc?.cs || 1}`;
         const rowspan = `${mc?.rs || 1}`;
@@ -225,30 +246,16 @@ export default {
         }
         }
         //td 内部div样式
-        let divStyle = `width:${width * colspan}px;height:${height * rowspan}px;`;//宽高
+        let divStyle = `width:${width * colspan}px;height:${height * rowspan}px;line-height:${height * rowspan}px;`;//宽高
         divStyle += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;`;//超出文字省略
         if (ht) divStyle += `justify-content:${ ht == 0 ? 'center' : (ht == 2 ? 'right' : 'left')};`;//水平居中 0:居中;1:居左;2:居右
-        if (vt) divStyle += `align-items:${ vt == 0 ? 'center' : (vt == 2 ? 'right' : 'left')};;`;//垂直居中
+        if (vt) divStyle += `align-items:${ vt == 0 ? 'center' : (vt == 2 ? 'right' : 'left')};`;//垂直居中
+        
         this.tableHtml[r][c] = { style, colspan, rowspan, divStyle,valueType, value: v };
+        console.log( this.tableHtml[r][c],r,c);
       })
     },
-    //获取查询参数 并获得参数类型及是否必填
-    getParamsList (setParam, setParam_parse) {
-      const extendObj = setParam = setParam_parse;
-      const extendArry = [];
-      for (const i in extendObj) {
-        const children = [];
-        for (const y in extendObj[i]) {
-          if (!y.endsWith('required') && !y.endsWith('type')) {
-            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] });
-            this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
-          }
-        }
-        extendArry.push({ name: i, children: children });
-      }
-      return extendArry;
-    },
-    // 获取边框
+       // 获取边框
     getBorderInfo (borderInfo, r, c) {
       let border = "none";
       borderInfo?.forEach((borderItem, borderIndex) => {
@@ -269,6 +276,27 @@ export default {
       })
       return border;
     },
+
+     //获取查询参数 并获得参数类型及是否必填
+    getParamsList (setParam,setCodes,setNames) {
+      const extendObj = setParam;
+      const extendArry = [];
+      for (const i in extendObj) {
+        const children = [];
+        for (const y in extendObj[i]) {
+          if (!y.endsWith('required') && !y.endsWith('type')&& !y.endsWith('paramAstrict')&&!y.endsWith('paramDesc')) {
+            children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + 'type'], required: extendObj[i][y + 'required'] ,paramAstrict:extendObj[i][y+'paramAstrict'],paramDesc:extendObj[i][y+'paramDesc']});
+            this.ruleValidate[i + y] = [{ required: true, message: 'The name cannot be empty', trigger: 'blur' }];
+          }
+        }
+        //报表编码的索引,从而获取报表编码的名称
+        const index = setCodes.findIndex((item) => {
+            return item === i;
+        })
+        extendArry.push({ name: i, children: children,title:setNames[index] });
+      }
+      return extendArry;
+    },
     // Excel导出
     async download () {
       exportReq(this.req).then((res) => {
@@ -276,6 +304,17 @@ export default {
         const fileName = this.req.reportCode + '-' + `${formatDate(new Date())}.xlsx`; // 自定义文件名
         exportFile(blob, fileName);
       });
+    },
+    //重置
+    resetClick(){
+        this.tableData2.map(item=>{
+            item.children.map(cItem=>{
+                if(cItem.type!=='Boolean'){
+                     cItem.value = "";
+                }
+               
+            })
+        })
     },
     //时间格式化
     dateFormate () {
@@ -313,20 +352,16 @@ export default {
       }
       return objSecond
     },
-    // 自动改变表格高度
-    autoSize () {
-      this.req.height = document.body.clientHeight - 120;
-    },
     // 选择第几页
     pageChange (index) {
       this.req.requestCount = index
-      this.searchPreview()
+      this.pageLoad()
     },
     // 选择一页几条数据
     pageSizeChange (index) {
       this.req.requestCount = 1
       this.req.pageSize = index
-      this.searchPreview()
+      this.pageLoad()
     }
   },
   mounted () {
@@ -334,14 +369,9 @@ export default {
       this.req.reportCode = this.$route.query.reportCode;
       document.title =  this.$route.query.reportName
       this.tableData2 = [];
-      this.searchPreview();
-      this.autoSize();
-      window.addEventListener('resize', () => this.autoSize());
-      window.addEventListener('resize', () => this.getTable("excelpreview", this.jsonStr))
-      // 解决Jquery 版本冲突问题
-      //   window.jQuery.noConflict();
+      this.getParams();
     })
-  },
+  }
 }
 </script>
 <style>
@@ -358,27 +388,6 @@ export default {
     text-align: center;
     line-height: 2rem;
   }
-.content {
-  width: 90%;
-  height: 100%;
-  margin: 0 auto;
-  background-color: #efefef;
-  padding: 1rem 2rem;
-  position: relative;
-
-  .push_btn {
-    position: absolute;
-    z-index: 100;
-    top: 15px;
-    right: 1%;
-  }
-  .req_search{
-    position: absolute;
-    z-index: 100;
-    top: 15px;
-    left: 2%;
-  }
-}
 .content-top{
     .report-title{
         font-size: 1.14rem;
@@ -413,18 +422,18 @@ export default {
   height: 100%;
   background: #fff;
 }
-/deep/.ivu-collapse-simple {
-  border-top: none;
-}
-.tableModal {
-  /deep/ .ivu-modal {
-    width: 600px !important;
-  }
-}
+// /deep/.ivu-collapse-simple {
+//   border-top: none;
+// }
 .excel-page {
   //   width: 98%;
   position: absolute;
   bottom: 8px;
   z-index: 9999;
+  background: #fff;
+}
+.submitForm{
+    max-height:10rem;
+    overflow-y:auto;
 }
 </style>
