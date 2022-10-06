@@ -379,7 +379,7 @@ export default {
           const v = jsonData[itemIndex].celldata[i].v;
           if (!v?.cellAttribute || !v.v) {
             //去除数据为空的无效单元格
-            if (JSON.stringify(v) === "{}" || !v.v) {
+            if (JSON.stringify(v) === "{}" || (!v.v&&!v.bg)) {
               jsonData[itemIndex].celldata.splice(i, 1);
             };
             continue;
