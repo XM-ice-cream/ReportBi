@@ -6,13 +6,6 @@
       <Card :bordered="false" dis-hover class="card-style">
         <div slot="title">
           <Form ref="searchReq" :model="req" inline :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
-            <!-- 类型 -->
-            <!-- <FormItem :label="$t('reportType')" prop="reportType">
-              <RadioGroup v-model="req.reportType" type="button" button-style="solid" @on-change='searchClick'>
-                <Radio label="excel">Excel</Radio>
-                <Radio label="largescreen">大屏</Radio>
-              </RadioGroup>
-            </FormItem> -->
              <!-- 报表分类 -->
             <FormItem label="报表分类" prop="remark">
                 <Select v-model="req.remark" clearable :placeholder="$t('pleaseSelect') +'报表分类'" transfer filterable cleabler @on-change='searchClick' style="width:200px">
@@ -48,22 +41,8 @@
                 <span class="name" :title="item.reportName">
                   {{item.reportName}}
                 </span>
-                <!-- <span class='title-dot'>
-                  <Button @click="preview(item.reportCode)">
-                    <Icon type="md-eye" />预览
-                  </Button>
-                  <Button @click="design(item.reportCode)">
-                    <Icon type="md-create" />设计
-                  </Button>
-                </span> -->
               </span>
               <div class="content">
-                <!-- <div>
-                  报表类型： <span class="value" style="color: #41ce27;">
-                    <template v-if="item.reportType==='excel'">Excel报表</template>
-                    <template v-else>大屏报表</template>
-                  </span>
-                </div> -->
                 <div>
                   报表类别：  <span class="value" :title="item.remark" style="font-weight: bold;">
                     {{item.remark}}
@@ -104,6 +83,7 @@ export default {
   data () {
     return {
       data: [], // 结果集
+      remarkList:[],
       selectObj: null,//表格选中
       formatDate: formatDate,
       roleBtn:[],//该角色下的报表权限卡片
@@ -149,7 +129,7 @@ export default {
           reportName,
           reportCode,
           remark,
-          codeList:this.roleBtn.toString()
+          codeList:"wuliao"||this.roleBtn.toString()
         },
       };
       getpagelistReq(obj).then((res) => {
@@ -161,11 +141,6 @@ export default {
         }
       }).catch();
     },
-    //设计
-    design (reportCode,reportName) {
-      const href = this.skipUrl(this.req.reportType + 'Design', reportCode,reportName);
-      window.open(href, '_blank');
-    },
     // 预览
     preview (reportCode,reportName) {
       const href = this.skipUrl(this.req.reportType + 'Preview', reportCode,reportName);
@@ -176,8 +151,6 @@ export default {
       const obj = {
         excelPreview: '/bill-design-manage/excelreport-preview',
         largescreenPreview: '/bill-design-manage/screenreport-preview',
-        excelDesign: '/bill-design-manage/excelreport-design',
-        largescreenDesign: '/bill-design-manage/screenreport-design'
       }
       const { href } = this.$router.resolve({
         path: obj[key],

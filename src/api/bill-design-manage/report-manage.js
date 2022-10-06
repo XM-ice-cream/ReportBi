@@ -148,4 +148,4 @@ export const exportReq = data => {
 //大屏默认背景图片
 // ||${window.localStorage.getItem("reportDesignIp")}
 
-export const baseImgUrl = `http://10.191.19.111:8700/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_317603302898536448.png`
+export const baseImgUrl = `http://10.191.21.54:8700/api/autoreportcenter/v1/ftpfile/showimage/showimage/autoReport_317603302898536448.png`

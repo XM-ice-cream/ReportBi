@@ -68,6 +68,7 @@ export default {
     getOptions () {
       let props = { value: this.value,};
       this.language !== undefined && (props.language = this.language);
+      console.log(this.defaultOptions);
       let options = Object.assign({}, this.defaultOptions, this.options, props);
       return options;
     },

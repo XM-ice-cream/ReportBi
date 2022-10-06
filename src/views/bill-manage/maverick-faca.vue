@@ -149,7 +149,6 @@ export default {
     },
     //获取url参数
     getUrlParams () {
-      console.log("123");
       let url = window.location.href;
       if (url.indexOf('?') != -1) {
         let obj = {};

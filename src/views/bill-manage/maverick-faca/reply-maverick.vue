@@ -145,7 +145,6 @@ export default {
             maverickDetailList,
             mailDepartArry
           };
-          console.log(obj);
           if (!warningType) {
             modifyReq(obj).then((res) => {
               if (res.code === 200) {

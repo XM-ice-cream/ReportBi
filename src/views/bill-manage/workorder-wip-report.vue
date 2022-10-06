@@ -198,7 +198,6 @@ export default {
     // 表格单元格点击事件
     show (row, type) {
       let obj = { workOrder: row.workorder };
-      console.log("obj", obj);
       let index = type + 1;
       this.tabName = "tab" + index;
       this["tab" + index] = true;

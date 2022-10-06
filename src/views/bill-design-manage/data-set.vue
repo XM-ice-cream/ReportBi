@@ -200,40 +200,8 @@ export default {
         const type = this.selectObj.setType;
         this.dialogVisibleSetDataSet = true;
         this.isAdd = false;
-        // this.submitData = {
-        //   ...this.selectObj
-        // };
         this.$refs.EditDataSet.addOrEditDataSet(this.dataSet, type, this.isAdd);
       } else this.$Msg.warning(this.$t("oneData"));
-    },
-    //提交 isClose = false
-    submitClick () {
-      //   this.$refs.submitReq.validate((validate) => {
-      //     if (validate) {
-      //       const href =
-      //         this.submitData.component === "Main"
-      //           ? `/${this.submitData.name}`
-      //           : this.submitData.name;
-      //       const apis = this.submitData.apis.join(",");
-      //       let obj = { ...this.submitData, href, apis };
-      //       // 添加上传文件参数并上传文件
-      //       this.uploadFile()
-
-      //   let request = this.isAdd ? addReq(obj) : modifyReq(obj);
-      //   request.then((res) => {
-      //     if (res.code === 200) {
-      //       this.selectObj = null;
-      //       this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
-      //       this.getLeftMenu();
-      //       if (isClose) {
-      //         this.treeCancel();
-      //         this.cancelClick();
-      //       }
-      //     } else
-      //       this.$Msg.error(`${this.drawerTitle}${this.$t("fail")},${errorType(this, res)}`);
-      //   });
-      //     }
-      //   });
     },
     //数据预览
     dataview (data) {
