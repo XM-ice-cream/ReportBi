@@ -68,7 +68,7 @@
           </div>
           <!-- 表格 -->
           <div class="data-table" style="height:100%">
-            <table class='table tableScroll' :class="tableHtml.length?'':'blankBg'" id='exceltable'>
+            <table class='table tableScroll' :class="tableHtml.length>1?'':'blankBg'" id='exceltable'>
               <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr" style="height:18px">
                 <template v-for="(item,index) in itemTr">
                   <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan||1" :rowspan="item.rowspan||1" :key="index">
