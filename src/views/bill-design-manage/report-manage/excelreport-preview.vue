@@ -176,8 +176,11 @@ export default {
                 }
                // 渲染表格
                  this.getTable(this.jsonStr);
-            } else {
-            this.$Message.error(res.message);
+            } else {               
+                this.$Message.error( {
+                        content: res.message,
+                        duration: 3
+                    });
             this.sheetData = [{}];
             }
         }).finally(()=>{   this.searchPoptipModal = false; this.$Spin.hide();})
