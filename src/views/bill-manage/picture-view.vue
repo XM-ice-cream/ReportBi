@@ -229,8 +229,8 @@ export default {
       if ( SN ) {
         this.tableConfig.loading = true;
         let obj = {
-            orderField: "sntype", // 排序字段
-            ascending: false, // 是否升序
+            orderField: "sntype,storageTime", // 排序字段
+            ascending: true, // 是否升序
             pageSize: this.req.pageSize, // 分页大小
             pageIndex: this.req.pageIndex, // 当前页码
             data: { SN },

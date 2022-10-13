@@ -32,6 +32,7 @@ export const getlistReq = (data) => {
 // 分页查询
 export const getpagelistReq = (data) => {
   return requestCenter({
+    timeout: 0,
     url: "/api/workflowcenter/v1/unitinfotravel/getpagelist",
     method: "post",
     data,
