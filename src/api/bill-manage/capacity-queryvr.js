@@ -1,4 +1,6 @@
-import {requestCenter} from '@/libs/request'
+import {
+  requestCenter
+} from '@/libs/request'
 /* 产能良率查询 接口 */
 
 // 查询
@@ -6,7 +8,7 @@ export const getlistReq = data => {
   return requestCenter({
     timeout: 0,
     baseUrl: window.localStorage.getItem("reportip"),
-    url: '/api/reportcenter/anonymous/v1/productiondata/prodctiondatabyworkorderquick',
+    url: '/api/reportcenter/anonymous/v1/productiondata/prodctiondata',
     method: 'post',
     data
   })
@@ -29,6 +31,17 @@ export const exportReq = data => {
     timeout: 0,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/productiondata/export',
+    responseType: 'arraybuffer',
+    method: 'post',
+    data
+  })
+}
+// 导出明细
+export const exportModelReq = data => {
+  return requestCenter({
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/productiondata/prodctiondataexport',
     responseType: 'arraybuffer',
     method: 'post',
     data
