@@ -41,7 +41,7 @@ export const exportModelReq = data => {
   return requestCenter({
     timeout: 0,
     baseUrl: window.localStorage.getItem("reportip"),
-    url: '/api/reportcenter/anonymous/v1/productiondata/prodctiondataexport',
+    url: '/api/reportcenter/anonymous/v1/productiondata/productiondataexport',
     responseType: 'arraybuffer',
     method: 'post',
     data
