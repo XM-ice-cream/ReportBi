@@ -10,7 +10,7 @@
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
 								<Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">{{ $t("selectQuery") }}</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
+									<Form :rules="ruleValidate" :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker style="width: 50%" transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
@@ -102,8 +102,6 @@
 						</div>
 					</template>
 				</Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
-
 				<Modal draggable v-model="modalFlag" width="1500" title="工单明细" :styles="{ top: '20px' }">
 					<Button type="primary" @click="exportModalClick" style="float: right">导出</Button>
 					<Table style="margin-top: 30px" :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columnsModal" :data="dataModal"></Table>
@@ -440,20 +438,10 @@ export default {
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
-				startTime: [
+				workOrder: [
 					{
 						required: true,
-						type: "date",
-						trigger: "change",
-						message: this.$t("pleaseSelect") + this.$t("startTime"),
-					},
-				],
-				endTime: [
-					{
-						required: true,
-						type: "date",
-						trigger: "change",
-						message: this.$t("pleaseSelect") + this.$t("endTime"),
+						message: this.$t("pleaseSelect") + this.$t("workOrder"),
 					},
 				],
 			},
@@ -477,15 +465,14 @@ export default {
 				if (validate) {
 					this.tableConfig.loading = true;
 					const { workOrder, pn, name, startTime, startTime1, endTime, endTime1 } = this.req;
-
 					const obj = {
 						orderField: "WorkOrder",
 						ascending: true,
-						pageSize: this.req.pageSize,
+						pageSize: 1000,
 						pageIndex: this.req.pageIndex,
 						data: {
-							startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
-							endTime: formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59"),
+							startTime: startTime ? formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00") : "",
+							endTime: endTime ? formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59") : "",
 							workOrder,
 							pn,
 							name,
@@ -500,7 +487,8 @@ export default {
 								this.data = data || [];
 							}
 						})
-						.catch(() => (this.tableConfig.loading = false));
+						.catch(() => (this.tableConfig.loading = false))
+						.finally(() => (this.searchPoptipModal = false));
 				}
 			});
 		},
@@ -510,49 +498,45 @@ export default {
 			this.modalFlag = true;
 			this.currentRow = row; // 当前点击表格行数据
 			this.currentType = type; //
-			this.$refs.searchReq.validate((validate) => {
-				if (validate) {
-					this.tableConfig.loadingModal = true;
-					const { startTime, endTime, workOrder, processName, pn, name } = row;
-					const obj = {
-						orderField: "unitid", // 排序字段
-						ascending: true, // 是否升序
-						pageSize: this.modalReq.pageSize, // 分页大小
-						pageIndex: this.modalReq.pageIndex, // 当前页码
-						data: {
-							startTime,
-							endTime,
-							workOrder,
-							stepName: processName,
-							trackType: type,
-							pn,
-							name,
-						},
-					};
-					getlistReqByType(obj)
-						.then((res) => {
-							this.tableConfig.loadingModal = false;
-							if (res.code === 200) {
-								this.dataModal = [];
-								let data = res.result;
-								this.dataModal = data.data ? data.data : [];
-								this.modalReq.pageSize = data.pageSize;
-								this.modalReq.pageIndex = data.pageIndex;
-								this.modalReq.total = data.total;
-								this.modalReq.totalPage = data.totalPage;
-							}
-						})
-						.catch(() => (this.tableConfig.loadingModal = false));
-				}
-			});
+			this.tableConfig.loadingModal = true;
+			const { startTime, endTime, workOrder, processName, pn, name } = row;
+			const obj = {
+				orderField: "unitid", // 排序字段
+				ascending: true, // 是否升序
+				pageSize: this.modalReq.pageSize, // 分页大小
+				pageIndex: this.modalReq.pageIndex, // 当前页码
+				data: {
+					startTime,
+					endTime,
+					workOrder,
+					stepName: processName,
+					trackType: type,
+					pn,
+					name,
+				},
+			};
+			getlistReqByType(obj)
+				.then((res) => {
+					this.tableConfig.loadingModal = false;
+					if (res.code === 200) {
+						this.dataModal = [];
+						let data = res.result;
+						this.dataModal = data.data ? data.data : [];
+						this.modalReq.pageSize = data.pageSize;
+						this.modalReq.pageIndex = data.pageIndex;
+						this.modalReq.total = data.total;
+						this.modalReq.totalPage = data.totalPage;
+					}
+				})
+				.catch(() => (this.tableConfig.loadingModal = false));
 		},
 		// SN导出
 		exportClick() {
 			const { workOrder, startTime, startTime1, endTime, endTime1, pn, name } = this.req;
 			const obj = {
 				workOrder,
-				startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
-				endTime: formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59"),
+				startTime: startTime ? formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00") : "",
+				endTime: endTime ? formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59") : "",
 				pn,
 				name,
 			};
@@ -567,8 +551,8 @@ export default {
 			const { workOrder, startTime, startTime1, endTime, endTime1, pn, name } = this.req;
 			const obj = {
 				workOrder,
-				startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
-				endTime: formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59"),
+				startTime: startTime ? formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00") : "",
+				endTime: endTime ? formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59") : "",
 				pn,
 				trackType: this.currentType,
 				name,
@@ -582,17 +566,6 @@ export default {
 		// 自动改变表格高度
 		autoSize() {
 			this.tableConfig.height = document.body.clientHeight - 180;
-		},
-		// 选择第几页
-		pageChange(index) {
-			this.req.pageIndex = index;
-			this.pageLoad();
-		},
-		// 选择一页有条数据
-		pageSizeChange(index) {
-			this.req.pageIndex = 1;
-			this.req.pageSize = index;
-			this.pageLoad();
 		},
 		// 选择第几页
 		pageChangeModal(index) {
@@ -612,9 +585,6 @@ export default {
 		},
 		// 点击搜索按钮触发
 		searchClick() {
-			if (this.req.startTime && this.req.endTime) {
-				this.searchPoptipModal = false;
-			}
 			this.req.pageIndex = 1;
 			this.pageLoad();
 		},
