@@ -68,7 +68,7 @@
           </div>
           <!-- 表格 -->
           <div class="data-table" style="height:100%">
-            <table class='table tableScroll' id='exceltable'>
+            <table class='table tableScroll' :class="tableHtml.length>1?'':'blankBg'" id='exceltable'>
               <tr v-for="(itemTr,indexTr) in tableHtml" :key="indexTr" style="height:18px">
                 <template v-for="(item,index) in itemTr">
                   <td v-if="item&&item.rowspan" :style="item.style" :colspan="item.colspan||1" :rowspan="item.rowspan||1" :key="index">
@@ -82,10 +82,8 @@
                     </div>
                   </td>
                   <td v-if="!item" :key="index" style="width:75px;height:18px"></td>
-                </template>
-  
-              </tr>
-  
+                </template>  
+              </tr>  
             </table>
             <page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
           </div>
@@ -178,8 +176,11 @@ export default {
                 }
                // 渲染表格
                  this.getTable(this.jsonStr);
-            } else {
-            this.$Message.error(res.message);
+            } else {               
+                this.$Message.error( {
+                        content: res.message,
+                        duration: 3
+                    });
             this.sheetData = [{}];
             }
         }).finally(()=>{   this.searchPoptipModal = false; this.$Spin.hide();})
@@ -193,7 +194,6 @@ export default {
       }
       //   this.htm = "<table class='table tableScroll' id='exceltable'>";
       let { celldata, config, frozen } = data[0];
-      console.log("冻结",frozen);
       this.tableHtml = [];
       // 处理表格单元格样式
       celldata.forEach(item => {
@@ -252,12 +252,11 @@ export default {
         if (vt) divStyle += `align-items:${ vt == 0 ? 'center' : (vt == 2 ? 'right' : 'left')};`;//垂直居中
         
         this.tableHtml[r][c] = { style, colspan, rowspan, divStyle,valueType, value: v };
-        console.log( this.tableHtml[r][c],r,c);
       })
     },
        // 获取边框
     getBorderInfo (borderInfo, r, c) {
-      let border = "none";
+      let border = "1px solid #eeeeee";
       borderInfo?.forEach((borderItem, borderIndex) => {
         const { borderType, color, range, rangeType } = borderItem;
         if (rangeType === "range" && range[0]) {
@@ -270,7 +269,7 @@ export default {
             border = `1px solid ${color}`;
           }
           if (borderType === "border-none" && columnRang && rowRang) {
-            border = "none";
+            border = `none`;
           }
         }
       })
@@ -422,18 +421,18 @@ export default {
   height: 100%;
   background: #fff;
 }
-// /deep/.ivu-collapse-simple {
-//   border-top: none;
-// }
 .excel-page {
-  //   width: 98%;
   position: absolute;
   bottom: 8px;
   z-index: 9999;
   background: #fff;
 }
 .submitForm{
-    max-height:10rem;
+    max-height:20rem;
     overflow-y:auto;
+}
+.blankBg{
+    background: url("../../../assets/images/report-design/blankBox.png") no-repeat;
+    background-position: center center;
 }
 </style>
