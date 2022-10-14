@@ -36,7 +36,7 @@
 														return {
 															totalRow: res.total,
 															list: res.data || [],
-														}
+														};
 													}
 												"
 											>
@@ -65,26 +65,44 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
+				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
+					<template #qty="{ row }">
+						<div @click="show(row, 1)" style="color: blue; cursor: pointer">
+							{{ row.qty }}
+						</div>
+					</template>
+					<template #panelNoQty="{ row }">
+						<Poptip title="PanelNo 条码" :content="panelNos" placement="right-start">
+							<div @click="show(row, 2)" style="color: blue; cursor: pointer">
+								{{ row.panelNoQty }}
+							</div>
+						</Poptip>
+					</template>
+				</Table>
 			</Card>
+			<FlowInfo :drawerFlag.sync="drawerFlag" :selectObj="selectObj" />
 		</div>
 	</div>
 </template>
 
 <script>
-import { getlistReq } from "@/api/bill-manage/bake-temprature-report"
-import { workerPageListUrl } from "@/api/material-manager/order-info"
-import { formatDate, getButtonBoolean, renderDate } from "@/libs/tools"
+import { getlistReq, getpanelNolistReq } from "@/api/bill-manage/bake-temprature-report";
+import { workerPageListUrl } from "@/api/material-manager/order-info";
+import { formatDate, getButtonBoolean, renderDate } from "@/libs/tools";
+import FlowInfo from "./bake-temprature-report/flow-info.vue";
 export default {
 	name: "bake-temprature-report",
 	data() {
 		return {
 			workerPageListUrl: workerPageListUrl(),
 			searchPoptipModal: false,
-			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
-			tableConfig: { ...this.$config.tableConfig }, // table配置
-			data: [], // 表格数据
+			drawerFlag: false,
+			noRepeatRefresh: true,
+			tableConfig: { ...this.$config.tableConfig },
+			data: [],
 			btnData: [],
+			panelNos: null, //条码list
+			selectObj: {},
 			req: {
 				startTime: "",
 				endTime: "",
@@ -93,7 +111,7 @@ export default {
 				buildConfig: "",
 				eqpID: "",
 				...this.$config.pageConfig,
-			}, //查询数据
+			},
 			columns: [
 				{
 					type: "index",
@@ -101,14 +119,15 @@ export default {
 					width: 50,
 					align: "center",
 					indexMethod: (row) => {
-						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1
+						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
 				{ title: "日期类型", key: "datecode", align: "center", minWidth: 180, tooltip: true },
 				{ title: "班别", key: "shift", align: "center", minWidth: 100, tooltip: true },
 				{ title: "料号", key: "partName", align: "center", minWidth: 140, tooltip: true },
 				{ title: "站点", key: "curprocessname", align: "center", minWidth: 140, tooltip: true },
-				{ title: "数量", key: "qty", align: "center", minWidth: 80, tooltip: true },
+				{ title: "数量", slot: "qty", align: "center", minWidth: 80, tooltip: true },
+				{ title: "大板数量", slot: "panelNoQty", align: "center", minWidth: 100, tooltip: true },
 				{ title: "工单", key: "workorder", align: "center", minWidth: 140, tooltip: true },
 				{ title: "设备ID", key: "eqpID", align: "center", minWidth: 140, tooltip: true },
 				{ title: "Magazine", key: "magazine", minWidth: 160, tooltip: true },
@@ -118,9 +137,10 @@ export default {
 				{ title: "烘烤时长", key: "bakingTotalMin", align: "center", minWidth: 100, tooltip: true },
 				{ title: "烘烤开始时间", key: "bakingStartTime", align: "center", minWidth: 140, tooltip: true, render: renderDate },
 				{ title: "烘烤结束时间", key: "bakingEndTime", align: "center", minWidth: 140, tooltip: true, render: renderDate },
+				{ title: "程序名称", key: "programName", align: "center", minWidth: 100, tooltip: true },
 				{ title: "备注", key: "reMark", align: "center", minWidth: 180, tooltip: true },
 				{ title: "人员", key: "createusername", align: "center", minWidth: 100, tooltip: true },
-			], // 表格数据
+			],
 			// 验证实体
 			ruleValidate: {
 				startTime: [
@@ -140,31 +160,31 @@ export default {
 					},
 				],
 			},
-		}
+		};
 	},
 	activated() {
-		this.pageLoad()
-		this.autoSize()
-		window.addEventListener("resize", () => this.autoSize())
-		getButtonBoolean(this, this.btnData)
+		this.pageLoad();
+		this.autoSize();
+		window.addEventListener("resize", () => this.autoSize());
+		getButtonBoolean(this, this.btnData);
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
-		this.searchPoptipModal = false
-		next()
+		this.searchPoptipModal = false;
+		next();
 	},
 	methods: {
 		// 点击搜索按钮触发
 		searchClick() {
-			this.pageLoad()
+			this.pageLoad();
 		},
 		// 获取分页列表数据
 		pageLoad() {
-			this.tableConfig.loading = false
-			const { startTime, endTime, workorder, partName, buildConfig, eqpID } = this.req
+			this.tableConfig.loading = false;
+			const { startTime, endTime, workorder, partName, buildConfig, eqpID } = this.req;
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
-					this.tableConfig.loading = true
+					this.tableConfig.loading = true;
 					const obj = {
 						startTime: formatDate(startTime),
 						endTime: formatDate(endTime),
@@ -172,28 +192,65 @@ export default {
 						partName,
 						buildConfig,
 						eqpID,
-					}
+					};
 					getlistReq(obj)
 						.then((res) => {
-							this.tableConfig.loading = false
+							this.tableConfig.loading = false;
 							if (res.code === 200) {
-								this.data = res.result || []
+								this.data = res.result || [];
 							}
 						})
-						.catch(() => (this.tableConfig.loading = false))
-					this.searchPoptipModal = false
+						.catch(() => (this.tableConfig.loading = false));
+					this.searchPoptipModal = false;
 				}
-			})
+			});
+		},
+		//1-展示流程卡信息 及 2-panelNo信息
+		show(row, type) {
+			this.selectObj = { ...row };
+			if (type === 1) {
+				this.drawerFlag = true;
+			}
+			if (type === 2) {
+				this.panelNos = "";
+				let { datecode, partName, workorder, curprocessname, eqpID } = row;
+				const startTime = datecode.split("-")[0];
+				const endTime = datecode.split("-")[1];
+				const obj = {
+					startTime: formatDate(`${startTime.substr(0, 4)}-${startTime.substr(4, 2)}-${startTime.substr(6, 2)} ${startTime.substr(8, 2)}:00:00`),
+					endTime: formatDate(`${endTime.substr(0, 4)}-${endTime.substr(4, 2)}-${endTime.substr(6, 2)} ${endTime.substr(8, 2)}:00:00`),
+					partName,
+					workorder,
+					curprocessname,
+					eqpID,
+				};
+				getpanelNolistReq(obj).then((res) => {
+					if (res.code === 200) {
+						res?.result.forEach((item, index) => {
+							this.panelNos += `${index + 1}. ${item} \r\n`;
+						}) || [];
+					}
+				});
+			}
 		},
 		// 点击重置按钮触发
 		resetClick() {
-			this.$refs.searchReq.resetFields()
-			this.$refs.workOrder.remove()
+			this.$refs.searchReq.resetFields();
+			this.$refs.workOrder.remove();
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 130
+			this.tableConfig.height = document.body.clientHeight - 130;
 		},
 	},
-}
+	components: { FlowInfo },
+};
 </script>
+<style style="less" scoped>
+:deep(.ivu-poptip-body-content-inner) {
+	color: #515a6e;
+	white-space: pre-line;
+	padding: 5px;
+	text-align: left;
+}
+</style>

@@ -13,3 +13,13 @@ export const getlistReq = data => {
     data
   })
 }
+// 查询panelno
+export const getpanelNolistReq = data => {
+  return requestCenter({
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/anonymous/v1/baketempraturereport/getpanelnodetail',
+    method: 'post',
+    data
+  })
+}
