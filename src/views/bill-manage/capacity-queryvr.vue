@@ -548,13 +548,14 @@ export default {
 		},
 		// 明细导出
 		exportModalClick() {
-			const { workOrder, startTime, startTime1, endTime, endTime1, pn, name } = this.req;
+			const { startTime, endTime, workOrder, processName, pn, name } = this.currentRow;
 			const obj = {
+				startTime,
+				endTime,
 				workOrder,
-				startTime: startTime ? formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00") : "",
-				endTime: endTime ? formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59") : "",
-				pn,
+				stepName: processName,
 				trackType: this.currentType,
+				pn,
 				name,
 			};
 			exportModelReq(obj).then((res) => {
