@@ -10,12 +10,6 @@
 					<Select v-model="rightForm.showType" size="small" transfer class="showtype" @on-change="autoChangeFunc">
 						<Option v-for="item in showTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					</Select>
-					<!-- 分组为普通的 -->
-					<Select v-model="rightForm.showTypeValue" size="small" transfer v-if="['group'].includes(rightForm.showType)" class="showtype" @on-change="autoChangeFunc">
-						<Option v-for="item in showTypeList[0].children" :value="item.value" :key="item.value">{{ item.label }}</Option>
-					</Select>
-					<!-- 分组为高级 -->
-					<div v-if="rightForm.showTypeValue === 'high'" class="showtypebtn" @click="userDefinedClick">自定义</div>
 					<!-- 分组为汇总的 -->
 					<Select v-model="rightForm.showTypeValue" size="small" transfer v-if="['summary'].includes(rightForm.showType)" class="showtype" @on-change="autoChangeFunc">
 						<Option v-for="item in showTypeList[2].children" :value="item.value" :key="item.value" :label="item.label"></Option>
@@ -72,11 +66,6 @@ export default {
 				{
 					label: "分组",
 					value: "group",
-					children: [
-						{ label: "普通", value: "ordinary" },
-						{ label: "相邻连续", value: "adjacent" },
-						{ label: "高级", value: "high" },
-					],
 				},
 				{
 					label: "列表",
@@ -100,9 +89,8 @@ export default {
 	methods: {
 		autoChangeFunc(val) {
 			this.rightForm = { ...this.rightForm, ...val };
-			// console.log("panel", this.rightForm);
-			// const { showType } = this.rightForm;
-			// if (showType !== "group") this.rightForm.showTypeValue = "";
+			const { showType } = this.rightForm;
+			if (showType !== "summary") this.rightForm.showTypeValue = "";
 			this.$emit("autoChangeFunc", "cell", this.rightForm);
 		},
 		//自定义按钮设定
