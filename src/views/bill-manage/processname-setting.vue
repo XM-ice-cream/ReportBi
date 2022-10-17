@@ -13,13 +13,26 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
-										<!-- 起始时间 -->
-										<FormItem :label="$t('startTime')" prop="startTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
-										</FormItem>
-										<!-- 结束时间 -->
-										<FormItem :label="$t('endTime')" prop="endTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
+										<!-- 当前流程 -->
+										<FormItem label="当前流程" prop="routID">
+											<v-selectpage
+												class="select-page-style"
+												key-field="id"
+												ref="routID"
+												show-field="name"
+												:data="wfPageListUrl"
+												v-model="req.routID"
+												:placeholder="$t('pleaseSelect') + '当前流程'"
+												:result-format="
+													(res) => {
+														return {
+															totalRow: res.total,
+															list: res.data || [],
+														};
+													}
+												"
+											>
+											</v-selectpage>
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -35,7 +48,6 @@
 					</Row>
 				</div>
 				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick"></Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
 			</Card>
 		</div>
 		<!-- 新增 、编辑 -->
@@ -44,15 +56,17 @@
 </template>
 
 <script>
-import { getpagelistReq } from "@/api/bill-manage/insight-tracktooling.js";
-import { getButtonBoolean, formatDate, renderDate } from "@/libs/tools";
+import { getlistReq } from "@/api/bill-manage/processname-setting";
+import { getButtonBoolean, formatDate, renderDate, renderIsEnabled } from "@/libs/tools";
 import AddModify from "./processname-setting/add-modify.vue";
+import { wfPageListUrl } from "@/api/basis-info/wf-route";
 
 export default {
 	name: "processname-setting",
 	components: { AddModify },
 	data() {
 		return {
+			wfPageListUrl: wfPageListUrl(),
 			searchPoptipModal: false,
 			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
 			tableConfig: { ...this.$config.tableConfig }, // table配置
@@ -64,9 +78,7 @@ export default {
 			data: [], // 表格数据
 			btnData: [],
 			req: {
-				startTime: "",
-				endTime: "",
-				...this.$config.pageConfig,
+				routID: "",
 			}, //查询数据
 			columns: [
 				{
@@ -87,7 +99,7 @@ export default {
 									props: {
 										border: true,
 										columns: this.columns1,
-										data: this.data[params.index].children || [],
+										data: this.data[params.index].processes || [],
 										tablekey: 0,
 									},
 								}),
@@ -100,20 +112,12 @@ export default {
 					fixed: "left",
 					width: 50,
 					align: "center",
-					indexMethod: (row) => {
-						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
-					},
 				},
-				{ title: "MES机种", key: "modelName", align: "center", minWidth: 140, tooltip: true },
-				{ title: "客户机种", key: "customerModelName", align: "center", minWidth: 140, tooltip: true },
-				{ title: "MES站点", key: "stepName", align: "center", minWidth: 140, tooltip: true },
-				{ title: "客户站点", key: "customerStepName", align: "center", minWidth: 140, tooltip: true },
-				{ title: "上传站点", key: "uploadStepName", align: "center", minWidth: 140, tooltip: true },
-				{ title: "序号", key: "sortNumber", align: "center", minWidth: 140, tooltip: true },
-				{ title: "创建人", key: "createUserName", align: "center", minWidth: 120, tooltip: true },
-				{ title: "创建时间", key: "createDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
-				{ title: "修改人", key: "modifyUserName", align: "center", minWidth: 120, tooltip: true },
-				{ title: "修改时间", key: "modifyDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
+				{ title: "流程", key: "routeID", align: "center", minWidth: 140, tooltip: true },
+				// { title: "创建人", key: "createUserName", align: "center", minWidth: 120, tooltip: true },
+				// { title: "创建时间", key: "createDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
+				// { title: "修改人", key: "modifyUserName", align: "center", minWidth: 120, tooltip: true },
+				// { title: "修改时间", key: "modifyDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
 			], // 表格数据
 			columns1: [
 				{
@@ -125,8 +129,8 @@ export default {
 						return row._index + 1;
 					},
 				},
-				{ title: this.$t("name"), key: "name", minWidth: 120, tooltip: true, align: "center" },
-				{ title: this.$t("category"), key: "categoryName", minWidth: 120, tooltip: true, align: "center" },
+				{ title: this.$t("name"), key: "processName", minWidth: 120, tooltip: true, align: "center" },
+				{ title: "必过站", key: "isrequested", minWidth: 120, tooltip: true, align: "center" },
 			],
 		};
 	},
@@ -152,29 +156,15 @@ export default {
 		// 获取分页列表数据
 		pageLoad() {
 			this.data = [];
-			this.tableConfig.loading = false;
-			const { startTime, endTime } = this.req;
+			const { routID } = this.req;
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
 					this.tableConfig.loading = true;
-					let obj = {
-						orderField: "modelName", // 排序字段
-						ascending: true, // 是否升序
-						pageSize: this.req.pageSize, // 分页大小
-						pageIndex: this.req.pageIndex, // 当前页码
-						data: {
-							startTime: formatDate(startTime),
-							endTime: formatDate(endTime),
-							modelName,
-						},
-					};
-					getpagelistReq(obj)
+					getlistReq({ routID })
 						.then((res) => {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
-								let { data, pageSize, pageIndex, total, totalPage } = res.result;
-								this.data = data || [];
-								this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
+								this.data = [res.result] || [];
 							}
 						})
 						.catch(() => (this.tableConfig.loading = false));
@@ -216,17 +206,6 @@ export default {
 		// 自动改变表格高度
 		autoSize() {
 			this.tableConfig.height = document.body.clientHeight - 120 - 60;
-		},
-		// 选择第几页
-		pageChange(index) {
-			this.req.pageIndex = index;
-			this.pageLoad();
-		},
-		// 选择一页有条数据
-		pageSizeChange(index) {
-			this.req.pageIndex = 1;
-			this.req.pageSize = index;
-			this.pageLoad();
 		},
 	},
 };

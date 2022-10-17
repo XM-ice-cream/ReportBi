@@ -38,8 +38,8 @@
 					row-key="name"
 				>
 					<!-- 是否为必过站 -->
-					<template #isRequired="{ row }">
-						<Checkbox v-model="row.isRequest"></Checkbox>
+					<template #isRequired="{ row, index }">
+						<Checkbox v-model="shuttledDate[index].isRequested"></Checkbox>
 					</template>
 				</Table>
 			</div>
@@ -87,6 +87,18 @@ export default {
 		},
 		isShowDateList() {
 			this.originDate = this.isShowDateList;
+			this.$nextTick(() => {
+				this.originDate.forEach((item, index) => {
+					this.shuttledDate.forEach((shutItem) => {
+						if (shutItem.processName === item.name) {
+							this.originDate[index]._disabled = true;
+							this.originDate[index]._checked = true;
+						}
+					});
+				});
+				this.originDate = JSON.parse(JSON.stringify(this.originDate));
+				console.log(this.originDate, this.shuttledDate);
+			});
 		},
 		isSelectDateList() {
 			this.shuttledDate = this.isSelectDateList;
@@ -115,6 +127,7 @@ export default {
 								info._disabled = true;
 								info._checked = true;
 								item._checked = false;
+								item.processName = item.name;
 							}
 						});
 					});
@@ -174,7 +187,12 @@ export default {
 			this.originDate.map((item) => {
 				arr.map((info) => {
 					info._checked = true;
-					if (item[this.rowKeyName] === info[this.rowKeyName]) item._checked = true;
+					if (item[this.rowKeyName] === info[this.rowKeyName]) {
+						info._disabled = true;
+						info._checked = true;
+						item._checked = false;
+						item.processName = item.name;
+					}
 				});
 			});
 			this.checkedQuotaList = arr;

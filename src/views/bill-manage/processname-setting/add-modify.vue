@@ -3,15 +3,15 @@
 	<Drawer v-model="drawerFlag" :title="drawerTitle" width="900" :mask-closable="false" @on-close="cancelClick">
 		<Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
 			<!-- 当前流程 -->
-			<FormItem label="当前流程" prop="toRouteId">
+			<FormItem label="当前流程" prop="routeID">
 				<v-selectpage
 					class="select-page-style"
 					key-field="id"
-					ref="toRouteId"
+					ref="routeID"
 					:title="toRouteTitle"
 					show-field="name"
 					:data="wfPageListUrl"
-					v-model="submitData.toRouteId"
+					v-model="submitData.routeID"
 					@values="getProcess"
 					:placeholder="$t('pleaseSelect') + '当前流程'"
 					:result-format="
@@ -36,11 +36,12 @@
 </template>
 
 <script>
-import { addReq, modifyReq } from "@/api/bill-manage/insight-tracktooling";
+import { addReq, modifyReq } from "@/api/bill-manage/processname-setting";
 import { wfPageListUrl, getprocessbyrouteidReq } from "@/api/basis-info/wf-route";
 import TransferTable from "./transfer-table.vue";
 export default {
 	name: "processname-setting-add-modify",
+	components: { TransferTable },
 	props: {
 		drawerFlag: {
 			type: Boolean,
@@ -64,6 +65,9 @@ export default {
 			//弹窗开启 及编辑时 赋值
 			if (newVal && !this.isAdd) {
 				this.submitData = { ...this.selectObj };
+				this.keyRelations_ = this.selectObj.processes.map((item) => {
+					return { ...item, name: item.processName, isRequested: item.isrequested };
+				});
 			}
 		},
 	},
@@ -115,15 +119,12 @@ export default {
 		submitClick(isClose = false) {
 			this.$refs.submitData.validate((validate) => {
 				if (validate) {
-					const { modelName, customerModelName, stepName, customerStepName, uploadStepName, sortNumber, id } = this.submitData;
+					const arr = this.keyRelations_.map((item, index) => {
+						return { seq: (index + 1) * 10, processName: item.name, isrequested: item?.isRequested || false };
+					});
 					const obj = {
-						modelName,
-						customerModelName,
-						stepName,
-						customerStepName,
-						uploadStepName,
-						sortNumber,
-						id,
+						routeID: this.submitData.routeID,
+						processes: arr,
 					};
 					const requestApi = this.isAdd ? addReq : modifyReq;
 					requestApi(obj).then((res) => {
@@ -138,13 +139,11 @@ export default {
 		},
 		getProcess() {
 			this.processList = [];
-			let obj = { routeId: this.submitData.toRouteId };
+			let obj = { routeId: this.submitData.routeID };
 			getprocessbyrouteidReq(obj).then((res) => {
 				if (res.code === 200) {
 					let result = res.result || [];
 					this.processList = result.filter((o) => o.id !== "start" && o.id !== "end");
-					//清空右侧选中值
-					this.keyRelations_ = [];
 				}
 			});
 		},
@@ -152,10 +151,10 @@ export default {
 		cancelClick() {
 			this.$emit("update:drawerFlag", false);
 			this.$refs.submitData.resetFields();
+			this.$refs.routeID.remove();
 			//清空所有data值
 			Object.assign(this.$data, this.$options.data());
 		},
 	},
-	components: { TransferTable },
 };
 </script>
