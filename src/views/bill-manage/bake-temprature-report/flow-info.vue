@@ -27,11 +27,13 @@ export default {
 		},
 	},
 	watch: {
-		drawerFlag() {
-			this.submitData = { ...this.selectObj };
-			this.pageLoad();
-			this.autoSize();
-			window.addEventListener("resize", () => this.autoSize());
+		drawerFlag(val) {
+			if (val) {
+				this.submitData = { ...this.selectObj };
+				this.pageLoad();
+				this.autoSize();
+				window.addEventListener("resize", () => this.autoSize());
+			}
 		},
 	},
 	data() {
@@ -70,32 +72,32 @@ export default {
 					width: 140,
 					tooltip: true,
 				},
-				{ title: "工作站（设备ID）", key: "eqpId", align: "center", width: 150 },
-				{ title: "下个制程名称", key: "nextProcessName", align: "center", width: 150 },
-				{ title: "当前状态", key: "currentStatus", align: "center", width: 70 },
-				{ title: "进入制程时间", key: "inProcessTime", align: "center", width: 150 },
-				{ title: "离开制程时间", key: "outProcessTime", align: "center", width: 150 },
-				{ title: "进入生产线时间", key: "inPdLineTime", align: "center", width: 150 },
-				{ title: "离开生产线时间", key: "outPdLineTime", align: "center", width: 150 },
-				{ title: "栈板号", key: "palletNo", align: "center", width: 150 },
-				{ title: "货柜", key: "container", align: "center", width: 150 },
-				{ title: "箱号", key: "cartonNo", align: "center", width: 150 },
-				{ title: "抽验编号", key: "qcNo", align: "center", width: 150 },
-				{ title: "抽验结果", key: "qcResult", align: "center", width: 70 },
-				{ title: "重工号", key: "reworkWo", align: "center", width: 150 },
-				{ title: "包装盒/袋子", key: "boxNo", align: "center", width: 150 },
-				{ title: "穴位", key: "boardNo", align: "center", width: 70 },
-				{ title: "载具", key: "carrier", align: "center", width: 150 },
-				{ title: "Cover", key: "cover", align: "center", width: 150 },
-				{ title: "Base", key: "base", align: "center", width: 150 },
-				{ title: "Magazine", key: "magazine", align: "center", width: 150 },
-				{ title: "操作动作", key: "action", align: "center", width: 70 },
-				{ title: "X板标识", key: "xFlag", align: "center", width: 70 },
-				{ title: "当前制程过站成功数量", key: "splitFlag", align: "center", width: 150 },
-				{ title: "分板标识", key: "pcbWashRecord", align: "center", width: 70 },
-				{ title: "ledBin", key: "ledBin", align: "center", width: 70 },
-				{ title: "holdReason", key: "holdReason", align: "center", width: 150 },
-				{ title: "processGrade", key: "processGrade", align: "center", width: 150 },
+				{ title: "工作站（设备ID）", key: "eqpId", align: "center", width: 150, tooltip: true },
+				{ title: "下个制程名称", key: "nextProcessName", align: "center", width: 150, tooltip: true },
+				{ title: "当前状态", key: "currentStatus", align: "center", width: 70, tooltip: true },
+				{ title: "进入制程时间", key: "inProcessTime", align: "center", width: 150, tooltip: true },
+				{ title: "离开制程时间", key: "outProcessTime", align: "center", width: 150, tooltip: true },
+				{ title: "进入生产线时间", key: "inPdLineTime", align: "center", width: 150, tooltip: true },
+				{ title: "离开生产线时间", key: "outPdLineTime", align: "center", width: 150, tooltip: true },
+				{ title: "栈板号", key: "palletNo", align: "center", width: 150, tooltip: true },
+				{ title: "货柜", key: "container", align: "center", width: 150, tooltip: true },
+				{ title: "箱号", key: "cartonNo", align: "center", width: 150, tooltip: true },
+				{ title: "抽验编号", key: "qcNo", align: "center", width: 150, tooltip: true },
+				{ title: "抽验结果", key: "qcResult", align: "center", width: 70, tooltip: true },
+				{ title: "重工号", key: "reworkWo", align: "center", width: 150, tooltip: true },
+				{ title: "包装盒/袋子", key: "boxNo", align: "center", width: 150, tooltip: true },
+				{ title: "穴位", key: "boardNo", align: "center", width: 70, tooltip: true },
+				{ title: "载具", key: "carrier", align: "center", width: 150, tooltip: true },
+				{ title: "Cover", key: "cover", align: "center", width: 150, tooltip: true },
+				{ title: "Base", key: "base", align: "center", width: 150, tooltip: true },
+				{ title: "Magazine", key: "magazine", align: "center", width: 150, tooltip: true },
+				{ title: "操作动作", key: "action", align: "center", width: 70, tooltip: true },
+				{ title: "X板标识", key: "xFlag", align: "center", width: 70, tooltip: true },
+				{ title: "当前制程过站成功数量", key: "splitFlag", align: "center", width: 150, tooltip: true },
+				{ title: "分板标识", key: "pcbWashRecord", align: "center", width: 70, tooltip: true },
+				{ title: "ledBin", key: "ledBin", align: "center", width: 70, tooltip: true },
+				{ title: "holdReason", key: "holdReason", align: "center", width: 150, tooltip: true },
+				{ title: "processGrade", key: "processGrade", align: "center", width: 150, tooltip: true },
 			], // 表格数据
 		};
 	},
@@ -103,7 +105,6 @@ export default {
 	methods: {
 		// 获取分页列表数据
 		pageLoad() {
-			console.log(this.submitData);
 			let { datecode, partName, workorder, curprocessname, eqpID } = this.submitData;
 			const startTime = datecode.split("-")[0];
 			const endTime = datecode.split("-")[1];
@@ -137,7 +138,7 @@ export default {
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 170 - 60;
+			this.tableConfig.height = document.body.clientHeight - 150;
 		},
 		// 选择第几页
 		pageChange(index) {
