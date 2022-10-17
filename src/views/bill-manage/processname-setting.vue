@@ -12,7 +12,7 @@
 									{{ $t("selectQuery") }}
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" :rules="rulesValidate" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 当前流程 -->
 										<FormItem label="当前流程" prop="routID">
 											<v-selectpage
@@ -158,6 +158,15 @@ export default {
 					},
 				},
 			],
+			rulesValidate: {
+				routID: [
+					{
+						required: true,
+						message: `${this.$t("pleaseSelect")}当前流程`,
+						trigger: "change",
+					},
+				],
+			},
 		};
 	},
 	activated() {
@@ -176,7 +185,6 @@ export default {
 		// 点击搜索按钮触发
 		searchClick() {
 			this.selectObj = null;
-			this.req.pageIndex = 1;
 			this.pageLoad();
 		},
 		// 获取分页列表数据
@@ -223,6 +231,7 @@ export default {
 		// 点击重置按钮触发
 		resetClick() {
 			this.$refs.searchReq.resetFields();
+			this.$refs.routID.remove();
 		},
 		// 左侧抽屉取消
 		cancelClick() {
