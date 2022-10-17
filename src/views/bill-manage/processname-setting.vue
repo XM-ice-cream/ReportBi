@@ -57,7 +57,7 @@
 
 <script>
 import { getlistReq } from "@/api/bill-manage/processname-setting";
-import { getButtonBoolean, formatDate, renderDate, renderIsEnabled } from "@/libs/tools";
+import { getButtonBoolean, renderState, formatDate, renderDate, renderIsEnabled } from "@/libs/tools";
 import AddModify from "./processname-setting/add-modify.vue";
 import { wfPageListUrl } from "@/api/basis-info/wf-route";
 
@@ -129,8 +129,34 @@ export default {
 						return row._index + 1;
 					},
 				},
-				{ title: this.$t("name"), key: "processName", minWidth: 120, tooltip: true, align: "center" },
-				{ title: "必过站", key: "isrequested", minWidth: 120, tooltip: true, align: "center" },
+				{
+					title: this.$t("name"),
+					key: "processName",
+					minWidth: 120,
+					tooltip: true,
+					align: "center",
+				},
+				{
+					title: "必过站",
+					key: "isrequested",
+					minWidth: 120,
+					tooltip: true,
+					align: "center",
+					render: (h, params) => {
+						let { isrequested } = params.row;
+						// repairId ? "#27ce88" : "#cccc00"
+						let color = "";
+						let name = "";
+						if (isrequested) {
+							name = "是";
+							color = "#27ce88";
+						} else {
+							name = "否";
+							color = "#c0c7c4";
+						}
+						return renderState(h, color, `${name}`);
+					},
+				},
 			],
 		};
 	},
