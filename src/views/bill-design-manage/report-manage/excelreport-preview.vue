@@ -167,8 +167,12 @@ export default {
 				this.$Message.error("超出最大查询时间差,请重新选择");
 				return;
 			}
-			//左侧查询参数 --必要参数接收
+			//左侧查询参数 --必要参数接收[所有查询条件的值为空时，返回false,不可查询]
 			const arr = this.toObject(this.tableData2);
+			if (!arr) {
+				this.$Message.error("至少要有一个查询条件!");
+				return;
+			}
 			this.req.setParam = JSON.stringify(arr);
 			this.$Spin.show();
 
@@ -345,21 +349,25 @@ export default {
 			});
 			return flag;
 		},
-		// 表单封装json
+		// 表单封装json[如果均没有值 不可查询数据]
 		toObject(val) {
 			const objfirst = {};
 			const objSecond = {};
+			let flag = false; //判断是否有值
 			val.forEach((el) => {
 				el.name ? (objfirst[el.name] = el.children) : "";
 			});
 			for (const key in objfirst) {
 				const newObj = {};
 				objfirst[key].map((ev) => {
+					if (ev.value) {
+						flag = true;
+					}
 					Object.assign(newObj, { [ev.name]: ev.value, [ev.name + "required"]: ev.required, [ev.name + "type"]: ev.type });
 				});
 				objSecond[key] = newObj;
 			}
-			return objSecond;
+			return flag ? objSecond : false;
 		},
 		// 选择第几页
 		pageChange(index) {
