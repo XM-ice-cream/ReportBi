@@ -660,6 +660,7 @@ export default {
 /deep/.ivu-layout-sider-children {
 	background-color: #fff;
 }
+
 /deep/ #luckysheet-row-count-show {
 	width: 1.2rem !important;
 }
