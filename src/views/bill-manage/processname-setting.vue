@@ -57,7 +57,7 @@
 
 <script>
 import { getlistReq } from "@/api/bill-manage/processname-setting";
-import { getButtonBoolean, renderState, formatDate, renderDate, renderIsEnabled } from "@/libs/tools";
+import { getButtonBoolean, renderState } from "@/libs/tools";
 import AddModify from "./processname-setting/add-modify.vue";
 import { wfPageListUrl } from "@/api/basis-info/wf-route";
 
@@ -113,11 +113,9 @@ export default {
 					width: 50,
 					align: "center",
 				},
-				{ title: "流程", key: "routeID", align: "center", minWidth: 140, tooltip: true },
-				// { title: "创建人", key: "createUserName", align: "center", minWidth: 120, tooltip: true },
-				// { title: "创建时间", key: "createDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
-				// { title: "修改人", key: "modifyUserName", align: "center", minWidth: 120, tooltip: true },
-				// { title: "修改时间", key: "modifyDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
+				{ title: "流程ID", key: "routeID", align: "center", minWidth: 140, tooltip: true },
+				{ title: "流程", key: "routeName", align: "center", minWidth: 140, tooltip: true },
+				{ title: "维护人", key: "createUser", align: "center", minWidth: 120, tooltip: true },
 			], // 表格数据
 			columns1: [
 				{

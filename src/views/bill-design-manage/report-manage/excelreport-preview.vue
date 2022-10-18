@@ -95,7 +95,7 @@
 							</template>
 						</tr>
 					</table>
-					<page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+					<page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" :elapsedMilliseconds="req.elapsedMilliseconds" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
 				</div>
 			</Card>
 		</div>
@@ -162,17 +162,14 @@ export default {
 			this.pageLoad();
 		},
 		async pageLoad() {
-			// 左侧查询参数--时间格式化
-			if (this.dateFormate()) {
-				this.$Message.error("超出最大查询时间差,请重新选择");
+			// 校验查询参数
+			const { message } = this.tableDataFormate();
+			if (message) {
+				this.$Message.error(message);
 				return;
 			}
 			//左侧查询参数 --必要参数接收[所有查询条件的值为空时，返回false,不可查询]
 			const arr = this.toObject(this.tableData2);
-			if (!arr) {
-				this.$Message.error("至少要有一个查询条件!");
-				return;
-			}
 			this.req.setParam = JSON.stringify(arr);
 			this.$Spin.show();
 
@@ -329,45 +326,63 @@ export default {
 				});
 			});
 		},
-		//时间格式化
-		dateFormate() {
+		//数据格式化
+		tableDataFormate() {
 			let flag = false;
-			this.tableData2.map((item) => {
-				item.children.map((o, index) => {
-					if (o.type === "DateTime") {
-						o.value = formatDate(o.value);
-						if (item.children[index - 1]?.type === "DateTime") {
-							const preTime = item.children[index - 1].value;
-							const diff = new Date(o.value).getTime() - new Date(preTime).getTime();
-							const day = Math.floor(diff / (24 * 3600 * 1000));
-							if (day > item.children[index - 1].paramAstrict) {
-								flag = true;
+			let message = "";
+			try {
+				this.tableData2.map((item) => {
+					item.children.map((o, index) => {
+						//至少有一个查询条件
+						if (o.value) flag = true;
+						//时间类型 格式化 + 校验是否在范围内
+						if (o.type === "DateTime") {
+							o.value = formatDate(o.value);
+							if (item.children[index - 1]?.type === "DateTime") {
+								const preTime = item.children[index - 1].value;
+								const diff = new Date(o.value).getTime() - new Date(preTime).getTime();
+								const day = Math.floor(diff / (24 * 3600 * 1000));
+								if (day > item.children[index - 1].paramAstrict) {
+									flag = true;
+									message = "超出最大查询时间差,请重新选择";
+									throw message;
+								}
 							}
 						}
-					}
+						// 数据类型 校验是否长度超出
+						if (o.type === "Array" && o.value) {
+							const value = o.value.replace(/\n/gi, ",");
+							const length = value.split(",").length;
+							//console.log(value, length, o.paramAstrict);
+							if (length > parseInt(o.paramAstrict)) {
+								flag = true;
+								message = "超出最大数组长度,请重新输入";
+								throw message;
+							}
+						}
+					});
 				});
-			});
-			return flag;
+			} catch (e) {}
+			if (!flag && !message) {
+				message = "查询失败，至少要有一个查询条件！";
+			}
+			return { flag, message };
 		},
-		// 表单封装json[如果均没有值 不可查询数据]
+		// 表单封装json
 		toObject(val) {
 			const objfirst = {};
 			const objSecond = {};
-			let flag = false; //判断是否有值
 			val.forEach((el) => {
 				el.name ? (objfirst[el.name] = el.children) : "";
 			});
 			for (const key in objfirst) {
 				const newObj = {};
 				objfirst[key].map((ev) => {
-					if (ev.value) {
-						flag = true;
-					}
 					Object.assign(newObj, { [ev.name]: ev.value, [ev.name + "required"]: ev.required, [ev.name + "type"]: ev.type });
 				});
 				objSecond[key] = newObj;
 			}
-			return flag ? objSecond : false;
+			return objSecond;
 		},
 		// 选择第几页
 		pageChange(index) {
@@ -439,6 +454,7 @@ export default {
 	background: #fff;
 }
 .excel-page {
+	width: 100%;
 	position: absolute;
 	bottom: 8px;
 	z-index: 9999;
