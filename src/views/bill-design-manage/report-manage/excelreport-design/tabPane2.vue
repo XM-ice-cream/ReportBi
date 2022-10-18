@@ -1,35 +1,30 @@
 <template>
-	<Tabs size="small" v-if="type === 2" class="tabPane2">
-		<TabPane label="单元格元素" name="first" size="small">
-			<Form ref="rightForm" :model="rightForm" :label-width="80" style="padding: 0 0.5rem">
-				<!-- <FormItem label="单元格">
-          <label>{{rightForm.coordinate}}</label>
-        </FormItem> -->
-				<!-- 显示方式：分组，列表，汇总 -->
-				<FormItem label="数据设置">
-					<Select v-model="rightForm.showType" size="small" transfer class="showtype" @on-change="autoChangeFunc">
-						<Option v-for="item in showTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-					</Select>
-					<!-- 分组为汇总的 -->
-					<Select v-model="rightForm.showTypeValue" size="small" transfer v-if="['summary'].includes(rightForm.showType)" class="showtype" @on-change="autoChangeFunc">
-						<Option v-for="item in showTypeList[2].children" :value="item.value" :key="item.value" :label="item.label"></Option>
-					</Select>
-				</FormItem>
-				<!-- 常量不设定过滤值 -->
-				<FormItem label="过滤条件" v-if="rightForm.label && rightForm.label.indexOf('#') > -1">
-					<Button long @click="filterClick">编辑</Button>
-				</FormItem>
-				<!-- 补充空白行 -->
-				<FormItem label="数据总行数">
-					<InputNumber v-model="rightForm.blankNum" class="inputNumber" placeholder="请输入数据总行数" clearable @on-change="autoChangeFunc" />
-				</FormItem>
-			</Form>
-		</TabPane>
+	<div class="tabpane2-container">
+		<Form ref="rightForm" :model="rightForm" :label-width="80" style="padding: 0 1.3rem">
+			<!-- 显示方式：分组，列表，汇总 -->
+			<FormItem label="数据设置">
+				<Select v-model="rightForm.showType" size="small" transfer class="showtype" @on-change="autoChangeFunc">
+					<Option v-for="item in showTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+				</Select>
+				<!-- 分组为汇总的 -->
+				<Select v-model="rightForm.showTypeValue" size="small" transfer v-if="['summary'].includes(rightForm.showType)" class="showtype" @on-change="autoChangeFunc">
+					<Option v-for="item in showTypeList[2].children" :value="item.value" :key="item.value" :label="item.label"></Option>
+				</Select>
+			</FormItem>
+			<!-- 常量不设定过滤值 -->
+			<FormItem label="过滤条件" v-if="rightForm.label && rightForm.label.indexOf('#') > -1">
+				<Button long @click="filterClick">编辑</Button>
+			</FormItem>
+			<!-- 补充空白行 -->
+			<FormItem label="数据总行数">
+				<InputNumber v-model="rightForm.blankNum" class="inputNumber" placeholder="请输入数据总行数" clearable @on-change="autoChangeFunc" />
+			</FormItem>
+		</Form>
 		<!-- 自定义 -->
 		<pane-2-user-defined ref="userDefined" :formData="rightForm" />
 		<!-- 过滤数据 -->
 		<pane-2-filter-data ref="filterData" :formData.sync="rightForm" @autoChangeFunc="autoChangeFunc" />
-	</Tabs>
+	</div>
 </template>
 <script>
 import Pane2FilterData from "./pane2-filter-data.vue";
@@ -42,10 +37,6 @@ export default {
 		formData: {
 			type: Object,
 			default: () => {},
-		},
-		type: {
-			type: Number,
-			default: 1,
 		},
 	},
 	watch: {

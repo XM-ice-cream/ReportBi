@@ -246,7 +246,7 @@ export default {
 				},
 				// 单元格元素
 				cell: {
-					showType: showType || "group",
+					showType: showType || "list", //数据默认为list
 					showTypeValue: showTypeValue || "ordinary",
 					filterData: filterData || "",
 					isFather: isFather || true,
