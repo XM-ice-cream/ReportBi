@@ -63,9 +63,11 @@ export default {
 		};
 	},
 	methods: {
+		//更新值
 		autoChangeFunc(val) {
-			this.rightForm[this.dataIndex] = { ...val };
-			console.log("condition", this.rightForm);
+			if (val) {
+				this.rightForm[this.dataIndex] = { ...val };
+			}
 			this.$emit("autoChangeFunc", "conditions", this.rightForm);
 		},
 		//添加条件
@@ -76,10 +78,10 @@ export default {
 		//删除
 		remove(index) {
 			this.rightForm.splice(index, 1);
+			this.autoChangeFunc();
 		},
 		//编辑条件属性
 		show(val, index) {
-			console.log("val", val);
 			this.dataIndex = index;
 			this.$refs.pane3condition.drawerFlag = true;
 			this.$refs.pane3condition.rightForm = { ...val };

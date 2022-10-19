@@ -14,19 +14,13 @@
 				<ListItem class="listItem" v-for="(item, index) in rightForm.types" :key="item.label">
 					<Icon type="md-close" class="icon" @click="remove(index)" />
 					<span class="name">{{ item.label }}:</span>
-					<!-- 行高、列宽 -->
-					<template v-if="['rh', 'cw'].includes(item.type)">
-						<InputNumber v-model="rightForm.types[index].value" class="inputNumber" />
-					</template>
 					<!-- 颜色 -->
-					<template v-if="['color'].includes(item.type)">
-						<ColorPicker v-model="rightForm.types[index].value" recommend />
+					<template v-if="['color', 'bg', 'border'].includes(item.type)">
+						<ColorPicker v-model="rightForm.types[index].value" recommend transfer />
 					</template>
-					<!-- 选择当前行、列、单元格 -->
-					<template v-if="['color'].includes(item.type)">
-						<Select v-model="rightForm.types[index].area" size="small" transfer class="showtype" :label-in-value="true">
-							<Option v-for="item in areaList" :key="item.value" :value="item.value">{{ item.label }}</Option>
-						</Select>
+					<!-- 输入框 -->
+					<template v-if="['newValue'].includes(item.type)">
+						<Input v-model="rightForm.types[index].value" clearable />
 					</template>
 				</ListItem>
 			</List>
@@ -54,15 +48,10 @@ export default {
 			//属性设定下拉
 			attrList: [
 				{ label: "", value: "" },
-				{ label: "行高", value: "rh" },
-				{ label: "列宽", value: "cw" },
 				{ label: "颜色", value: "color" },
-			],
-			//区域下拉
-			areaList: [
-				{ label: "当前格子", value: "currentCell" },
-				{ label: "当前行", value: "currentRow" },
-				{ label: "当前列", value: "currentColumn" },
+				{ label: "背景", value: "bg" },
+				{ label: "边框", value: "border" },
+				{ label: "新值", value: "newValue" },
 			],
 		};
 	},
@@ -82,7 +71,7 @@ export default {
 		typeChange(val) {
 			if (val) {
 				const { label, value } = val;
-				let obj = { label, type: value, value: 0 };
+				let obj = { label, type: value, value: "#27ce88" };
 				if (!this.rightForm.types) this.rightForm.types = [];
 				if (label) this.rightForm.types.push(obj);
 			}
@@ -103,7 +92,11 @@ export default {
 	},
 };
 </script>
-<style></style>
+<style>
+.ivu-select-dropdown.ivu-transfer-no-max-height {
+	width: 260px;
+}
+</style>
 <style scoped lang="less">
 .list {
 	max-height: 150px;

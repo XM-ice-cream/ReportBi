@@ -110,6 +110,7 @@ import { getExcelPreviewReq, getParamsReq, exportReq } from "@/api/bill-design-m
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
 import { getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
+import { isGecko } from "vue-json-editor/assets/jsoneditor";
 
 export default {
 	name: "excelreport-preview",
@@ -212,13 +213,13 @@ export default {
 			let { celldata, config, frozen } = data[0];
 			this.tableHtml = [];
 			// 处理表格单元格样式
-			celldata.forEach((item) => {
+			celldata.forEach((item, index) => {
 				const { r, c } = item;
-
+				//console.log(r, c, item);
 				if (!this.tableHtml[r]) this.tableHtml[r] = [];
 				if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
 
-				const { v, bg, bl, fc, ht, vt, mc, fs, valueType } = item.v; //获取样式
+				const { v, bg, bl, fc, ht, vt, mc, fs, valueType, conditions } = item.v; //获取样式
 				const { columnlen, rowlen, borderInfo } = config; //边框
 				let style = "";
 				//   宽高
@@ -232,7 +233,8 @@ export default {
 				if (fc) style += `color:${fc};`; //字体颜色
 				if (fs) style += `font-size:${fs}px;`; //文字大小
 				if (border) style += `border:${border};`; //边框
-				if (frozen?.type && r == 0) style += "position:sticky;top:0"; //冻结首行
+				if (frozen?.type && r == 0) style += "position:sticky;top:0;"; //冻结首行
+				style += this.getCondition(conditions, v, index); //条件属性设定
 				//合并单元格
 				const colspan = `${mc?.cs || 1}`;
 				const rowspan = `${mc?.rs || 1}`;
@@ -260,13 +262,14 @@ export default {
 						}
 					}
 				}
+
 				//td 内部div样式
 				let divStyle = `width:${width * colspan}px;height:${height * rowspan}px;line-height:${height * rowspan}px;`; //宽高
 				divStyle += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;`; //超出文字省略
 				if (ht) divStyle += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
 				if (vt) divStyle += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
 
-				this.tableHtml[r][c] = { style, colspan, rowspan, divStyle, valueType, value: v };
+				this.tableHtml[r][c] = { style, colspan, rowspan, divStyle, valueType, value: this.jsonStr[0].celldata[index].v.v };
 			});
 		},
 		// 获取边框
@@ -290,7 +293,38 @@ export default {
 			});
 			return border;
 		},
-
+		//条件属性设定
+		getCondition(conditions, v, index) {
+			let style = "";
+			conditions?.forEach((item) => {
+				const { filterData, types } = item;
+				let filterDataTemp = filterData
+					.replace(/currentValue/gi, `"${v}"`)
+					.replace(/and/gi, "&&")
+					.replace(/or/gi, "||");
+				// eval 字符串 转Js
+				if (eval(filterDataTemp)) {
+					types.forEach((tItem) => {
+						const { type, value } = tItem;
+						switch (type) {
+							case "color":
+								style += `color:${value};`;
+								break;
+							case "bg":
+								style += `background-color:${value};`;
+								break;
+							case "border":
+								style += `border-color:${value};`;
+								break;
+							case "newValue":
+								this.jsonStr[0].celldata[index].v.v = value;
+								break;
+						}
+					});
+				}
+			});
+			return style;
+		},
 		//获取查询参数 并获得参数类型及是否必填
 		getParamsList(setParam, setCodes, setNames) {
 			const extendObj = setParam;

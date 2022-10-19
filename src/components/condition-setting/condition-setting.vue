@@ -157,8 +157,8 @@ export default {
 		async addRow() {
 			let { selectItem, operator, content, relation, type } = this.tableData[0];
 			if (type === "date") content = formatDate(content);
-
-			const curContent = this.type ? `( ${selectItem} ) ${operator} ${content}` : `${operator} ${content}`;
+			selectItem = this.type ? selectItem : "currentValue";
+			const curContent = `( ${selectItem} ) ${operator} ${content}`;
 			// 是否存在值
 			const isExit = await this.getValue(this.data, curContent);
 			if (isExit) {
