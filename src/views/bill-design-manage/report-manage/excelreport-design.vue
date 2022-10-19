@@ -34,6 +34,7 @@
 							<Icon type="ios-folder" />
 						</Button>
 					</Tooltip>
+					&nbsp;&nbsp;
 					<Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
 						<Button type="text" @click="preview()">
 							<Icon type="md-eye" />
@@ -41,7 +42,7 @@
 					</Tooltip>
 					<!-- <Icon custom="iconfont luckysheet-iconfont-hanshu" style="margin-right:5px" /> -->
 				</div>
-				<div id="luckysheet" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 98%; left: 0px; top: 0.2rem"></div>
+				<div id="luckysheet" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0"></div>
 				<div style="display: none"></div>
 			</Content>
 			<!-- 右侧基础配置 -->
@@ -544,15 +545,16 @@ export default {
 <style>
 #luckysheet_info_detail_title,
 #luckysheet_info_detail_update,
-#luckysheet_info_detail_save {
+#luckysheet_info_detail_save,
+#luckysheet_info_detail_input {
 	display: none;
 }
 </style>
 <style lang="less" scoped>
 .sider {
-	width: 300px !important;
-	min-width: 300px !important;
-	max-width: 300px !important;
+	width: calc(300px - 0.5rem) !important;
+	min-width: calc(300px - 0.5rem) !important;
+	max-width: calc(300px - 0.5rem) !important;
 	flex: 0 0 300px !important;
 	height: 100%;
 	margin: 0 0.5rem;
@@ -621,8 +623,7 @@ export default {
 		z-index: 99;
 		i {
 			color: #6c6666;
-			font-size: 1.12rem;
-			margin-right: 0.3rem;
+			font-size: 1.4rem;
 		}
 	}
 }

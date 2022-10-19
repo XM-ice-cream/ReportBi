@@ -11,54 +11,57 @@
 									{{ $t("selectQuery") }}
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="submitReq" :label-width="80" :label-colon="true" class="submitForm">
-										<template v-for="item in tableData2">
-											<span class="title">{{ item.title }} </span>
-											<template v-for="(subitem, subindex) in item.children">
-												<FormItem :label="subitem.paramDesc" :prop="item.name + subitem.name" :rules="subitem.required == 1 ? [{ required: true, message: '必填项' }] : [{ required: false }]">
-													<!-- 字符串 -->
-													<Input v-if="subitem.type === 'String'" type="text" v-model.trim="subitem.value" clearable />
-													<!-- 布尔 true/false/0/1-->
-													<RadioGroup v-else-if="subitem.type === 'Boolean' && ['true', 'false', '0', '1'].includes(subitem.value)" v-model="subitem.value">
-														<template v-if="['true', 'false'].includes(subitem.value)">
-															<Radio label="true">true</Radio>
-															<Radio label="false">false</Radio>
-														</template>
-														<template v-if="['0', '1'].includes(subitem.value)">
-															<Radio label="0">0</Radio>
-															<Radio label="1">1</Radio>
-														</template>
-													</RadioGroup>
-													<!-- 数组 -->
-													<Input v-else-if="subitem.type === 'Array'" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model.trim="subitem.value" clearable />
-													<!-- 时间 -->
-													<DatePicker v-else-if="subitem.type === 'DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
-													<!-- 下拉框 -->
-													<v-selectpage
-														v-else-if="subitem.type === 'Select'"
-														class="select-page-style"
-														v-model="subitem.value"
-														transfer
-														:params="{ setCode: subitem.paramAstrict }"
-														key-field="value"
-														show-field="value"
-														:data="getValueBySetcodePageListUrl"
-														:result-format="
-															(res) => {
-																return {
-																	totalRow: res.total,
-																	list: res.data || [],
-																};
-															}
-														"
-													>
-													</v-selectpage>
-													<!-- 其余类型 -->
-													<Input v-else v-model.trim="subitem.value" type="text" clearable />
-												</FormItem>
+									<div class="submitForm">
+										<Form ref="submitReq" :label-width="80" :label-colon="true">
+											<template v-for="item in tableData2">
+												<span class="title">{{ item.title }} </span>
+												<template v-for="(subitem, subindex) in item.children">
+													<FormItem :label="subitem.paramDesc" :prop="item.name + subitem.name" :rules="subitem.required == 1 ? [{ required: true, message: '必填项' }] : [{ required: false }]">
+														<!-- 字符串 -->
+														<Input v-if="subitem.type === 'String'" type="text" v-model.trim="subitem.value" clearable />
+														<!-- 布尔 true/false/0/1-->
+														<RadioGroup v-else-if="subitem.type === 'Boolean' && ['true', 'false', '0', '1'].includes(subitem.value)" v-model="subitem.value">
+															<template v-if="['true', 'false'].includes(subitem.value)">
+																<Radio label="true">true</Radio>
+																<Radio label="false">false</Radio>
+															</template>
+															<template v-if="['0', '1'].includes(subitem.value)">
+																<Radio label="0">0</Radio>
+																<Radio label="1">1</Radio>
+															</template>
+														</RadioGroup>
+														<!-- 数组 -->
+														<Input v-else-if="subitem.type === 'Array'" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model.trim="subitem.value" clearable />
+														<!-- 时间 -->
+														<DatePicker v-else-if="subitem.type === 'DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+														<!-- 下拉框 -->
+														<v-selectpage
+															v-else-if="subitem.type === 'Select'"
+															class="select-page-style"
+															v-model="subitem.value"
+															transfer
+															:params="{ setCode: subitem.paramAstrict }"
+															key-field="value"
+															show-field="value"
+															:data="getValueBySetcodePageListUrl"
+															:result-format="
+																(res) => {
+																	return {
+																		totalRow: res.total,
+																		list: res.data || [],
+																	};
+																}
+															"
+														>
+														</v-selectpage>
+														<!-- 其余类型 -->
+														<Input v-else v-model.trim="subitem.value" type="text" clearable />
+													</FormItem>
+												</template>
 											</template>
-										</template>
-									</Form>
+										</Form>
+									</div>
+
 									<div class="poptip-style-button">
 										<Button @click="resetClick">{{ $t("reset") }}</Button>
 										<Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
@@ -414,11 +417,15 @@ export default {
 </style>
 <style lang="less" scoped>
 .title {
-	width: 100%;
-	height: 2rem;
-	color: #2369ed;
-	text-align: center;
-	line-height: 2rem;
+	display: inline-block;
+	padding: 4px;
+	margin-bottom: 10px;
+	font-weight: bold;
+	color: #3a3c41;
+	text-align: left;
+	line-height: 1.3rem;
+	border-bottom: 2px solid #2369ed;
+	border-radius: 6px;
 }
 .content-top {
 	.report-title {
@@ -461,11 +468,16 @@ export default {
 	background: #fff;
 }
 .submitForm {
+	padding: 0.5rem;
 	max-height: 20rem;
 	overflow-y: auto;
 }
 .blankBg {
 	background: url("../../../assets/images/report-design/blankBox.png") no-repeat;
 	background-position: center center;
+	background-size: 20%;
+}
+:deep(.poptip-style-button) {
+	margin-top: 10px;
 }
 </style>
