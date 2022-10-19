@@ -51,7 +51,7 @@
 			<Button type="success" class="row-button" @click="bracketDelete" :disabled="!checkList.every((item) => item.children)"> 去除括号 </Button>
 		</div>
 		<!-- 树状图 -->
-		<Tree :data="data" show-checkbox multiple @on-check-change="checkChange" check-strictly @on-contextmenu="handleContextMenu">
+		<Tree :data="data" show-checkbox @on-check-change="checkChange" check-strictly @on-contextmenu="handleContextMenu">
 			<template #contextMenu>
 				<DropdownItem @click.native="handleContextMenuDelete" style="color: #ed4014">删除</DropdownItem>
 			</template>
@@ -87,6 +87,7 @@ export default {
 	watch: {
 		"data.length": {
 			handler() {
+				console.log(this.data);
 				this.$emit("updateData", this.data);
 			},
 			deep: true,
@@ -239,20 +240,28 @@ export default {
 		async bracketAdd() {
 			let callback = ({ data, index }) => {
 				let title = "";
+				let logic = "";
 				this.checkList.map((item, index) => {
 					item.checked = false;
+					console.log(item);
 					if (index == 0) {
 						const reg = /^and|^or/g;
 						title = `${item.title.match(reg) || ""} (`;
 						let index = item.title.indexOf("(");
 						item.title = item.title.replace(reg, "");
 						title += item.title.substring(item.title.indexOf("(", index));
+						logic = `${item.logic.match(reg) || ""} (`;
+						let indexLogic = item.logic.indexOf("(");
+						item.logic = item.logic.replace(reg, "");
+						logic += item.logic.substring(item.logic.indexOf("(", indexLogic));
 					} else {
 						title += " " + item.title;
+						logic += " " + item.logic;
 					}
 				});
 				title += " )";
-				let obj = { title, expand: true, children: this.checkList, checked: false, disableCheckbox: false, contextmenu: true };
+				logic += " )";
+				let obj = { title, logic, expand: true, children: this.checkList, checked: false, disableCheckbox: false, contextmenu: true };
 				data[index] = { ...data[index], ...obj };
 			};
 			let callback1 = ({ data, index }) => {
@@ -278,7 +287,7 @@ export default {
 						item?.children?.forEach((cItem, cIndex) => {
 							if (cIndex == 0) {
 								const reg = /^and|^or/g;
-								data[index + cIndex] = { ...cItem, checked: false, disableCheckbox: false, title: `${item.title.match(reg) || ""} ${cItem.title}` };
+								data[index + cIndex] = { ...cItem, checked: false, disableCheckbox: false, title: `${item.title.match(reg) || ""} ${cItem.title}`, logic: `${item.title.match(reg) || ""} ${cItem.logic}` };
 							} else {
 								// 指定位置插入数据
 								data.splice(index + cIndex, 0, { ...cItem, checked: false, disableCheckbox: false });
@@ -322,8 +331,24 @@ export default {
 		},
 		// 树状图删除
 		handleContextMenuDelete() {
-			this.data.splice(this.contextData.nodeKey, 1);
+			this.recursiveDelete(this.data, this.contextData.nodeKey);
 		},
+		// 递归删除
+		recursiveDelete(data, nodeKey) {
+			data.some((item, index) => {
+				if (item.nodeKey === nodeKey) {
+					if (item.disableCheckbox) {
+						this.$Message.error("请去除括号后，再删除！");
+					} else {
+						data.splice(index, 1);
+					}
+					return true;
+				} else if (item.children) {
+					this.recursiveDelete(item.children, nodeKey);
+				}
+			});
+		},
+
 		// 自动改变表格高度
 		autoSize() {
 			this.tableConfig.height = 20;
