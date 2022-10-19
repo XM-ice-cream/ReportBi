@@ -458,7 +458,7 @@ export default {
 	color: #3a3c41;
 	text-align: left;
 	line-height: 1.3rem;
-	border-bottom: 2px solid #2369ed;
+	border-bottom: 2px solid #27ce88;
 	border-radius: 6px;
 }
 .content-top {

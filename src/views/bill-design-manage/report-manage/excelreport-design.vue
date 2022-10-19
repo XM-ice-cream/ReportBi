@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { getpagelistReq, getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
+import { getDeatilByIdReq } from "@/api/bill-design-manage/data-set.js";
 import { getExcelByReportcodeReq, insertExcelReportReq, modifyExcelReportReq } from "@/api/bill-design-manage/report-manage.js";
 import draggable from "vuedraggable";
 import RightTabPane from "./excelreport-design/right-tabPane.vue";

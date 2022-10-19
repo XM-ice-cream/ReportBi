@@ -283,7 +283,7 @@ export default {
 		async bracketDelete() {
 			let callback = ({ data, index }) => {
 				if (this.checkList) {
-					this.checkList.map((item, iIndex) => {
+					this.checkList.map((item) => {
 						item?.children?.forEach((cItem, cIndex) => {
 							if (cIndex == 0) {
 								const reg = /^and|^or/g;
@@ -377,7 +377,7 @@ export default {
 	margin-bottom: 1rem;
 }
 /deep/.ivu-tree {
-	height: 500px;
+	height: 400px;
 	background: #e6fbf2;
 	border-radius: 10px;
 	padding: 1rem;

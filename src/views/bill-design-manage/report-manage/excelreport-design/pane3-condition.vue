@@ -99,7 +99,7 @@ export default {
 </style>
 <style scoped lang="less">
 .list {
-	max-height: 150px;
+	max-height: 200px;
 	overflow-y: auto;
 	margin-bottom: 1rem;
 	border: 1px solid #dcdee2;

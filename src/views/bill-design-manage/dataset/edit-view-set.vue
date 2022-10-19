@@ -172,14 +172,13 @@
 </template>
 <script>
 import { getAllDatasourceReq, testTransformSet, insertDatacollectReq, modifyDatacollectReq, getDeatilByIdReq, setCodePageListUrl, getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
-import Dictionary from "@/components/dictionary/index";
 import MonacoEditor from "@/components/monaco-editor/monaco-editor.vue";
 import vueJsonEditor from "vue-json-editor";
 import { validateEngOrNum } from "@/libs/validate";
 import { formatDate } from "@/libs/tools";
 export default {
 	name: "Support",
-	components: { Dictionary, vueJsonEditor, MonacoEditor },
+	components: {  vueJsonEditor, MonacoEditor },
 	props: {
 		visib: {
 			required: true,

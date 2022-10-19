@@ -14,8 +14,8 @@
 				<strong>{{ row.name }}</strong>
 			</template>
 			<template #action="{ row, index }">
-				<Button type="primary" size="small" style="margin-right: 5px" @click="show(row, index)">View</Button>
-				<Button type="error" size="small" @click="remove(index)">Delete</Button>
+				<Button type="primary" size="small" class="view-btn" style="margin-right: 5px" @click="show(row, index)">View</Button>
+				<Button type="error" size="small" class="delete-btn" @click="remove(index)">Delete</Button>
 			</template>
 		</Table>
 		<!-- 条件属性设定 -->
@@ -90,4 +90,15 @@ export default {
 };
 </script>
 <style></style>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.view-btn {
+	height: 22px;
+	background: #27ce88;
+	margin: 4px;
+}
+.delete-btn {
+	height: 22px;
+	background: #f24242;
+	margin: 4px;
+}
+</style>

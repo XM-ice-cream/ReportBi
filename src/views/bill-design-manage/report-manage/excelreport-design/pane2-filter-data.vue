@@ -110,7 +110,7 @@ export default {
 	margin-bottom: 1rem;
 }
 /deep/.ivu-tree {
-	height: 500px;
+	height: 400px;
 	background: #e6fbf2;
 	border-radius: 10px;
 	padding: 1rem;

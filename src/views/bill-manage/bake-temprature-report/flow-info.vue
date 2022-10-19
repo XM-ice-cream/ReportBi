@@ -117,8 +117,8 @@ export default {
 				data: {
 					startTime: formatDate(`${startTime.substr(0, 4)}-${startTime.substr(4, 2)}-${startTime.substr(6, 2)} ${startTime.substr(8, 2)}:00:00`),
 					endTime: formatDate(`${endTime.substr(0, 4)}-${endTime.substr(4, 2)}-${endTime.substr(6, 2)} ${endTime.substr(8, 2)}:00:00`),
-					partName,
-					workorder,
+					pn: partName,
+					wo: workorder,
 					curprocessname,
 					eqpID,
 					IsHistory: true,
