@@ -81,7 +81,7 @@
 				</div>
 				<!-- 表格 -->
 				<div class="data-table" style="height: 100%">
-					<table class="table tableScroll" :class="tableHtml.length > 1 ? '' : 'blankBg'" id="exceltable">
+					<table class="table tableScroll" id="exceltable" :class="tableHtml.length > 1 ? '' : 'blankBg'">
 						<tr v-for="(itemTr, indexTr) in tableHtml" :key="indexTr" style="height: 18px">
 							<template v-for="(item, index) in itemTr">
 								<td v-if="item && item.rowspan" :style="item.style" :colspan="item.colspan || 1" :rowspan="item.rowspan || 1" :key="index">
@@ -110,7 +110,6 @@ import { getExcelPreviewReq, getParamsReq, exportReq } from "@/api/bill-design-m
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
 import { getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
-import { isGecko } from "vue-json-editor/assets/jsoneditor";
 
 export default {
 	name: "excelreport-preview",
@@ -507,7 +506,7 @@ export default {
 	overflow-y: auto;
 }
 .blankBg {
-	background: url("../../../assets/images/report-design/blankBox.png") no-repeat;
+	background: url("~@/assets/images/report-design/blankBox.png") no-repeat;
 	background-position: center center;
 	background-size: 20%;
 }
