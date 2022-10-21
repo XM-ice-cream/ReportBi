@@ -65,9 +65,9 @@
 </template>
 
 <script>
-import { getpagelistReq, getLineReq, getStationReq, getModelReq } from "@/api/bill-manage/maverick-report.js"
-import { formatDate } from "@/libs/tools"
-import LineMaverick from "@/components/echarts/line-maverick.vue"
+import { getpagelistReq, getLineReq, getStationReq, getModelReq } from "@/api/bill-manage/maverick-report.js";
+import { formatDate } from "@/libs/tools";
+import LineMaverick from "@/components/echarts/line-maverick.vue";
 export default {
 	name: "maverick-email-setting",
 	components: { LineMaverick },
@@ -111,48 +111,48 @@ export default {
 					},
 				],
 			},
-		}
+		};
 	},
 	watch: {
 		"req.isRefresh"(val) {
 			if (val) {
 				this.timer = setInterval(() => {
-					this.pageLoad()
-				}, this.req.refeshRate * 60 * 1000)
+					this.pageLoad();
+				}, this.req.refeshRate * 60 * 1000);
 			} else {
-				clearInterval(this.timer)
+				clearInterval(this.timer);
 			}
 		},
 	},
 	mounted() {
-		this.getLine()
+		this.getLine();
 		this.$nextTick(() => {
-			this.$refs.lineMaverick.initChart()
-		})
+			this.$refs.lineMaverick.initChart();
+		});
 	},
 	methods: {
 		// 获取分页列表数据
 		pageLoad() {
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
-					let { startTime, endTime, line, model, station, isRefresh } = this.req
+					let { startTime, endTime, line, model, station, isRefresh } = this.req;
 					let obj = {
 						startTime: isRefresh ? "" : formatDate(startTime),
 						endTime: isRefresh ? "" : formatDate(endTime),
 						line,
 						model,
 						station,
-					}
+					};
 					getpagelistReq(obj).then((res) => {
 						if (res.code === 200) {
-							this.lineData.xData = res.result.map((item, index) => index)
-							this.lineData.station = station
+							this.lineData.xData = res.result.map((item, index) => index);
+							this.lineData.station = station;
 							this.lineData.series = [
 								{
 									type: "line",
 									name: "YR",
 									data: res.result.map((item1) => {
-										return { value: item1.yield, createtime: formatDate(item1.createtime), station: item1.station, yielD_TARGET: item1.yielD_TARGET }
+										return { value: item1.yield, createtime: item1.datecode, station: item1.station, yielD_TARGET: item1.yielD_TARGET };
 									}),
 								},
 								{
@@ -165,22 +165,22 @@ export default {
 									name: "SYL Target",
 									data: res.result.map((item1) => item1.yielD_TARGET),
 								},
-							]
+							];
 							this.$nextTick(() => {
-								this.$refs.lineMaverick.initChart()
-							})
+								this.$refs.lineMaverick.initChart();
+							});
 						}
-					})
+					});
 				}
-			})
+			});
 		},
 		//获取线体
 		async getLine() {
 			await getLineReq().then((res) => {
 				if (res.code === 200) {
-					this.lineList = res.result || []
+					this.lineList = res.result || [];
 				}
-			})
+			});
 		},
 		//
 
@@ -188,24 +188,24 @@ export default {
 		getStation() {
 			getStationReq({ line: this.req.line }).then((res) => {
 				if (res.code === 200) {
-					this.stationList = res.result || []
+					this.stationList = res.result || [];
 				}
-			})
+			});
 		},
 		//获取机种
 		getModel() {
 			getModelReq({ line: this.req.line }).then((res) => {
 				if (res.code === 200) {
-					this.modelList = res.result || []
+					this.modelList = res.result || [];
 				}
-			})
+			});
 		},
 		// 点击重置按钮触发
 		resetClick() {
-			this.$refs.searchReq.resetFields()
+			this.$refs.searchReq.resetFields();
 		},
 	},
-}
+};
 </script>
 <style lang="less" scoped>
 :deep(.ivu-switch-small.ivu-switch-checked:after) {
