@@ -17,14 +17,14 @@
         <div class="function-name">
             <Menu :active-name="menuName" @on-select="(name)=>menuName=name">
                 <MenuGroup title="函数名">
-                    <MenuItem :name="index" v-for="(item,index) in dataItemList[parseInt(menuType)]?.children" :key="index"  @dblclick.native="menuDblclick(item)">
+                    <MenuItem :name="index" v-for="(item,index) in dataItemList[parseInt(menuType)].children" :key="index"  @dblclick.native="menuDblclick(item)">
                         {{item.detailCode}}
                     </MenuItem>
                 </MenuGroup>
              </Menu>
         </div>
         <div class="function-remark">
-              {{dataItemList[parseInt(menuType)]?.children[parseInt(menuName)].remark}}
+              {{dataItemList[parseInt(menuType)].children[parseInt(menuName)].remark}}
         </div>
       </div>
       <div slot="footer" class="dialog-footer">

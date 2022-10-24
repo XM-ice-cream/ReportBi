@@ -15,7 +15,7 @@ export const getpagelistReq = data => {
 // 下载图片
 export const downPictureReq = data => {
     return requestCenter({
-        timeout: 1000 * 60 * 5,
+        timeout: 0,
         baseUrl: window.localStorage.getItem("reportip"),
         url: '/api/reportcenter/anonymous/v1/pictureview/downpicture',
         method: 'post',

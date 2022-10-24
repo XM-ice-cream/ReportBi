@@ -130,6 +130,11 @@ export default {
               source = fileFullName.split("\\LA1\\");
               httpPath += source[1].replace('\\', '/');
               break;
+          case "Audio-SIP":
+              httpPath = "http://10.32.36.227:85/";
+              source = fileFullName.split("\\Audio-SIP\\");
+              httpPath += source[1].replace('\\', '/');
+              break;
           case "ZS7-2_aoi": //越南
               httpPath = "http://10.171.13.119:85/";
               source = fileFullName.split("\\ZS7-2_aoi\\");
@@ -168,6 +173,11 @@ export default {
           case "LA1":
               httpPath = "http://10.32.36.227:84/";
               source = fileFullName.split("\\LA1\\");
+              httpPath += source[1].replace('\\', '/');
+              break;
+          case "Audio-SIP":
+              httpPath = "http://10.32.36.227:85/";
+              source = fileFullName.split("\\Audio-SIP\\");
               httpPath += source[1].replace('\\', '/');
               break;
           case "ZS7-2_aoi": //越南
