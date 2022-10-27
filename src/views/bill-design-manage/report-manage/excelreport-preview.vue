@@ -74,8 +74,19 @@
 							<div class="report-title">{{ $route.query.reportName }}</div>
 						</i-col>
 						<!-- 下载 -->
-						<i-col span="6">
-							<Icon type="md-cloud-download" @click="download()" />
+
+						<i-col span="6" style="text-align: right">
+							<Dropdown transfer trigger="click" id="excel-preview-dropdown" @on-click="download">
+								<Icon type="md-cloud-download" />
+								<template #list>
+									<DropdownMenu>
+										<DropdownItem :name="1">数据源导出</DropdownItem>
+										<DropdownItem :name="2">快速导出</DropdownItem>
+										<DropdownItem :name="3">模板设定导出</DropdownItem>
+										<DropdownItem :name="4">表格导出</DropdownItem>
+									</DropdownMenu>
+								</template>
+							</Dropdown>
 						</i-col>
 					</Row>
 				</div>
@@ -231,6 +242,8 @@ export default {
 				if (bl) style += `font-weight:${bl == 1 ? "bold" : "normal"};`; //字体粗细
 				if (fc) style += `color:${fc};`; //字体颜色
 				if (fs) style += `font-size:${fs}px;`; //文字大小
+				if (ht) style += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
+				if (vt) style += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
 				if (border) style += `border:${border};`; //边框
 				if (frozen?.type && r == 0) style += "position:sticky;top:0;"; //冻结首行
 				style += this.getCondition(conditions, v, index); //条件属性设定
@@ -345,12 +358,33 @@ export default {
 			return extendArry;
 		},
 		// Excel导出
-		async download() {
-			exportReq(this.req).then((res) => {
-				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-				const fileName = this.req.reportCode + "-" + `${formatDate(new Date())}.xlsx`; // 自定义文件名
-				exportFile(blob, fileName);
-			});
+		async download(name) {
+			// 校验查询参数
+			const { message } = this.tableDataFormate();
+			if (message) {
+				this.$Message.error(message);
+				return;
+			}
+			//左侧查询参数 --必要参数接收[所有查询条件的值为空时，返回false,不可查询]
+			const arr = this.toObject(this.tableData2);
+			this.req.setParam = JSON.stringify(arr);
+
+			switch (name) {
+				case 4:
+					// 前端自己导出表格
+					$("#exceltable").table2excel({
+						filename: `${this.$route.query.reportName}${formatDate(new Date())}.xls`, //文件名称
+					});
+					break;
+				default:
+					//后端导出excel
+					const obj = { ...this.req, exportType: name };
+					exportReq(obj).then((res) => {
+						let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+						const fileName = this.req.reportCode + "-" + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+						exportFile(blob, fileName);
+					});
+			}
 		},
 		//重置
 		resetClick() {
@@ -400,7 +434,7 @@ export default {
 				});
 			} catch (e) {}
 			if (!flag && !message) {
-				message = "查询失败，至少要有一个查询条件！";
+				message = "操作失败，至少要有一个查询条件！";
 			}
 			return { flag, message };
 		},
@@ -446,6 +480,9 @@ export default {
 @import "../../../assets/table.less";
 .excel-preview .card-style {
 	padding: 1rem;
+}
+#excel-preview-dropdown .ivu-select-dropdown {
+	top: 45px !important;
 }
 </style>
 <style lang="less" scoped>
@@ -512,5 +549,8 @@ export default {
 }
 :deep(.poptip-style-button) {
 	margin-top: 10px;
+}
+:deep(.ivu-dropdown-rel) {
+	height: 26px;
 }
 </style>
