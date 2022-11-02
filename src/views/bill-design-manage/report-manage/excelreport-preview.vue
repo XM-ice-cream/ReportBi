@@ -109,7 +109,14 @@
 							</template>
 						</tr>
 					</table>
-					<page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" :elapsedMilliseconds="req.elapsedMilliseconds" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+					<page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" :elapsedMilliseconds="req.elapsedMilliseconds" @on-change="pageChange" @on-page-size-change="pageSizeChange">
+						<template #right>
+							<Button type="warning" ghost v-if="isLoading" :loading="loading" @click="getTotalPage">
+								<span v-if="!loading">加载右侧信息</span>
+								<span v-else>Loading...</span>
+							</Button>
+						</template>
+					</page-custom>
 				</div>
 			</Card>
 		</div>
@@ -117,7 +124,7 @@
 </template>
 
 <script>
-import { getExcelPreviewReq, getParamsReq, exportReq } from "@/api/bill-design-manage/report-manage";
+import { getExcelPreviewReq, getParamsReq, exportReq, getTotalPageReq } from "@/api/bill-design-manage/report-manage";
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
 import { getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
@@ -130,6 +137,8 @@ export default {
 			sheetData: [{ row: 30, column: 26 }], //初始化默认显示30行 26列
 			tableData2: [],
 			searchPoptipModal: false,
+			loading: false, //加载总页数 总条数信息
+			isLoading: false, //是否加载过，加载过就不执行[默认不显示 查询过后再显示]
 			getValueBySetcodePageListUrl: getValueBySetcodePageListUrl(),
 			req: {
 				reportCode: "",
@@ -172,6 +181,7 @@ export default {
 		},
 
 		async searchClick() {
+			this.isLoading = true;
 			this.req.requestCount = 1; // 点击查询按钮
 			this.pageLoad();
 		},
@@ -191,12 +201,20 @@ export default {
 				.then((res) => {
 					if (res.code === 200) {
 						this.jsonStr = JSON.parse(res.result.jsonStr);
-						this.req = {
-							...this.req,
-							total: this.jsonStr[this.jsonIndex].total,
-							totalPage: this.jsonStr[this.jsonIndex].pageCount,
-							elapsedMilliseconds: res.elapsedMilliseconds,
-						};
+						if (this.isLoading) {
+							this.req = {
+								...this.req,
+								total: this.jsonStr[this.jsonIndex].total === -1 ? 999 : this.jsonStr[this.jsonIndex].total,
+								totalPage: this.jsonStr[this.jsonIndex].pageCount === -1 ? 34 : this.jsonStr[this.jsonIndex].pageCount,
+								elapsedMilliseconds: res.elapsedMilliseconds,
+							};
+							if (this.jsonStr[this.jsonIndex].total !== -1) this.isLoading = false;
+						} else {
+							this.req = {
+								...this.req,
+								elapsedMilliseconds: res.elapsedMilliseconds,
+							};
+						}
 						// 渲染表格
 						this.getTable(this.jsonStr);
 					} else {
@@ -386,6 +404,23 @@ export default {
 					});
 			}
 		},
+		// 获取总页数 总条数
+		getTotalPage() {
+			this.loading = true;
+
+			getTotalPageReq(this.req).then((res) => {
+				if (res.code === 200) {
+					this.loading = false;
+					this.isLoading = false; //已经加载过总页数
+					const { total, totalPage } = res.result;
+					this.req = {
+						...this.req,
+						total,
+						totalPage,
+					};
+				}
+			});
+		},
 		//重置
 		resetClick() {
 			this.tableData2.map((item) => {
@@ -552,5 +587,15 @@ export default {
 }
 :deep(.ivu-dropdown-rel) {
 	height: 26px;
+}
+:deep(.ivu-btn-ghost.ivu-btn-warning) {
+	color: #fff;
+	background: #2fe86f;
+	padding: 4px 10px;
+	border: 1px solid #2fe86f;
+	&:hover {
+		background: #27ce88;
+		border: 1px solid #27ce88;
+	}
 }
 </style>

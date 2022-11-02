@@ -29,6 +29,12 @@
 			<!-- 中间内容excel -->
 			<Content class="content">
 				<div class="push_btn">
+					<Tooltip class="item" effect="dark" content="自定义高级规则(C#)" placement="bottom-start">
+						<Button type="text" @click="addFunction()">
+							<img src="../../../assets/images/report-design/VS-logo.png" style="width: 24px; height: 24px" />
+						</Button>
+					</Tooltip>
+					&nbsp;&nbsp;
 					<Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
 						<Button type="text" @click="save()">
 							<Icon type="ios-folder" />
@@ -40,6 +46,7 @@
 							<Icon type="md-eye" />
 						</Button>
 					</Tooltip>
+
 					<!-- <Icon custom="iconfont luckysheet-iconfont-hanshu" style="margin-right:5px" /> -->
 				</div>
 				<div id="luckysheet" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0"></div>
@@ -54,6 +61,10 @@
 		<!-- <dataset-manage ref = "datasetmanage"/> -->
 		<dataset-manage ref="datasetmanage" />
 		<function-manage ref="functionmanage" :formData="rightForm" @autoChangeFunc="autoChangeFunc" />
+		<!-- 添加计算逻辑函数 -->
+		<add-function ref="addfunction" :monacoEditor.sync="monacoEditor"></add-function>
+		<!-- cellItem注解 -->
+		<CellItemExplain :drawerFlag.sync="drawerFlag" />
 	</div>
 </template>
 
@@ -64,17 +75,21 @@ import draggable from "vuedraggable";
 import RightTabPane from "./excelreport-design/right-tabPane.vue";
 import DatasetManage from "./excelreport-design/dataset-manage.vue";
 import FunctionManage from "./excelreport-design/function-manage.vue";
+import AddFunction from "./excelreport-design/add-function.vue";
+import CellItemExplain from "./excelreport-design/cellItem-explain.vue";
 
 export default {
 	name: "excelreport-design",
-	components: { draggable, RightTabPane, DatasetManage, FunctionManage },
+	components: { draggable, RightTabPane, DatasetManage, FunctionManage, AddFunction, CellItemExplain },
 	data() {
 		return {
 			dataSet: [],
+			drawerFlag: false,
 			setCode: "",
 			reportCode: "",
 			draggableFieldLabel: "", //拖拽的文本内容
 			sheetData: "",
+			monacoEditor: "",
 			blankNum: 1, //空白格
 			rightForm: {
 				coordinate: "",
@@ -120,6 +135,7 @@ export default {
 						this.reportId = result.reportCode;
 					}
 					this.sheetData = result == null ? [{}] : JSON.parse(result.jsonStr);
+					this.monacoEditor = this.sheetData[0].monacoEditor;
 					this.createSheet();
 					if (result != null) {
 						if (result.setCodes != null && result.setCodes !== "") {
@@ -367,6 +383,7 @@ export default {
 				jsonData[itemIndex].relationList = [];
 				jsonData[itemIndex].data = [];
 				jsonData[itemIndex].blankNum = this.blankNum; //空白格
+				jsonData[itemIndex].monacoEditor = this.monacoEditor; //自定义函数规则C#
 				for (let i = celldata.length - 1; i >= 0; i--) {
 					//说明为静态数据，不判断父子格
 					const v = jsonData[itemIndex].celldata[i].v;
@@ -532,6 +549,10 @@ export default {
 			this.$refs.datasetmanage.queryAllDataSet(); //所有数据集
 			this.$refs.datasetmanage.getDataItemData(); // 数据字典
 		},
+		// 新增函数
+		addFunction() {
+			this.$refs.addfunction.drawerFlag = true;
+		},
 	},
 	created() {
 		this.$nextTick(() => {
@@ -607,6 +628,7 @@ export default {
 :deep(.luckysheet-grid-container) {
 	z-index: 1;
 }
+
 .content {
 	width: calc(100% - 600px);
 	height: 100%;
@@ -664,5 +686,28 @@ export default {
 
 /deep/ #luckysheet-row-count-show {
 	width: 1.2rem !important;
+}
+
+:deep(.transition-box) {
+	position: fixed;
+	left: 10px;
+	bottom: -2px;
+	z-index: 99999;
+}
+/deep/.ivu-card {
+	padding: 0px 30px 10px;
+}
+/deep/.ivu-card-head {
+	border-bottom: 1px solid #e8eaec;
+	padding: 14px 16px;
+	line-height: 1;
+	background: #ed8b29;
+	color: #fff;
+	border-radius: 9px;
+	font-size: 16px;
+	font-weight: bold;
+	> i {
+		font-size: 18px;
+	}
 }
 </style>

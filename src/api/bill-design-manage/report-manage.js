@@ -76,6 +76,25 @@ export const getExcelPreviewReq = data => {
     data
   })
 }
+//Excel 预览 总页数
+export const getTotalPageReq = data => {
+  return requestCenter({
+    timeout: 1000 * 60 * 20, //最长等待20分钟
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/reportexcel/countPreview',
+    method: 'post',
+    data
+  })
+}
+//Excel 设计 自定义函数 校验
+export const checkFunctionReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/dynamiccode/syntaxrules',
+    method: 'post',
+    data
+  })
+}
 //Excel 获取查询参数
 export const getParamsReq = data => {
   return requestCenter({
