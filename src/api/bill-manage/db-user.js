@@ -23,7 +23,7 @@ export const addReq = data => {
         data
     })
 }
-// 新增
+// 修改
 export const modifyReq = data => {
     return requestCenter({
         timeout: 0,
@@ -33,6 +33,19 @@ export const modifyReq = data => {
         data
     })
 }
+
+// 导出
+export const exportReq = (data) => {
+  return requestCenter({
+    loading: true,
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/DBAccountManagement/v1/DBUserInfo/export',
+    method: "post",
+    responseType: "arraybuffer",
+    data,
+  });
+};
 
 // 批量导入Excel文件
 export const uploadUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/DBAccountManagement/v1/DBUserInfo/upload`

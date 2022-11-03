@@ -82,7 +82,7 @@
               </Poptip>
             </i-col>
              <i-col span="18">
-              <button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-import-click="importClick"></button-custom>
+              <button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-import-click="importClick" @on-export-click="exportClick"></button-custom>
             </i-col>
           </Row>
         </div>
@@ -105,8 +105,8 @@
 </template>
 
 <script>
-import { getpagelistReq ,addReq,modifyReq,uploadUrl } from "@/api/bill-manage/db-user";
-import {  getButtonBoolean,formatDate, renderDate,renderIsEnabled } from "@/libs/tools";
+import { getpagelistReq ,addReq,modifyReq,uploadUrl, exportReq } from "@/api/bill-manage/db-user";
+import {  getButtonBoolean,formatDate, renderDate,renderIsEnabled,exportFile } from "@/libs/tools";
 import { errorType } from "@/libs/tools";
 import UploadCustom from "@/components/upload-custom";
 
@@ -199,7 +199,7 @@ export default {
             this.tableConfig.loading = true;
             let obj = {
                 orderField: "CREATEDATE", // 排序字段
-                ascending: true, // 是否升序
+                ascending: false, // 是否升序
                 pageSize: this.req.pageSize, // 分页大小
                 pageIndex: this.req.pageIndex, // 当前页码
                 data: {
@@ -223,6 +223,23 @@ export default {
             this.searchPoptipModal = false;
             }
         });
+    },
+    // 导出
+    exportClick () {
+      let { startTime, endTime,userID,userName, deptName, enabled } = this.req;
+      let obj = {
+        startTime: formatDate(startTime),
+        endTime: formatDate(endTime),
+        userID,
+        userName,
+        deptName,
+        enabled
+      };
+      exportReq(obj).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `员工信息${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     //提交
     submitClick (isClose = false) {      
