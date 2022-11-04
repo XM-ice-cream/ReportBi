@@ -387,22 +387,43 @@ export default {
 			const arr = this.toObject(this.tableData2);
 			this.req.setParam = JSON.stringify(arr);
 
+			const obj = { ...this.req, exportType: name };
+			const fileName = `${this.$route.query.reportName}` + "-" + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+			let type = { type: "application/vnd.ms-excel" }; //接收excel类型
+			let exportInfo = "导出失败";
+
 			switch (name) {
+				case 1:
+					type = { type: "text/csv" };
+					this.exportReqFun(obj, type, fileName, exportInfo);
+					break;
+				case 2:
+					this.exportReqFun(obj, type, fileName, exportInfo);
+					break;
+				case 3:
+					type = { type: "application/vnd.ms-excel" };
+					exportInfo = "导出失败,仅支持一万笔以内的导出";
+					this.exportReqFun(obj, type, fileName, exportInfo);
+					break;
 				case 4:
 					// 前端自己导出表格
 					$("#exceltable").table2excel({
-						filename: `${this.$route.query.reportName}${formatDate(new Date())}.xls`, //文件名称
+						filename: fileName, //文件名称
 					});
 					break;
-				default:
-					//后端导出excel
-					const obj = { ...this.req, exportType: name };
-					exportReq(obj).then((res) => {
-						let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-						const fileName = this.req.reportCode + "-" + `${formatDate(new Date())}.xlsx`; // 自定义文件名
-						exportFile(blob, fileName);
-					});
 			}
+		},
+		//导出function
+		exportReqFun(obj, type, fileName, message) {
+			//后端导出excel
+			exportReq(obj).then((res) => {
+				if (res.byteLength > 129) {
+					let blob = new Blob([res], type);
+					exportFile(blob, fileName);
+				} else {
+					this.$Message.error(message);
+				}
+			});
 		},
 		// 获取总页数 总条数
 		getTotalPage() {

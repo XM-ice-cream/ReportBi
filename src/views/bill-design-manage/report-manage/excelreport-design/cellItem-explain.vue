@@ -26,9 +26,7 @@ export default {
 	},
 	computed: {},
 	watch: {
-		drawerFlag() {
-			console("drawerFlag", this.drawerFlag);
-		},
+		drawerFlag() {},
 	},
 	data() {
 		return {

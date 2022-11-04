@@ -4,7 +4,7 @@
 		<!-- 左侧抽屉 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" @on-close="cancelClick">
 			<!-- 计算逻辑 -->
-			<monaco-editor v-model.trim="validationRules" language="csharp" style="height: 700px" v-if="drawerFlag" />
+			<monaco-editor v-model.trim="validationRules" language="csharp" style="height: 700px" v-if="drawerFlag" @save="checkClick" />
 			<div style="margin-top: 10px; text-align: center">
 				<!-- 按钮 -->
 				<drawer-button :text="drawerTitle" class="tree" @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)">
@@ -46,7 +46,7 @@ export default {
 					this.validationRules = this.monacoEditor;
 				} else {
 					this.validationRules =
-						"using System;\r\nusing Baize.Entities.AutoReportCenter.Response;\r\nusing System.Text;\r\nusing System.Collections.Generic;\r\nnamespace RoslynCompileSample\r\n{\r\n    public class Writer\r\n    {\r\n        public void Write(List<CellItem> list)\r\n        {\r\n            //此处编写代码\r\n        }\r\n    }\r\n}";
+						'using System;\r\nusing Baize.Entities.AutoReportCenter.Response;\r\nusing System.Text;\r\nusing System.Linq;\r\nusing System.Data;\r\nusing System.Collections.Generic;\r\nusing Baize.Core.Extensions;\r\n\r\nnamespace RoslynCompileSample\r\n{\r\n    public class Writer\r\n    {\r\n        public string Write(List<CellItem> list)\r\n        {\r\n            try{\r\n                //此处编写代码\r\n                \r\n\r\n\r\n            }catch(Exception ex){\r\n                return ex.ToString();\r\n            }    \r\n            // 此处返回OK 代表程序正常执行，否则抛出异常\r\n            return "OK";\r\n        }\r\n    }\r\n}';
 				}
 			},
 			deep: true,
@@ -54,7 +54,6 @@ export default {
 		},
 		drawerFlag() {
 			this.$parent.drawerFlag = this.drawerFlag;
-			console.log(this.drawerFlag, this.$parent.drawerFlag);
 		},
 	},
 	mounted() {},
@@ -62,7 +61,6 @@ export default {
 		//更新数据
 		submitClick(flag) {
 			//是否已核验
-			console.log(this.isCheck);
 			if (this.isCheck) {
 				this.$emit("update:monacoEditor", this.validationRules);
 				if (flag) {
@@ -82,7 +80,6 @@ export default {
 						desc: "",
 						duration: 0,
 					});
-
 					if (res.message === "语法检查无误！") {
 						this.isCheck = true;
 					} else this.isCheck = false;
