@@ -171,7 +171,7 @@
                 this.columns = this.data.map(val => ({
                     title: val.title,
                     key: val.key,
-                    minWidth: 100,
+                    minWidth: val.minWidth,
                     tooltip: true,
                     ellipsis: true,
                     align: 'center',
