@@ -152,18 +152,6 @@ export const getDictReq = data => {
     data,
   })
 }
-// 导出
-export const exportReq = data => {
-  return requestCenter({
-    timeout: 1000 * 60 * 20, //最长等待二十分钟
-    loading: true,
-    baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportexcel/export',
-    method: 'post',
-    responseType: 'arraybuffer',
-    data
-  })
-}
 //大屏默认背景图片
 // ||${window.localStorage.getItem("reportDesignIp")}
 

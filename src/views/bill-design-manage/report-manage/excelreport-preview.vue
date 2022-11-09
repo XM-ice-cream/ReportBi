@@ -120,15 +120,16 @@
 				</div>
 			</Card>
 		</div>
+		<Progress :percent="percent" :stroke-width="14" status="active" text-inside v-if="percent !== 0" />
 	</div>
 </template>
 
 <script>
-import { getExcelPreviewReq, getParamsReq, exportReq, getTotalPageReq } from "@/api/bill-design-manage/report-manage";
+import { getExcelPreviewReq, getParamsReq, getTotalPageReq } from "@/api/bill-design-manage/report-manage";
 import draggable from "vuedraggable";
 import { exportFile, formatDate } from "@/libs/tools";
 import { getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
-
+import axios from "axios";
 export default {
 	name: "excelreport-preview",
 	components: { draggable },
@@ -158,6 +159,7 @@ export default {
 			// 验证实体
 			ruleValidate: {},
 			tableHtml: [],
+			percent: 0, //下载进度条
 		};
 	},
 	methods: {
@@ -388,12 +390,13 @@ export default {
 			this.req.setParam = JSON.stringify(arr);
 
 			const obj = { ...this.req, exportType: name };
-			const fileName = `${this.$route.query.reportName}` + "-" + `${formatDate(new Date())}.xlsx`; // 自定义文件名
+			let fileName = `${this.$route.query.reportName}` + "-" + `${formatDate(new Date())}.xlsx`; // 自定义文件名
 			let type = { type: "application/vnd.ms-excel" }; //接收excel类型
 			let exportInfo = "导出失败";
-
+			// "application/zip"
 			switch (name) {
 				case 1:
+					fileName = `${this.$route.query.reportName}` + "-" + `${formatDate(new Date())}.csv`;
 					type = { type: "text/csv" };
 					this.exportReqFun(obj, type, fileName, exportInfo);
 					break;
@@ -414,16 +417,43 @@ export default {
 			}
 		},
 		//导出function
-		exportReqFun(obj, type, fileName, message) {
+		exportReqFun(obj, type, fileName) {
+			const httpPath = `${window.localStorage.getItem("reportDesignIp")}/api/autoreportcenter/anonymous/v1/reportexcel/export`;
+			const that = this;
+			this.$Spin.show();
 			//后端导出excel
-			exportReq(obj).then((res) => {
-				if (res.byteLength > 129) {
-					let blob = new Blob([res], type);
-					exportFile(blob, fileName);
-				} else {
-					this.$Message.error(message);
-				}
-			});
+			axios
+				.post(httpPath, obj, {
+					responseType: "arraybuffer",
+					headers: { "Content-Type": "application/json; application/octet-stream" },
+					onDownloadProgress: function (progressEvent) {
+						that.showProgess(progressEvent);
+					},
+				})
+				.then((res) => {
+					// 导出ZIP 文件
+					if (res.headers["content-type"] === "application/zip") {
+						let blob = new Blob([res.data], { type: "application/zip" }); //设置下载的内容以及格式
+						const url = window.URL.createObjectURL(blob); //设置路径
+						const link = window.document.createElement("a"); // 创建a标签
+						link.href = url;
+						link.download = `${this.$route.query.reportName}` + "-" + `${formatDate(new Date())}.zip`; //设置文件名
+						link.style.display = "none";
+						link.click();
+						URL.revokeObjectURL(url); // 释放内存
+					} else {
+						let blob = new Blob([res.data], type);
+						exportFile(blob, fileName);
+					}
+					this.percent = 0; //进度条 重置 0
+				})
+				.catch(() => {
+					this.percent = 0;
+				});
+		},
+		showProgess(progress) {
+			this.$Spin.hide();
+			this.percent = Math.round((progress.loaded / progress.total) * 100);
 		},
 		// 获取总页数 总条数
 		getTotalPage() {
@@ -539,6 +569,10 @@ export default {
 }
 #excel-preview-dropdown .ivu-select-dropdown {
 	top: 45px !important;
+}
+.excel-preview .ivu-progress {
+	position: absolute;
+	top: 0px;
 }
 </style>
 <style lang="less" scoped>
