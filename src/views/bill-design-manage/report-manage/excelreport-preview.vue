@@ -76,14 +76,22 @@
 						<!-- 下载 -->
 
 						<i-col span="6" style="text-align: right">
-							<Dropdown transfer trigger="click" id="excel-preview-dropdown" @on-click="download">
+							<Dropdown transfer trigger="click" id="excel-preview-dropdown" @on-click="download" class="dropdown">
 								<Icon type="md-cloud-download" />
 								<template #list>
 									<DropdownMenu>
-										<DropdownItem :name="1">数据源导出</DropdownItem>
-										<DropdownItem :name="2">快速导出</DropdownItem>
-										<DropdownItem :name="3">模板设定导出</DropdownItem>
-										<DropdownItem :name="4">表格导出</DropdownItem>
+										<DropdownItem :name="1"
+											><Tooltip max-width="180" content="导出sql执行的直接结果,标题为sql查询字段【查询数量无上限】" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>数据源导出
+										</DropdownItem>
+										<DropdownItem :name="2"
+											><Tooltip max-width="180" content="按照模板拖动字段,动态单元格,静态单元格位置导出【限制数量一百万】" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>快速导出</DropdownItem
+										>
+										<DropdownItem :name="3"
+											><Tooltip max-width="180" content="按照设计完整导出，适用于汇总，计算，筛选等复杂逻辑条件【限制数量一千】" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>模板设定导出</DropdownItem
+										>
+										<DropdownItem :name="4"
+											><Tooltip max-width="180" content="导出当前页面显示内容" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>表格导出</DropdownItem
+										>
 									</DropdownMenu>
 								</template>
 							</Dropdown>
@@ -206,8 +214,8 @@ export default {
 						if (this.isLoading) {
 							this.req = {
 								...this.req,
-								total: this.jsonStr[this.jsonIndex].total === -1 ? 999 : this.jsonStr[this.jsonIndex].total,
-								totalPage: this.jsonStr[this.jsonIndex].pageCount === -1 ? 34 : this.jsonStr[this.jsonIndex].pageCount,
+								total: this.jsonStr[this.jsonIndex].total === -1 ? 0 : this.jsonStr[this.jsonIndex].total,
+								totalPage: this.jsonStr[this.jsonIndex].pageCount === -1 ? 0 : this.jsonStr[this.jsonIndex].pageCount,
 								elapsedMilliseconds: res.elapsedMilliseconds,
 							};
 							if (this.jsonStr[this.jsonIndex].total !== -1) this.isLoading = false;
@@ -431,6 +439,7 @@ export default {
 					},
 				})
 				.then((res) => {
+					console.log(res);
 					// 导出ZIP 文件
 					if (res.headers["content-type"] === "application/zip") {
 						let blob = new Blob([res.data], { type: "application/zip" }); //设置下载的内容以及格式

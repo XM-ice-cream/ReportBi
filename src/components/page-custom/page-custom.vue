@@ -39,7 +39,7 @@ export default {
 	computed: {
 		// 提示信息
 		pageShowTips() {
-			return `${this.$t("pageTips1")}${this.total}, ${this.$t("pageTips2")}${this.totalPage}${this.elapsedMilliseconds ? `, 耗时：${this.elapsedMilliseconds}ms` : ""}`;
+			return this.total === 0 ? "" : `${this.$t("pageTips1")}${this.total}, ${this.$t("pageTips2")}${this.totalPage}${this.elapsedMilliseconds ? `, 耗时：${this.elapsedMilliseconds}ms` : ""}`;
 		},
 	},
 	methods: {
