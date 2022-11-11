@@ -84,7 +84,14 @@
         methods: {
             renderComp ({ row, index, fieldType, fileKey }) {
                 switch (fieldType) {
-                    case 'SN':
+                    case 'input':
+                    return <Input
+                        value={row[fileKey]}
+                        placeholder="请输入"
+                        onInput={(value) => this.tableData[index][fileKey] = value}
+                        style='backgroundColor:#FFF'
+                    />
+                    case 'changeInput':
                     return <Input
                         value={row[fileKey]}
                         placeholder="请输入"
@@ -92,34 +99,12 @@
                         nativeOnkeyup={(event) => this.changeInput(event, index, fileKey)}
                         style='backgroundColor:#FED'
                     />
-                    case 'Location':
-                    return <Input
+                    case 'datetime':
+                    return <DatePicker
                         value={row[fileKey]}
-                        placeholder="请输入"
+                        type="datetime"
+                        placeholder="请选择"
                         onInput={(value) => this.tableData[index][fileKey] = value}
-                        nativeOnkeyup={(event) => this.changeInput(event, index, fileKey)}
-                        style='backgroundColor:#FED'
-                    />
-                    case 'Radar No.':
-                    return <Input
-                        value={row[fileKey]}
-                        placeholder="请输入"
-                        onInput={(value) => this.tableData[index][fileKey] = value}
-                        style='backgroundColor:#FFF'
-                    />
-                    case 'Error code':
-                    return <Input
-                        value={row[fileKey]}
-                        placeholder="请输入"
-                        onInput={(value) => this.tableData[index][fileKey] = value}
-                        style='backgroundColor:#FFF'
-                    />
-                    case 'Issue Description':
-                    return <Input
-                        value={row[fileKey]}
-                        placeholder="请输入"
-                        onInput={(value) => this.tableData[index][fileKey] = value}
-                        style='backgroundColor:#FFF'
                     />
                     case 'Qty':
                     return <div>1</div>
@@ -167,7 +152,6 @@
             // 新增
             getColumnsList () {
                 this.columns = [];
-                console.log('========columns1',this.columns);
                 this.columns = this.data.map(val => ({
                     title: val.title,
                     key: val.key,
@@ -177,14 +161,13 @@
                     align: 'center',
                     render: (h, { row, index }) => {
                     return this.renderComp({
-                        fieldType: val.title,
+                        fieldType: val.inputType,
                         fileKey: val.key,
                         row,
                         index
                     })
                     },
                 }))
-                console.log('========columns1', this.columns);
                 this.columns.push({
                     title: this.$t("operation"), slot: "operation", width: 130, align: "center"
                 },
@@ -205,14 +188,11 @@
             addLastRow() {
                 let rowData
                 rowData = this.submitData.detailsList.map((val => val.title))
-                console.log('==========rowData',rowData)
                 const rowObj = {}
                 for (let key in rowData) {
-                console.log('==========key',key)
                     rowObj[rowData[key]] = null
                 }
                 this.tableData.push(rowObj)
-                console.log('==========this.tableData',this.tableData)
             },
             // 新增下一列
             addRowClick (index) {
