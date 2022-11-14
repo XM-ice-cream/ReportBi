@@ -439,7 +439,6 @@ export default {
 					},
 				})
 				.then((res) => {
-					console.log(res);
 					// 导出ZIP 文件
 					if (res.headers["content-type"] === "application/zip") {
 						let blob = new Blob([res.data], { type: "application/zip" }); //设置下载的内容以及格式
