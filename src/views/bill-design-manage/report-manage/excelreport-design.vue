@@ -688,7 +688,7 @@ export default {
 	width: 1.2rem !important;
 }
 
-:deep(.transition-box) {
+.transition-box {
 	position: fixed;
 	left: 10px;
 	bottom: -2px;

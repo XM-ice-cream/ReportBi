@@ -119,7 +119,7 @@
 					</table>
 					<page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" :elapsedMilliseconds="req.elapsedMilliseconds" @on-change="pageChange" @on-page-size-change="pageSizeChange">
 						<template #right>
-							<Button type="warning" ghost v-if="isLoading" :loading="loading" @click="getTotalPage">
+							<Button class="total-btn" v-if="isLoading" :loading="loading" @click="getTotalPage">
 								<span v-if="!loading">加载右侧信息</span>
 								<span v-else>Loading...</span>
 							</Button>
@@ -651,7 +651,7 @@ export default {
 :deep(.ivu-dropdown-rel) {
 	height: 26px;
 }
-:deep(.ivu-btn-ghost.ivu-btn-warning) {
+.total-btn {
 	color: #fff;
 	background: #2fe86f;
 	padding: 4px 10px;
