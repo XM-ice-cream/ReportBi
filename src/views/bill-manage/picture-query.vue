@@ -130,7 +130,7 @@ export default {
         },
         { title: this.$t("workOrder"), key: "workOrder", align: "center" },
         { title: "PanelNO", key: "panelNO", align: "center" },
-        { title: this.$t("barCoding"), key: "unitID", align: "center" },
+        { title: this.$t("barCoding"), key: "unitID", align: "center", tooltip: true },
         { title: this.$t("lineName"), key: "lineName", align: "center" },
         { title: this.$t("modelName"), key: "modelName", align: "center" },
         { title: this.$t("eqpCode"), key: "eqpCode", align: "center" },
@@ -217,7 +217,16 @@ export default {
           this.tableConfig.loading = false;
           if (res.code === 200) {
             let { data, pageSize, pageIndex, total, totalPage } = res.result;
-            this.data = data || [];
+            // 过滤op20以外的数据,然后取op20最新的数据
+            this.data = data.filter(val=>val.processName !== 'OP20')  || []
+            let op20Data = data.filter(val=>val.processName === 'OP20').sort((a, b)  => Date.parse(a.createDate) - Date.parse(b.createDate)) || []
+            // 去重
+            const myMap = new Map()
+            op20Data.forEach(val => {
+              myMap.set(val.panelNO, val)
+            })
+            this.data = [...this.data,...Array.from(myMap.values())]
+            this.data.sort((a, b)  => Date.parse(b.createDate) - Date.parse(a.createDate))
             this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
           }
         })
