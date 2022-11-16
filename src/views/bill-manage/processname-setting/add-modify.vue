@@ -107,6 +107,11 @@ export default {
 					slot: "isRequired",
 					align: "center",
 				},
+				{
+					title: "序号",
+					key: "seq",
+					align: "center",
+				},
 			],
 			submitData: {
 				toRouteId: "",
@@ -126,8 +131,9 @@ export default {
 						routeID: this.submitData.routeID,
 						processes: arr,
 					};
-					const requestApi = this.isAdd ? addReq : modifyReq;
-					requestApi(obj).then((res) => {
+					// const requestApi = this.isAdd ? addReq : modifyReq;
+					// 都走更新接口 【新增接口 不会删除原有数据】
+					modifyReq(obj).then((res) => {
 						if (res.code === 200) {
 							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.$emit("pageLoad");

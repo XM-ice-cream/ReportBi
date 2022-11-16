@@ -417,6 +417,7 @@ export default {
 					this.exportReqFun(obj, type, fileName, exportInfo);
 					break;
 				case 4:
+					fileName = `${this.$route.query.reportName}` + "-" + `${formatDate(new Date())}.xls`;
 					// 前端自己导出表格
 					$("#exceltable").table2excel({
 						filename: fileName, //文件名称

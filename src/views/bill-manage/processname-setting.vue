@@ -155,6 +155,13 @@ export default {
 						return renderState(h, color, `${name}`);
 					},
 				},
+				{
+					title: "排序",
+					key: "seq",
+					minWidth: 50,
+					tooltip: true,
+					align: "center",
+				},
 			],
 			rulesValidate: {
 				routID: [

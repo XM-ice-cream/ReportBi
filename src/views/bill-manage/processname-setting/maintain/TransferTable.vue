@@ -74,9 +74,6 @@ export default {
 		isSort: Boolean,
 	},
 	watch: {
-		isSort() {
-			this.setSort();
-		},
 		// 监听到的shuttledDate传出
 		shuttledDate: {
 			handler(arr) {
@@ -122,11 +119,12 @@ export default {
 			if (this.checkedQuotaList.length) {
 				if (arr.length) {
 					arr.map((info) => {
-						this.checkedQuotaList.map((item) => {
+						this.checkedQuotaList.map((item, index) => {
 							if (info[this.rowKeyName] === item[this.rowKeyName]) {
 								info._disabled = true;
 								info._checked = true;
 								item._checked = false;
+								item._disabled = false;
 								item.processName = item.name;
 							}
 						});
@@ -134,9 +132,10 @@ export default {
 				}
 			}
 			this.originDate = JSON.parse(JSON.stringify(arr));
-			console.log("this.checkedQuotaList", this.checkedQuotaList);
 			this.hasTransferedList = this.hasTransferedList.concat(this.checkedQuotaList);
 			this.shuttledDate = this.objectArrayReset(this.hasTransferedList, this.rowKeyName);
+			//数据去重后 赋排序码
+			this.shuttledDate.map((item, index) => (item.seq = (index + 1) * 10));
 		},
 		// 穿梭至左侧
 		handleTransferLeftClick() {
@@ -185,7 +184,7 @@ export default {
 		handleSelectionChange(arr) {
 			this.checkedQuotaList = [];
 			this.originDate.map((item) => {
-				arr.map((info) => {
+				arr.map((info, index) => {
 					info._checked = true;
 					if (item[this.rowKeyName] === info[this.rowKeyName]) {
 						info._disabled = true;
@@ -210,6 +209,8 @@ export default {
 			this.originDate = JSON.parse(JSON.stringify(this.originDate));
 			this.hasTransferedList = this.hasTransferedList.concat([{ ...row, _disabled: false, _checked: false }]);
 			this.shuttledDate = this.objectArrayReset(this.hasTransferedList, this.rowKeyName);
+			//数据去重后 赋排序码
+			this.shuttledDate.map((item, index) => (item.seq = (index + 1) * 10));
 		},
 		// 双击穿梭返回
 		handleDbRebackRowClick(row) {
@@ -219,6 +220,8 @@ export default {
 					if (item[this.rowKeyName] === row[this.rowKeyName]) rowCurIndex = index;
 				});
 				this.shuttledDate.splice(rowCurIndex, 1);
+				//数据去重后 赋排序码
+				this.shuttledDate.map((item, index) => (item.seq = (index + 1) * 10));
 			}
 
 			let arr = JSON.parse(JSON.stringify(this.originDate));
@@ -269,9 +272,15 @@ export default {
 				onEnd: (evt) => {
 					const targetRow = this.shuttledDate.splice(evt.oldIndex, 1)[0];
 					this.shuttledDate.splice(evt.newIndex, 0, targetRow);
+					//数据去重后 赋排序码
+					this.shuttledDate.map((item, index) => (item.seq = (index + 1) * 10));
+					console.log("onEnd", this.shuttledDate);
 				},
 			});
 		},
+	},
+	mounted() {
+		this.setSort();
 	},
 };
 </script>
