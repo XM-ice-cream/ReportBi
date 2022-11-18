@@ -29,6 +29,7 @@
     "highlight.js": "^11.2.0",
     "lemon-imui": "^1.7.2",
     "lodash": "^4.17.15",
+    "moment": "^2.29.4",
     "monaco-editor": "^0.20.0",
     "rimraf": "^3.0.2",
     "sortablejs": "^1.15.0",

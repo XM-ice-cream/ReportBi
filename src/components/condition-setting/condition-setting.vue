@@ -25,7 +25,15 @@
 			<template slot-scope="{ index }" slot="content">
 				<Input v-model="tableData[index].content" v-if="['string', 'Function', 'cell'].includes(tableData[index].type)" />
 				<InputNumber v-model="tableData[index].content" v-if="tableData[index].type === 'int'" />
+				<!-- 时间 -->
 				<DatePicker transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="tableData[index].content" v-if="tableData[index].type === 'date'"></DatePicker>
+				<!-- 年 -->
+				<DatePicker transfer type="year" v-model="tableData[index].content" v-if="tableData[index].type === 'year'"></DatePicker>
+				<!-- 月 -->
+				<DatePicker transfer type="month" v-model="tableData[index].content" v-if="tableData[index].type === 'month'"></DatePicker>
+				<!-- 時段 -->
+				<TimePicker transfer type="time" confirm v-model="tableData[index].content" v-if="tableData[index].type === 'time'"></TimePicker>
+
 				<Checkbox v-model="tableData[index].content" v-if="tableData[index].type === 'boolean'"></Checkbox>
 				<Select v-model="tableData[index].content" size="small" transfer v-if="tableData[index].type === 'dataItem'">
 					<Option v-for="item in selectList.typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -141,12 +149,15 @@ export default {
 				typeList: [
 					{ label: "字符串", value: "string" },
 					{ label: "数字", value: "int" },
-					{ label: "日期", value: "date" },
 					{ label: "布尔型", value: "boolean" },
 					{ label: "公式", value: "Function" },
 					{ label: "参数", value: "params" },
 					{ label: "单元格", value: "cell" },
 					{ label: "数据列", value: "dataItem" },
+					{ label: "年", value: "year" },
+					{ label: "月", value: "month" },
+					{ label: "日期", value: "date" },
+					{ label: "时段", value: "time" },
 				],
 			},
 		};
@@ -157,6 +168,9 @@ export default {
 		async addRow() {
 			let { selectItem, operator, content, relation, type } = this.tableData[0];
 			if (type === "date") content = formatDate(content);
+			if (type === "year") content = formatDate(content, "yyyy");
+			if (type === "month") content = formatDate(content, "yyyy-MM");
+			// if (type === "time") content = this.$moment(content).format("HH:mm:ss");
 			selectItem = this.type ? selectItem : "currentValue";
 			const curContent = `( ${selectItem} ) ${operator} ${content}`;
 			// 是否存在值
