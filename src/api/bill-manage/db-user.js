@@ -49,3 +49,5 @@ export const exportReq = (data) => {
 
 // 批量导入Excel文件
 export const uploadUrl = () => `${window.localStorage.getItem("reportip")}/api/reportcenter/DBAccountManagement/v1/DBUserInfo/upload`
+// 分页查询
+export const userIDPageListUrl =()=> `${window.localStorage.getItem("reportip")}/api/reportcenter/DBAccountManagement/v1/DBUserInfo/getpagelist`

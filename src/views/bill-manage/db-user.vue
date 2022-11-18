@@ -14,7 +14,11 @@
         </FormItem>
          <!-- 部门名称 -->
          <FormItem label="部门名称" prop="deptName">
-            <Input v-model="submitData.deptName" :placeholder="$t('pleaseEnter') + '部门名称'"/>
+            <Select v-model="submitData.deptName" clearable filterable :placeholder="$t('pleaseSelect') + '部门名称'" transfer>
+              <Option v-for="(item, i) in deptList" :value="item.detailName" :key="i">
+                {{ item.detailName }}
+              </Option>
+            </Select>
         </FormItem>
         <!-- Enabled-->
          <FormItem label="是否在职" prop="enabled">
@@ -64,7 +68,11 @@
                     </FormItem>
                     <!-- 部门名称 -->
                     <FormItem label="部门名称" prop="deptName">
-                      <Input v-model="req.deptName" :placeholder="$t('pleaseEnter') + '部门名称'"/>
+                      <Select v-model="req.deptName" clearable filterable :placeholder="$t('pleaseSelect') + '部门名称'" transfer>
+                        <Option v-for="(item, i) in deptList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                     <!-- 是否在职 -->
                     <FormItem label="是否在职" prop="enabled">
@@ -107,6 +115,7 @@
 <script>
 import { getpagelistReq ,addReq,modifyReq,uploadUrl, exportReq } from "@/api/bill-manage/db-user";
 import {  getButtonBoolean,formatDate, renderDate,renderIsEnabled,exportFile } from "@/libs/tools";
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 import { errorType } from "@/libs/tools";
 import UploadCustom from "@/components/upload-custom";
 
@@ -126,6 +135,7 @@ export default {
       selectObj:null,// 表格选中数据
       data: [], // 表格数据
       btnData: [],
+      deptList: [],// 部门下拉框
       req: {
         startTime: "",
         endTime: "",
@@ -162,7 +172,7 @@ export default {
       },
       ruleValidate: {
         userID: [
-          { required: true, message: "员工工号必填", trigger: "blur" },
+          { required: true, message: "员工工号必填", trigger: "blur" },{ validator: this.checkUserID, trigger: 'blur' }
         ],
         userName:[
              { required: true, message: "员工姓名必填", trigger: "blur" },
@@ -174,8 +184,9 @@ export default {
     this.pageLoad();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
-     getButtonBoolean(this, this.btnData);
-      this.tableConfig.loading = false;
+    getButtonBoolean(this, this.btnData);
+    this.getDataItemData();
+    this.tableConfig.loading = false;
   },
   // 导航离开该组件的对应路由时调用
   beforeRouteLeave (to, from, next) {
@@ -241,6 +252,20 @@ export default {
         exportFile(blob, fileName);
       });
     },
+    // 获取业务数据
+    async getDataItemData () {
+      this.deptList = await this.getDataItemDetailList("DBUserDept");
+    },
+    // 获取数据字典数据
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) {
+          arr = res.result || [];
+        }
+      });
+      return arr;
+    },
     //提交
     submitClick (isClose = false) {      
       this.$refs.submitData.validate((validate) => {
@@ -259,6 +284,17 @@ export default {
           });
         }
       });
+    },
+     checkUserID(rule, value, callback) {
+        if (value) {
+          if (/[\u4E00-\u9FA5]/g.test(value)) {
+            this.submitData.userID = value.replace(/[^a-zA-Z0-9_]/g,'');
+            callback(new Error('不能输入中文!'))
+          } else {
+            callback()
+          }
+        }
+        callback()
     },
      // 点击新增按钮触发
     addClick () {

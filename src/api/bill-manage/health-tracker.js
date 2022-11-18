@@ -33,3 +33,16 @@ export const getInfoReq = data => {
         data
     })
 }
+
+// 导出
+export const exportReq = data => {
+    return requestCenter({
+        loading: true,
+        timeout: 0,
+        baseUrl: window.localStorage.getItem("reportip"),
+        url: '/api/reportcenter/anonymous/v1/HealthTrack/export',
+        method: 'post',
+        responseType: 'arraybuffer',
+        data
+    })
+}

@@ -6,33 +6,61 @@
       <Form ref="submitData" :model="submitData" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
          <!-- 账户ID -->
          <FormItem label="账户ID" prop="accountID">
-            <Input v-model="submitData.accountID" :placeholder="$t('pleaseEnter') + '账户ID'" :disabled="!isAdd"/>
+            <Input v-model="submitData.accountID" :placeholder="$t('pleaseEnter') + '账户ID'"/>
         </FormItem>
          <!-- 账户类型 -->
          <FormItem label="账户类型" prop="accountType">
-            <Input v-model="submitData.accountType" :placeholder="$t('pleaseEnter') + '账户类型'"/>
+            <Select v-model="submitData.accountType" clearable filterable :placeholder="$t('pleaseSelect') + '账户类型'" transfer>
+              <Option v-for="(item, i) in accountTypeList" :value="item.detailName" :key="i">
+                {{ item.detailName }}
+              </Option>
+            </Select>
         </FormItem>
         <!-- 员工工号 -->
         <FormItem label="员工工号" prop="userID">
-            <Input v-model="submitData.userID" :placeholder="$t('pleaseEnter') + '员工工号'"/>
+          <v-selectpage class="select-page-style" ref="userID2" key-field="userID" show-field="userID" :data="userIDPageListUrl" v-model="submitData.userID" :disabled="!isAdd" :placeholder="$t('pleaseSelect') + '员工工号'" :params="{
+              enabled: '',
+            }" :result-format="
+            (res) => {
+              return {
+                totalRow: res.total,
+                list: res.data || [],
+              };
+            }
+          ">
+          </v-selectpage>
         </FormItem>
          <!-- 权限等级 -->
          <FormItem label="权限等级" prop="privilegeLevel">
-            <Input v-model="submitData.privilegeLevel" :placeholder="$t('pleaseEnter') + '权限等级'"/>
+            <Select v-model="submitData.privilegeLevel" clearable filterable :placeholder="$t('pleaseSelect') + '权限等级'" transfer>
+              <Option v-for="(item, i) in accountPrivilegeLevelList" :value="item.detailName" :key="i">
+                {{ item.detailName }}
+              </Option>
+            </Select>
         </FormItem>
          <!-- 区域 -->
-         <FormItem label="区域" prop="area">
-            <Input v-model="submitData.area" :placeholder="$t('pleaseEnter') + '区域'" :disabled="!isAdd"/>
+        <FormItem label="区域" prop="area">
+          <Select v-model="submitData.area" clearable filterable :placeholder="$t('pleaseSelect') + '区域'" transfer :disabled="!isAdd">
+            <Option v-for="(item, i) in accountAreaList" :value="item.detailName" :key="i">
+              {{ item.detailName }}
+            </Option>
+          </Select>
         </FormItem>
          <!-- DB名称 -->
          <FormItem label="DB名称" prop="dbName">
-            <Input v-model="submitData.dbName" :placeholder="$t('pleaseEnter') + 'DB名称'"/>
+            <Select v-model="submitData.dbName" clearable filterable :placeholder="$t('pleaseSelect') + 'DB名称'" transfer :disabled="!isAdd">
+              <Option v-for="(item, i) in DBNameList" :value="item.detailName" :key="i">
+                {{ item.detailName }}
+              </Option>
+            </Select>
         </FormItem>
         <!-- 状态 -->
         <FormItem label="状态" prop="status">
-            <Select v-model="submitData.status" clearable>
-                <Option v-for="item in statusList" :value="item" :key="item">{{ item }}</Option>
-            </Select>
+          <Select v-model="submitData.status" clearable filterable :placeholder="$t('pleaseSelect') + '状态'" transfer>
+            <Option v-for="(item, i) in accountStatusList" :value="item.detailName" :key="i">
+              {{ item.detailName }}
+            </Option>
+          </Select>
         </FormItem>
         <!-- Enabled-->
          <FormItem label="是否启用" prop="enabled">
@@ -78,29 +106,57 @@
                     </FormItem>
                     <!-- 账户类型 -->
                     <FormItem label="账户类型" prop="accountType">
-                        <Input v-model="req.accountType" :placeholder="$t('pleaseEnter') + '账户类型'"/>
+                      <Select v-model="req.accountType" clearable filterable :placeholder="$t('pleaseSelect') + '账户类型'" transfer>
+                        <Option v-for="(item, i) in accountTypeList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                     <!-- 员工工号 -->
                     <FormItem label="员工工号" prop="userID">
-                        <Input v-model="req.userID" :placeholder="$t('pleaseEnter') + '员工工号'"/>
+                      <v-selectpage class="select-page-style" ref="userID" v-if="searchPoptipModal" key-field="userID" show-field="userID" :data="userIDPageListUrl" v-model="req.userID" :placeholder="$t('pleaseSelect') + '员工工号'" :params="{
+                          enabled: '',
+                        }" :result-format="
+                        (res) => {
+                          return {
+                            totalRow: res.total,
+                            list: res.data || [],
+                          };
+                        }
+                      ">
+                      </v-selectpage>
                     </FormItem>
                     <!-- 权限等级 -->
                     <FormItem label="权限等级" prop="privilegeLevel">
-                        <Input v-model="req.privilegeLevel" :placeholder="$t('pleaseEnter') + '权限等级'"/>
+                      <Select v-model="req.privilegeLevel" clearable filterable :placeholder="$t('pleaseSelect') + '权限等级'" transfer>
+                        <Option v-for="(item, i) in accountPrivilegeLevelList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                     <!-- 区域 -->
                     <FormItem label="区域" prop="area">
-                        <Input v-model="req.area" :placeholder="$t('pleaseEnter') + '区域'"/>
+                      <Select v-model="req.area" clearable filterable :placeholder="$t('pleaseSelect') + '区域'" transfer>
+                        <Option v-for="(item, i) in accountAreaList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                     <!-- DB名称 -->
                     <FormItem label="DB名称" prop="dbName">
-                        <Input v-model="req.dbName" :placeholder="$t('pleaseEnter') + 'DB名称'"/>
+                      <Select v-model="req.dbName" clearable filterable :placeholder="$t('pleaseSelect') + 'DB名称'" transfer>
+                        <Option v-for="(item, i) in DBNameList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                     <!-- 状态 -->
                     <FormItem label="状态" prop="status">
-                        <Select v-model="req.status" transfer filterable clearable :placeholder="$t('pleaseSelect') + '状态'">
-                            <Option v-for="item in statusList" :value="item" :key="item">{{ item }}</Option>
-                        </Select>
+                      <Select v-model="req.status" clearable filterable :placeholder="$t('pleaseSelect') + '状态'" transfer>
+                        <Option v-for="(item, i) in accountStatusList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
                     </FormItem>
                     <!-- 是否启用 -->
                     <FormItem label="是否启用" prop="enabled">
@@ -142,7 +198,9 @@
 
 <script>
 import { getpagelistReq ,addReq,modifyReq,uploadUrl, exportReq } from "@/api/bill-manage/db-account";
+import { userIDPageListUrl } from "@/api/bill-manage/db-user";
 import { getButtonBoolean,formatDate, renderDate,renderIsEnabled,exportFile } from "@/libs/tools";
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 import { errorType } from "@/libs/tools";
 import UploadCustom from "@/components/upload-custom";
 
@@ -151,6 +209,7 @@ export default {
   components: { UploadCustom },
   data () {
     return {
+      userIDPageListUrl: userIDPageListUrl(),
       searchPoptipModal: false,
       noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
       tableConfig: { ...this.$config.tableConfig }, // table配置
@@ -162,6 +221,11 @@ export default {
       selectObj:null,// 表格选中数据
       data: [], // 表格数据
       btnData: [],
+      accountTypeList: [],
+      accountPrivilegeLevelList: [],
+      accountAreaList: [],
+      DBNameList: [],
+      accountStatusList: [],
       req: {
         startTime: "",
         endTime: "",
@@ -209,10 +273,12 @@ export default {
         enabled: 1,
         id: ""  
       },
-      statusList:['OPEN','EXPIRED','EXPIRED(GRACE)'],
       ruleValidate: {
         accountID: [
           { required: true, message: "账户ID必填", trigger: "blur" },
+        ],
+        userID:[
+             { required: true, message: "员工工号必填", trigger: "blur" },
         ],
         area:[
              { required: true, message: "区域必填", trigger: "blur" },
@@ -227,8 +293,9 @@ export default {
     this.pageLoad();
     this.autoSize();
     window.addEventListener('resize', () => this.autoSize());
-     getButtonBoolean(this, this.btnData);
-      this.tableConfig.loading = false;
+    getButtonBoolean(this, this.btnData);
+    this.getDataItemData();
+    this.tableConfig.loading = false;
   },
   // 导航离开该组件的对应路由时调用
   beforeRouteLeave (to, from, next) {
@@ -302,6 +369,24 @@ export default {
         exportFile(blob, fileName);
       });
     },
+    // 获取业务数据
+    async getDataItemData () {
+      this.accountTypeList = await this.getDataItemDetailList("DBAccountType"); 
+      this.accountPrivilegeLevelList = await this.getDataItemDetailList("DBAccountPrivilegeLevel");
+      this.accountAreaList = await this.getDataItemDetailList("DBAccountArea");
+      this.DBNameList = await this.getDataItemDetailList("DBName");
+      this.accountStatusList = await this.getDataItemDetailList("DBAccountStatus");
+    },
+    // 获取数据字典数据
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) {
+          arr = res.result || [];
+        }
+      });
+      return arr;
+    },
     //提交
     submitClick (isClose = false) {      
       this.$refs.submitData.validate((validate) => {
@@ -330,6 +415,7 @@ export default {
     },
      // 点击编辑按钮触发
     editClick () {
+      console.log('===============this.selectObj',this.selectObj)
       if (this.selectObj) {
         let {
             userID,accountID, accountType, privilegeLevel, area, dbName, status, remark, enabled, id
@@ -337,6 +423,7 @@ export default {
         this.submitData = {
             userID,accountID, accountType, privilegeLevel, area, dbName, status, remark, enabled, id
         };
+      console.log('===============this.submitData',this.submitData)
         this.isAdd = false;
         this.drawerFlag = true;
         this.drawerTitle = this.$t("edit");
