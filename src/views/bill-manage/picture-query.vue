@@ -90,7 +90,7 @@
 <script>
 import { getpagelistReq, exportReq } from "@/api/bill-manage/picture-query";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
-import { formatDate, getButtonBoolean, exportFile } from "@/libs/tools";
+import { formatDate, getButtonBoolean, exportFile, renderDate } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { Spin } from "view-design";
 import axios from "axios";
@@ -135,6 +135,7 @@ export default {
         { title: this.$t("modelName"), key: "modelName", align: "center" },
         { title: this.$t("eqpCode"), key: "eqpCode", align: "center" },
         { title: this.$t("processName"), key: "processName", align: "center" },
+        { title: '时间', key: "fileDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
         { title: this.$t("image"), slot: "image", width: 80, align: "center" },
       ], // 表格数据
     };

@@ -415,7 +415,6 @@ export default {
     },
      // 点击编辑按钮触发
     editClick () {
-      console.log('===============this.selectObj',this.selectObj)
       if (this.selectObj) {
         let {
             userID,accountID, accountType, privilegeLevel, area, dbName, status, remark, enabled, id
@@ -423,7 +422,9 @@ export default {
         this.submitData = {
             userID,accountID, accountType, privilegeLevel, area, dbName, status, remark, enabled, id
         };
-      console.log('===============this.submitData',this.submitData)
+        if(!this.submitData.userID){
+          this.submitData.userID = 'null';
+        }
         this.isAdd = false;
         this.drawerFlag = true;
         this.drawerTitle = this.$t("edit");
