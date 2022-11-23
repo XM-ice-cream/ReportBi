@@ -16,7 +16,7 @@
 												<!-- 复选框 -->
 												<template v-if="item.cellType.type === 'checkbox'">
 													<CheckboxGroup v-model="item.value" @on-change="changeValue">
-														<Checkbox v-for="cellItem in item.cellType.data" :label="cellItem.value">{{ cellItem.name }}</Checkbox>
+														<Checkbox v-for="cellItem in item.cellType.data" :key="cellItem.value" :label="cellItem.value">{{ cellItem.name }}</Checkbox>
 													</CheckboxGroup>
 												</template>
 												<!-- 下拉框 -->

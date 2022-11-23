@@ -1,6 +1,8 @@
 /* 单元格元素过滤数据 */
 <template>
 	<div class="condition-setting" v-if="drawerFlag">
+		<!-- <treeselect :options="roleData" :showCount="true" :multiple="true" value-consists-of="BRANCH_PRIORITY" :placeholder="$t('pleaseSelect') + $t('roleName')" style="height: 100%" /> -->
+
 		<!-- 表格 -->
 		<Table :columns="columns" :data="tableData" :height="70" :border="tableConfig.border" disabled-hover>
 			<!-- 可选列 -->
@@ -23,6 +25,8 @@
 			</template>
 			<!-- 内容 -->
 			<template slot-scope="{ index }" slot="content">
+				<treeselect v-model="tableData[index].content" :appendToBody="true" z-index="9999" :options="roleData" :showCount="true" :multiple="true" value-consists-of="BRANCH_PRIORITY" :placeholder="$t('pleaseSelect') + $t('roleName')" style="height: 100%" />
+
 				<Input v-model="tableData[index].content" v-if="['string', 'Function', 'cell'].includes(tableData[index].type)" />
 				<InputNumber v-model="tableData[index].content" v-if="tableData[index].type === 'int'" />
 				<!-- 时间 -->
@@ -38,6 +42,9 @@
 				<Select v-model="tableData[index].content" size="small" transfer v-if="tableData[index].type === 'dataItem'">
 					<Option v-for="item in selectList.typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				</Select>
+				<!-- 角色下拉框 -->
+
+				<!-- <treeselect v-model="tableData[index].content" :appendToBody="true"  :options="roleData" :showCount="true" :multiple="true" value-consists-of="BRANCH_PRIORITY" :placeholder="$t('pleaseSelect') + $t('roleName')" style="height: 100%" /> -->
 			</template>
 			<!-- 关系 -->
 			<template slot-scope="{ index }" slot="relation">
@@ -91,6 +98,10 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+		roleData: {
+			type: Array,
+			default: () => [],
+		},
 	},
 	watch: {
 		"data.length": {
@@ -109,6 +120,7 @@ export default {
 				if (this.rightForm) {
 					console.log("condition-setting", this.rightForm);
 					this.data = [...this.rightForm];
+					console.log("roleData", this.roleData);
 				}
 			} else {
 				this.cancelClick();
@@ -158,6 +170,7 @@ export default {
 					{ label: "月", value: "month" },
 					{ label: "日期", value: "date" },
 					{ label: "时段", value: "time" },
+					{ label: "角色下拉框", value: "roleSelect" },
 				],
 			},
 		};

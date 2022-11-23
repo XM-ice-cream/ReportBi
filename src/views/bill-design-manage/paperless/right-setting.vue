@@ -11,7 +11,7 @@
 				</FormItem>
 			</Form>
 			<!-- 过滤表格 -->
-			<ConditionSetting ref="conditionsetting" :drawerFlag.sync="modalAuthority" :rightForm="authority.data" @updateData="updateData" />
+			<ConditionSetting ref="conditionsetting" :drawerFlag.sync="modalAuthority" :rightForm="authority.data" :roleData="roleData" @updateData="updateData" />
 		</Modal>
 		<Tabs>
 			<TabPane label="单元格权限" name="name1">
@@ -72,7 +72,9 @@
 
 <script>
 import ConditionSetting from "@/components/condition-setting/condition-setting.vue";
+import { getlisttreeReq as getRoleListTreeReq } from "@/api/organize-manager/authorize-manager/role-manager";
 
+import { treeLoop } from "@/libs/tools";
 export default {
 	name: "right-setting",
 	props: {
@@ -112,6 +114,7 @@ export default {
 				data: [],
 			},
 			authorityData: [], //权限
+			roleData: [],
 			types: [
 				{ name: "周期范围", value: "checkTime" },
 				{ name: "角色范围", value: "role" },
@@ -232,8 +235,23 @@ export default {
 			this.$refs.cellType.resetFields();
 			this.cellType.data = [];
 		},
+		// 获取角色数据
+		getRoleTreeData() {
+			getRoleListTreeReq({ enabled: 1 }).then((res) => {
+				if (res.code === 200) {
+					this.roleData = [];
+					treeLoop(this.roleData, res.result, (node) => {
+						node.label = node.name;
+					});
+					console.log("this.roleData", this.roleData);
+				}
+			});
+		},
 	},
 	created() {},
+	mounted() {
+		this.getRoleTreeData();
+	},
 };
 </script>
 <style></style>
