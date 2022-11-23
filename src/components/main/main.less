@@ -1,65 +1,70 @@
 @import "../../assets/common";
 
 .main {
-  height: 100%;
+	height: 100%;
 
-  // 登录页面样式
-  .logo-con {
-    height: 64px;
-    padding-top: 13px;
+	// 登录页面样式
+	.logo-con {
+		height: 64px;
+		padding-top: 13px;
 
-    img {
-      height: @logoMinHeight;
-      width: auto;
-      display: block;
-      margin: 0 auto;
-    }
-  }
+		img {
+			height: @logoMinHeight;
+			width: auto;
+			display: block;
+			margin: 0 auto;
+		}
+	}
 
-  // sider部分修改
-  .left-sider {
-    background: @baseColorBlack; // 最外层背景颜色
-    .ivu-layout-sider-children {
-      overflow-y: scroll;
-      margin-right: -18px;
-    }
-  }
+	// sider部分修改
+	.left-sider {
+		background: @baseColorBlack; // 最外层背景颜色
+		.ivu-layout-sider-children {
+			overflow-y: scroll;
+			margin-right: -18px;
+		}
+	}
 
-  .ivu-menu, .ivu-menu-item, .ivu-menu-submenu-title {
-    background: @baseColorBlack; // 菜单一级背景颜色
-  }
+	.ivu-menu,
+	.ivu-menu-item,
+	.ivu-menu-submenu-title {
+		background: @baseColorBlack; // 菜单一级背景颜色
+	}
+	.ivu-menu {
+		z-index: 0;
+	}
 
-  // header部分修改
-  .header-con {
-    width: @baseSize;
-    height: @headBaseHeight;
-    padding: 0 10px;
-    background: @baseColorWhite;
-  }
+	// header部分修改
+	.header-con {
+		width: @baseSize;
+		height: @headBaseHeight;
+		padding: 0 10px;
+		background: @baseColorWhite;
+	}
 
-  // 页签部分修改
-  .tag-nav-wrapper {
-    height: @headBaseHeight;
-  }
+	// 页签部分修改
+	.tag-nav-wrapper {
+		height: @headBaseHeight;
+	}
 
-  // content部分修改
-  .content-wrapper {
-    padding: 5px;
-    height: calc(@baseSize - 80px);
-    overflow: auto;
+	// content部分修改
+	.content-wrapper {
+		padding: 5px;
+		height: calc(@baseSize - 80px);
+		overflow: auto;
 
-    &-div {
-      height: @baseSize; // 自定义背景颜色
-      background-color: @baseColorWhite;
-    }
-  }
+		&-div {
+			height: @baseSize; // 自定义背景颜色
+			background-color: @baseColorWhite;
+		}
+	}
 
-  .main-layout-con {
-    height: @baseSize;
-    overflow: hidden;
-  }
+	.main-layout-con {
+		height: @baseSize;
+		overflow: hidden;
+	}
 
-  .main-content-con {
-    height: calc(@baseSize - 60px);
-  }
+	.main-content-con {
+		height: calc(@baseSize - 60px);
+	}
 }

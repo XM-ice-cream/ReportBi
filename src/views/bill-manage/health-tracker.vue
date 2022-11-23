@@ -12,7 +12,7 @@
                   {{ $t("selectQuery") }}
                 </Button>
                 <div class="poptip-style-content" slot="content">
-                  <Form ref="searchReq" :model="req" :label-width="50" :label-colon="true" @submit.native.prevent>
+                  <Form ref="searchReq" :model="req" :label-width="90" :label-colon="true" @submit.native.prevent>
                     <!-- 起始时间 -->
                     <FormItem :label="$t('startTime')" prop="startTime">
                       <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
@@ -21,9 +21,29 @@
                     <FormItem :label="$t('endTime')" prop="endTime">
                       <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
-                    <!-- 小条码 -->
+                    <!-- Project -->
                     <FormItem label="Project" prop="project">
-                      <Input v-model.trim="req.project" :placeholder="$t('pleaseEnter') + 'project'" />
+                      <Input v-model.trim="req.project" :placeholder="$t('pleaseEnter') + 'Project'" />
+                    </FormItem>
+                    <!-- Location -->
+                    <FormItem label="Location" prop="loacation">
+                      <Input v-model.trim="req.loacation" :placeholder="$t('pleaseEnter') + 'Location'" />
+                    </FormItem>
+                    <!-- FailureStation -->
+                    <FormItem label="FailureStation" prop="failurestation">
+                      <Input v-model.trim="req.failurestation" :placeholder="$t('pleaseEnter') + 'FailureStation'" />
+                    </FormItem>
+                    <!-- APN -->
+                    <FormItem label="APN" prop="apn">
+                      <Input v-model.trim="req.apn" :placeholder="$t('pleaseEnter') + 'APN'" />
+                    </FormItem>
+                    <!-- DC -->
+                    <FormItem label="DC" prop="dc">
+                      <Input v-model.trim="req.dc" :placeholder="$t('pleaseEnter') + 'DC'" />
+                    </FormItem>
+                    <!-- LC -->
+                    <FormItem label="LC" prop="lc">
+                      <Input v-model.trim="req.lc" :placeholder="$t('pleaseEnter') + 'LC'" />
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -34,7 +54,7 @@
               </Poptip>
             </i-col>
             <i-col span="18">
-              <button-custom :btnData="btnData" @on-add-click="addRecord"></button-custom>
+              <button-custom :btnData="btnData" @on-add-click="addRecord" @on-export-click="exportClick"></button-custom>
             </i-col>
           </Row>
         </div>
@@ -48,8 +68,8 @@
 </template>
 
 <script>
-import { getpagelistReq } from "@/api/bill-manage/health-tracker";
-import { getButtonBoolean,renderDate,formatDate } from "@/libs/tools";
+import { getpagelistReq,exportReq } from "@/api/bill-manage/health-tracker";
+import { getButtonBoolean,renderDate,formatDate,exportFile } from "@/libs/tools";
 import addRecord from "./health-tracker/add-modify"; 
 export default {
   name: "health-tracker",
@@ -67,6 +87,11 @@ export default {
         startTime: "",
         endTime: "",
         project: "", 
+        loacation: "", 
+        failurestation: "", 
+        apn: "", 
+        dc: "", 
+        lc: "", 
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -117,7 +142,7 @@ export default {
     // 获取分页列表数据
     pageLoad () {
       this.tableConfig.loading = false;
-      let { startTime,endTime,project } = this.req;
+      let { startTime,endTime,project,loacation,failurestation,apn,dc,lc } = this.req;
       if (startTime&&endTime) {
         this.tableConfig.loading = true;
         let obj = {
@@ -128,7 +153,12 @@ export default {
           data: {
             startTime: formatDate(startTime),
             endTime: formatDate(endTime),
-            project
+            project,
+            loacation,
+            failurestation,
+            apn,
+            dc,
+            lc
           },
         };
         getpagelistReq(obj)
@@ -144,6 +174,25 @@ export default {
       } else {
         this.$Message.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
       }
+    },
+    // 导出
+    exportClick () {
+      let { startTime,endTime,project,loacation,failurestation,apn,dc,lc } = this.req;
+      let obj = {
+        startTime: formatDate(startTime),
+        endTime: formatDate(endTime),
+        project,
+        loacation,
+        failurestation,
+        apn,
+        dc,
+        lc
+      };
+      exportReq(obj).then((res) => {
+        let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        const fileName = `HealthTracker${formatDate(new Date())}.xlsx`; // 自定义文件名
+        exportFile(blob, fileName);
+      });
     },
     // 点击新增按钮触发
     addRecord () {

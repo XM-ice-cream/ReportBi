@@ -10,6 +10,7 @@ module.exports = {
   filenameHashing: true,
   // 设为false打包时不生成.map文件
   productionSourceMap: false,
+  runtimeCompiler: true,
   // webpack基本配置
   configureWebpack: config => {
     const plugins = []

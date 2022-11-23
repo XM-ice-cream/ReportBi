@@ -1,6 +1,6 @@
 <template>
 	<!-- <div v-if="modalFlag" style="width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; z-index: 1"> -->
-	<Modal v-model="modalFlag" fullscreen :mask="false" :z-index="999" transfer>
+	<Modal v-model="modalFlag" title="无纸化表单设计" fullscreen :mask="false" :z-index="999" transfer>
 		<Layout class="layout">
 			<!-- 中间内容excel -->
 			<Content class="content">
@@ -16,15 +16,13 @@
 							<Icon type="md-eye" />
 						</Button>
 					</Tooltip>
-
-					<!-- <Icon custom="iconfont luckysheet-iconfont-hanshu" style="margin-right:5px" /> -->
 				</div>
 				<div id="luckysheet" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0"></div>
 				<div style="display: none"></div>
 			</Content>
 			<!-- 右侧基础配置 -->
 			<Sider hide-trigger class="sider" style="right: 0; position: absolute">
-				<RightSetting @autoChangeFunc="autoChangeFunc" />
+				<RightSetting :formData="rightForm" @autoChangeFunc="autoChangeFunc" />
 			</Sider>
 		</Layout>
 	</Modal>
@@ -39,8 +37,11 @@ export default {
 		isAdd: Boolean,
 	},
 	watch: {
-		modalFlag() {
-			this.pageLoad();
+		modalFlag(newVal) {
+			console.log(newVal);
+			if (newVal) {
+				this.pageLoad();
+			}
 		},
 	},
 	components: { RightSetting },
@@ -70,6 +71,7 @@ export default {
 						that.setRightForm(cell, postion, sheetFile, ctx, that.draggableFieldLabel); //rightForm默认值
 					},
 					cellMousedown: function (cell, postion, sheetFile, ctx) {
+						console.log("cellMousedown");
 						const value = cell == null ? "" : cell.v;
 						that.setRightForm(cell, postion, sheetFile, ctx, value); //rightForm默认值
 					},
@@ -87,7 +89,7 @@ export default {
 						order: 0, //工作表的下标
 						hide: 0, //是否隐藏
 						row: 36, //行数
-						column: 18, //列数
+						column: 21, //列数
 						defaultRowHeight: 19, //自定义行高
 						defaultColWidth: 73, //自定义列宽
 						celldata: [], //初始化使用的单元格数据
@@ -133,6 +135,7 @@ export default {
 			console.log(cell, postion, sheetFile, ctx);
 			const { r, c } = postion;
 			window.luckysheet.setCellValue(r, c, { ...cell });
+			this.rightForm = { ...cell };
 		},
 		//更新单元格信息，扩展、排序...
 		autoChangeFunc(type, right) {
@@ -163,7 +166,8 @@ export default {
 #luckysheet_info_detail_title,
 #luckysheet_info_detail_update,
 #luckysheet_info_detail_save,
-#luckysheet_info_detail_input {
+#luckysheet_info_detail_input,
+.ivu-icon-ios-arrow-back {
 	display: none;
 }
 </style>
@@ -306,6 +310,6 @@ export default {
 	}
 }
 /deep/.ivu-modal-wrap {
-	z-index: 999 !important;
+	z-index: 1 !important;
 }
 </style>

@@ -28,7 +28,7 @@ export const modifyReq = data => {
 
 export const getMailDepartReq = data => {
   return requestCenter({
-    timeout: 1000 * 60 * 10, //10分钟
+    timeout: 1000 * 60 * 5, //五分钟
     loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/maverick/getmaildepart',
