@@ -49,6 +49,10 @@
         <FormItem label="LCL" prop="lcl">
           <Input v-model="submitData.lcl" :placeholder="$t('pleaseEnter') + 'LCL'" />
         </FormItem>
+        <!-- 下限 -->
+        <FormItem label="Line_Categy" prop="line_Categy">
+          <Input v-model="submitData.line_Categy" :placeholder="$t('pleaseEnter') + 'Line_Categy'" />
+        </FormItem>
         <!-- 备注 -->
         <FormItem label="备注" prop="remark">
           <Input v-model="submitData.remark" :placeholder="$t('pleaseEnter') + '备注'" />
@@ -160,6 +164,7 @@ export default {
         { title: "LSL", key: "lsl", align: "center", minWidth: 100, tooltip: true  },
         { title: "UCL", key: "ucl", align: "center", minWidth: 100, tooltip: true  },
         { title: "LCL", key: "lcl", align: "center", minWidth: 100, tooltip: true },
+        { title: "Line_Categy", key: "line_Categy", align: "center", minWidth: 100, tooltip: true },
         { title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true  },
         { title: this.$t("createUser"), key: "createUserName", align: "center", width: 80 },
         { title: this.$t("createDate"), key: "createDate", align: "center", width: 125, render: renderDate },
@@ -181,6 +186,7 @@ export default {
         lsl:0,
         ucl: 0,
         lcl: 0,
+        line_Categy: "",
         remark:"",
       },
       // 验证实体
