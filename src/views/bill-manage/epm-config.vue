@@ -51,7 +51,11 @@
         </FormItem>
         <!-- 下限 -->
         <FormItem label="Line_Categy" prop="line_Categy">
-          <Input v-model="submitData.line_Categy" :placeholder="$t('pleaseEnter') + 'Line_Categy'" />
+          <Select v-model="submitData.line_Categy" clearable filterable :placeholder="$t('pleaseSelect') + 'Line_Categy'" transfer>
+            <Option v-for="(item, i) in lineCategyList" :value="item.detailName" :key="i">
+              {{ item.detailName }}
+            </Option>
+          </Select>
         </FormItem>
         <!-- 备注 -->
         <FormItem label="备注" prop="remark">
@@ -138,6 +142,7 @@
 <script>
 import { getpagelistReq, addReq, modifyReq } from "@/api/bill-manage/epm-config";
 import { getButtonBoolean, errorType, renderDate } from "@/libs/tools";
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 export default {
   name: "epm-config",
   data() {
@@ -148,7 +153,7 @@ export default {
       tableConfig: { ...this.$config.tableConfig }, // table配置
       drawerTitle: this.$t("add"),
       // 表格表头
-      stationList: [],
+      lineCategyList: [],
       columns: [
         {
           type: "index",
@@ -207,6 +212,7 @@ export default {
     this.autoSize();
     window.addEventListener("resize", () => this.autoSize());
     getButtonBoolean(this, this.btnData);
+    this.getDataItemData();
   },
 
   methods: {
@@ -265,6 +271,20 @@ export default {
           });
         }
       });
+    },
+    // 获取业务数据
+    async getDataItemData () {
+      this.lineCategyList = await this.getDataItemDetailList("LineCategyList");
+    },
+    // 获取数据字典数据
+    async getDataItemDetailList (itemCode) {
+      let arr = [];
+      await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+        if (res.code === 200) {
+          arr = res.result || [];
+        }
+      });
+      return arr;
     },
     // 左侧抽屉取消
     cancelClick() {
