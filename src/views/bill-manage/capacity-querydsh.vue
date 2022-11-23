@@ -10,7 +10,7 @@
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
 								<Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">{{ $t("selectQuery") }}</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form :rules="ruleValidate" :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
+									<Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker style="width: 50%" transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
@@ -64,47 +64,11 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
-					<!-- 投入 -->
-					<template slot-scope="{ row }" slot="inputQty">
-						<div @click="show(row, 'TRACKIN')" style="color: blue; cursor: pointer">
-							{{ row.inputQty }}
-						</div>
-					</template>
-					<template slot-scope="{ row }" slot="holdQty">
-						<div @click="show(row, 'HOLD')" style="color: blue; cursor: pointer">
-							{{ row.holdQty }}
-						</div>
-					</template>
-					<template slot-scope="{ row }" slot="repass">
-						<div @click="show(row, 'REPASS')" style="color: blue; cursor: pointer">
-							{{ row.repass }}
-						</div>
-					</template>
-					<template slot-scope="{ row }" slot="defectQty">
-						<div @click="show(row, 'DEFECT')" style="color: blue; cursor: pointer">
-							{{ row.defectQty }}
-						</div>
-					</template>
-					<template slot-scope="{ row }" slot="dryboxQty">
-						<div @click="show(row, 'DRYBOX')" style="color: blue; cursor: pointer">
-							{{ row.dryboxQty }}
-						</div>
-					</template>
-					<template slot-scope="{ row }" slot="wip">
-						<div @click="show(row, 'WIP')" style="color: blue; cursor: pointer">
-							{{ row.wip }}
-						</div>
-					</template>
-					<template slot-scope="{ row }" slot="scrapQty">
-						<div @click="show(row, 'SCRAP')" style="color: blue; cursor: pointer">
-							{{ row.scrapQty }}
-						</div>
-					</template>
-				</Table>
+				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
+				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+
 				<Modal draggable v-model="modalFlag" width="1500" title="工单明细" :styles="{ top: '20px' }">
-					<Button type="primary" @click="exportModalClick" style="float: right">导出</Button>
-					<Table style="margin-top: 30px" :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columnsModal" :data="dataModal"></Table>
+					<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columnsModal" :data="dataModal"></Table>
 					<page-custom :total="modalReq.total" :totalPage="modalReq.totalPage" :pageIndex="modalReq.pageIndex" :page-size="modalReq.pageSize" @on-change="pageChangeModal" @on-page-size-change="pageSizeChangeModal" />
 				</Modal>
 			</Card>
@@ -113,7 +77,7 @@
 </template>
 
 <script>
-import { getlistReq, getlistReqByType, exportReq, exportModelReq } from "@/api/bill-manage/capacity-querydsh";
+import { getlistReq, getlistReqByType, exportReq } from "@/api/bill-manage/capacity-querydsh";
 import { workerPageListUrl } from "@/api/material-manager/order-info";
 import { exportFile, formatDate, getButtonBoolean, renderDate } from "@/libs/tools";
 
@@ -180,7 +144,6 @@ export default {
 					minWidth: 140,
 					ellipsis: true,
 					tooltip: true,
-					align: "center",
 				},
 				{
 					title: this.$t("pn"),
@@ -200,11 +163,43 @@ export default {
 				},
 				{
 					title: this.$t("input_PassQty"),
-					slot: "inputQty",
+					key: "inputQty",
 					width: 80,
 					align: "center",
 					ellipsis: true,
 					tooltip: true,
+					render: (h, params) => {
+						return h("div", [
+							h(
+								"a",
+								{
+									props: {
+										type: "primary",
+										size: "small",
+									},
+									style: {
+										marginRight: "5px",
+										color: "blue",
+										fontSize: "13px",
+										overflow: "hidden",
+										textOverflow: "ellipsis",
+										whiteSpace: "nowrap",
+										display: "block", //设置样式，超过文字省略号显示
+										cursor: "pointer", //设置鼠标样式
+									},
+									domProps: {
+										title: params.row.inputQty, //添加title属性
+									},
+									on: {
+										click: () => {
+											this.show(params.row, "TRACKIN"); //点击事件
+										},
+									},
+								},
+								params.row.inputQty
+							),
+						]);
+					},
 				},
 				{
 					title: this.$t("output_PassQty"),
@@ -216,39 +211,127 @@ export default {
 				},
 				{
 					title: this.$t("HoldQty"),
-					slot: "holdQty",
+					key: "holdQty",
 					width: 80,
 					align: "center",
 					ellipsis: true,
 					tooltip: true,
-				},
-				{
-					title: "Repass",
-					slot: "repass",
-					width: 80,
-					align: "center",
-					ellipsis: true,
-					tooltip: true,
+					render: (h, params) => {
+						return h("div", [
+							h(
+								"a",
+								{
+									props: {
+										type: "primary",
+										size: "small",
+									},
+									style: {
+										marginRight: "5px",
+										color: "blue",
+										fontSize: "13px",
+										overflow: "hidden",
+										textOverflow: "ellipsis",
+										whiteSpace: "nowrap",
+										display: "block", //设置样式，超过文字省略号显示
+										cursor: "pointer", //设置鼠标样式
+									},
+									domProps: {
+										title: params.row.holdQty, //添加title属性
+									},
+									on: {
+										click: () => {
+											this.show(params.row, "HOLD"); //点击事件
+										},
+									},
+								},
+								params.row.holdQty
+							),
+						]);
+					},
 				},
 				{
 					title: this.$t("DefectQty"),
-					slot: "defectQty",
+					key: "defectQty",
 					width: 80,
 					align: "center",
 					ellipsis: true,
 					tooltip: true,
+					render: (h, params) => {
+						return h("div", [
+							h(
+								"a",
+								{
+									props: {
+										type: "primary",
+										size: "small",
+									},
+									style: {
+										marginRight: "5px",
+										color: "blue",
+										fontSize: "13px",
+										overflow: "hidden",
+										textOverflow: "ellipsis",
+										whiteSpace: "nowrap",
+										display: "block", //设置样式，超过文字省略号显示
+										cursor: "pointer", //设置鼠标样式
+									},
+									domProps: {
+										title: params.row.defectQty, //添加title属性
+									},
+									on: {
+										click: () => {
+											this.show(params.row, "DEFECT"); //点击事件
+										},
+									},
+								},
+								params.row.defectQty
+							),
+						]);
+					},
 				},
 				{
 					title: this.$t("dryBoxQty"),
-					slot: "dryboxQty",
+					key: "dryboxQty",
 					width: 80,
 					align: "center",
 					ellipsis: true,
 					tooltip: true,
+					render: (h, params) => {
+						return h("div", [
+							h(
+								"a",
+								{
+									props: {
+										type: "primary",
+										size: "small",
+									},
+									style: {
+										marginRight: "5px",
+										color: "blue",
+										fontSize: "13px",
+										overflow: "hidden",
+										textOverflow: "ellipsis",
+										whiteSpace: "nowrap",
+										display: "block", //设置样式，超过文字省略号显示
+										cursor: "pointer", //设置鼠标样式
+									},
+									domProps: {
+										title: params.row.dryboxQty, //添加title属性
+									},
+									on: {
+										click: () => {
+											this.show(params.row, "DRYBOX"); //点击事件
+										},
+									},
+								},
+								params.row.dryboxQty
+							),
+						]);
+					},
 				},
 				{
 					title: this.$t("wip"),
-					slot: "wip",
+					key: "wip",
 					width: 80,
 					align: "center",
 					ellipsis: true,
@@ -280,7 +363,7 @@ export default {
 				},
 				{
 					title: "报废数",
-					slot: "scrapQty",
+					key: "scrapQty",
 					width: 80,
 					align: "center",
 					ellipsis: true,
@@ -363,22 +446,6 @@ export default {
 					align: "center",
 				},
 				{
-					title: this.$t("modelName"),
-					key: "modelName",
-					ellipsis: true,
-					tooltip: true,
-					width: 130,
-					align: "center",
-				},
-				{
-					title: this.$t("pn"),
-					key: "partname",
-					ellipsis: true,
-					tooltip: true,
-					width: 130,
-					align: "center",
-				},
-				{
 					title: this.$t("lineName"),
 					key: "linename",
 					ellipsis: true,
@@ -438,10 +505,20 @@ export default {
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
-				workOrder: [
+				startTime: [
 					{
 						required: true,
-						message: this.$t("pleaseSelect") + this.$t("workOrder"),
+						type: "date",
+						trigger: "change",
+						message: this.$t("pleaseSelect") + this.$t("startTime"),
+					},
+				],
+				endTime: [
+					{
+						required: true,
+						type: "date",
+						trigger: "change",
+						message: this.$t("pleaseSelect") + this.$t("endTime"),
 					},
 				],
 			},
@@ -465,14 +542,15 @@ export default {
 				if (validate) {
 					this.tableConfig.loading = true;
 					const { workOrder, pn, name, startTime, startTime1, endTime, endTime1 } = this.req;
+
 					const obj = {
 						orderField: "WorkOrder",
 						ascending: true,
-						pageSize: 1000,
+						pageSize: this.req.pageSize,
 						pageIndex: this.req.pageIndex,
 						data: {
-							startTime: startTime ? formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00") : "",
-							endTime: endTime ? formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59") : "",
+							startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
+							endTime: formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59"),
 							workOrder,
 							pn,
 							name,
@@ -482,13 +560,13 @@ export default {
 						.then((res) => {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
+								//   this.data = res.result || [];
 								let { data, pageSize, pageIndex, total, totalPage } = res.result;
 								this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 								this.data = data || [];
 							}
 						})
-						.catch(() => (this.tableConfig.loading = false))
-						.finally(() => (this.searchPoptipModal = false));
+						.catch(() => (this.tableConfig.loading = false));
 				}
 			});
 		},
@@ -496,47 +574,51 @@ export default {
 		// 表格单元格点击事件
 		show(row, type) {
 			this.modalFlag = true;
-			this.currentRow = row; // 当前点击表格行数据
-			this.currentType = type; //
-			this.tableConfig.loadingModal = true;
-			const { startTime, endTime, workOrder, processName, pn, name } = row;
-			const obj = {
-				orderField: "unitid", // 排序字段
-				ascending: true, // 是否升序
-				pageSize: this.modalReq.pageSize, // 分页大小
-				pageIndex: this.modalReq.pageIndex, // 当前页码
-				data: {
-					startTime,
-					endTime,
-					workOrder,
-					stepName: processName,
-					trackType: type,
-					pn,
-					name,
-				},
-			};
-			getlistReqByType(obj)
-				.then((res) => {
-					this.tableConfig.loadingModal = false;
-					if (res.code === 200) {
-						this.dataModal = [];
-						let data = res.result;
-						this.dataModal = data.data ? data.data : [];
-						this.modalReq.pageSize = data.pageSize;
-						this.modalReq.pageIndex = data.pageIndex;
-						this.modalReq.total = data.total;
-						this.modalReq.totalPage = data.totalPage;
+			(this.currentRow = row), // 当前点击表格行数据
+				(this.currentType = type), //
+				this.$refs.searchReq.validate((validate) => {
+					if (validate) {
+						this.tableConfig.loadingModal = true;
+						const { startTime, endTime, workOrder, processName, pn, name } = row;
+						const obj = {
+							orderField: "unitid", // 排序字段
+							ascending: true, // 是否升序
+							pageSize: this.modalReq.pageSize, // 分页大小
+							pageIndex: this.modalReq.pageIndex, // 当前页码
+							data: {
+								startTime,
+								endTime,
+								workOrder,
+								stepName: processName,
+								trackType: type,
+								pn,
+								name,
+							},
+						};
+						getlistReqByType(obj)
+							.then((res) => {
+								this.tableConfig.loadingModal = false;
+								if (res.code === 200) {
+									this.dataModal = [];
+									let data = res.result;
+									this.dataModal = data.data ? data.data : [];
+									this.modalReq.pageSize = data.pageSize;
+									this.modalReq.pageIndex = data.pageIndex;
+									this.modalReq.total = data.total;
+									this.modalReq.totalPage = data.totalPage;
+								}
+							})
+							.catch(() => (this.tableConfig.loadingModal = false));
 					}
-				})
-				.catch(() => (this.tableConfig.loadingModal = false));
+				});
 		},
 		// SN导出
 		exportClick() {
 			const { workOrder, startTime, startTime1, endTime, endTime1, pn, name } = this.req;
 			const obj = {
 				workOrder,
-				startTime: startTime ? formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00") : "",
-				endTime: endTime ? formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59") : "",
+				startTime: formatDate(startTime, "yyyy-MM-dd ") + (startTime1 || "00:00:00"),
+				endTime: formatDate(endTime, "yyyy-MM-dd ") + (endTime1 || "23:59:59"),
 				pn,
 				name,
 			};
@@ -546,27 +628,20 @@ export default {
 				exportFile(blob, fileName);
 			});
 		},
-		// 明细导出
-		exportModalClick() {
-			const { startTime, endTime, workOrder, processName, pn, name } = this.currentRow;
-			const obj = {
-				startTime,
-				endTime,
-				workOrder,
-				stepName: processName,
-				trackType: this.currentType,
-				pn,
-				name,
-			};
-			exportModelReq(obj).then((res) => {
-				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-				const fileName = `${this.$t("capacity-queryvr")}${formatDate(new Date())}.xlsx`; // 自定义文件名
-				exportFile(blob, fileName);
-			});
-		},
 		// 自动改变表格高度
 		autoSize() {
 			this.tableConfig.height = document.body.clientHeight - 180;
+		},
+		// 选择第几页
+		pageChange(index) {
+			this.req.pageIndex = index;
+			this.pageLoad();
+		},
+		// 选择一页有条数据
+		pageSizeChange(index) {
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
 		},
 		// 选择第几页
 		pageChangeModal(index) {
@@ -586,10 +661,15 @@ export default {
 		},
 		// 点击搜索按钮触发
 		searchClick() {
+			if (this.req.startTime && this.req.endTime) {
+				this.searchPoptipModal = false;
+			}
 			this.req.pageIndex = 1;
 			this.pageLoad();
 		},
 	},
-	mounted() {},
+	mounted() {
+		//this.pageLoad();
+	},
 };
 </script>
