@@ -133,7 +133,7 @@ export default {
           align: "center",
           render:renderDate
         }, {
-          title: '维修状态',
+          title: 'Recheck 状态',
           key: "rpstatus",
           minWidth: 120,
           ellipsis: true,
