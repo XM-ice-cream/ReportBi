@@ -1,8 +1,6 @@
 /* 单元格元素过滤数据 */
 <template>
 	<div class="condition-setting" v-if="drawerFlag">
-		<!-- <treeselect :options="roleData" :showCount="true" :multiple="true" value-consists-of="BRANCH_PRIORITY" :placeholder="$t('pleaseSelect') + $t('roleName')" style="height: 100%" /> -->
-
 		<!-- 表格 -->
 		<Table :columns="columns" :data="tableData" :height="70" :border="tableConfig.border" disabled-hover>
 			<!-- 可选列 -->
@@ -19,14 +17,12 @@
 			</template>
 			<!-- 类型 -->
 			<template slot-scope="{ index }" slot="type">
-				<Select v-model="tableData[index].type" size="small" transfer @on-change="tableData[index].content = ''">
+				<Select v-model="tableData[index].type" size="small" transfer @on-change="tableData[index].content = null">
 					<Option v-for="item in selectList.typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				</Select>
 			</template>
 			<!-- 内容 -->
 			<template slot-scope="{ index }" slot="content">
-				<treeselect v-model="tableData[index].content" :appendToBody="true" z-index="9999" :options="roleData" :showCount="true" :multiple="true" value-consists-of="BRANCH_PRIORITY" :placeholder="$t('pleaseSelect') + $t('roleName')" style="height: 100%" />
-
 				<Input v-model="tableData[index].content" v-if="['string', 'Function', 'cell'].includes(tableData[index].type)" />
 				<InputNumber v-model="tableData[index].content" v-if="tableData[index].type === 'int'" />
 				<!-- 时间 -->
@@ -43,8 +39,18 @@
 					<Option v-for="item in selectList.typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				</Select>
 				<!-- 角色下拉框 -->
-
-				<!-- <treeselect v-model="tableData[index].content" :appendToBody="true"  :options="roleData" :showCount="true" :multiple="true" value-consists-of="BRANCH_PRIORITY" :placeholder="$t('pleaseSelect') + $t('roleName')" style="height: 100%" /> -->
+				<treeselect
+					v-model="tableData[index].content"
+					v-if="tableData[index].type === 'roleSelect'"
+					:appendToBody="true"
+					z-index="9999"
+					:options="roleData"
+					:showCount="true"
+					:multiple="true"
+					value-consists-of="BRANCH_PRIORITY"
+					:placeholder="$t('pleaseSelect') + $t('roleName')"
+					style="height: 100%"
+				/>
 			</template>
 			<!-- 关系 -->
 			<template slot-scope="{ index }" slot="relation">
@@ -137,12 +143,12 @@ export default {
 			columns: [
 				{ title: "可选列", slot: "selectItem", width: 100, align: "center" },
 				{ title: "操作符", slot: "operator", width: 110, align: "center" },
-				{ title: "类型", slot: "type", width: 80, align: "center" },
+				{ title: "类型", slot: "type", width: 100, align: "center" },
 				{ title: "内容", slot: "content", minWidth: 150, align: "center" },
 				{ title: "关系", slot: "relation", width: 100, align: "center" },
 				{ title: "操作", slot: "operation", width: 80, align: "center" },
 			],
-			tableData: [{ selectItem: "", operator: "=", content: "", relation: "and", type: "string" }],
+			tableData: [{ selectItem: "", operator: "=", content: null, relation: "and", type: "string" }],
 			selectList: {
 				//可选列集合
 				operatorList: [
@@ -383,7 +389,7 @@ export default {
 		// 左侧抽屉取消
 		cancelClick() {
 			this.drawerFlag = false;
-			this.tableData = [{ selectItem: "", operator: "=", type: "string", content: "", relation: "and" }];
+			this.tableData = [{ selectItem: "", operator: "=", type: "string", content: null, relation: "and" }];
 			this.data = [];
 		},
 	},

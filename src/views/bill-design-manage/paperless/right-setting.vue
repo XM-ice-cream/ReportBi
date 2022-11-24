@@ -3,7 +3,7 @@
 		<Modal v-model="modalAuthority" title="权限设定" @on-ok="submitClick" @on-cancel="cancelClick" width="700">
 			<Form ref="authority" :model="authority" :label-width="120" style="padding: 0 1.3rem" :rules="ruleValidate">
 				<FormItem label="权限类型" prop="type">
-					<Select transfer v-model="authority.type" clearable :placeholder="$t('pleaseSelect') + '权限类型'">
+					<Select transfer v-model="authority.type" clearable :placeholder="$t('pleaseSelect') + '权限类型'" @on-change="changeAuthorityType">
 						<Option v-for="(item, i) in types" :value="item.value" :key="i">
 							{{ item.name }}
 						</Option>
@@ -35,13 +35,13 @@
 			</TabPane>
 			<TabPane label="单元格类型" name="name2">
 				<Form ref="cellType" :label-width="60" :model="cellType" style="padding: 0 1.3rem">
-					<FormItem label="类型" prop="category">
-						<Select v-model.trim="cellType.category" clearable transfer>
+					<FormItem label="类型" prop="type">
+						<Select v-model.trim="cellType.type" clearable transfer>
 							<Option v-for="item in typeList" :key="item.value" :label="item.name" :value="item.value" />
 						</Select>
 					</FormItem>
 					<FormItem label="默认值" prop="default">
-						<DatePicker v-if="cellType.category == 'datePicker'" v-model.trim="cellType.default" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
+						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.default" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
 						<Input v-else type="text" v-model.trim="cellType.default" clearable />
 					</FormItem>
 				</Form>
@@ -94,7 +94,7 @@ export default {
 					this.cellType = this.rightForm?.cellType;
 				} else {
 					this.authorityData = [];
-					this.cellType = { category: "", default: "", data: [] };
+					this.cellType = { type: "", default: "", data: [] };
 				}
 			},
 			immediate: true,
@@ -133,7 +133,7 @@ export default {
 			],
 			// 验证实体
 			ruleValidate: {
-				category: [
+				type: [
 					{
 						required: true,
 						message: `${this.$t("pleaseEnter")}'权限类型'`,
@@ -142,7 +142,7 @@ export default {
 				],
 			},
 			//--------------数据类型
-			cellType: { category: "", default: "", data: [] },
+			cellType: { type: "", default: "", data: [] },
 			typeList: [
 				{ name: "输入框", value: "input" },
 				{ name: "下拉框", value: "select" },
@@ -212,6 +212,20 @@ export default {
 		//删除权限设定
 		removeAuthority(row, index) {
 			this.authorityData.splice(index, 1);
+		},
+		//选择权限类别
+		changeAuthorityType() {
+			console.log(this.$refs.conditionsetting, this.authority.type);
+			if (this.authority.type === "checkTime") {
+				//默认为日期
+				this.$refs.conditionsetting.tableData[0].type = "date";
+				this.$refs.conditionsetting.tableData[0].content = "";
+			}
+			if (this.authority.type === "role") {
+				//默认为角色选择器
+				this.$refs.conditionsetting.tableData[0].type = "roleSelect";
+				this.$refs.conditionsetting.tableData[0].content = null;
+			}
 		},
 		//----------------------单元格类型
 		// 删除
