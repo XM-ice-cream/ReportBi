@@ -242,6 +242,7 @@ export default {
 		},
 		// 提交
 		submitType() {
+			if (this.cellType.type == "checkbox") this.cellType.default = [this.cellType.default];
 			this.$emit("autoChangeFunc", "cellType", { ...this.cellType });
 		},
 		//重置

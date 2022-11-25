@@ -105,7 +105,8 @@ export default {
 				divStyle += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;`; //超出文字省略
 				if (ht) divStyle += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
 				if (vt) divStyle += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
-
+				// 值不存在 则显示默认值
+				if (!v) v = cellType?.default || "";
 				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType };
 			});
 		},

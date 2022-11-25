@@ -43,12 +43,13 @@
 					v-model="tableData[index].content"
 					v-if="tableData[index].type === 'roleSelect'"
 					:appendToBody="true"
-					z-index="9999"
 					:options="roleData"
 					:showCount="true"
 					:multiple="true"
-					value-consists-of="BRANCH_PRIORITY"
 					:placeholder="$t('pleaseSelect') + $t('roleName')"
+					:normalizer="normalizer"
+					z-index="9999"
+					value-consists-of="BRANCH_PRIORITY"
 					style="height: 100%"
 				/>
 			</template>
@@ -178,6 +179,13 @@ export default {
 					{ label: "时段", value: "time" },
 					{ label: "角色下拉框", value: "roleSelect" },
 				],
+			},
+			normalizer(node) {
+				return {
+					id: node.name,
+					label: node.name,
+					children: node.subOptions,
+				};
 			},
 		};
 	},
