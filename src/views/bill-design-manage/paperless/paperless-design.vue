@@ -22,7 +22,7 @@
 			</Content>
 			<!-- 右侧基础配置 -->
 			<Sider hide-trigger class="sider" style="right: 0; position: absolute">
-				<RightSetting :formData="rightForm" @autoChangeFunc="autoChangeFunc" />
+				<RightSetting :formData="rightForm" :formInfo.sync="formInfo" @autoChangeFunc="autoChangeFunc" />
 			</Sider>
 		</Layout>
 	</Modal>
@@ -31,6 +31,8 @@
 
 <script>
 import RightSetting from "./right-setting.vue";
+import { addReq, modifyReq } from "@/api/bill-design-manage/paperless.js";
+
 export default {
 	name: "excelreport-design",
 	props: {
@@ -38,9 +40,17 @@ export default {
 	},
 	watch: {
 		modalFlag(newVal) {
-			console.log(newVal);
 			if (newVal) {
-				this.pageLoad();
+				this.$nextTick(() => {
+					this.pageLoad();
+					this.sheetData[0].celldata.forEach((element) => {
+						console.log(element.v.v);
+					});
+				});
+			} else {
+				this.formInfo = {};
+				this.sheetData = [{}];
+				this.rightForm = {};
 			}
 		},
 	},
@@ -48,9 +58,10 @@ export default {
 	data() {
 		return {
 			modalFlag: false,
-			sheetData: [],
+			sheetData: [{}],
 			rightForm: {},
 			selectRange: {}, //选中范围
+			formInfo: {}, //表单信息
 		};
 	},
 	methods: {
@@ -122,7 +133,7 @@ export default {
 					},
 				],
 			};
-			// options.data = this.sheetData;
+			options.data = this.sheetData;
 			this.$nextTick(() => {
 				$(function () {
 					luckysheet.create(options);
@@ -155,7 +166,22 @@ export default {
 		//保存
 		async save() {
 			let jsonData = luckysheet.getAllSheets();
-			console.log("jsonData", jsonData);
+			jsonData[0].data = [];
+			jsonData[0].celldata = jsonData[0].celldata.filter((item) => {
+				return JSON.stringify(item.v) !== "{}";
+			});
+			console.log("jsonData", jsonData, "this.formInfo", this.formInfo);
+			if (jsonData[0].celldata.length > 0) {
+				const { name, enCode } = this.formInfo;
+				const obj = { sortCode: 0, enabled: 1, remark: "", enCode, name, category: 0, json: JSON.stringify(jsonData), status: "" };
+				// addReq(obj).then((res) => {
+				// 	if (res.code === 200) {
+				// 		this.$Message.success("新增成功!");
+				// 	}
+				// });
+			} else {
+				this.$Message.error("数据为空，不可提交!");
+			}
 		},
 	},
 	created() {},

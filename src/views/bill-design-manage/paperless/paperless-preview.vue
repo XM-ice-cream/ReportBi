@@ -10,6 +10,7 @@
 								<template v-for="(item, index) in itemTr">
 									<td v-if="item && item.rowspan" :style="item.style" :colspan="item.colspan || 1" :rowspan="item.rowspan || 1" :key="index">
 										<div :title="item.value" :style="item.divStyle">
+											{{ item.cellType }}{{ item.value }}
 											<template v-if="item.cellType">
 												<!-- 输入框 -->
 												<template v-if="item.cellType.type === 'input'"> <Input clearable v-model.trim="item.value" @on-change="changeValue" /> </template>
@@ -64,13 +65,16 @@ export default {
 	},
 	watch: {
 		modalFlag() {
-			this.getTable();
+			this.$nextTick(() => {
+				this.getTable();
+			});
 		},
 	},
 	methods: {
 		//初始化表格
 		getTable() {
-			let { celldata, config, frozen } = this.data;
+			let { celldata, config, frozen } = JSON.parse(this.data.json)[0];
+			console.log("JSON.parse(this.data.json)", JSON.parse(this.data.json));
 			this.tableHtml = [];
 
 			// 处理表格单元格样式
@@ -80,8 +84,7 @@ export default {
 				if (!this.tableHtml[r]) this.tableHtml[r] = [];
 				if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
 
-				const { v, bg, bl, fc, ht, vt, mc, fs, cellType, authority } = item.v; //获取样式
-				console.log(item.v);
+				let { v, bg, bl, fc, ht, vt, mc, fs, cellType, authority } = item.v; //获取样式
 				const { columnlen, rowlen } = config; //边框
 				let style = "";
 				//   宽高
@@ -106,7 +109,7 @@ export default {
 				if (ht) divStyle += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
 				if (vt) divStyle += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
 				// 值不存在 则显示默认值
-				if (!v) v = cellType?.default || "";
+				if (!v) v = cellType?.default || v;
 				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType };
 			});
 		},

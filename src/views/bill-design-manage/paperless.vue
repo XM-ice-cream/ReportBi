@@ -34,7 +34,11 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick"> </Table>
+				<Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick">
+					<template slot="operator" slot-scope="{ row }">
+						<Button class="tableBtn" type="text" @click="signForm(row)">签订</Button>
+					</template>
+				</Table>
 				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
 			</Card>
 		</div>
@@ -47,6 +51,7 @@
 import { getButtonBoolean } from "@/libs/tools";
 import PaperlessDesign from "./paperless/paperless-design.vue";
 import PaperlessPreview from "./paperless/paperless-preview.vue";
+import { getpagelistReq } from "@/api/bill-design-manage/paperless.js";
 
 export default {
 	components: { PaperlessDesign, PaperlessPreview },
@@ -78,7 +83,10 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: "表单名称", key: "reportName", align: "center", tooltip: true },
+				{ title: "ID", key: "id", align: "center", tooltip: true },
+				{ title: "表单名称", key: "name", align: "center", tooltip: true },
+				{ title: "表单编码", key: "enCode", align: "center", tooltip: true },
+				{ title: "操作", slot: "operator", align: "center", tooltip: true },
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {},
@@ -97,10 +105,35 @@ export default {
 	},
 	methods: {
 		// 点击搜索按钮触发
-		searchClick() {},
+		searchClick() {
+			this.selectObj = null;
+			this.req.pageIndex = 1;
+			this.pageLoad();
+			this.searchPoptipModal = false;
+		},
 		// 获取分页列表数据
 		pageLoad() {
-			this.tableConfig.loading = false;
+			let { orderField, ascending, pageSize, pageIndex } = this.req;
+			const obj = {
+				orderField, // 排序字段
+				ascending, // 是否升序
+				pageSize, // 分页大小
+				pageIndex, // 当前页码
+				data: { enCode: "", name: "", category: 0, status: "" },
+			};
+			getpagelistReq(obj)
+				.then((res) => {
+					if (res.code === 200) {
+						let data = res.result;
+						this.data = data.data || [];
+						this.req.pageSize = data.pageSize;
+						this.req.pageIndex = data.pageIndex;
+						this.req.total = data.total;
+						this.req.totalPage = data.totalPage;
+						this.req.elapsedMilliseconds = res.elapsedMilliseconds;
+					}
+				})
+				.finally(() => (this.tableConfig.loading = false));
 		},
 		// 点击新增按钮触发
 		addClick() {
@@ -110,11 +143,20 @@ export default {
 		// 点击编辑按钮触发
 		editClick() {
 			if (this.selectObj) {
-				// let { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled, remark } = this.selectObj;
-				// this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled, remark };
+				this.submitData = { ...this.selectObj };
+
+				const { json, name, enCode } = this.selectObj;
+				console.log(this.submitData, JSON.parse(json));
 				this.isAdd = false;
-				this.$refs["paperless-preview"].modalFlag = true;
+				this.$refs["paperless-design"].modalFlag = true;
+				this.$refs["paperless-design"].sheetData = JSON.parse(json);
+				this.$refs["paperless-design"].formInfo = { name, enCode };
 			} else this.$Msg.warning(this.$t("oneData"));
+		},
+		// 签订表单
+		signForm(row) {
+			this.$refs["paperless-preview"].data = { ...row };
+			this.$refs["paperless-preview"].modalFlag = true;
 		},
 		cancelClick() {
 			this.$refs.submitReq.resetFields(); //清除表单红色提示

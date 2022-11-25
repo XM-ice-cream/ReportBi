@@ -14,7 +14,17 @@
 			<ConditionSetting ref="conditionsetting" :drawerFlag.sync="modalAuthority" :rightForm="authority.data" :roleData="roleData" @updateData="updateData" />
 		</Modal>
 		<Tabs>
-			<TabPane label="单元格权限" name="name1">
+			<TabPane label="信息" name="name3">
+				<Form ref="rightForm" :label-width="60" style="padding: 0 1.3rem">
+					<FormItem label="表单名称" prop="name">
+						<Input type="text" v-model="formInfo.name" clearable />
+					</FormItem>
+					<FormItem label="表单编号" prop="enCode">
+						<Input type="text" v-model="formInfo.enCode" clearable />
+					</FormItem>
+				</Form>
+			</TabPane>
+			<TabPane label="权限" name="name1">
 				<Form ref="rightForm" :label-width="60" style="padding: 0 1.3rem">
 					<!-- 添加条件 -->
 					<FormItem label="添加条件">
@@ -33,7 +43,7 @@
 					</template>
 				</Table>
 			</TabPane>
-			<TabPane label="单元格类型" name="name2">
+			<TabPane label="类型" name="name2">
 				<Form ref="cellType" :label-width="60" :model="cellType" style="padding: 0 1.3rem">
 					<FormItem label="类型" prop="type">
 						<Select v-model.trim="cellType.type" clearable transfer>
@@ -82,6 +92,10 @@ export default {
 			type: Object,
 			default: () => {},
 		},
+		formInfo: {
+			type: Object,
+			default: () => {},
+		},
 	},
 	watch: {
 		formData: {
@@ -100,6 +114,13 @@ export default {
 			immediate: true,
 			deep: true,
 		},
+		formInfo: {
+			handler() {
+				this.$emit("update:formInfo", this.formInfo);
+			},
+			deep: true,
+			immediate: true,
+		},
 	},
 	components: { ConditionSetting },
 	data() {
@@ -108,6 +129,7 @@ export default {
 			dataIndex: true,
 			sheetData: [],
 			rightForm: {},
+			formInfo: { name: "", enCode: "" },
 			data: [],
 			authority: {
 				type: "",
