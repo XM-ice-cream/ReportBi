@@ -48,7 +48,7 @@
 											<Input v-model.trim="req.unitId" clearable />
 										</FormItem>
 										<!-- Error_Item -->
-										<FormItem label="Erro_Item " prop="erro_Item ">
+										<FormItem label="Erro_Item " prop="erro_Item">
 											<Input v-model.trim="req.erro_Item" clearable />
 										</FormItem>
 									</Form>
