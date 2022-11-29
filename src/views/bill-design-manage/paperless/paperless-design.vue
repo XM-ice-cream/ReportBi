@@ -4,19 +4,6 @@
 		<Layout class="layout">
 			<!-- 中间内容excel -->
 			<Content class="content">
-				<div class="push_btn">
-					<Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
-						<Button type="text" @click="save()">
-							<Icon type="ios-folder" />
-						</Button>
-					</Tooltip>
-					&nbsp;&nbsp;
-					<Tooltip class="item" effect="dark" content="预览" placement="bottom-start">
-						<Button type="text" @click="preview()">
-							<Icon type="md-eye" />
-						</Button>
-					</Tooltip>
-				</div>
 				<div id="luckysheet" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0"></div>
 				<div style="display: none"></div>
 			</Content>
@@ -25,6 +12,10 @@
 				<RightSetting :formData="rightForm" :formInfo.sync="formInfo" @autoChangeFunc="autoChangeFunc" />
 			</Sider>
 		</Layout>
+		<div slot="footer">
+			<Button @click="modalCancel">{{ $t("cancel") }}</Button>
+			<Button type="primary" @click="modalOk">{{ $t("submit") }}</Button>
+		</div>
 	</Modal>
 	<!-- </div> -->
 </template>
@@ -43,14 +34,7 @@ export default {
 			if (newVal) {
 				this.$nextTick(() => {
 					this.pageLoad();
-					this.sheetData[0].celldata.forEach((element) => {
-						console.log(element.v.v);
-					});
 				});
-			} else {
-				this.formInfo = {};
-				this.sheetData = [{}];
-				this.rightForm = {};
 			}
 		},
 	},
@@ -143,8 +127,8 @@ export default {
 
 		//设定RightForm
 		setRightForm(cell, postion, sheetFile, ctx) {
-			console.log(cell, postion, sheetFile, ctx);
 			const { r, c } = postion;
+			console.log(cell, postion, sheetFile, ctx, window.luckysheet.getCellValue(r, c));
 			window.luckysheet.setCellValue(r, c, { ...cell });
 			this.rightForm = { ...cell };
 		},
@@ -164,24 +148,34 @@ export default {
 		},
 
 		//保存
-		async save() {
+		async modalOk() {
 			let jsonData = luckysheet.getAllSheets();
 			jsonData[0].data = [];
 			jsonData[0].celldata = jsonData[0].celldata.filter((item) => {
-				return JSON.stringify(item.v) !== "{}";
+				return JSON.stringify(item.v) !== "{}" && ((item.v.v && item.v.v != "") || (item.v.ct && item.v.ct.s) || (item.v.cellType && item.v.cellType.type) || item.v.authority);
 			});
-			console.log("jsonData", jsonData, "this.formInfo", this.formInfo);
+			console.log("jsonData", jsonData, "this.formInfo", this.formInfo, this.isAdd);
 			if (jsonData[0].celldata.length > 0) {
-				const { name, enCode } = this.formInfo;
-				const obj = { sortCode: 0, enabled: 1, remark: "", enCode, name, category: 0, json: JSON.stringify(jsonData), status: "" };
-				// addReq(obj).then((res) => {
-				// 	if (res.code === 200) {
-				// 		this.$Message.success("新增成功!");
-				// 	}
-				// });
+				const { name, enCode, id } = this.formInfo;
+				const obj = { sortCode: 0, enabled: 1, remark: "", enCode, name, category: 0, json: JSON.stringify(jsonData), status: "", id };
+
+				const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
+				requestApi.then((res) => {
+					if (res.code === 200) {
+						this.$Message.success("提交成功!");
+						this.$parent.pageLoad(); //刷新数据
+						this.modalCancel(); //关闭弹框
+					}
+				});
 			} else {
 				this.$Message.error("数据为空，不可提交!");
 			}
+		},
+		modalCancel() {
+			this.modalFlag = false; //关闭弹框
+			this.formInfo = {};
+			this.sheetData = [{}];
+			this.rightForm = {};
 		},
 	},
 	created() {},
@@ -263,16 +257,6 @@ export default {
 	margin-right: 300px;
 	margin-left: 30px;
 	overflow-x: visible !important;
-	.push_btn {
-		position: absolute;
-		top: 15px;
-		right: 4%;
-		z-index: 99;
-		i {
-			color: #6c6666;
-			font-size: 1.4rem;
-		}
-	}
 }
 /deep/ .ivu-collapse-simple > .ivu-collapse-item > .ivu-collapse-content > .ivu-collapse-content-box {
 	position: relative;

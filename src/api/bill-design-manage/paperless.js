@@ -22,7 +22,7 @@ export const addReq = data => {
 export const modifyReq = data => {
   return requestCenter({
     url: '/api/reportcenter/v1/ef_complexforms/modify',
-    method: 'post',
+    method: 'put',
     data
   })
 }

@@ -145,12 +145,12 @@ export default {
 			if (this.selectObj) {
 				this.submitData = { ...this.selectObj };
 
-				const { json, name, enCode } = this.selectObj;
+				const { json, name, enCode, id } = this.selectObj;
 				console.log(this.submitData, JSON.parse(json));
 				this.isAdd = false;
 				this.$refs["paperless-design"].modalFlag = true;
 				this.$refs["paperless-design"].sheetData = JSON.parse(json);
-				this.$refs["paperless-design"].formInfo = { name, enCode };
+				this.$refs["paperless-design"].formInfo = { name, enCode, id };
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
 		// 签订表单

@@ -46,24 +46,24 @@
 			<TabPane label="类型" name="name2">
 				<Form ref="cellType" :label-width="60" :model="cellType" style="padding: 0 1.3rem">
 					<FormItem label="类型" prop="type">
-						<Select v-model.trim="cellType.type" clearable transfer>
+						<Select v-model.trim="cellType.type" clearable transfer @on-change="submitType">
 							<Option v-for="item in typeList" :key="item.value" :label="item.name" :value="item.value" />
 						</Select>
 					</FormItem>
 					<FormItem label="默认值" prop="default">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.default" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
-						<Input v-else type="text" v-model.trim="cellType.default" clearable />
+						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.default" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType"></DatePicker>
+						<Input v-else type="text" v-model.trim="cellType.default" clearable @on-change="submitType" />
 					</FormItem>
 				</Form>
 				<Button type="warning" class="add-btn" v-if="cellType.data.length == 0" size="small" @click="addRow(-1)">添加 </Button>
 				<Table :data="cellType.data" border :columns="typeColumns" :max-height="350" style="width: 100%">
 					<template slot-scope="{ index }" slot="name">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].name" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
-						<Input v-else v-model.trim="cellType.data[index].name" clearable />
+						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].name" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType"></DatePicker>
+						<Input v-else v-model.trim="cellType.data[index].name" clearable @on-change="submitType" />
 					</template>
 					<template slot-scope="{ index }" slot="value">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].value" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
-						<Input v-else v-model.trim="cellType.data[index].value" clearable />
+						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].value" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType"></DatePicker>
+						<Input v-else v-model.trim="cellType.data[index].value" clearable @on-change="submitType" />
 					</template>
 					<!-- 操作 -->
 					<template slot-scope="{ row, index }" slot="operator">
@@ -73,7 +73,6 @@
 				</Table>
 				<div class="operator-btn">
 					<Button type="primary" ghost @click="resetType">重置</Button>
-					<Button type="primary" @click="submitType">提交</Button>
 				</div>
 			</TabPane>
 		</Tabs>
@@ -100,12 +99,13 @@ export default {
 	watch: {
 		formData: {
 			handler() {
-				if (this.formData && JSON.stringify(this.formData) !== "{}") {
+				console.log("right-setting", this.formData.authority, this.formData.cellType);
+				if (this.formData && JSON.stringify(this.formData) !== "{}" && (this.formData.authority || this.formData.cellType)) {
 					this.rightForm = { ...this.formData };
 					// 权限
-					this.authorityData = this.rightForm?.authority;
+					this.authorityData = this.rightForm?.authority || [];
 					//类型
-					this.cellType = this.rightForm?.cellType;
+					this.cellType = this.rightForm?.cellType || { type: "", default: "", data: [] };
 				} else {
 					this.authorityData = [];
 					this.cellType = { type: "", default: "", data: [] };
@@ -264,7 +264,9 @@ export default {
 		},
 		// 提交
 		submitType() {
-			if (this.cellType.type == "checkbox") this.cellType.default = [this.cellType.default];
+			console.log("change===========");
+			if (this.cellType.type == "checkbox") this.cellType.default = [...this.cellType.default];
+
 			this.$emit("autoChangeFunc", "cellType", { ...this.cellType });
 		},
 		//重置

@@ -10,8 +10,7 @@
 								<template v-for="(item, index) in itemTr">
 									<td v-if="item && item.rowspan" :style="item.style" :colspan="item.colspan || 1" :rowspan="item.rowspan || 1" :key="index">
 										<div :title="item.value" :style="item.divStyle">
-											{{ item.cellType }}{{ item.value }}
-											<template v-if="item.cellType">
+											<template v-if="item.cellType?.type">
 												<!-- 输入框 -->
 												<template v-if="item.cellType.type === 'input'"> <Input clearable v-model.trim="item.value" @on-change="changeValue" /> </template>
 												<!-- 复选框 -->
@@ -28,19 +27,17 @@
 												</template>
 												<!-- 时间选择器 -->
 												<template v-if="item.cellType.type === 'datePicker'">
-													<DatePicker type="datetime" v-model="item.value" :options="datePickerOptions" clearable></DatePicker>
+													<DatePicker type="datetime" v-model="item.value" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
 												</template>
 												<!-- 数字输入框 -->
 												<template v-if="item.cellType.type === 'inputnumber'">
 													<InputNumber v-model="item.value" clearable />
 												</template>
-												<!-- 其余均为文本 -->
-												<template v-else>{{ item.value }}</template>
 											</template>
 											<template v-else>{{ item.value }}</template>
 										</div>
 									</td>
-									<td v-if="!item" :key="index" style="width: 75px; height: 18px"></td>
+									<!-- <td v-if="!item" :key="index" style="width: 75px; height: 18px"></td> -->
 								</template>
 							</tr>
 						</table>
@@ -84,7 +81,7 @@ export default {
 				if (!this.tableHtml[r]) this.tableHtml[r] = [];
 				if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
 
-				let { v, bg, bl, fc, ht, vt, mc, fs, cellType, authority } = item.v; //获取样式
+				let { v, bg, bl, fc, ht, vt, mc, fs, cellType, authority, ct } = item.v; //获取样式
 				const { columnlen, rowlen } = config; //边框
 				let style = "";
 				//   宽高
@@ -98,18 +95,19 @@ export default {
 				if (ht) style += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
 				if (vt) style += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
 				if (frozen?.type && r == 0) style += "position:sticky;top:0;"; //冻结首行
-				style += `border:1px solid #eeeeee;`; //边框
+				style += `border:1px solid #000;`; //边框
 				//合并单元格
-				const colspan = `${mc?.cs || 1}`;
-				const rowspan = `${mc?.rs || 1}`;
-
+				const colspan = mc ? (r == mc?.r && c == mc?.c ? mc.cs : 0) : 1;
+				const rowspan = mc ? (r == mc?.r && c == mc?.c ? mc.rs : 0) : 1;
+				console.log(r, c, colspan, rowspan);
 				//td 内部div样式
 				let divStyle = `min-width:${width * colspan}px;min-height:${height * rowspan}px;line-height:${height * rowspan}px;`; //宽高
-				divStyle += `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;`; //超出文字省略
+				divStyle += `white-space: pre-line;overflow: hidden;text-overflow: ellipsis;display: flex;`; //超出文字省略,有\n 换行
 				if (ht) divStyle += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
 				if (vt) divStyle += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
 				// 值不存在 则显示默认值
-				if (!v) v = cellType?.default || v;
+				if (!v) v = cellType?.default || ct?.s?.map((item) => item.v).toString() || v;
+				console.log(r, c, v);
 				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType };
 			});
 		},
@@ -122,4 +120,20 @@ export default {
 <style>
 @import "../../../assets/table.less";
 </style>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.data-table table {
+	width: auto;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+:deep(.ivu-input) {
+	border: none;
+	border-radius: 0px !important;
+	border-bottom: 1px solid #000;
+}
+:deep(.ivu-checkbox-wrapper) {
+	font-size: 16px;
+}
+</style>
