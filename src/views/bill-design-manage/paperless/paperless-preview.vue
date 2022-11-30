@@ -37,7 +37,7 @@
 											<template v-else>{{ item.value }}</template>
 										</div>
 									</td>
-									<!-- <td v-if="!item" :key="index" style="width: 75px; height: 18px"></td> -->
+									<!-- <td v-if="!item" :key="index" style="width: 75px; height: 18px; border: 1px solid #000"></td> -->
 								</template>
 							</tr>
 						</table>
@@ -122,16 +122,19 @@ export default {
 </style>
 <style lang="less" scoped>
 .data-table table {
-	width: auto;
 	position: absolute;
+	width: 100%;
+	height: 100%;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
+.data-table td {
+	padding: 0;
+}
 :deep(.ivu-input) {
 	border: none;
 	border-radius: 0px !important;
-	border-bottom: 1px solid #000;
 }
 :deep(.ivu-checkbox-wrapper) {
 	font-size: 16px;
