@@ -27,8 +27,8 @@
                         <Input v-model.trim="req.jobname" :placeholder="$t('pleaseEnter') + 'jobname'"  />
                     </FormItem>
                     <!-- 线体 -->
-                    <FormItem label="线体" prop="lineName">
-                        <Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + '线体'"  />
+                    <FormItem label="线体" prop="linename">
+                        <Input v-model.trim="req.linename" :placeholder="$t('pleaseEnter') + '线体'"  />
                     </FormItem>
                     <!-- Refdes -->
                     <FormItem label="Refdes" prop="refdes">
