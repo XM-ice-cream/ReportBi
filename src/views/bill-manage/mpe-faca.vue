@@ -45,7 +45,7 @@
 										</FormItem>
 										<!-- UnitId -->
 										<FormItem label="UnitId" prop="unitId">
-											<Input v-model.trim="req.unitId" clearable />
+											<Input v-model.trim="req.unitId" placeholder="请输入小板码,多个以英文逗号或空格分隔" clearable />
 										</FormItem>
 										<!-- Error_Item -->
 										<FormItem label="Erro_Item " prop="erro_Item">
@@ -65,6 +65,7 @@
 					</Row>
 				</div>
 				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick"> </Table>
+				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
 			</Card>
 		</div>
 	</div>
@@ -72,7 +73,7 @@
 
 <script>
 import { getlistReq, modifyReq } from "@/api/bill-manage/mpe-faca";
-import { getButtonBoolean, renderDate, formatDate } from "@/libs/tools";
+import { getButtonBoolean, renderDate, formatDate, commaSplitString } from "@/libs/tools";
 
 export default {
 	components: {},
@@ -93,6 +94,7 @@ export default {
 				endTime: "",
 				startTime: "",
 				erro_Item: "",
+				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
 				{ type: "index", fixed: "left", width: 50, align: "center" },
@@ -112,14 +114,7 @@ export default {
 			], // 表格数据
 			selectObj: null, //表格选中数据
 			// 验证实体
-			ruleValidate: {
-				unitId: [
-					{
-						required: true,
-						message: this.$t("pleaseEnter") + "unitId",
-					},
-				],
-			},
+			ruleValidate: {},
 		};
 	},
 	activated() {
@@ -136,6 +131,8 @@ export default {
 	methods: {
 		// 点击搜索按钮触发
 		searchClick() {
+			this.selectObj = null;
+			this.req.pageIndex = 1;
 			this.pageLoad();
 		},
 		// 获取分页列表数据
@@ -146,17 +143,25 @@ export default {
 					this.tableConfig.loading = true;
 					const { unitId, erro_Item, createdate, startTime, endTime } = this.req;
 					let obj = {
-						unitId,
-						erro_Item,
-						createdate: formatDate(createdate),
-						startTime: formatDate(startTime),
-						endTime: formatDate(endTime),
+						orderField: "unitId", // 排序字段
+						ascending: false, // 是否升序
+						pageSize: this.req.pageSize, // 分页大小
+						pageIndex: this.req.pageIndex, // 当前页码
+						data: {
+							unitId: commaSplitString(unitId).join(),
+							erro_Item,
+							createdate: formatDate(createdate),
+							startTime: formatDate(startTime),
+							endTime: formatDate(endTime),
+						},
 					};
 					getlistReq(obj)
 						.then((res) => {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
-								this.data = res?.result || [];
+								let { data, pageSize, pageIndex, total, totalPage } = res.result;
+								this.data = data || [];
+								this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 							}
 						})
 						.catch(() => (this.tableConfig.loading = false));
@@ -206,6 +211,17 @@ export default {
 		cancelClick() {
 			this.drawerFlag = false;
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
+		},
+		// 选择第几页
+		pageChange(index) {
+			this.req.pageIndex = index;
+			this.pageLoad();
+		},
+		// 选择一页有条数据
+		pageSizeChange(index) {
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
 		},
 	},
 	mounted() {
