@@ -148,7 +148,7 @@ export default {
 	data() {
 		return {
 			searchPoptipModal: false,
-			isConnectSuccess: true,
+			isConnectSuccess: false,
 			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
 			tableConfig: { ...this.$config.tableConfig }, // table配置
 			data: [], // 表格数据
@@ -271,6 +271,7 @@ export default {
 		},
 		// 点击新增按钮触发
 		addClick() {
+			this.isConnectSuccess = false;
 			this.drawerFlag = true;
 			this.isAdd = true;
 			this.drawerTitle = this.$t("add");
@@ -279,6 +280,7 @@ export default {
 		editClick() {
 			if (this.selectObj) {
 				// let { sourceCode, sourceConnect, sourceDesc, sourceName, sourceType } = this.selectObj;
+				this.isConnectSuccess = false;
 				this.submitData = { ...this.selectObj };
 				this.drawerFlag = true;
 				this.isAdd = false;
@@ -289,7 +291,7 @@ export default {
 		submitClick(isSkip = false) {
 			//测试连接失败
 			if (!this.isConnectSuccess) {
-				this.$Message.error("测试连接失败,请核实！");
+				this.$Message.error("未测试或测试连接失败,请确认！");
 				return;
 			}
 			this.$refs.submitReq.validate((validate) => {
