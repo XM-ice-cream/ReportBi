@@ -6,32 +6,32 @@
 					<!-- 表格 -->
 					<div class="data-table" style="height: 100%">
 						<table class="table tableScroll" id="exceltable" :class="tableHtml.length > 1 ? '' : 'blankBg'">
-							<tr v-for="(itemTr, indexTr) in tableHtml" :key="indexTr" style="height: 18px">
+							<tr v-for="(itemTr, indexTr) in tableHtml" :key="indexTr">
 								<template v-for="(item, index) in itemTr">
 									<td v-if="item && item.rowspan" :style="item.style" :colspan="item.colspan || 1" :rowspan="item.rowspan || 1" :key="index">
 										<div :title="item.value" :style="item.divStyle">
 											<template v-if="item.cellType?.type">
 												<!-- 输入框 -->
-												<template v-if="item.cellType.type === 'input'"> <Input clearable v-model.trim="item.value" @on-change="changeValue" /> </template>
+												<template v-if="item.cellType.type === 'input'"> <Input clearable v-model.trim="resultData.celldata[indexTr][index].v.v" /> </template>
 												<!-- 复选框 -->
 												<template v-if="item.cellType.type === 'checkbox'">
-													<CheckboxGroup v-model="item.value" @on-change="changeValue">
+													<CheckboxGroup v-model="resultData.celldata[indexTr][index].v.v">
 														<Checkbox v-for="cellItem in item.cellType.data" :key="cellItem.value" :label="cellItem.value">{{ cellItem.name }}</Checkbox>
 													</CheckboxGroup>
 												</template>
 												<!-- 下拉框 -->
 												<template v-if="item.cellType.type === 'select'">
-													<Select v-model="item.value" clearable>
+													<Select v-model="resultData.celldata[indexTr][index].v.v" clearable transfer placeholder="">
 														<Option v-for="cellItem in item.cellType.data" :value="cellItem.value" :key="cellItem.value">{{ cellItem.name }}</Option>
 													</Select>
 												</template>
 												<!-- 时间选择器 -->
 												<template v-if="item.cellType.type === 'datePicker'">
-													<DatePicker type="datetime" v-model="item.value" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+													<DatePicker type="datetime" v-model="resultData.celldata[indexTr][index].v.v" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
 												</template>
 												<!-- 数字输入框 -->
 												<template v-if="item.cellType.type === 'inputnumber'">
-													<InputNumber v-model="item.value" clearable />
+													<InputNumber v-model="resultData.celldata[indexTr][index].v.v" clearable />
 												</template>
 											</template>
 											<template v-else>{{ item.value }}</template>
@@ -44,6 +44,10 @@
 					</div>
 				</Card>
 			</div>
+		</div>
+		<div slot="footer">
+			<Button @click="modalCancel">{{ $t("cancel") }}</Button>
+			<Button type="primary" @click="modalOk">{{ $t("submit") }}</Button>
 		</div>
 	</Modal>
 </template>
@@ -70,7 +74,8 @@ export default {
 	methods: {
 		//初始化表格
 		getTable() {
-			let { celldata, config, frozen } = JSON.parse(this.data.json)[0];
+			this.resultData = JSON.parse(this.data.json)[0];
+			let { celldata, config, frozen } = this.resultData;
 			console.log("JSON.parse(this.data.json)", JSON.parse(this.data.json));
 			this.tableHtml = [];
 
@@ -99,21 +104,26 @@ export default {
 				//合并单元格
 				const colspan = mc ? (r == mc?.r && c == mc?.c ? mc.cs : 0) : 1;
 				const rowspan = mc ? (r == mc?.r && c == mc?.c ? mc.rs : 0) : 1;
-				console.log(r, c, colspan, rowspan);
+				console.log(r, c, colspan, rowspan, width);
 				//td 内部div样式
-				let divStyle = `min-width:${width * colspan}px;min-height:${height * rowspan}px;`; //宽高
+				let divStyle = `min-width:${width}px;min-height:${height}px;`; //宽高
 				if (v) divStyle += `line-height:${height * rowspan}px;`;
 				divStyle += `white-space: pre-line;overflow: hidden;text-overflow: ellipsis;display: flex;`; //超出文字省略,有\n 换行
 				if (ht) divStyle += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
 				if (vt) divStyle += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
 				// 值不存在 则显示默认值
 				if (!v) v = cellType?.default || ct?.s?.map((item) => item.v).toString() || v;
-				console.log(r, c, v);
+				this.resultData.celldata[index] = { ...item, v: { ...item?.v, v: v } };
+				console.log(this.resultData.celldata[r][c]);
 				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType };
 			});
 		},
-		changeValue() {
-			console.log(this.tableHtml);
+		modalOk() {
+			console.log("结果集：", this.resultData);
+		},
+		//取消
+		modalCancel() {
+			this.modalFlag = false;
 		},
 	},
 };
@@ -124,11 +134,12 @@ export default {
 <style lang="less" scoped>
 .data-table table {
 	position: absolute;
-	width: 100%;
+	width: auto;
 	height: 100%;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	color: #1a1a1a !important;
 }
 .data-table td {
 	padding: 0;

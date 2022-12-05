@@ -152,7 +152,7 @@ export default {
 			let jsonData = luckysheet.getAllSheets();
 			jsonData[0].data = [];
 			jsonData[0].celldata = jsonData[0].celldata.filter((item) => {
-				return JSON.stringify(item.v) !== "{}" && ((item.v.v && item.v.v != "") || (item.v.ct && item.v.ct.s) || (item.v.cellType && item.v.cellType.type) || item.v?.authority.length);
+				return JSON.stringify(item.v) !== "{}" && ((item.v.v && item.v.v != "") || (item.v.ct && item.v.ct.s) || (item.v.cellType && item.v.cellType.type) || item.v?.authority?.length);
 			});
 			console.log("jsonData", jsonData, "this.formInfo", this.formInfo, this.isAdd);
 			if (jsonData[0].celldata.length > 0) {
