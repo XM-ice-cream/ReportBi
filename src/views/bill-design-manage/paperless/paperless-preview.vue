@@ -101,7 +101,8 @@ export default {
 				const rowspan = mc ? (r == mc?.r && c == mc?.c ? mc.rs : 0) : 1;
 				console.log(r, c, colspan, rowspan);
 				//td 内部div样式
-				let divStyle = `min-width:${width * colspan}px;min-height:${height * rowspan}px;line-height:${height * rowspan}px;`; //宽高
+				let divStyle = `min-width:${width * colspan}px;min-height:${height * rowspan}px;`; //宽高
+				if (v) divStyle += `line-height:${height * rowspan}px;`;
 				divStyle += `white-space: pre-line;overflow: hidden;text-overflow: ellipsis;display: flex;`; //超出文字省略,有\n 换行
 				if (ht) divStyle += `justify-content:${ht == 0 ? "center" : ht == 2 ? "right" : "left"};`; //水平居中 0:居中;1:居左;2:居右
 				if (vt) divStyle += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
@@ -138,5 +139,9 @@ export default {
 }
 :deep(.ivu-checkbox-wrapper) {
 	font-size: 16px;
+}
+:deep(.ivu-modal-fullscreen .ivu-modal-body) {
+	top: 25px;
+	bottom: 0px;
 }
 </style>
