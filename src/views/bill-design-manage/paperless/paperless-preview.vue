@@ -12,26 +12,26 @@
 										<div :title="item.value" :style="item.divStyle">
 											<template v-if="item.cellType?.type">
 												<!-- 输入框 -->
-												<template v-if="item.cellType.type === 'input'"> <Input clearable v-model.trim="resultData.celldata[indexTr][index].v.v" /> </template>
+												<template v-if="item.cellType.type === 'input'"> <Input clearable v-model.trim="resultData.celldata[item.index].v.v" /> </template>
 												<!-- 复选框 -->
 												<template v-if="item.cellType.type === 'checkbox'">
-													<CheckboxGroup v-model="resultData.celldata[indexTr][index].v.v">
+													<CheckboxGroup v-model="resultData.celldata[item.index].v.v">
 														<Checkbox v-for="cellItem in item.cellType.data" :key="cellItem.value" :label="cellItem.value">{{ cellItem.name }}</Checkbox>
 													</CheckboxGroup>
 												</template>
 												<!-- 下拉框 -->
 												<template v-if="item.cellType.type === 'select'">
-													<Select v-model="resultData.celldata[indexTr][index].v.v" clearable transfer placeholder="">
+													<Select v-model="resultData.celldata[item.index].v.v" clearable transfer placeholder="">
 														<Option v-for="cellItem in item.cellType.data" :value="cellItem.value" :key="cellItem.value">{{ cellItem.name }}</Option>
 													</Select>
 												</template>
 												<!-- 时间选择器 -->
 												<template v-if="item.cellType.type === 'datePicker'">
-													<DatePicker type="datetime" v-model="resultData.celldata[indexTr][index].v.v" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+													<DatePicker type="datetime" v-model="resultData.celldata[item.index].v.v" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
 												</template>
 												<!-- 数字输入框 -->
 												<template v-if="item.cellType.type === 'inputnumber'">
-													<InputNumber v-model="resultData.celldata[indexTr][index].v.v" clearable />
+													<InputNumber v-model="resultData.celldata[item.index].v.v" clearable />
 												</template>
 											</template>
 											<template v-else>{{ item.value }}</template>
@@ -104,7 +104,7 @@ export default {
 				//合并单元格
 				const colspan = mc ? (r == mc?.r && c == mc?.c ? mc.cs : 0) : 1;
 				const rowspan = mc ? (r == mc?.r && c == mc?.c ? mc.rs : 0) : 1;
-				console.log(r, c, colspan, rowspan, width);
+
 				//td 内部div样式
 				let divStyle = `min-width:${width}px;min-height:${height}px;`; //宽高
 				if (v) divStyle += `line-height:${height * rowspan}px;`;
@@ -113,9 +113,9 @@ export default {
 				if (vt) divStyle += `align-items:${vt == 0 ? "center" : vt == 2 ? "right" : "left"};`; //垂直居中
 				// 值不存在 则显示默认值
 				if (!v) v = cellType?.default || ct?.s?.map((item) => item.v).toString() || v;
+
 				this.resultData.celldata[index] = { ...item, v: { ...item?.v, v: v } };
-				console.log(this.resultData.celldata[r][c]);
-				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType };
+				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType, index };
 			});
 		},
 		modalOk() {
