@@ -1,10 +1,14 @@
 <template>
-	<Modal v-model="modalFlag" title="无纸化表单编辑" fullscreen :mask="false" :z-index="999" transfer>
+	<!-- <Modal v-model="modalFlag" title="无纸化表单编辑" fullscreen :mask="false" :z-index="999" transfer> -->
+	<div style="height: 100%">
 		<div class="page-style excel-preview">
 			<div class="comment">
 				<Card :bordered="false" dis-hover class="card-style">
+					<p slot="title">
+						{{ data.name }}
+					</p>
 					<!-- 表格 -->
-					<div class="data-table" style="height: 100%">
+					<div class="data-table" style="height: calc(100% - 20px)">
 						<table class="table tableScroll" id="exceltable" :class="tableHtml.length > 1 ? '' : 'blankBg'">
 							<tr v-for="(itemTr, indexTr) in tableHtml" :key="indexTr">
 								<template v-for="(item, index) in itemTr">
@@ -27,7 +31,7 @@
 												</template>
 												<!-- 时间选择器 -->
 												<template v-if="item.cellType.type === 'datePicker'">
-													<DatePicker type="datetime" v-model="resultData.celldata[item.index].v.v" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+													<DatePicker type="datetime" v-model="resultData.celldata[item.index].v.v" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable transfer></DatePicker>
 												</template>
 												<!-- 数字输入框 -->
 												<template v-if="item.cellType.type === 'inputnumber'">
@@ -42,14 +46,15 @@
 							</tr>
 						</table>
 					</div>
+					<!-- 提交按钮 -->
+					<div class="card-footer">
+						<Button type="primary" @click="modalOk">{{ $t("submit") }}</Button>
+					</div>
 				</Card>
 			</div>
 		</div>
-		<div slot="footer">
-			<Button @click="modalCancel">{{ $t("cancel") }}</Button>
-			<Button type="primary" @click="modalOk">{{ $t("submit") }}</Button>
-		</div>
-	</Modal>
+	</div>
+	<!-- </Modal> -->
 </template>
 
 <script>
@@ -64,23 +69,19 @@ export default {
 			data: {},
 		};
 	},
-	watch: {
-		modalFlag() {
-			this.$nextTick(() => {
-				this.getTable();
-			});
-		},
-	},
+
 	methods: {
 		//初始化表格
 		getTable() {
 			this.resultData = JSON.parse(this.data.json)[0];
 			let { celldata, config, frozen } = this.resultData;
-			console.log("JSON.parse(this.data.json)", JSON.parse(this.data.json));
+			console.log("JSON.parse(this.data.json)", celldata, JSON.parse(this.data.json));
+
 			this.tableHtml = [];
 
 			// 处理表格单元格样式
 			celldata.forEach((item, index) => {
+				console.log(item);
 				const { r, c } = item;
 				//console.log(r, c, item);
 				if (!this.tableHtml[r]) this.tableHtml[r] = [];
@@ -115,16 +116,22 @@ export default {
 				if (!v) v = cellType?.default || ct?.s?.map((item) => item.v).toString() || v;
 
 				this.resultData.celldata[index] = { ...item, v: { ...item?.v, v: v } };
+
 				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType, index };
+				console.log(this.tableHtml[r][c]);
 			});
 		},
 		modalOk() {
 			console.log("结果集：", this.resultData);
 		},
-		//取消
-		modalCancel() {
-			this.modalFlag = false;
-		},
+	},
+	mounted() {
+		this.data = JSON.parse(window.localStorage.getItem("paperlessRow"));
+		document.title = this.data.name;
+
+		this.$nextTick(() => {
+			this.getTable();
+		});
 	},
 };
 </script>
@@ -143,10 +150,43 @@ export default {
 }
 .data-table td {
 	padding: 0;
+	&:hover {
+		background-color: #27ce88 !important;
+		color: #fff;
+	}
+}
+.card-footer {
+	width: 100%;
+	text-align: center;
+	position: absolute;
+	bottom: 4px;
+
+	button {
+		margin-right: 10px;
+		padding: 0 25px;
+	}
+}
+:deep(.ivu-card-head) {
+	p {
+		padding-left: 10px;
+		&::before {
+			content: "";
+			position: absolute;
+			left: 8px;
+			display: inline-block;
+			width: 4px;
+			height: 22px;
+			background: #27ce88;
+		}
+	}
 }
 :deep(.ivu-input) {
 	border: none;
 	border-radius: 0px !important;
+	background: transparent;
+	&:hover {
+		color: #fff;
+	}
 }
 :deep(.ivu-checkbox-wrapper) {
 	font-size: 16px;
@@ -154,5 +194,14 @@ export default {
 :deep(.ivu-modal-fullscreen .ivu-modal-body) {
 	top: 25px;
 	bottom: 0px;
+}
+:deep(.ivu-select-selection:hover) {
+	border: none;
+	background-color: transparent;
+	border-radius: 0px;
+	color: #fff;
+}
+:deep(.ivu-select-visible .ivu-select-selection) {
+	border: none;
 }
 </style>

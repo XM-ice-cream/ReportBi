@@ -36,14 +36,14 @@
 				</div>
 				<Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick">
 					<template slot="operator" slot-scope="{ row }">
-						<Button class="tableBtn" type="text" @click="signForm(row)">签订</Button>
+						<Button class="tableBtn" type="text" @click="signForm(row)">审核</Button>
 					</template>
 				</Table>
 				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
 			</Card>
 		</div>
 		<PaperlessDesign ref="paperless-design" :isAdd="isAdd" />
-		<PaperlessPreview ref="paperless-preview" />
+		<!-- <PaperlessPreview ref="paperless-preview" /> -->
 	</div>
 </template>
 
@@ -155,9 +155,13 @@ export default {
 		},
 		// 签订表单
 		signForm(row) {
-			this.$refs["paperless-preview"].data = { ...row };
-			this.$refs["paperless-preview"].modalFlag = true;
+			window.localStorage.setItem("paperlessRow", JSON.stringify(row));
+			const { href } = this.$router.resolve({
+				path: "/bill-design-manage/paperless-preview",
+			});
+			window.open(href, "_blank");
 		},
+
 		cancelClick() {
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
 		},
@@ -192,7 +196,7 @@ export default {
 <style scoped lang="less">
 .tableBtn {
 	display: inline-block;
-	padding: 0.2rem;
+	padding: 3px 10px;
 	color: #1890ff;
 	background: #f5f5f5;
 
