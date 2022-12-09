@@ -1,6 +1,6 @@
 <template>
 	<!-- <div v-if="modalFlag" style="width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; z-index: 1"> -->
-	<Modal v-model="modalFlag" title="无纸化表单设计" fullscreen :mask="false" :z-index="999" transfer>
+	<Modal v-model="modalFlag" :title="isAdd ? `无纸化模板新增` : `无纸化模板编辑`" fullscreen :mask="false" :z-index="999" transfer>
 		<Layout class="layout">
 			<!-- 中间内容excel -->
 			<Content class="content">
