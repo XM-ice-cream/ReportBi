@@ -1,4 +1,4 @@
-/* 无纸化 */
+/* 无纸化 模板 */
 <template>
 	<div class="page-style">
 		<!-- 页面表格 -->
@@ -13,13 +13,13 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
-										<!-- 报表类型 -->
-										<FormItem :label="$t('reportType')" prop="reportType">
-											<Select v-model="req.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')" transfer cleabler>
-												<Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
-													{{ item.detailName }}
-												</Option>
-											</Select>
+										<!-- 模板名称 -->
+										<FormItem label="模板名称" prop="name">
+											<Input v-model="req.name" :placeholder="$t('pleaseEnter') + '模板名称'" cleabler />
+										</FormItem>
+										<!-- 模板编码 -->
+										<FormItem label="模板编码" prop="enCode">
+											<Input v-model="req.enCode" :placeholder="$t('pleaseEnter') + '模板编码'" cleabler />
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -36,7 +36,7 @@
 				</div>
 				<Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick">
 					<template slot="operator" slot-scope="{ row }">
-						<Button class="tableBtn" type="text" @click="signForm(row)">审核</Button>
+						<Button class="tableBtn" type="text" @click="signForm(row)">预览</Button>
 					</template>
 				</Table>
 				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
@@ -48,14 +48,13 @@
 </template>
 
 <script>
-import { getButtonBoolean } from "@/libs/tools";
+import { getButtonBoolean, renderDate } from "@/libs/tools";
 import PaperlessDesign from "./paperless/paperless-design.vue";
-import PaperlessPreview from "./paperless/paperless-preview.vue";
-import { getpagelistReq } from "@/api/bill-design-manage/paperless.js";
+import { getpagelistReq } from "@/api/bill-design-manage/paperless-template.js";
 
 export default {
-	components: { PaperlessDesign, PaperlessPreview },
-	name: "Paperless",
+	components: { PaperlessDesign },
+	name: "PaperlessTemplate",
 	data() {
 		return {
 			searchPoptipModal: false,
@@ -65,13 +64,11 @@ export default {
 			btnData: [],
 			isAdd: true,
 			selectObj: {}, //表格选中
-			reportTypeList: [
-				{ detailValue: "excel", detailName: "Excel报表" },
-				{ detailValue: "largescreen", detailName: "大屏报表" },
-			],
 			submitData: {},
 			drawerFlag: false,
 			req: {
+				enCode: "",
+				name: "",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -84,8 +81,10 @@ export default {
 					},
 				},
 				{ title: "ID", key: "id", align: "center", tooltip: true },
-				{ title: "表单名称", key: "name", align: "center", tooltip: true },
-				{ title: "表单编码", key: "enCode", align: "center", tooltip: true },
+				{ title: "模板名称", key: "name", align: "center", tooltip: true },
+				{ title: "模板编码", key: "enCode", align: "center", tooltip: true },
+				{ title: "创建时间", key: "createDate", align: "center", tooltip: true, render: renderDate },
+				{ title: "修改时间", key: "modifyDate", align: "center", tooltip: true, render: renderDate },
 				{ title: "操作", slot: "operator", align: "center", tooltip: true },
 			], // 表格数据
 			// 验证实体
@@ -113,13 +112,13 @@ export default {
 		},
 		// 获取分页列表数据
 		pageLoad() {
-			let { orderField, ascending, pageSize, pageIndex } = this.req;
+			let { orderField, ascending, pageSize, pageIndex, enCode, name } = this.req;
 			const obj = {
 				orderField, // 排序字段
 				ascending, // 是否升序
 				pageSize, // 分页大小
 				pageIndex, // 当前页码
-				data: { enCode: "", name: "", category: 0, status: "" },
+				data: { enCode, name, category: 0, status: "" },
 			};
 			getpagelistReq(obj)
 				.then((res) => {
@@ -155,7 +154,8 @@ export default {
 		},
 		// 签订表单
 		signForm(row) {
-			window.localStorage.setItem("paperlessRow", JSON.stringify(row));
+			const obj = { row };
+			window.localStorage.setItem("paperlessRow", JSON.stringify(obj));
 			const { href } = this.$router.resolve({
 				path: "/bill-design-manage/paperless-preview",
 			});

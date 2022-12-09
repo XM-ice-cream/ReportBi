@@ -9,7 +9,7 @@
 			</Content>
 			<!-- 右侧基础配置 -->
 			<Sider hide-trigger class="sider" style="right: 0; position: absolute">
-				<RightSetting :formData="rightForm" :formInfo.sync="formInfo" @autoChangeFunc="autoChangeFunc" />
+				<RightSetting :formData="rightForm" :formInfo.sync="formInfo" :isSingleCell="isSingleCell" @autoChangeFunc="autoChangeFunc" />
 			</Sider>
 		</Layout>
 		<div slot="footer">
@@ -22,7 +22,7 @@
 
 <script>
 import RightSetting from "./right-setting.vue";
-import { addReq, modifyReq } from "@/api/bill-design-manage/paperless.js";
+import { addReq, modifyReq } from "@/api/bill-design-manage/paperless-template.js";
 
 export default {
 	name: "excelreport-design",
@@ -46,6 +46,7 @@ export default {
 			rightForm: {},
 			selectRange: {}, //选中范围
 			formInfo: {}, //表单信息
+			isSingleCell: true, //选中范围 是否为单个单元格
 		};
 	},
 	methods: {
@@ -71,7 +72,13 @@ export default {
 						that.setRightForm(cell, postion, sheetFile, ctx, value); //rightForm默认值
 					},
 					rangeSelect: function (sheet, range) {
-						that.selectRange = { rows: range[0].row, columns: range[0].column };
+						const { row, column } = range[0];
+						that.selectRange = { rows: row, columns: column };
+						if (row[0] == row[1] && column[0] === column[1]) {
+							that.isSingleCell = true;
+						} else {
+							that.isSingleCell = false;
+						}
 						console.log("选区操作", range[0].row, range[0].column);
 					},
 				},

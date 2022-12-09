@@ -46,24 +46,24 @@
 			<TabPane label="类型" name="name2">
 				<Form ref="cellType" :label-width="60" :model="cellType" style="padding: 0 1.3rem">
 					<FormItem label="类型" prop="type">
-						<Select v-model.trim="cellType.type" clearable transfer>
+						<Select v-model.trim="cellType.type" clearable transfer @on-change="submitType()">
 							<Option v-for="item in typeList" :key="item.value" :label="item.name" :value="item.value" />
 						</Select>
 					</FormItem>
 					<FormItem label="默认值" prop="default">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.default" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType"></DatePicker>
-						<Input v-else type="text" v-model.trim="cellType.default" clearable />
+						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.default" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType()"></DatePicker>
+						<Input v-else type="text" v-model.trim="cellType.default" clearable @on-change="submitType()" />
 					</FormItem>
 				</Form>
 				<Button type="warning" class="add-btn" v-if="cellType.data.length == 0" size="small" @click="addRow(-1)">添加 </Button>
 				<Table :data="cellType.data" border :columns="typeColumns" :max-height="350" style="width: 100%">
 					<template slot-scope="{ index }" slot="name">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].name" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType"></DatePicker>
-						<Input v-else v-model.trim="cellType.data[index].name" clearable />
+						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].name" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType()"></DatePicker>
+						<Input v-else v-model.trim="cellType.data[index].name" clearable @on-change="submitType()" />
 					</template>
 					<template slot-scope="{ index }" slot="value">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].value" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType"></DatePicker>
-						<Input v-else v-model.trim="cellType.data[index].value" clearable />
+						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].value" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType()"></DatePicker>
+						<Input v-else v-model.trim="cellType.data[index].value" clearable @on-change="submitType()" />
 					</template>
 					<!-- 操作 -->
 					<template slot-scope="{ row, index }" slot="operator">
@@ -73,8 +73,9 @@
 				</Table>
 				<div class="operator-btn">
 					<Button type="primary" ghost @click="resetType">重置</Button>
-					<Button type="primary" @click="submitType">提交</Button>
+					<Button type="primary" @click="submitType(true)" v-if="!isSingleCell">提交</Button>
 				</div>
+				<Alert type="warning" show-icon class="alert-warning">当选中多个区域时, 请点击<b>提交按钮</b></Alert>
 			</TabPane>
 		</Tabs>
 	</div>
@@ -95,6 +96,10 @@ export default {
 		formInfo: {
 			type: Object,
 			default: () => {},
+		},
+		isSingleCell: {
+			type: Boolean,
+			default: () => true,
 		},
 	},
 	watch: {
@@ -264,12 +269,14 @@ export default {
 			this.cellType.data.splice(index + 1, 0, obj);
 		},
 		// 提交
-		submitType() {
-			console.log("change===========");
+		submitType(flag = false) {
+			//多个cell和flag 为false 不可提交【防止卡死】
+			if (!this.isSingleCell && !flag) {
+				return;
+			}
 			if (this.cellType.type == "checkbox") this.cellType.default = [...this.cellType.default];
-
 			this.$emit("autoChangeFunc", "cellType", { ...this.cellType });
-			this.$Message.success("提交成功");
+			if (flag) this.$Message.success("提交成功");
 		},
 		//重置
 		resetType() {
@@ -324,5 +331,13 @@ export default {
 	border: none;
 	float: right;
 	margin-right: 5px;
+}
+.alert-warning {
+	width: 86%;
+	margin: 0 auto;
+	margin-top: 10px;
+	b {
+		color: #f56c6c;
+	}
 }
 </style>

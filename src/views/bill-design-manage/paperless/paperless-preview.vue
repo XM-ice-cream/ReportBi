@@ -1,14 +1,11 @@
 <template>
-	<!-- <Modal v-model="modalFlag" title="无纸化表单编辑" fullscreen :mask="false" :z-index="999" transfer> -->
 	<div style="height: 100%">
 		<div class="page-style excel-preview">
 			<div class="comment">
 				<Card :bordered="false" dis-hover class="card-style">
-					<p slot="title">
-						{{ data.name }}
-					</p>
+					<p slot="title">{{ isPreview ? `模板预览【${data.name}】` : `表单审核【${data.billNumber}】` }}</p>
 					<!-- 表格 -->
-					<div class="data-table" style="height: calc(100% - 20px)">
+					<div class="data-table" style="height: calc(100% - 20px); overflow: auto">
 						<table class="table tableScroll" id="exceltable" :class="tableHtml.length > 1 ? '' : 'blankBg'">
 							<tr v-for="(itemTr, indexTr) in tableHtml" :key="indexTr">
 								<template v-for="(item, index) in itemTr">
@@ -47,36 +44,54 @@
 						</table>
 					</div>
 					<!-- 提交按钮 -->
-					<div class="card-footer">
-						<Button type="primary" @click="modalOk">{{ $t("submit") }}</Button>
+					<div class="card-footer" v-if="!isPreview">
+						<Button type="primary" ghost @click="modalOk(-1)">{{ $t("save") }}</Button>
+						<Button type="primary" @click="modalOk(0)">{{ $t("submit") }}</Button>
 					</div>
 				</Card>
 			</div>
 		</div>
 	</div>
-	<!-- </Modal> -->
 </template>
 
 <script>
+import { modifyReq, getlistReq } from "@/api/bill-design-manage/paperless-form.js";
+
 export default {
 	name: "paperless-preview",
 	components: {},
 	data() {
 		return {
 			tableHtml: [],
-			modalFlag: false,
+			isPreview: false,
 			resultData: [],
 			data: {},
 		};
 	},
 
 	methods: {
+		//获取数据
+		pageLoad() {
+			const data = window.localStorage.getItem("paperlessRow");
+			const obj = {
+				billNumber: JSON.parse(data).billNumber,
+				templateId: JSON.parse(data).templateId,
+			};
+			getlistReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.data = res?.result[0] || [];
+					console.log(this.data);
+					this.$nextTick(() => {
+						this.getTable();
+					});
+				}
+			});
+		},
+
 		//初始化表格
 		getTable() {
 			this.resultData = JSON.parse(this.data.json)[0];
 			let { celldata, config, frozen } = this.resultData;
-			console.log("JSON.parse(this.data.json)", celldata, JSON.parse(this.data.json));
-
 			this.tableHtml = [];
 
 			// 处理表格单元格样式
@@ -121,17 +136,38 @@ export default {
 				console.log(this.tableHtml[r][c]);
 			});
 		},
-		modalOk() {
+		modalOk(type) {
+			const obj = {
+				...this.data,
+				json: JSON.stringify([this.resultData]),
+				state: type,
+			};
+			modifyReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.$Message.success("提交成功！");
+				} else {
+					this.$Message.error("提交失败", res.message);
+				}
+			});
 			console.log("结果集：", this.resultData);
 		},
 	},
 	mounted() {
-		this.data = JSON.parse(window.localStorage.getItem("paperlessRow"));
-		document.title = this.data.name;
+		const obj = window.localStorage.getItem("paperlessRow");
+		const parseObj = JSON.parse(obj);
+		if (parseObj?.row) {
+			console.log(obj.row);
+			this.data = parseObj.row;
+			this.isPreview = true;
+			document.title = `模板-${this.data.name}`;
 
-		this.$nextTick(() => {
-			this.getTable();
-		});
+			this.$nextTick(() => {
+				this.getTable();
+			});
+		} else {
+			document.title = JSON.parse(obj).billNumber;
+			this.pageLoad();
+		}
 	},
 };
 </script>
@@ -140,16 +176,19 @@ export default {
 </style>
 <style lang="less" scoped>
 .data-table table {
-	position: absolute;
 	width: auto;
-	height: 100%;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	height: auto;
+	// position: absolute;
+	// top: 50%;
+	// left: 50%;
+	// transform: translate(-50%, -50%);
+	float: none;
+	display: table;
 	color: #1a1a1a !important;
+	border: none;
 }
 .data-table td {
-	padding: 0;
+	padding: 0 3px;
 	&:hover {
 		background-color: #27ce88 !important;
 		color: #fff;
@@ -169,6 +208,7 @@ export default {
 :deep(.ivu-card-head) {
 	p {
 		padding-left: 10px;
+		font-weight: bold;
 		&::before {
 			content: "";
 			position: absolute;
@@ -201,7 +241,7 @@ export default {
 	border-radius: 0px;
 	color: #fff;
 }
-:deep(.ivu-select-visible .ivu-select-selection) {
+:deep(.ivu-select-selection) {
 	border: none;
 }
 </style>

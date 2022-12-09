@@ -1966,6 +1966,9 @@ export default {
   'maverick-yield-report': 'Mavrick 报表',
   'panel-additional-recording': '打件资料补录',
   'asm-data-generate': 'ASM数据处理',
+  'paperless-template': '无纸化模板',
+  'paperless-form': '无纸化表单',
+  'mpe-unlock-hold': 'MPE 解Hold',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
