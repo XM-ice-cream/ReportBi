@@ -18,13 +18,25 @@
 					<FormItem label="VendorreceivDate" prop="vendorreceivdate">
 						<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + 'VendorreceivDate'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="selectObj.vendorreceivdate"></DatePicker>
 					</FormItem>
+					<!-- issuedate -->
+					<FormItem label="IssueDate" prop="issuedate">
+						<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + 'IssueDate'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="selectObj.issuedate"></DatePicker>
+					</FormItem>
 					<!-- reportdate -->
 					<FormItem label="ReportDate" prop="reportdate">
 						<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + 'ReportDate'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="selectObj.reportdate"></DatePicker>
 					</FormItem>
+					<!-- failurestation -->
+					<FormItem label="FailureStation" prop="failurestation">
+						<Input v-model.trim="selectObj.failurestation" :placeholder="$t('pleaseEnter') + 'FailureStation'" />
+					</FormItem>
 					<!-- status -->
 					<FormItem label="状态" prop="status">
 						<Input v-model.trim="selectObj.status" :placeholder="$t('pleaseEnter') + '状态'" />
+					</FormItem>
+					<!-- 备注 -->
+					<FormItem label="备注" prop="remark">
+						<Input v-model.trim="selectObj.remark" :placeholder="$t('pleaseEnter') + '备注'" />
 					</FormItem>
 				</Form>
 				<drawer-button @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
@@ -76,8 +88,8 @@ export default {
 	methods: {
 		// 提交
 		submitClick(isClose = false) {
-			const { reportdate, shipmentdate, vendorreceivdate } = this.selectObj;
-			const obj = { ...this.selectObj, reportdate: formatDate(reportdate), shipmentdate: formatDate(shipmentdate), vendorreceivdate: formatDate(vendorreceivdate) };
+			const { reportdate, shipmentdate, vendorreceivdate, issuedate } = this.selectObj;
+			const obj = { ...this.selectObj, reportdate: formatDate(reportdate), shipmentdate: formatDate(shipmentdate), vendorreceivdate: formatDate(vendorreceivdate), issuedate: formatDate(issuedate) };
 			modifyReq(obj).then((res) => {
 				if (res.code === 200) {
 					this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);

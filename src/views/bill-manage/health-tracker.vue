@@ -128,16 +128,18 @@ export default {
 				{ title: "DC", key: "dc", align: "center", minWidth: 100, tooltip: true },
 				{ title: "LC", key: "lc", align: "center", minWidth: 120, tooltip: true },
 				{ title: "Issue Date", key: "issuedate", align: "center", minWidth: 130, tooltip: true, render: renderDate },
-				{ title: "Error code", key: "errocode", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
-				{ title: "Failure station", key: "failurestation", align: "center", minWidth: 120, tooltip: true },
+				{ title: "Error Code", key: "errocode", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
+				{ title: "Failure Station", key: "failurestation", align: "center", minWidth: 120, tooltip: true },
 				{ title: "Issue Description", key: "issuedescription", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 				{ title: "Input Qty", key: "inputqty", align: "center", minWidth: 90, tooltip: true },
 				{ title: "FR", key: "failrate", align: "center", minWidth: 60, tooltip: true },
+				{ title: "Vendor", key: "vendor", align: "center", minWidth: 120, tooltip: true },
 				{ title: "Tracking No.", key: "trackingno", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 				{ title: "Shipment Date", key: "shipmentdate", align: "center", minWidth: 130, tooltip: true, render: renderDate, inputType: "datetime" },
 				{ title: "Vendor Receiving Date", key: "vendorreceivdate", align: "center", minWidth: 135, tooltip: true, render: renderDate, inputType: "datetime" },
-				{ title: "Report time", key: "reportdate", align: "center", minWidth: 130, tooltip: true, render: renderDate, inputType: "datetime" },
+				{ title: "Report Time", key: "reportdate", align: "center", minWidth: 130, tooltip: true, render: renderDate, inputType: "datetime" },
 				{ title: "Status", key: "status", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
+				{ title: "Remark", key: "remark", align: "center", minWidth: 120, tooltip: true },
 			], // 表格数据
 			rulesValidate: {
 				startTime: [
