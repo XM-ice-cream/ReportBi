@@ -46,8 +46,6 @@
 							<Icon type="md-eye" />
 						</Button>
 					</Tooltip>
-
-					<!-- <Icon custom="iconfont luckysheet-iconfont-hanshu" style="margin-right:5px" /> -->
 				</div>
 				<div id="luckysheet" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0"></div>
 				<div style="display: none"></div>
