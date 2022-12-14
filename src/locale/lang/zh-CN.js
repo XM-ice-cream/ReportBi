@@ -1969,6 +1969,8 @@ export default {
   'paperless-template': '无纸化模板',
   'paperless-form': '无纸化表单',
   'mpe-unlock-hold': 'MPE 解Hold',
+  'report-bi': 'Report BI',
+  'dataset-config': '数据集配置',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',

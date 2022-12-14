@@ -66,10 +66,10 @@
 </template>
 
 <script>
-import { getpagelistReq, getAllDatasourceReq, deleteDatacollectReq } from "@/api/bill-design-manage/data-set.js"
-import { getButtonBoolean, renderIsEnabled } from "@/libs/tools"
-import dataView from "./dataset/data-view.vue"
-import EditViewSet from "./dataset/edit-view-set.vue"
+import { getpagelistReq, getAllDatasourceReq, deleteDatacollectReq } from "@/api/bill-design-manage/data-set.js";
+import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
+import dataView from "./dataset/data-view.vue";
+import EditViewSet from "./dataset/edit-view-set.vue";
 
 export default {
 	components: { dataView, EditViewSet },
@@ -107,7 +107,7 @@ export default {
 					width: 50,
 					align: "center",
 					indexMethod: (row) => {
-						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1
+						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
 				{ title: this.$t("setCode"), key: "setCode", align: "center", tooltip: true },
@@ -123,40 +123,40 @@ export default {
 				sourceCode: [
 					{
 						required: true,
-						message: this.$t("pleaseEnter") + this.$t("sourceCode"),
+						message: this.$t("pleaseEnter") + this.$t("dataSourceCode"),
 						trigger: "change",
 					},
 				],
 			},
-		}
+		};
 	},
 	activated() {
-		console.log(this.$route.query.sourceCode)
+		console.log(this.$route.query.sourceCode);
 		if (this.$route.query.sourceCode) {
-			this.req.sourceCode = this.$route.query.sourceCode
+			this.req.sourceCode = this.$route.query.sourceCode;
 		}
-		this.pageLoad()
-		this.autoSize()
-		this.getDataSourceList()
-		window.addEventListener("resize", () => this.autoSize())
-		getButtonBoolean(this, this.btnData)
+		this.pageLoad();
+		this.autoSize();
+		this.getDataSourceList();
+		window.addEventListener("resize", () => this.autoSize());
+		getButtonBoolean(this, this.btnData);
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
-		this.searchPoptipModal = false
-		next()
+		this.searchPoptipModal = false;
+		next();
 	},
 	methods: {
 		// 点击搜索按钮触发
 		searchClick() {
-			this.req.pageIndex = 1
-			this.pageLoad()
+			this.req.pageIndex = 1;
+			this.pageLoad();
 		},
 		// 获取分页列表数据
 		pageLoad() {
-			this.data = []
-			this.tableConfig.loading = true
-			const { sourceCode, setCode, setName } = this.req
+			this.data = [];
+			this.tableConfig.loading = true;
+			const { sourceCode, setCode, setName } = this.req;
 			let obj = {
 				orderField: "setCode", // 排序字段
 				ascending: true, // 是否升序
@@ -167,47 +167,47 @@ export default {
 					setCode,
 					setName,
 				},
-			}
+			};
 			getpagelistReq(obj)
 				.then((res) => {
-					this.tableConfig.loading = false
+					this.tableConfig.loading = false;
 					if (res.code === 200) {
-						let { data, pageSize, pageIndex, total, totalPage } = res.result
-						this.data = data || []
-						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds }
+						let { data, pageSize, pageIndex, total, totalPage } = res.result;
+						this.data = data || [];
+						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 					}
 				})
-				.catch(() => (this.tableConfig.loading = false))
-			this.searchPoptipModal = false
+				.catch(() => (this.tableConfig.loading = false));
+			this.searchPoptipModal = false;
 		},
 		//获取数据源下拉框
 		getDataSourceList() {
-			const obj = { sourceType: "" }
+			const obj = { sourceType: "" };
 			getAllDatasourceReq(obj).then((res) => {
-				const { code, result } = res
-				if (code !== 200) return
-				this.sourceList = result
-			})
+				const { code, result } = res;
+				if (code !== 200) return;
+				this.sourceList = result;
+			});
 		},
 		// 新增按钮
 		addClick(type) {
-			this.dialogVisibleSetDataSet = true
-			this.dataSet = {}
-			this.isAdd = true
-			this.$refs.EditDataSet.addOrEditDataSet(this.dataSet, type, this.isAdd)
+			this.dialogVisibleSetDataSet = true;
+			this.dataSet = {};
+			this.isAdd = true;
+			this.$refs.EditDataSet.addOrEditDataSet(this.dataSet, type, this.isAdd);
 		},
 		// 点击编辑按钮触发
 		editClick() {
 			if (this.selectObj) {
-				this.dataSet = this.selectObj
-				const type = this.selectObj.setType
-				this.dialogVisibleSetDataSet = true
-				this.isAdd = false
+				this.dataSet = this.selectObj;
+				const type = this.selectObj.setType;
+				this.dialogVisibleSetDataSet = true;
+				this.isAdd = false;
 				// this.submitData = {
 				//   ...this.selectObj
 				// };
-				this.$refs.EditDataSet.addOrEditDataSet(this.dataSet, type, this.isAdd)
-			} else this.$Msg.warning(this.$t("oneData"))
+				this.$refs.EditDataSet.addOrEditDataSet(this.dataSet, type, this.isAdd);
+			} else this.$Msg.warning(this.$t("oneData"));
 		},
 		//提交 isClose = false
 		submitClick() {
@@ -239,62 +239,62 @@ export default {
 		},
 		//数据预览
 		dataview(data) {
-			this.dialogCaseResult = true
-			this.$refs.DataView.dataViewPreview(data.setName, JSON.parse(data.caseResult))
+			this.dialogCaseResult = true;
+			this.$refs.DataView.dataViewPreview(data.setName, JSON.parse(data.caseResult));
 		},
 		cancelClick() {
-			this.$refs.submitReq.resetFields() //清除表单红色提示
+			this.$refs.submitReq.resetFields(); //清除表单红色提示
 		},
 		//删除
 		deleteClick() {
-			const deleteData = this.selectArr.length > 0 ? this.selectArr : this.selectObj ? [{ ...this.selectObj }] : []
+			const deleteData = this.selectArr.length > 0 ? this.selectArr : this.selectObj ? [{ ...this.selectObj }] : [];
 			if (deleteData.length == 0) {
-				this.$Message.error("无选中删除数据")
-				return
+				this.$Message.error("无选中删除数据");
+				return;
 			}
 			this.$Modal.confirm({
 				title: "确认要删除该数据吗?",
 				onOk: () => {
-					const deleteArr = deleteData.map((o) => o.setCode)
+					const deleteArr = deleteData.map((o) => o.setCode);
 					deleteDatacollectReq({ setCode: deleteArr }).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success("删除成功")
-							this.pageLoad()
+							this.$Message.success("删除成功");
+							this.pageLoad();
 						}
-					})
+					});
 				},
-			})
+			});
 		},
 
 		// 某一行高亮时触发
 		currentClick(currentRow) {
-			this.selectObj = currentRow
+			this.selectObj = currentRow;
 		},
 		//删除选择的数据
 		selectClick(selection) {
-			this.selectArr = selection
+			this.selectArr = selection;
 		},
 		// 点击重置按钮触发
 		resetClick() {
-			this.$refs.searchReq.resetFields()
+			this.$refs.searchReq.resetFields();
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 120 - 60
+			this.tableConfig.height = document.body.clientHeight - 120 - 60;
 		},
 		// 选择第几页
 		pageChange(index) {
-			this.req.pageIndex = index
-			this.pageLoad()
+			this.req.pageIndex = index;
+			this.pageLoad();
 		},
 		// 选择一页有条数据
 		pageSizeChange(index) {
-			this.req.pageIndex = 1
-			this.req.pageSize = index
-			this.pageLoad()
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
 		},
 	},
-}
+};
 </script>
 <style lang="less" scope>
 .tableBtn {
