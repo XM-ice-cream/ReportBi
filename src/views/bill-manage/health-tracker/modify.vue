@@ -2,7 +2,14 @@
 <template>
 	<div>
 		<!-- 左侧抽屉 -->
-		<Drawer class="add-record" v-model="drawerFlag" :title="isAdd ? '新增记录' : '修改记录'" width="700" :mask-closable="false" @on-close="cancelClick">
+		<Drawer
+			class="add-record"
+			v-model="drawerFlag"
+			:title="isAdd ? '新增记录' : '修改记录'"
+			width="700"
+			:mask-closable="false"
+			@on-close="cancelClick"
+		>
 			<!-- 页面表格 -->
 			<div class="comment">
 				<Form ref="searchReq" :model="selectObj" :label-width="120" :label-colon="true" @submit.native.prevent>
@@ -12,19 +19,47 @@
 					</FormItem>
 					<!-- shipmentdate -->
 					<FormItem label="ShipmentDate" prop="shipmentdate">
-						<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + 'ShipmentDate'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="selectObj.shipmentdate"></DatePicker>
+						<DatePicker
+							transfer
+							type="datetime"
+							:placeholder="$t('pleaseSelect') + 'ShipmentDate'"
+							format="yyyy-MM-dd HH:mm:ss"
+							:options="$config.datetimeOptions"
+							v-model="selectObj.shipmentdate"
+						></DatePicker>
 					</FormItem>
 					<!-- vendorreceivdate -->
 					<FormItem label="VendorreceivDate" prop="vendorreceivdate">
-						<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + 'VendorreceivDate'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="selectObj.vendorreceivdate"></DatePicker>
+						<DatePicker
+							transfer
+							type="datetime"
+							:placeholder="$t('pleaseSelect') + 'VendorreceivDate'"
+							format="yyyy-MM-dd HH:mm:ss"
+							:options="$config.datetimeOptions"
+							v-model="selectObj.vendorreceivdate"
+						></DatePicker>
 					</FormItem>
 					<!-- issuedate -->
 					<FormItem label="IssueDate" prop="issuedate">
-						<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + 'IssueDate'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="selectObj.issuedate"></DatePicker>
+						<DatePicker
+							transfer
+							type="datetime"
+							:placeholder="$t('pleaseSelect') + 'IssueDate'"
+							format="yyyy-MM-dd HH:mm:ss"
+							:options="$config.datetimeOptions"
+							v-model="selectObj.issuedate"
+						></DatePicker>
 					</FormItem>
 					<!-- reportdate -->
 					<FormItem label="ReportDate" prop="reportdate">
-						<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + 'ReportDate'" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="selectObj.reportdate"></DatePicker>
+						<DatePicker
+							transfer
+							type="datetime"
+							:placeholder="$t('pleaseSelect') + 'ReportDate'"
+							format="yyyy-MM-dd HH:mm:ss"
+							:options="$config.datetimeOptions"
+							v-model="selectObj.reportdate"
+						></DatePicker>
 					</FormItem>
 					<!-- failurestation -->
 					<FormItem label="FailureStation" prop="failurestation">
@@ -89,7 +124,13 @@ export default {
 		// 提交
 		submitClick(isClose = false) {
 			const { reportdate, shipmentdate, vendorreceivdate, issuedate } = this.selectObj;
-			const obj = { ...this.selectObj, reportdate: formatDate(reportdate), shipmentdate: formatDate(shipmentdate), vendorreceivdate: formatDate(vendorreceivdate), issuedate: formatDate(issuedate) };
+			const obj = {
+				...this.selectObj,
+				reportdate: formatDate(reportdate),
+				shipmentdate: formatDate(shipmentdate),
+				vendorreceivdate: formatDate(vendorreceivdate),
+				issuedate: formatDate(issuedate),
+			};
 			modifyReq(obj).then((res) => {
 				if (res.code === 200) {
 					this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
@@ -113,9 +154,7 @@ export default {
 		},
 	},
 	created() {},
-	mounted() {
-		this.getColumnsList();
-	},
+	mounted() {},
 };
 </script>
 <style lang="less">

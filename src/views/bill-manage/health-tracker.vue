@@ -15,11 +15,25 @@
 									<Form ref="searchReq" :model="req" :label-width="90" :label-colon="true" @submit.native.prevent :rules="rulesValidate">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('startTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.startTime"
+											></DatePicker>
 										</FormItem>
 										<!-- 结束时间 -->
 										<FormItem :label="$t('endTime')" prop="endTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('endTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.endTime"
+											></DatePicker>
 										</FormItem>
 										<!-- Project -->
 										<FormItem label="Project" prop="project">
@@ -51,7 +65,11 @@
 										</FormItem>
 										<!-- RadarNo -->
 										<FormItem label="RadarNo" prop="radarno">
-											<Input v-model.trim="req.radarno" :placeholder="$t('pleaseEnter') + 'RadarNo'" placeholder="请输入RadarNo,多个以英文逗号或空格分隔" />
+											<Input
+												v-model.trim="req.radarno"
+												:placeholder="$t('pleaseEnter') + 'RadarNo'"
+												placeholder="请输入RadarNo,多个以英文逗号或空格分隔"
+											/>
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -66,8 +84,24 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick"></Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+				></Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 		<!-- 新增/编辑记录 -->
@@ -133,13 +167,21 @@ export default {
 				{ title: "Issue Description", key: "issuedescription", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 				{ title: "Input Qty", key: "inputqty", align: "center", minWidth: 90, tooltip: true },
 				{ title: "FR", key: "failrate", align: "center", minWidth: 60, tooltip: true },
-				{ title: "Vendor", key: "vendor", align: "center", minWidth: 120, tooltip: true },
+				{ title: "Vendor", key: "vendor", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 				{ title: "Tracking No.", key: "trackingno", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 				{ title: "Shipment Date", key: "shipmentdate", align: "center", minWidth: 130, tooltip: true, render: renderDate, inputType: "datetime" },
-				{ title: "Vendor Receiving Date", key: "vendorreceivdate", align: "center", minWidth: 135, tooltip: true, render: renderDate, inputType: "datetime" },
+				{
+					title: "Vendor Receiving Date",
+					key: "vendorreceivdate",
+					align: "center",
+					minWidth: 135,
+					tooltip: true,
+					render: renderDate,
+					inputType: "datetime",
+				},
 				{ title: "Report Time", key: "reportdate", align: "center", minWidth: 130, tooltip: true, render: renderDate, inputType: "datetime" },
 				{ title: "Status", key: "status", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
-				{ title: "Remark", key: "remark", align: "center", minWidth: 120, tooltip: true },
+				{ title: "Remark", key: "remark", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 			], // 表格数据
 			rulesValidate: {
 				startTime: [
