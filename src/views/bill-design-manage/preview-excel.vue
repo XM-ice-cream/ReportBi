@@ -15,7 +15,16 @@
             </FormItem> -->
 						<!-- 报表分类 -->
 						<FormItem label="报表分类" prop="remark">
-							<Select v-model="req.remark" clearable :placeholder="$t('pleaseSelect') + '报表分类'" transfer filterable cleabler @on-change="searchClick" style="width: 200px">
+							<Select
+								v-model="req.remark"
+								clearable
+								:placeholder="$t('pleaseSelect') + '报表分类'"
+								transfer
+								filterable
+								cleabler
+								@on-change="searchClick"
+								style="width: 200px"
+							>
 								<Option v-for="(item, i) in remarkList" :value="item.detailName" :key="i">
 									{{ item.detailName }}
 								</Option>
@@ -88,17 +97,25 @@
 						</div>
 					</template>
 				</div>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 	</div>
 </template>
 
 <script>
-import { formatDate } from "@/libs/tools"
-import { getpagelistReq } from "@/api/bill-design-manage/report-manage"
-import { getpagelisttreeReq } from "@/api/organize-manager/authorize-manager/menu-manager"
-import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item"
+import { formatDate } from "@/libs/tools";
+import { getpagelistReq } from "@/api/bill-design-manage/report-manage";
+import { getpagelisttreeReq } from "@/api/organize-manager/authorize-manager/menu-manager";
+import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item";
 export default {
 	components: {},
 	name: "previewExcel",
@@ -108,6 +125,7 @@ export default {
 			selectObj: null, //表格选中
 			formatDate: formatDate,
 			roleBtn: [], //该角色下的报表权限卡片
+			remarkList: [], //报表类型下拉
 			pageConfig: { ...this.$config.pageConfig },
 			req: {
 				reportName: "",
@@ -116,27 +134,27 @@ export default {
 				remark: "",
 				...this.$config.pageConfig,
 			}, //查询数据
-		}
+		};
 	},
 	mounted() {
-		this.getRoleBtn()
-		this.getDataItemData()
+		this.getRoleBtn();
+		this.getDataItemData();
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
-		this.searchPoptipModal = false
-		next()
+		this.searchPoptipModal = false;
+		next();
 	},
 	methods: {
 		// 点击搜索按钮触发
 		searchClick() {
-			this.req.pageIndex = 1
-			this.pageLoad()
+			this.req.pageIndex = 1;
+			this.pageLoad();
 		},
 		// 获取分页列表数据
 		pageLoad() {
-			this.data = []
-			const { reportType, reportName, reportCode, remark } = this.req
+			this.data = [];
+			const { reportType, reportName, reportCode, remark } = this.req;
 			//   this.tableConfig.loading = true;
 			let obj = {
 				orderField: "reportType", // 排序字段
@@ -150,27 +168,27 @@ export default {
 					remark,
 					codeList: this.roleBtn.toString(),
 				},
-			}
+			};
 			getpagelistReq(obj)
 				.then((res) => {
 					// this.tableConfig.loading = false;
 					if (res.code === 200) {
-						let { data, pageSize, pageIndex, total, totalPage } = res.result
-						this.data = data || []
-						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds }
+						let { data, pageSize, pageIndex, total, totalPage } = res.result;
+						this.data = data || [];
+						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 					}
 				})
-				.catch()
+				.catch();
 		},
 		//设计
 		design(reportCode, reportName) {
-			const href = this.skipUrl(this.req.reportType + "Design", reportCode, reportName)
-			window.open(href, "_blank")
+			const href = this.skipUrl(this.req.reportType + "Design", reportCode, reportName);
+			window.open(href, "_blank");
 		},
 		// 预览
 		preview(reportCode, reportName) {
-			const href = this.skipUrl(this.req.reportType + "Preview", reportCode, reportName)
-			window.open(href, "_blank")
+			const href = this.skipUrl(this.req.reportType + "Preview", reportCode, reportName);
+			window.open(href, "_blank");
 		},
 		//跳转路径
 		skipUrl(key, reportCode, reportName) {
@@ -179,12 +197,12 @@ export default {
 				largescreenPreview: "/bill-design-manage/screenreport-preview",
 				excelDesign: "/bill-design-manage/excelreport-design",
 				largescreenDesign: "/bill-design-manage/screenreport-design",
-			}
+			};
 			const { href } = this.$router.resolve({
 				path: obj[key],
 				query: { reportCode, reportName },
-			})
-			return href
+			});
+			return href;
 		},
 		//获取角色按钮
 		getRoleBtn() {
@@ -202,44 +220,44 @@ export default {
 					title: "",
 					enabled: 1,
 				},
-			}
+			};
 			getpagelisttreeReq(obj).then((res) => {
 				if (res.code === 200) {
-					console.log(res.result.data)
-					const data = res.result.data
-					this.roleBtn = data.length ? data.map((item) => item.name) : ["a"]
-					this.pageLoad()
+					console.log(res.result.data);
+					const data = res.result.data;
+					this.roleBtn = data.length ? data.map((item) => item.name) : ["a"];
+					this.pageLoad();
 				}
-			})
+			});
 		},
 		// 获取业务数据
 		async getDataItemData() {
-			this.remarkList = await this.getDataItemDetailList("reportDesignType") // 获取站点数据
+			this.remarkList = await this.getDataItemDetailList("reportDesignType"); // 获取站点数据
 		},
 		// 获取数据字典数据
 		async getDataItemDetailList(itemCode) {
-			let arr = []
+			let arr = [];
 			await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
 				if (res.code === 200) {
-					arr = res.result || []
+					arr = res.result || [];
 				}
-			})
-			return arr
+			});
+			return arr;
 		},
 
 		// 选择第几页
 		pageChange(index) {
-			this.req.pageIndex = index
-			this.pageLoad()
+			this.req.pageIndex = index;
+			this.pageLoad();
 		},
 		// 选择一页有条数据
 		pageSizeChange(index) {
-			this.req.pageIndex = 1
-			this.req.pageSize = index
-			this.pageLoad()
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
 		},
 	},
-}
+};
 </script>
 <style>
 .preview-excel .card-style .ivu-card-body {

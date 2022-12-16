@@ -1,46 +1,52 @@
+/*数据集配置 编辑 */
 <template>
-	<Modal :title="modalTitle" :mask-closable="false" :closable="true" v-model="modalFlag" fullscreen :before-close="closeDialog">
-		<div class="modal-content">
-			<Split v-model="splitValue">
-				<div slot="left" class="left-box">
-					<Form ref="submitRef" :model="submitData">
-						<label class="name-label">数据源：</label>
-						<FormItem prop="sourceCode">
-							<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源">
-								<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
-							</Select>
-						</FormItem>
-						<label class="name-label">筛选表名称：</label>
-						<FormItem prop="filterTable">
-							<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" @on-search="pageLoad" />
-						</FormItem>
-					</Form>
-					<!-- 树 -->
-					<div class="left-tree">
-						<ul>
-							<li v-for="(item, index) in treeData" :key="index" draggable @dragend="addNodeImage($event, item)">
-								<Icon custom="iconfont icon-biaodanzujian-biaoge" class="icon" />{{ item.title }}
-							</li>
-						</ul>
+	<div style="height: 100%">
+		<!-- 数据集 -->
+		<Modal :title="modalTitle" :mask-closable="false" :closable="true" v-model="modalFlag" fullscreen :before-close="closeDialog">
+			<div class="modal-content">
+				<Split v-model="splitValue">
+					<div slot="left" class="left-box">
+						<Form ref="submitRef" :model="submitData">
+							<label class="name-label">数据源：</label>
+							<FormItem prop="sourceCode">
+								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源">
+									<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
+								</Select>
+							</FormItem>
+							<label class="name-label">筛选表名称：</label>
+							<FormItem prop="filterTable">
+								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" @on-search="pageLoad" />
+							</FormItem>
+						</Form>
+						<!-- 树 -->
+						<div class="left-tree">
+							<ul>
+								<li v-for="(item, index) in treeData" :key="index" draggable @dragend="addNodeImage($event, item)">
+									<Icon custom="iconfont icon-biaodanzujian-biaoge" class="icon" />{{ item.title }}
+								</li>
+							</ul>
+						</div>
 					</div>
-				</div>
-				<div slot="right" class="right-box">
-					<div id="table-box" ref="tablebox"></div>
-				</div>
-			</Split>
-		</div>
-		<div slot="footer" class="dialog-footer">
-			<Button @click="closeDialog">取消</Button>
-			<Button type="primary" @click="submitClick()">提交</Button>
-		</div>
-	</Modal>
+					<div slot="right" class="right-box">
+						<div id="table-box" ref="tablebox"></div>
+					</div>
+				</Split>
+			</div>
+			<div slot="footer" class="dialog-footer">
+				<Button @click="closeDialog">取消</Button>
+				<Button type="primary" @click="submitClick()">提交</Button>
+			</div>
+		</Modal>
+		<DataSetConfigConnecttable ref="datasetconfigconnecttable" :modalFlag.sync="connectModalFlag" :connectObj="connectObj" />
+	</div>
 </template>
 <script>
 import { getAllDatasourceReq } from "@/api/bill-design-manage/data-set.js";
+import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
 export default {
 	name: "DataSetConfigAddEdit",
-	components: {},
+	components: { DataSetConfigConnecttable },
 	props: {
 		modalFlag: {
 			required: true,
@@ -60,7 +66,9 @@ export default {
 	},
 	data() {
 		return {
-			modalTitle: "数据集配置",
+			modalTitle: "编辑关系",
+			connectModalFlag: false,
+			connectObj: {}, //关联表
 			submitData: {},
 			splitValue: 0.2,
 			graph: "",
@@ -192,10 +200,16 @@ export default {
 			// });
 			//边的双击事件
 			this.graph.on("edge:dblclick", (e) => {
-				const { source, target } = e.item.getModel();
-				const obj = { source, target };
-				console.log("边的双击事件", obj, e.item.getModel());
+				this.edgeDblclick(e);
 			});
+		},
+		//边双击
+		edgeDblclick(e) {
+			const { source, target } = e.item.getModel();
+			const obj = { source, target };
+			this.connectModalFlag = true;
+			this.connectObj = { ...obj };
+			console.log("边的双击事件", obj, e.item.getModel());
 		},
 
 		// 添加节点

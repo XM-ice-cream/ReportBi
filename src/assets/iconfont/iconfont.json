@@ -6,6 +6,41 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "587122",
+      "name": "string",
+      "font_class": "string",
+      "unicode": "e809",
+      "unicode_decimal": 59401
+    },
+    {
+      "icon_id": "1766501",
+      "name": "符号-数字输入框",
+      "font_class": "shuzishurukuang",
+      "unicode": "e69c",
+      "unicode_decimal": 59036
+    },
+    {
+      "icon_id": "4766919",
+      "name": "table",
+      "font_class": "table",
+      "unicode": "e7de",
+      "unicode_decimal": 59358
+    },
+    {
+      "icon_id": "11372667",
+      "name": "话题符号",
+      "font_class": "huatifuhao",
+      "unicode": "e8b0",
+      "unicode_decimal": 59568
+    },
+    {
+      "icon_id": "17692261",
+      "name": "日期时间",
+      "font_class": "riqishijian",
+      "unicode": "e708",
+      "unicode_decimal": 59144
+    },
+    {
       "icon_id": "124495",
       "name": "警告",
       "font_class": "jinggao",
