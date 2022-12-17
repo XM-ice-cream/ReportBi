@@ -6,37 +6,37 @@
 		<div class="modal-content">
 			<Table :columns="columns" :data="data" :height="tableConfig.height" disabled-hover>
 				<!-- 源表 -->
-				<template #source="{ row }">
-					<Select v-model="row.source" size="small" placehold="选择字段">
-						<template #prefix>
+				<template #source="{ row, index }">
+					<Select v-model="data[index].source" size="small" placehold="选择字段" transfer>
+						<template #prefix v-if="!row.source">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="item in sourceList" :value="item.field" :key="item">
-							<icon custom="iconfont icon-string" v-if="item.type === 'string'" />
-							<icon custom="iconfont icon-shuzishurukuang" v-if="item.type === 'number'" />
-							<icon custom="iconfont icon-huatifuhao" v-if="item.type === 'any'" />
-							<icon custom="iconfont icon-riqishijian" v-if="item.type === 'datetime'" />
-							{{ item.field }}
+						<Option v-for="item in sourceList" :value="item.columnName" :key="item">
+							<icon custom="iconfont icon-string" v-if="item.columnType === 'VARCHAR2'" />
+							<icon custom="iconfont icon-shuzishurukuang" v-if="item.columnType === 'NUMBER'" />
+							<icon custom="iconfont icon-huatifuhao" v-if="item.columnType === 'any'" />
+							<icon custom="iconfont icon-riqishijian" v-if="item.columnType === 'datetime'" />
+							{{ item.columnName }}
 						</Option>
 					</Select>
 				</template>
-				<template #symbol="{ row }">
-					<Select v-model="row.symbol" size="small" style="border: none">
+				<template #symbol="{ row, index }">
+					<Select v-model="data[index].symbol" size="small" style="border: none" transfer>
 						<Option v-for="item in symbolList" :value="item" :key="item">{{ item }}</Option>
 					</Select>
 				</template>
 				<!-- 目标表 -->
-				<template #target="{ row }">
-					<Select v-model="row.target" size="small" placehold="选择字段">
-						<template #prefix>
+				<template #target="{ row, index }">
+					<Select v-model="data[index].target" size="small" placehold="选择字段" transfer>
+						<template #prefix v-if="!row.target">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="item in targetList" :value="item.field" :key="item">
-							<icon custom="iconfont icon-string" v-if="item.type === 'string'" />
-							<icon custom="iconfont icon-shuzishurukuang" v-if="item.type === 'number'" />
-							<icon custom="iconfont icon-huatifuhao" v-if="item.type === 'any'" />
-							<icon custom="iconfont icon-riqishijian" v-if="item.type === 'datetime'" />
-							{{ item.field }}
+						<Option v-for="item in targetList" :value="item.columnName" :key="item">
+							<icon custom="iconfont icon-string" v-if="item.columnType === 'VARCHAR2'" />
+							<icon custom="iconfont icon-shuzishurukuang" v-if="item.columnType === 'NUMBER'" />
+							<icon custom="iconfont icon-huatifuhao" v-if="item.columnType === 'any'" />
+							<icon custom="iconfont icon-riqishijian" v-if="item.columnType === 'datetime'" />
+							{{ item.columnName }}
 						</Option>
 					</Select>
 				</template>
@@ -49,6 +49,8 @@
 	</Modal>
 </template>
 <script>
+import { getColumnListReq } from "@/api/bill-design-manage/data-set-config.js";
+
 export default {
 	name: "DataSetConfigConnecttable",
 	components: {},
@@ -66,6 +68,8 @@ export default {
 	watch: {
 		modalFlag(newVal) {
 			if (newVal) {
+				this.getSourceFieldList();
+				this.getTargetFieldList();
 				this.getColumns();
 				this.autoSize();
 				window.addEventListener("resize", () => this.autoSize());
@@ -79,27 +83,47 @@ export default {
 			data: [],
 			columns: [],
 			symbolList: ["=", "<>", "<", "<=", ">", ">="],
-			sourceList: [
-				{ type: "any", field: "BASE" },
-				{ type: "string", field: "BATCHID" },
-				{ type: "number", field: "BOARDNO" },
-			],
-			targetList: [
-				{ type: "datetime", field: "Createdate" },
-				{ type: "string", field: "Createuserid" },
-				{ type: "number", field: "Deliverdate" },
-			],
+			sourceList: [],
+			targetList: [],
 		};
 	},
 	methods: {
 		//提交
-		submitClick() {},
+		submitClick() {
+			this.$emit("updateEdge", this.data);
+		},
+		//获取字段 源表
+		getSourceFieldList() {
+			const { source } = this.connectObj;
+			const sourceObj = {
+				sourceCode: source.split(":")[0],
+				tableName: source.split(":")[1],
+			};
+			getColumnListReq(sourceObj).then((res) => {
+				if (res.code == 200) {
+					this.sourceList = res?.result || [];
+				}
+			});
+		},
+		//获取字段 源表
+		getTargetFieldList() {
+			const { target } = this.connectObj;
+			const targetObj = {
+				sourceCode: target.split(":")[0],
+				tableName: target.split(":")[1],
+			};
+			getColumnListReq(targetObj).then((res) => {
+				if (res.code == 200) {
+					this.targetList = res?.result || [];
+				}
+			});
+		},
 		//获取列
 		getColumns() {
 			const { source, target } = this.connectObj;
 			this.columns = [
 				{
-					title: source,
+					title: source.split(":")[1],
 					slot: "source",
 				},
 				{
@@ -107,7 +131,7 @@ export default {
 					slot: "symbol",
 				},
 				{
-					title: target,
+					title: target.split(":")[1],
 					slot: "target",
 				},
 			];

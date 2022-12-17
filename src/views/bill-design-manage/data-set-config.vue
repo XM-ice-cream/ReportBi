@@ -30,8 +30,26 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick"> </Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+					@on-selection-change="selectClick"
+				>
+				</Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 		<!-- 数据集配置 新增与编辑 -->
@@ -42,10 +60,11 @@
 <script>
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import DataSetConfigAddEdit from "./datasetconfig/data-set-config-add-edit.vue";
+import { getpagelistReq } from "@/api/bill-design-manage/data-set-config.js";
 
 export default {
 	components: { DataSetConfigAddEdit },
-	name: "data-set-config",
+	name: "dateset-config",
 	data() {
 		return {
 			btnData: [],
@@ -65,11 +84,6 @@ export default {
 			}, //查询数据
 			columns: [
 				{
-					type: "selection",
-					width: 60,
-					align: "center",
-				},
-				{
 					type: "index",
 					width: 50,
 					align: "center",
@@ -77,24 +91,13 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: this.$t("setCode"), key: "setCode", align: "center", tooltip: true },
-				{ title: this.$t("setName"), key: "setName", align: "center", tooltip: true },
-				{ title: this.$t("dataSetDesc"), key: "setDesc", align: "center", tooltip: true },
-				{ title: this.$t("dataSource"), key: "sourceName", align: "center", tooltip: true },
-				{ title: this.$t("sourceType"), key: "setType", align: "center", tooltip: true },
+				{ title: this.$t("setCode"), key: "datasetCode", align: "center", tooltip: true },
+				{ title: this.$t("setName"), key: "datasetName", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled },
 				{ title: "操作", slot: "operation", align: "center", width: "80" },
 			], // 表格数据
 			// 验证实体
-			ruleValidate: {
-				sourceCode: [
-					{
-						required: true,
-						message: this.$t("pleaseEnter") + this.$t("dataSourceCode"),
-						trigger: "change",
-					},
-				],
-			},
+			ruleValidate: {},
 		};
 	},
 	activated() {
@@ -116,7 +119,33 @@ export default {
 			this.pageLoad();
 		},
 		// 获取分页列表数据
-		pageLoad() {},
+		pageLoad() {
+			let { datasetName, datasetCode } = this.req;
+			this.tableConfig.loading = true;
+			let obj = {
+				orderField: "datasetCode", // 排序字段
+				ascending: true, // 是否升序
+				pageSize: this.req.pageSize, // 分页大小
+				pageIndex: this.req.pageIndex, // 当前页码
+				data: {
+					datasetName,
+					datasetCode,
+					enabled: 1,
+				},
+			};
+			getpagelistReq(obj)
+				.then((res) => {
+					if (res.code === 200) {
+						if (res.code === 200) {
+							let { data, pageSize, pageIndex, total, totalPage } = res.result;
+							this.data = data || [];
+							this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
+							this.searchPoptipModal = false;
+						}
+					}
+				})
+				.finally(() => (this.tableConfig.loading = false));
+		},
 
 		// 新增按钮
 		addClick() {

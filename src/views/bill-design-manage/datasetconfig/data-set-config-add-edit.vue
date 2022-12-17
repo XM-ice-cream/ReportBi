@@ -3,13 +3,20 @@
 	<div style="height: 100%">
 		<!-- 数据集 -->
 		<Modal :title="modalTitle" :mask-closable="false" :closable="true" v-model="modalFlag" fullscreen :before-close="closeDialog">
+			<template slot="header">
+				<div class="ivu-modal-header-inner">
+					{{ modalTitle }}
+					<Input v-model="submitData.datasetName" :border="false" :placeholder="$t('pleaseEnter') + '数据集名称'" style="width: 150px" />
+					<Input v-model="submitData.datasetCode" :border="false" :placeholder="$t('pleaseEnter') + '数据集编码'" style="width: 150px" />
+				</div>
+			</template>
 			<div class="modal-content">
 				<Split v-model="splitValue">
 					<div slot="left" class="left-box">
 						<Form ref="submitRef" :model="submitData">
 							<label class="name-label">数据源：</label>
 							<FormItem prop="sourceCode">
-								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源">
+								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getTableList">
 									<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
 								</Select>
 							</FormItem>
@@ -21,8 +28,8 @@
 						<!-- 树 -->
 						<div class="left-tree">
 							<ul>
-								<li v-for="(item, index) in treeData" :key="index" draggable @dragend="addNodeImage($event, item)">
-									<Icon custom="iconfont icon-biaodanzujian-biaoge" class="icon" />{{ item.title }}
+								<li v-for="(item, index) in filterData" :key="index" draggable @dragend="addNodeImage($event, item)" :title="item">
+									<Icon custom="iconfont icon-biaodanzujian-biaoge" class="icon" />{{ item }}
 								</li>
 							</ul>
 						</div>
@@ -37,11 +44,13 @@
 				<Button type="primary" @click="submitClick()">提交</Button>
 			</div>
 		</Modal>
-		<DataSetConfigConnecttable ref="datasetconfigconnecttable" :modalFlag.sync="connectModalFlag" :connectObj="connectObj" />
+		<DataSetConfigConnecttable ref="datasetconfigconnecttable" :modalFlag.sync="connectModalFlag" :connectObj="connectObj" @updateEdge="updateEdge" />
 	</div>
 </template>
 <script>
 import { getAllDatasourceReq } from "@/api/bill-design-manage/data-set.js";
+import { addReq, modifyReq, getTableListReq } from "@/api/bill-design-manage/data-set-config.js";
+
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
 export default {
@@ -59,61 +68,87 @@ export default {
 			if (newVal) {
 				this.getDataSourceList(); //获取数据源
 				this.$nextTick(() => {
-					this.createGraphic(); //创建画布
+					// 判断画布是否存在
+					this.graph === "" ? "" : this.graph.destroy();
+					this.data = {
+						nodes: [],
+						edges: [],
+						combos: [],
+					};
+					this.createGraphic();
 				});
 			}
 		},
 	},
+	computed: {
+		filterData() {
+			const keyWord = this.submitData.filterTable;
+			const reg = new RegExp(keyWord);
+			const arr = [];
+			this.treeData.forEach((item) => {
+				if (reg.test(item)) {
+					arr.push(item);
+				}
+			});
+			return arr;
+		},
+	},
 	data() {
 		return {
-			modalTitle: "编辑关系",
+			modalTitle: "数据集配置",
 			connectModalFlag: false,
 			connectObj: {}, //关联表
 			submitData: {},
 			splitValue: 0.2,
 			graph: "",
 			sourceList: [], //数据源集合
-			treeData: [
-				{ id: 1, title: "APS_BASE_INFO" },
-				{ id: 2, title: "APS_LINE" },
-				{ id: 3, title: "APS_PROCESS" },
-				{ id: 4, title: "APS_BASE_INFO" },
-				{ id: 5, title: "APS_LINE" },
-				{ id: 6, title: "APS_PROCESS" },
-				{ id: 7, title: "APS_BASE_INFO" },
-				{ id: 8, title: "APS_PROCESS_DETAIL" },
-				{ id: 9, title: "APS_PROCESS" },
-				{ id: 10, title: "APS_BASE_INFO" },
-				{ id: 11, title: "APS_LINE" },
-				{ id: 12, title: "APS_PROCESS" },
-				{ id: 13, title: "APS_BASE_INFO" },
-				{ id: 14, title: "APS_LINE" },
-				{ id: 15, title: "APS_PROCESS" },
-				{ id: 16, title: "APS_BASE_INFO" },
-				{ id: 17, title: "APS_LINE" },
-				{ id: 18, title: "APS_PROCESS" },
-				{ id: 19, title: "APS_BASE_INFO" },
-				{ id: 20, title: "APS_PROCESS_DETAIL" },
-				{ id: 21, title: "APS_PROCESS" },
-				{ id: 22, title: "APS_BASE_INFO" },
-				{ id: 23, title: "APS_LINE" },
-				{ id: 24, title: "APS_PROCESS" },
-			],
+			treeData: [],
+			data: {
+				nodes: [],
+				edges: [],
+				combos: [],
+			},
 		};
 	},
 	methods: {
 		//获取数据
 		pageLoad() {},
+		//获取表
+		getTableList() {
+			const obj = {
+				sourceCode: this.submitData.sourceCode,
+			};
+			getTableListReq(obj).then((res) => {
+				if (res.code === 200) {
+					this.treeData = res?.result || [];
+				} else {
+					this.$Message.error("获取表失败", res.message);
+				}
+			});
+		},
+
 		//提交
-		submitClick() {},
+		submitClick() {
+			const { id, datasetName, datasetCode } = this.submitData;
+			const obj = {
+				id,
+				datasetName,
+				datasetCode,
+				content: JSON.stringify(this.data),
+			};
+			const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
+			requestApi.then((res) => {
+				if (res.code === 200) {
+					this.$Message.success("提交成功！");
+					this.$parent.pageLoad(); //刷新数据
+					this.closeDialog(); //关闭弹框
+				} else {
+					this.$Message.error("提交异常", res.message);
+				}
+			});
+		},
 		// 创建画布
 		createGraphic() {
-			const data = {
-				nodes: [],
-				edges: [],
-				combos: [],
-			};
-
 			// 实例化画布
 			const container = document.getElementById("table-box"); // 画布
 			const width = container.scrollWidth;
@@ -165,6 +200,7 @@ export default {
 					style: {
 						stroke: "#F6BD16",
 						lineWidth: 2,
+						endArrow: true,
 					},
 				},
 				fitView: true, //自适应画布
@@ -172,7 +208,7 @@ export default {
 				// minZoom: 0, //最小缩放比例
 			});
 			// 渲染数据
-			this.graph.data(data);
+			this.graph.data(this.data);
 			this.graph.render();
 			// 设置层级
 			const canvas = this.graph.get("canvas");
@@ -215,14 +251,25 @@ export default {
 		// 添加节点
 		addNodeImage(e, row) {
 			console.log("添加节点", e);
+			const { sourceCode } = this.submitData;
 			const point = this.graph.getPointByClient(e.x, e.y);
 			this.graph.addItem("node", {
-				id: row.id.toString(),
-				label: row.title,
+				id: `${sourceCode}:${row}`,
+				label: row,
 				nodeType: 0,
 				x: point.x,
 				y: point.y,
 				type: "rect",
+			});
+		},
+		//更新边
+		updateEdge(val) {
+			this.data.edges.forEach((element) => {
+				const item = this.graph.findById(element.id);
+
+				this.graph.updateItem(item, {
+					attchInfo: val,
+				});
 			});
 		},
 		// 右键--节点的删除
@@ -273,6 +320,7 @@ export default {
 		// 关闭模态框
 		closeDialog() {
 			this.$emit("update:modalFlag", false);
+			this.submitData = {};
 		},
 	},
 };
@@ -280,6 +328,7 @@ export default {
 <style lang="less" scoped>
 .modal-content {
 	height: 100%;
+
 	.left-box {
 		height: 100%;
 		padding: 10px;
@@ -296,6 +345,10 @@ export default {
 			li {
 				list-style: none;
 				padding-bottom: 10px;
+				word-break: inherit;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 			.icon {
 				font-size: 22px;
@@ -309,6 +362,14 @@ export default {
 			width: 100%;
 			height: 100%;
 		}
+	}
+}
+:deep(.ivu-modal-header-inner) {
+	input {
+		background: transparent;
+		color: #fff;
+		font-weight: bold;
+		border: none;
 	}
 }
 :deep(.ivu-split-trigger-bar-con.vertical) {
