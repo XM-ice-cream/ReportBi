@@ -11,7 +11,7 @@
 						<template #prefix v-if="!row.source">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="item in sourceList" :value="item.columnName" :key="item">
+						<Option v-for="(item, index) in sourceList" :value="item.columnName" :key="index">
 							<icon custom="iconfont icon-string" v-if="item.columnType === 'VARCHAR2'" />
 							<icon custom="iconfont icon-shuzishurukuang" v-if="item.columnType === 'NUMBER'" />
 							<icon custom="iconfont icon-huatifuhao" v-if="item.columnType === 'any'" />
@@ -31,7 +31,7 @@
 						<template #prefix v-if="!row.target">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="item in targetList" :value="item.columnName" :key="item">
+						<Option v-for="(item, index) in targetList" :value="item.columnName" :key="index">
 							<icon custom="iconfont icon-string" v-if="item.columnType === 'VARCHAR2'" />
 							<icon custom="iconfont icon-shuzishurukuang" v-if="item.columnType === 'NUMBER'" />
 							<icon custom="iconfont icon-huatifuhao" v-if="item.columnType === 'any'" />
@@ -44,7 +44,7 @@
 		</div>
 		<div slot="footer" class="dialog-footer">
 			<Button @click="closeDialog">取消</Button>
-			<Button type="primary" @click="submitClick()">提交</Button>
+			<Button type="primary" @click="submitClick">提交</Button>
 		</div>
 	</Modal>
 </template>
@@ -90,7 +90,9 @@ export default {
 	methods: {
 		//提交
 		submitClick() {
-			this.$emit("updateEdge", this.data);
+			console.log("提交");
+			this.$emit("updateEdge", { ...this.connectObj, relations: this.data });
+			this.closeDialog();
 		},
 		//获取字段 源表
 		getSourceFieldList() {
@@ -147,6 +149,7 @@ export default {
 		// 关闭模态框
 		closeDialog() {
 			this.$emit("update:modalFlag", false);
+			this.data = [];
 		},
 	},
 };

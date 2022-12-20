@@ -26,7 +26,7 @@
 							</Poptip>
 						</i-col>
 						<i-col span="18" style="text-align: right">
-							<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick"></button-custom>
+							<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
 						</i-col>
 					</Row>
 				</div>
@@ -53,14 +53,14 @@
 			</Card>
 		</div>
 		<!-- 数据集配置 新增与编辑 -->
-		<DataSetConfigAddEdit :modalFlag.sync="modalFlag" />
+		<DataSetConfigAddEdit ref="datasetconfigaddedit" :modalFlag.sync="modalFlag" :isAdd="isAdd" />
 	</div>
 </template>
 
 <script>
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import DataSetConfigAddEdit from "./datasetconfig/data-set-config-add-edit.vue";
-import { getpagelistReq } from "@/api/bill-design-manage/data-set-config.js";
+import { getpagelistReq, deleteReq } from "@/api/bill-design-manage/data-set-config.js";
 
 export default {
 	components: { DataSetConfigAddEdit },
@@ -94,7 +94,6 @@ export default {
 				{ title: this.$t("setCode"), key: "datasetCode", align: "center", tooltip: true },
 				{ title: this.$t("setName"), key: "datasetName", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled },
-				{ title: "操作", slot: "operation", align: "center", width: "80" },
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {},
@@ -116,6 +115,7 @@ export default {
 		// 点击搜索按钮触发
 		searchClick() {
 			this.req.pageIndex = 1;
+			this.selectObj = {};
 			this.pageLoad();
 		},
 		// 获取分页列表数据
@@ -151,11 +151,32 @@ export default {
 		addClick() {
 			this.modalFlag = true;
 			this.isAdd = true;
-			this.selectObj = {};
+			this.$refs.datasetconfigaddedit.pageLoad({});
 		},
 		// 点击编辑按钮触发
 		editClick() {
 			if (this.selectObj) {
+				this.modalFlag = true;
+				this.isAdd = false;
+				this.$refs.datasetconfigaddedit.pageLoad(this.selectObj);
+			} else this.$Msg.warning(this.$t("oneData"));
+		},
+		//删除
+		deleteClick() {
+			if (this.selectObj) {
+				this.$Modal.confirm({
+					title: "确认要删除该数据吗?",
+					onOk: () => {
+						const obj = { ...this.selectObj };
+						deleteReq(obj).then((res) => {
+							if (res.code === 200) {
+								this.$Message.success("删除成功");
+								this.pageLoad();
+							}
+						});
+					},
+					//   onCancel: () => this.clearGraphData(),
+				});
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
 

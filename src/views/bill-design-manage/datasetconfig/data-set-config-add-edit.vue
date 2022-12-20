@@ -1,19 +1,34 @@
 /*数据集配置 编辑 */
 <template>
-	<div style="height: 100%">
+	<div>
 		<!-- 数据集 -->
 		<Modal :title="modalTitle" :mask-closable="false" :closable="true" v-model="modalFlag" fullscreen :before-close="closeDialog">
 			<template slot="header">
 				<div class="ivu-modal-header-inner">
 					{{ modalTitle }}
-					<Input v-model="submitData.datasetName" :border="false" :placeholder="$t('pleaseEnter') + '数据集名称'" style="width: 150px" />
-					<Input v-model="submitData.datasetCode" :border="false" :placeholder="$t('pleaseEnter') + '数据集编码'" style="width: 150px" />
 				</div>
 			</template>
 			<div class="modal-content">
+				<div class="base-info">
+					<Form ref="submitRef" :model="submitData" inline :label-width="90" :rules="rulesValidate">
+						<FormItem label="数据集名称:" prop="datasetName">
+							<Input v-model="submitData.datasetName" :placeholder="$t('pleaseEnter') + '数据集名称'" />
+						</FormItem>
+						<FormItem label="数据集编码:" prop="datasetCode">
+							<Input v-model="submitData.datasetCode" :placeholder="$t('pleaseEnter') + '数据集编码'" />
+						</FormItem>
+						<!-- 是否有效 -->
+						<FormItem :label="$t('enabled')" prop="enabled">
+							<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+								<span slot="open">{{ $t("open") }}</span>
+								<span slot="close">{{ $t("close") }}</span>
+							</i-switch>
+						</FormItem>
+					</Form>
+				</div>
 				<Split v-model="splitValue">
 					<div slot="left" class="left-box">
-						<Form ref="submitRef" :model="submitData">
+						<Form>
 							<label class="name-label">数据源：</label>
 							<FormItem prop="sourceCode">
 								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getTableList">
@@ -62,21 +77,17 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		isAdd: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	watch: {
 		modalFlag(newVal) {
 			if (newVal) {
 				this.getDataSourceList(); //获取数据源
-				this.$nextTick(() => {
-					// 判断画布是否存在
-					this.graph === "" ? "" : this.graph.destroy();
-					this.data = {
-						nodes: [],
-						edges: [],
-						combos: [],
-					};
-					this.createGraphic();
-				});
+			} else {
+				this.submitData = { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "" };
 			}
 		},
 	},
@@ -98,7 +109,7 @@ export default {
 			modalTitle: "数据集配置",
 			connectModalFlag: false,
 			connectObj: {}, //关联表
-			submitData: {},
+			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "" },
 			splitValue: 0.2,
 			graph: "",
 			sourceList: [], //数据源集合
@@ -108,42 +119,78 @@ export default {
 				edges: [],
 				combos: [],
 			},
+			rulesValidate: {
+				datasetName: [
+					{
+						required: true,
+						message: `${this.$t("pleaseEnter")}数据集名称`,
+					},
+				],
+				datasetCode: [
+					{
+						required: true,
+						message: `${this.$t("pleaseEnter")}数据集编码`,
+					},
+				],
+			},
 		};
 	},
 	methods: {
 		//获取数据
-		pageLoad() {},
+		pageLoad(val) {
+			console.log(val);
+			//// 隐式深拷贝，主要实现深拷贝，解除循环引用
+			if (JSON.stringify(val) !== "{}") {
+				this.data = { ...JSON.parse(val.content) };
+				this.submitData = { ...val };
+			}
+
+			this.$nextTick(() => {
+				this.createGraphic();
+			});
+			console.log(this.submitData);
+		},
 		//获取表
 		getTableList() {
 			const obj = {
 				sourceCode: this.submitData.sourceCode,
 			};
-			getTableListReq(obj).then((res) => {
-				if (res.code === 200) {
-					this.treeData = res?.result || [];
-				} else {
-					this.$Message.error("获取表失败", res.message);
-				}
-			});
+			if (obj.sourceCode) {
+				getTableListReq(obj).then((res) => {
+					if (res.code === 200) {
+						this.treeData = res?.result || [];
+					} else {
+						this.$Message.error("获取表失败", res.message);
+					}
+				});
+			}
 		},
 
 		//提交
 		submitClick() {
+			console.log("提交", this.graph);
+			return;
 			const { id, datasetName, datasetCode } = this.submitData;
+			console.log("提交参数", this.data);
 			const obj = {
 				id,
 				datasetName,
 				datasetCode,
-				content: JSON.stringify(this.data),
+				content: JSON.stringify({ ...this.data }),
 			};
-			const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
-			requestApi.then((res) => {
-				if (res.code === 200) {
-					this.$Message.success("提交成功！");
-					this.$parent.pageLoad(); //刷新数据
-					this.closeDialog(); //关闭弹框
-				} else {
-					this.$Message.error("提交异常", res.message);
+
+			this.$refs.submitRef.validate((validate) => {
+				if (validate) {
+					const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
+					requestApi.then((res) => {
+						if (res.code === 200) {
+							this.$Message.success("提交成功！");
+							this.$parent.pageLoad(); //刷新数据
+							this.closeDialog(); //关闭弹框
+						} else {
+							this.$Message.error("提交异常", res.message);
+						}
+					});
 				}
 			});
 		},
@@ -154,7 +201,7 @@ export default {
 			const width = container.scrollWidth;
 			const height = container.scrollHeight;
 			this.graph = new G6.Graph({
-				container,
+				container: "table-box",
 				width: width,
 				height: height,
 				plugins: [],
@@ -196,20 +243,23 @@ export default {
 				},
 				// 边
 				defaultEdge: {
-					type: "cubic-horizontal",
+					type: "custom-quadratic",
 					style: {
-						stroke: "#F6BD16",
+						// stroke: "#F6BD16",
+						stroke: "#fb5531",
 						lineWidth: 2,
 						endArrow: true,
+						lineDash: [1, 1],
 					},
 				},
-				fitView: true, //自适应画布
+				// fitView: true, //自适应画布
 				fitCenter: true, // 画布居中
 				// minZoom: 0, //最小缩放比例
 			});
 			// 渲染数据
 			this.graph.data(this.data);
 			this.graph.render();
+			this.graph.refresh(); //刷新
 			// 设置层级
 			const canvas = this.graph.get("canvas");
 			canvas.get("el").style.zIndex = 2;
@@ -231,9 +281,14 @@ export default {
 				this.graph.setItemState(e.item, "active", false);
 			});
 			//创建边
-			// this.graph.on("aftercreateedge", (e) => {
-			// 	console.log("创建边", e);
-			// });
+			this.graph.on("aftercreateedge", (e) => {
+				console.log("创建边", e, e.edge._cfg, e.edge.getModel());
+				if (e.edge.getModel()) {
+					this.data.edges.push({ ...e.edge.getModel() });
+					this.graph.changeData(this.data);
+					console.log(this.graph, this.data);
+				}
+			});
 			//边的双击事件
 			this.graph.on("edge:dblclick", (e) => {
 				this.edgeDblclick(e);
@@ -244,8 +299,8 @@ export default {
 			const { source, target } = e.item.getModel();
 			const obj = { source, target };
 			this.connectModalFlag = true;
-			this.connectObj = { ...obj };
-			console.log("边的双击事件", obj, e.item.getModel());
+			this.connectObj = { ...e.item.getModel() };
+			console.log("边的双击事件", obj, e.item.getModel(), this.graph);
 		},
 
 		// 添加节点
@@ -253,24 +308,36 @@ export default {
 			console.log("添加节点", e);
 			const { sourceCode } = this.submitData;
 			const point = this.graph.getPointByClient(e.x, e.y);
-			this.graph.addItem("node", {
+			const model = {
 				id: `${sourceCode}:${row}`,
 				label: row,
 				nodeType: 0,
 				x: point.x,
 				y: point.y,
 				type: "rect",
-			});
+			};
+			this.data.nodes.push({ ...model });
+			console.log("this.data", this.data);
+			this.graph.changeData(this.data);
+			const item = this.graph.findById(model.id);
 		},
 		//更新边
 		updateEdge(val) {
-			this.data.edges.forEach((element) => {
-				const item = this.graph.findById(element.id);
-
-				this.graph.updateItem(item, {
-					attchInfo: val,
+			console.log(val);
+			val.style.lineDash = [];
+			val.style.stroke = "#cacaca";
+			const isEdgeId = this.data.edges.map((item) => item.id).includes(val.id);
+			if (isEdgeId) {
+				this.data.edges.forEach((item, index) => {
+					if (item.id === val.id) {
+						this.data.edges[index] = JSON.parse(JSON.stringify({ ...val }));
+					}
 				});
-			});
+			} else {
+				this.data.edges.push({ ...val });
+			}
+			this.graph.changeData(this.data);
+			console.log(this.data, this.graph);
 		},
 		// 右键--节点的删除
 		getContextMenu() {
@@ -302,7 +369,13 @@ export default {
 				title: "确认删除该节点/边框吗?",
 				onOk: () => {
 					const item = this.graph.findById(id);
-					this.graph.removeItem(item);
+
+					const nodeId = item._cfg.id;
+					const edgeId = item._cfg.edges.map((item) => item._cfg.id);
+					this.data.edges = this.data.edges.filter((item) => !edgeId.includes(item.id));
+					this.data.nodes = this.data.nodes.filter((item) => item.id !== nodeId);
+
+					this.graph.changeData(this.data);
 				},
 			});
 		},
@@ -319,13 +392,48 @@ export default {
 
 		// 关闭模态框
 		closeDialog() {
+			console.log(this.$refs.submitRef);
+			this.$refs.submitRef.resetFields();
 			this.$emit("update:modalFlag", false);
-			this.submitData = {};
+			// this.submitData = { ...this.submitData, sourceCode: "", filterTable: "" };
+			this.treeData = [];
+			// 判断画布是否存在
+			this.graph === "" ? "" : this.graph.destroy();
+			this.data = {
+				nodes: [],
+				edges: [],
+				combos: [],
+			};
+			this.createGraphic();
 		},
 	},
 };
 </script>
 <style lang="less" scoped>
+.base-info {
+	position: absolute;
+	right: 0px;
+	background: #72c424;
+	margin: 5px;
+	/* line-height: 40px; */
+	vertical-align: baseline;
+	padding: 15px 5px;
+	/* background: #ccc; */
+	border-radius: 5px;
+	color: #fff !important;
+	width: 14%;
+	float: right;
+	z-index: 9999999;
+	:deep(.ivu-form .ivu-form-item-label) {
+		color: #fff;
+	}
+	:deep(input) {
+		border-radius: 5px;
+		background: transparent;
+		color: #fff;
+		border: 1px dashed;
+	}
+}
 .modal-content {
 	height: 100%;
 
@@ -365,11 +473,14 @@ export default {
 	}
 }
 :deep(.ivu-modal-header-inner) {
-	input {
-		background: transparent;
-		color: #fff;
-		font-weight: bold;
-		border: none;
+	form {
+		display: inline-block;
+		input {
+			background: transparent;
+			color: #fff;
+			font-weight: bold;
+			border: none;
+		}
 	}
 }
 :deep(.ivu-split-trigger-bar-con.vertical) {
@@ -393,4 +504,7 @@ export default {
 :deep(.g6-component-contextmenu) {
 	z-index: 999 !important;
 }
+// :deep(.ivu-modal-fullscreen .ivu-modal-body) {
+// 	top: 20px;
+// }
 </style>

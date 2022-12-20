@@ -1595,6 +1595,11 @@ export default {
   currentSn: '替换SN',
   currentPanel: '替换Panel',
 
+  //工作簿
+  workBookName: "工作簿名称",
+  workBookCode: "工作簿编码",
+
+
   // <!--------------------------------Menu Name----------------------------------------->
   'error-404': '找不到页面',
   'authorize-manager': '权限管理',
