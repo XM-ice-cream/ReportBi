@@ -1976,6 +1976,9 @@ export default {
   'mpe-unlock-hold': 'MPE 解Hold',
   'report-bi': 'Report BI',
   'dataset-config': '数据集配置',
+  'maverick-info': 'Maverick Info',
+  'workbook-manage': '工作簿管理',
+  'dateset-config': '数据集配置',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
