@@ -169,18 +169,20 @@ export default {
 
 		//提交
 		submitClick() {
-			this.getLevel();
-			const { id, datasetName, datasetCode } = this.submitData;
-			console.log("提交参数", this.data);
-			const obj = {
-				id,
-				datasetName,
-				datasetCode,
-				content: JSON.stringify({ ...this.data }),
-			};
-
 			this.$refs.submitRef.validate((validate) => {
 				if (validate) {
+					this.getLevel();
+					const { id, datasetName, datasetCode } = this.submitData;
+					const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
+					const obj = {
+						id,
+						datasetName,
+						datasetCode,
+						content: JSON.stringify(this.data),
+						sourceCode: Array.from(new Set(sourceList)).toString(),
+					};
+					console.log("结果值", obj);
+					console.log(obj);
 					const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 					requestApi.then((res) => {
 						if (res.code === 200) {
@@ -248,7 +250,7 @@ export default {
 						fill: "#fff",
 						stroke: "#d3d3d3",
 						lineWidth: 1,
-						width: 200,
+						width: 300,
 						height: 35,
 					},
 					// 文本内容设定样式

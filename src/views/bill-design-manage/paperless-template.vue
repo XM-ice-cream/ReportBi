@@ -34,12 +34,27 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick">
+				<Table
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+				>
 					<template slot="operator" slot-scope="{ row }">
 						<Button class="tableBtn" type="text" @click="signForm(row)">预览</Button>
 					</template>
 				</Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 		<PaperlessDesign ref="paperless-design" :isAdd="isAdd" />
@@ -138,6 +153,8 @@ export default {
 		addClick() {
 			this.isAdd = true;
 			this.$refs["paperless-design"].modalFlag = true;
+			this.$refs["paperless-design"].sheetData = [{}];
+			this.$refs["paperless-design"].formInfo = {};
 		},
 		// 点击编辑按钮触发
 		editClick() {
