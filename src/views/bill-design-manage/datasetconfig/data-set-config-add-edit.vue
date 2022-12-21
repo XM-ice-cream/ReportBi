@@ -65,6 +65,7 @@
 <script>
 import { getAllDatasourceReq } from "@/api/bill-design-manage/data-set.js";
 import { addReq, modifyReq, getTableListReq } from "@/api/bill-design-manage/data-set-config.js";
+import { deepCloneObj } from "@/libs/tools.js";
 
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
@@ -169,20 +170,21 @@ export default {
 
 		//提交
 		submitClick() {
+			// this.getLevel();
+			const { id, datasetName, datasetCode } = this.submitData;
+			console.log(this.data);
+			const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
+			const obj = {
+				id,
+				datasetName,
+				datasetCode,
+				content: JSON.stringify(this.data),
+				sourceCode: Array.from(new Set(sourceList)).toString(),
+			};
+			console.log("结果值", obj);
+			//return;
 			this.$refs.submitRef.validate((validate) => {
 				if (validate) {
-					this.getLevel();
-					const { id, datasetName, datasetCode } = this.submitData;
-					const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
-					const obj = {
-						id,
-						datasetName,
-						datasetCode,
-						content: JSON.stringify(this.data),
-						sourceCode: Array.from(new Set(sourceList)).toString(),
-					};
-					console.log("结果值", obj);
-					console.log(obj);
 					const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 					requestApi.then((res) => {
 						if (res.code === 200) {
@@ -320,7 +322,8 @@ export default {
 			this.graph.on("aftercreateedge", (e) => {
 				console.log("创建边", e, e.edge._cfg, e.edge.getModel());
 				if (e.edge.getModel()) {
-					this.data.edges.push({ ...e.edge.getModel() });
+					const { id, target, source } = e.edge.getModel();
+					this.data.edges.push({ id, target, source });
 					this.graph.changeData(this.data);
 					console.log(this.graph, this.data);
 				}

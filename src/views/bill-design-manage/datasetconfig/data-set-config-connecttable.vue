@@ -75,7 +75,7 @@ export default {
 				window.addEventListener("resize", () => this.autoSize());
 				this.$nextTick(() => {
 					const { relations } = this.connectObj;
-					this.data = [...relations];
+					this.data = relations ? [...relations] : [];
 				});
 				console.log(this.connectObj);
 			}
