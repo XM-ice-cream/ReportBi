@@ -68,6 +68,7 @@ import { addReq, modifyReq, getTableListReq } from "@/api/bill-design-manage/dat
 
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
+
 export default {
 	name: "DataSetConfigAddEdit",
 	components: { DataSetConfigConnecttable },
@@ -168,8 +169,7 @@ export default {
 
 		//提交
 		submitClick() {
-			console.log("提交", this.graph);
-			return;
+			this.getLevel();
 			const { id, datasetName, datasetCode } = this.submitData;
 			console.log("提交参数", this.data);
 			const obj = {
@@ -194,6 +194,40 @@ export default {
 				}
 			});
 		},
+		getLevel() {
+			let depth = 0;
+			let { nodes, edges } = this.data;
+			const edge = edges.map((item) => item.target);
+			nodes.forEach((item) => {
+				if (!edge.includes(item.id)) {
+					// 获取根节点
+					item.depth = depth;
+					let chilArr = [];
+					chilArr.push(item.id);
+					// 寻找子节点
+					while (chilArr.length > 0) {
+						depth++;
+						//	console.log(depth);
+						let chilArrTmp = [];
+						edges.forEach((x) => {
+							if (chilArr.includes(x.source)) {
+								//	console.log(x.source);
+								chilArrTmp.push(x.target);
+								nodes.forEach((y, yIndex) => {
+									if (y.id == x.target) {
+										//	console.log(x.target, depth);
+										nodes[yIndex].depth = depth;
+									}
+								});
+							}
+						});
+						chilArr = chilArrTmp;
+					}
+				}
+			});
+			console.log("获取level", nodes);
+		},
+
 		// 创建画布
 		createGraphic() {
 			// 实例化画布
