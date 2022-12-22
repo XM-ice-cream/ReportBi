@@ -31,13 +31,13 @@
 						<Form>
 							<label class="name-label">数据源：</label>
 							<FormItem prop="sourceCode">
-								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getTableList">
+								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getTableList" clearable>
 									<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
 								</Select>
 							</FormItem>
 							<label class="name-label">筛选表名称：</label>
 							<FormItem prop="filterTable">
-								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" @on-search="pageLoad" />
+								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" @on-search="pageLoad" clearable />
 							</FormItem>
 						</Form>
 						<!-- 树 -->
@@ -65,7 +65,6 @@
 <script>
 import { getAllDatasourceReq } from "@/api/bill-design-manage/data-set.js";
 import { addReq, modifyReq, getTableListReq } from "@/api/bill-design-manage/data-set-config.js";
-import { deepCloneObj } from "@/libs/tools.js";
 
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
@@ -95,7 +94,7 @@ export default {
 	},
 	computed: {
 		filterData() {
-			const keyWord = this.submitData.filterTable;
+			const keyWord = this.submitData.filterTable?.toUpperCase() || "";
 			const reg = new RegExp(keyWord);
 			const arr = [];
 			this.treeData.forEach((item) => {
@@ -140,11 +139,12 @@ export default {
 	methods: {
 		//获取数据
 		pageLoad(val) {
-			console.log(val);
 			//// 隐式深拷贝，主要实现深拷贝，解除循环引用
 			if (JSON.stringify(val) !== "{}") {
 				this.data = { ...JSON.parse(val.content) };
 				this.submitData = { ...val };
+				this.submitData.sourceCode = val.sourceCode?.split(",")[0] || "";
+				this.getTableList(); //获取数据源对应表
 			}
 
 			this.$nextTick(() => {
@@ -161,6 +161,7 @@ export default {
 				getTableListReq(obj).then((res) => {
 					if (res.code === 200) {
 						this.treeData = res?.result || [];
+						this.submitData.filterTable = ""; //清空搜索栏数据
 					} else {
 						this.$Message.error("获取表失败", res.message);
 					}
@@ -170,10 +171,13 @@ export default {
 
 		//提交
 		submitClick() {
-			// this.getLevel();
+			this.getLevel(); //节点层级
 			const { id, datasetName, datasetCode } = this.submitData;
-			console.log(this.data);
 			const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
+			this.data.edges = this.data.edges.map((item) => {
+				const { id, type, relations, source, target, startPoint, style } = item;
+				return { id, type, relations, source, target, startPoint, style };
+			});
 			const obj = {
 				id,
 				datasetName,
@@ -181,7 +185,7 @@ export default {
 				content: JSON.stringify(this.data),
 				sourceCode: Array.from(new Set(sourceList)).toString(),
 			};
-			console.log("结果值", obj);
+			console.log("结果值", obj, this.data);
 			//return;
 			this.$refs.submitRef.validate((validate) => {
 				if (validate) {
@@ -325,21 +329,23 @@ export default {
 					const { id, target, source } = e.edge.getModel();
 					this.data.edges.push({ id, target, source });
 					this.graph.changeData(this.data);
+					this.edgeDblclick(e.edge.getModel());
 					console.log(this.graph, this.data);
 				}
 			});
 			//边的双击事件
 			this.graph.on("edge:dblclick", (e) => {
-				this.edgeDblclick(e);
+				this.edgeDblclick(e.item.getModel());
 			});
 		},
 		//边双击
-		edgeDblclick(e) {
-			const { source, target } = e.item.getModel();
-			const obj = { source, target };
+		edgeDblclick(model) {
+			console.log(model);
+			const { id, type, relations, source, target, startPoint, style } = model;
+			const obj = { id, type, relations, source, target, startPoint, style };
 			this.connectModalFlag = true;
-			this.connectObj = { ...e.item.getModel() };
-			console.log("边的双击事件", obj, e.item.getModel(), this.graph);
+			this.connectObj = { ...obj };
+			console.log("边的双击事件", obj, this.graph);
 		},
 
 		// 添加节点
@@ -348,7 +354,7 @@ export default {
 			const { sourceCode } = this.submitData;
 			const point = this.graph.getPointByClient(e.x, e.y);
 			const model = {
-				id: `${sourceCode}:${row}`,
+				id: `${sourceCode}:${row}:${Math.random()}`,
 				label: row,
 				nodeType: 0,
 				x: point.x,
@@ -358,7 +364,6 @@ export default {
 			this.data.nodes.push({ ...model });
 			console.log("this.data", this.data);
 			this.graph.changeData(this.data);
-			const item = this.graph.findById(model.id);
 		},
 		//更新边
 		updateEdge(val) {
@@ -408,11 +413,17 @@ export default {
 				title: "确认删除该节点/边框吗?",
 				onOk: () => {
 					const item = this.graph.findById(id);
-
-					const nodeId = item._cfg.id;
-					const edgeId = item._cfg.edges.map((item) => item._cfg.id);
-					this.data.edges = this.data.edges.filter((item) => !edgeId.includes(item.id));
-					this.data.nodes = this.data.nodes.filter((item) => item.id !== nodeId);
+					const { id: itemid, type, edges } = item._cfg;
+					//删除边
+					if (type === "edge") {
+						this.data.edges = this.data.edges.filter((item) => !itemid.includes(item.id));
+					} else {
+						const nodeId = itemid;
+						const edgeId = edges.map((item) => item._cfg.id);
+						this.data.edges = this.data.edges.filter((item) => !edgeId.includes(item.id));
+						this.data.nodes = this.data.nodes.filter((item) => item.id !== nodeId);
+					}
+					console.log(item);
 
 					this.graph.changeData(this.data);
 				},
