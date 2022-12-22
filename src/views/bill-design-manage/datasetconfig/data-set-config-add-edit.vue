@@ -9,7 +9,7 @@
 				</div>
 			</template>
 			<div class="modal-content">
-				<div class="base-info">
+				<div class="base-info" :class="[isShake ? 'shake-constant' : '']">
 					<Form ref="submitRef" :model="submitData" inline :label-width="90" :rules="rulesValidate">
 						<FormItem label="数据集名称:" prop="datasetName">
 							<Input v-model="submitData.datasetName" :placeholder="$t('pleaseEnter') + '数据集名称'" />
@@ -31,13 +31,13 @@
 						<Form>
 							<label class="name-label">数据源：</label>
 							<FormItem prop="sourceCode">
-								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getTableList">
+								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getTableList" clearable>
 									<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
 								</Select>
 							</FormItem>
 							<label class="name-label">筛选表名称：</label>
 							<FormItem prop="filterTable">
-								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" @on-search="pageLoad" />
+								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" @on-search="pageLoad" clearable />
 							</FormItem>
 						</Form>
 						<!-- 树 -->
@@ -65,7 +65,6 @@
 <script>
 import { getAllDatasourceReq } from "@/api/bill-design-manage/data-set.js";
 import { addReq, modifyReq, getTableListReq } from "@/api/bill-design-manage/data-set-config.js";
-import { deepCloneObj } from "@/libs/tools.js";
 
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
@@ -95,7 +94,7 @@ export default {
 	},
 	computed: {
 		filterData() {
-			const keyWord = this.submitData.filterTable;
+			const keyWord = this.submitData.filterTable?.toUpperCase() || "";
 			const reg = new RegExp(keyWord);
 			const arr = [];
 			this.treeData.forEach((item) => {
@@ -110,6 +109,7 @@ export default {
 		return {
 			modalTitle: "数据集配置",
 			connectModalFlag: false,
+			isShake: false, //右侧卡片是否抖动
 			connectObj: {}, //关联表
 			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "" },
 			splitValue: 0.2,
@@ -140,11 +140,12 @@ export default {
 	methods: {
 		//获取数据
 		pageLoad(val) {
-			console.log(val);
 			//// 隐式深拷贝，主要实现深拷贝，解除循环引用
 			if (JSON.stringify(val) !== "{}") {
 				this.data = { ...JSON.parse(val.content) };
 				this.submitData = { ...val };
+				this.submitData.sourceCode = val.sourceCode?.split(",")[0] || "";
+				this.getTableList(); //获取数据源对应表
 			}
 
 			this.$nextTick(() => {
@@ -161,6 +162,7 @@ export default {
 				getTableListReq(obj).then((res) => {
 					if (res.code === 200) {
 						this.treeData = res?.result || [];
+						this.submitData.filterTable = ""; //清空搜索栏数据
 					} else {
 						this.$Message.error("获取表失败", res.message);
 					}
@@ -170,10 +172,13 @@ export default {
 
 		//提交
 		submitClick() {
-			// this.getLevel();
+			this.getLevel(); //节点层级
 			const { id, datasetName, datasetCode } = this.submitData;
-			console.log(this.data);
 			const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
+			this.data.edges = this.data.edges.map((item) => {
+				const { id, type, relations, source, target, startPoint, style } = item;
+				return { id, type, relations, source, target, startPoint, style };
+			});
 			const obj = {
 				id,
 				datasetName,
@@ -181,10 +186,11 @@ export default {
 				content: JSON.stringify(this.data),
 				sourceCode: Array.from(new Set(sourceList)).toString(),
 			};
-			console.log("结果值", obj);
+			console.log("结果值", obj, this.data);
 			//return;
 			this.$refs.submitRef.validate((validate) => {
 				if (validate) {
+					this.isShake = false; //停止抖动
 					const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 					requestApi.then((res) => {
 						if (res.code === 200) {
@@ -195,6 +201,11 @@ export default {
 							this.$Message.error("提交异常", res.message);
 						}
 					});
+				} else {
+					this.isShake = true;
+					setTimeout(() => {
+						this.isShake = false;
+					}, 1000 * 0.8); //0.8秒后抖动恢复原值
 				}
 			});
 		},
@@ -325,21 +336,23 @@ export default {
 					const { id, target, source } = e.edge.getModel();
 					this.data.edges.push({ id, target, source });
 					this.graph.changeData(this.data);
+					this.edgeDblclick(e.edge.getModel());
 					console.log(this.graph, this.data);
 				}
 			});
 			//边的双击事件
 			this.graph.on("edge:dblclick", (e) => {
-				this.edgeDblclick(e);
+				this.edgeDblclick(e.item.getModel());
 			});
 		},
 		//边双击
-		edgeDblclick(e) {
-			const { source, target } = e.item.getModel();
-			const obj = { source, target };
+		edgeDblclick(model) {
+			console.log(model);
+			const { id, type, relations, source, target, startPoint, style } = model;
+			const obj = { id, type, relations, source, target, startPoint, style };
 			this.connectModalFlag = true;
-			this.connectObj = { ...e.item.getModel() };
-			console.log("边的双击事件", obj, e.item.getModel(), this.graph);
+			this.connectObj = { ...obj };
+			console.log("边的双击事件", obj, this.graph);
 		},
 
 		// 添加节点
@@ -348,7 +361,7 @@ export default {
 			const { sourceCode } = this.submitData;
 			const point = this.graph.getPointByClient(e.x, e.y);
 			const model = {
-				id: `${sourceCode}:${row}`,
+				id: `${sourceCode}:${row}:${Math.random()}`,
 				label: row,
 				nodeType: 0,
 				x: point.x,
@@ -358,7 +371,6 @@ export default {
 			this.data.nodes.push({ ...model });
 			console.log("this.data", this.data);
 			this.graph.changeData(this.data);
-			const item = this.graph.findById(model.id);
 		},
 		//更新边
 		updateEdge(val) {
@@ -408,11 +420,17 @@ export default {
 				title: "确认删除该节点/边框吗?",
 				onOk: () => {
 					const item = this.graph.findById(id);
-
-					const nodeId = item._cfg.id;
-					const edgeId = item._cfg.edges.map((item) => item._cfg.id);
-					this.data.edges = this.data.edges.filter((item) => !edgeId.includes(item.id));
-					this.data.nodes = this.data.nodes.filter((item) => item.id !== nodeId);
+					const { id: itemid, type, edges } = item._cfg;
+					//删除边
+					if (type === "edge") {
+						this.data.edges = this.data.edges.filter((item) => !itemid.includes(item.id));
+					} else {
+						const nodeId = itemid;
+						const edgeId = edges.map((item) => item._cfg.id);
+						this.data.edges = this.data.edges.filter((item) => !edgeId.includes(item.id));
+						this.data.nodes = this.data.nodes.filter((item) => item.id !== nodeId);
+					}
+					console.log(item);
 
 					this.graph.changeData(this.data);
 				},
@@ -444,6 +462,7 @@ export default {
 				combos: [],
 			};
 			this.createGraphic();
+			this.isShake = flase;
 		},
 	},
 };
@@ -451,7 +470,7 @@ export default {
 <style lang="less" scoped>
 .base-info {
 	position: absolute;
-	right: 0px;
+	right: 10px;
 	background: #72c424;
 	margin: 5px;
 	/* line-height: 40px; */
@@ -461,7 +480,6 @@ export default {
 	border-radius: 5px;
 	color: #fff !important;
 	width: 14%;
-	float: right;
 	z-index: 9999999;
 	:deep(.ivu-form .ivu-form-item-label) {
 		color: #fff;
@@ -546,4 +564,163 @@ export default {
 // :deep(.ivu-modal-fullscreen .ivu-modal-body) {
 // 	top: 20px;
 // }
+.shake-constant {
+	animation-name: shake-hard;
+	animation-duration: 0.8s; //动画持续时间
+	animation-timing-function: ease-in-out;
+	// animation-iteration-count: infinite; /*定义循环资料，infinite为无限次*/
+}
+@keyframes shake-hard {
+	2% {
+		transform: translate(3px, -8px) rotate(-0.5deg);
+	}
+	4% {
+		transform: translate(-9px, 5px) rotate(-0.5deg);
+	}
+	6% {
+		transform: translate(-6px, 9px) rotate(2.5deg);
+	}
+	8% {
+		transform: translate(-8px, 9px) rotate(0.5deg);
+	}
+	10% {
+		transform: translate(-6px, -1px) rotate(0.5deg);
+	}
+	12% {
+		transform: translate(-9px, 2px) rotate(2.5deg);
+	}
+	14% {
+		transform: translate(-2px, 9px) rotate(-1.5deg);
+	}
+	16% {
+		transform: translate(0px, 10px) rotate(-0.5deg);
+	}
+	18% {
+		transform: translate(-3px, -3px) rotate(3.5deg);
+	}
+	20% {
+		transform: translate(8px, -1px) rotate(3.5deg);
+	}
+	22% {
+		transform: translate(10px, -4px) rotate(-0.5deg);
+	}
+	24% {
+		transform: translate(0px, -8px) rotate(0.5deg);
+	}
+	26% {
+		transform: translate(-1px, 2px) rotate(-1.5deg);
+	}
+	28% {
+		transform: translate(8px, 8px) rotate(-1.5deg);
+	}
+	30% {
+		transform: translate(-9px, 5px) rotate(-0.5deg);
+	}
+	32% {
+		transform: translate(1px, 10px) rotate(1.5deg);
+	}
+	34% {
+		transform: translate(7px, -4px) rotate(3.5deg);
+	}
+	36% {
+		transform: translate(2px, -8px) rotate(-1.5deg);
+	}
+	38% {
+		transform: translate(6px, 10px) rotate(-2.5deg);
+	}
+	40% {
+		transform: translate(3px, -1px) rotate(0.5deg);
+	}
+	42% {
+		transform: translate(-5px, -4px) rotate(-0.5deg);
+	}
+	44% {
+		transform: translate(-3px, 10px) rotate(-2.5deg);
+	}
+	46% {
+		transform: translate(-7px, 2px) rotate(-2.5deg);
+	}
+	48% {
+		transform: translate(-5px, -1px) rotate(3.5deg);
+	}
+	50% {
+		transform: translate(-7px, -1px) rotate(1.5deg);
+	}
+	52% {
+		transform: translate(2px, 8px) rotate(-1.5deg);
+	}
+	54% {
+		transform: translate(7px, -9px) rotate(0.5deg);
+	}
+	56% {
+		transform: translate(-4px, 1px) rotate(1.5deg);
+	}
+	58% {
+		transform: translate(-2px, -8px) rotate(1.5deg);
+	}
+	60% {
+		transform: translate(-7px, 1px) rotate(-0.5deg);
+	}
+	62% {
+		transform: translate(-5px, -2px) rotate(-0.5deg);
+	}
+	64% {
+		transform: translate(-2px, 5px) rotate(-2.5deg);
+	}
+	66% {
+		transform: translate(-2px, 7px) rotate(3.5deg);
+	}
+	68% {
+		transform: translate(-7px, -1px) rotate(-0.5deg);
+	}
+	70% {
+		transform: translate(-5px, 8px) rotate(-2.5deg);
+	}
+	72% {
+		transform: translate(-3px, -9px) rotate(-2.5deg);
+	}
+	74% {
+		transform: translate(-2px, -7px) rotate(3.5deg);
+	}
+	76% {
+		transform: translate(-5px, -4px) rotate(2.5deg);
+	}
+	78% {
+		transform: translate(-2px, 10px) rotate(-1.5deg);
+	}
+	80% {
+		transform: translate(4px, 9px) rotate(3.5deg);
+	}
+	82% {
+		transform: translate(3px, -1px) rotate(-1.5deg);
+	}
+	84% {
+		transform: translate(4px, -6px) rotate(0.5deg);
+	}
+	86% {
+		transform: translate(-1px, 4px) rotate(-0.5deg);
+	}
+	88% {
+		transform: translate(10px, -5px) rotate(3.5deg);
+	}
+	90% {
+		transform: translate(-3px, 7px) rotate(-0.5deg);
+	}
+	92% {
+		transform: translate(5px, -2px) rotate(2.5deg);
+	}
+	94% {
+		transform: translate(-2px, -7px) rotate(-0.5deg);
+	}
+	96% {
+		transform: translate(0px, 10px) rotate(-2.5deg);
+	}
+	98% {
+		transform: translate(-4px, 3px) rotate(2.5deg);
+	}
+	0%,
+	100% {
+		transform: translate(0, 0) rotate(0);
+	}
+}
 </style>
