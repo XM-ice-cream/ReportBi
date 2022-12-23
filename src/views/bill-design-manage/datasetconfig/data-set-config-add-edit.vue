@@ -37,13 +37,13 @@
 							</FormItem>
 							<label class="name-label">筛选表名称：</label>
 							<FormItem prop="filterTable">
-								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" @on-search="pageLoad" clearable />
+								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" clearable @keyup.native="filterData" />
 							</FormItem>
 						</Form>
 						<!-- 树 -->
 						<div class="left-tree">
 							<ul>
-								<li v-for="(item, index) in filterData" :key="index" draggable @dragend="addNodeImage($event, item)" :title="item">
+								<li v-for="(item, index) in filterList" :key="index" draggable @dragend="addNodeImage($event, item)" :title="item">
 									<Icon custom="iconfont icon-biaodanzujian-biaoge" class="icon" />{{ item }}
 								</li>
 							</ul>
@@ -89,22 +89,11 @@ export default {
 				this.getDataSourceList(); //获取数据源
 			} else {
 				this.submitData = { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "" };
+				this.filterList = [];
 			}
 		},
 	},
-	computed: {
-		filterData() {
-			const keyWord = this.submitData.filterTable?.toUpperCase() || "";
-			const reg = new RegExp(keyWord);
-			const arr = [];
-			this.treeData.forEach((item) => {
-				if (reg.test(item)) {
-					arr.push(item);
-				}
-			});
-			return arr;
-		},
-	},
+	computed: {},
 	data() {
 		return {
 			modalTitle: "数据集配置",
@@ -112,6 +101,7 @@ export default {
 			isShake: false, //右侧卡片是否抖动
 			connectObj: {}, //关联表
 			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "" },
+			filterList: [], //过滤后的值
 			splitValue: 0.2,
 			graph: "",
 			sourceList: [], //数据源集合
@@ -145,7 +135,9 @@ export default {
 				this.data = { ...JSON.parse(val.content) };
 				this.submitData = { ...val };
 				this.submitData.sourceCode = val.sourceCode?.split(",")[0] || "";
-				this.getTableList(); //获取数据源对应表
+				this.$nextTick(() => {
+					this.getTableList(); //获取数据源对应表
+				});
 			}
 
 			this.$nextTick(() => {
@@ -163,6 +155,7 @@ export default {
 					if (res.code === 200) {
 						this.treeData = res?.result || [];
 						this.submitData.filterTable = ""; //清空搜索栏数据
+						this.filterData(); //过滤值
 					} else {
 						this.$Message.error("获取表失败", res.message);
 					}
@@ -209,6 +202,7 @@ export default {
 				}
 			});
 		},
+		//获取二叉树层级
 		getLevel() {
 			let depth = 0;
 			let { nodes, edges } = this.data;
@@ -241,6 +235,18 @@ export default {
 				}
 			});
 			console.log("获取level", nodes);
+		},
+		filterData() {
+			const keyWord = this.submitData.filterTable?.toUpperCase() || "";
+			console.log("搜索", keyWord, this.submitData.filterTable);
+			const reg = new RegExp(keyWord);
+			const arr = [];
+			this.treeData.forEach((item) => {
+				if (reg.test(item)) {
+					arr.push(item);
+				}
+			});
+			this.filterList = arr;
 		},
 
 		// 创建画布
@@ -359,7 +365,7 @@ export default {
 		addNodeImage(e, row) {
 			console.log("添加节点", e);
 			const { sourceCode } = this.submitData;
-			const point = this.graph.getPointByClient(e.x, e.y);
+			const point = this.graph.getPointByClient(e.x, e.y); //将屏幕坐标转换为渲染坐标
 			const model = {
 				id: `${sourceCode}:${row}:${Math.random()}`,
 				label: row,
@@ -462,24 +468,22 @@ export default {
 				combos: [],
 			};
 			this.createGraphic();
-			this.isShake = flase;
+			this.isShake = false;
 		},
 	},
 };
 </script>
 <style lang="less" scoped>
 .base-info {
+	width: 14%;
 	position: absolute;
 	right: 10px;
+	color: #fff !important;
 	background: #72c424;
 	margin: 5px;
-	/* line-height: 40px; */
-	vertical-align: baseline;
 	padding: 15px 5px;
-	/* background: #ccc; */
+	vertical-align: baseline;
 	border-radius: 5px;
-	color: #fff !important;
-	width: 14%;
 	z-index: 9999999;
 	:deep(.ivu-form .ivu-form-item-label) {
 		color: #fff;
