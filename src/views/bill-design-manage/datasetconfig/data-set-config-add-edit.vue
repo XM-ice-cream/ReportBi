@@ -169,8 +169,8 @@ export default {
 			const { id, datasetName, datasetCode, enabled } = this.submitData;
 			const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
 			this.data.edges = this.data.edges.map((item) => {
-				const { id, type, relations, source, target, startPoint, style } = item;
-				return { id, type, relations, source, target, startPoint, style };
+				const { id, type, relations, source, target, startPoint, style, incidenceRelation } = item;
+				return { id, type, relations, source, target, startPoint, style, incidenceRelation };
 			});
 			const obj = {
 				id,
@@ -355,8 +355,9 @@ export default {
 		//边双击
 		edgeDblclick(model) {
 			console.log(model);
-			const { id, type, relations, source, target, startPoint, style } = model;
-			const obj = { id, type, relations, source, target, startPoint, style };
+			const { id, type, relations, source, target, startPoint, style, incidenceRelation } = model;
+			let obj = { id, type, relations, source, target, startPoint, style, incidenceRelation };
+			obj.incidenceRelation = obj?.incidenceRelation || "left join";
 			this.connectModalFlag = true;
 			this.connectObj = { ...obj };
 			console.log("边的双击事件", obj, this.graph);

@@ -2,21 +2,27 @@
 <template>
 	<!-- 数据集 -->
 	<Modal :title="modalTitle" :mask-closable="false" :width="1000" :closable="true" v-model="modalFlag" :before-close="closeDialog">
-		<div class="add-box"><icon custom="iconfont icon-add" class="add-icon" @click="addData" /> 添加更多字段</div>
+		<Form :label-width="70" inline>
+			<FormItem label="关联关系" prop="incidenceRelation">
+				<Select v-model.trim="connectObj.incidenceRelation" size="small" placeholder="请选择关联关系" clearable style="width: 200px">
+					<Option v-for="item in incidenceList" :key="item.value" :label="item.label" :value="item.value" />
+				</Select>
+			</FormItem>
+		</Form>
+		<div class="add-box" @click="addData"><icon custom="iconfont icon-add" class="add-icon" /> 添加更多字段</div>
 		<div class="modal-content">
 			<Table :columns="columns" :data="data" :height="tableConfig.height" disabled-hover>
 				<!-- 源表 -->
 				<template #source="{ row, index }">
-					<Select v-model="data[index].source" size="small" placehold="选择字段" transfer @on-change="changeField(index)">
+					<Select v-model.trim="data[index].source" size="small" placehold="选择字段" transfer filterable @on-change="changeField(index)">
 						<template #prefix v-if="!row.source">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="(item, index) in sourceList" :value="item.columnName" :key="index">
+						<Option v-for="(item, index) in sourceList" :value="item.columnName" :key="index" :label="item.columnName">
 							<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-shuzishurukuang" v-else-if="columnTypeList[1].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-huatifuhao" v-else />
-							{{ item.columnName }}
+							<icon custom="iconfont icon-huatifuhao" v-else />{{ item.columnName }}
 						</Option>
 					</Select>
 				</template>
@@ -27,16 +33,15 @@
 				</template>
 				<!-- 目标表 -->
 				<template #target="{ row, index }">
-					<Select v-model="data[index].target" size="small" placehold="选择字段" transfer @on-change="changeField(index)">
+					<Select v-model.trim="data[index].target" size="small" placehold="选择字段" transfer filterable @on-change="changeField(index)">
 						<template #prefix v-if="!row.target">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="(item, index) in targetList" :value="item.columnName" :key="index">
+						<Option v-for="(item, index) in targetList" :value="item.columnName" :key="index" :label="item.columnName">
 							<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-shuzishurukuang" v-else-if="columnTypeList[1].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-huatifuhao" v-else />
-							{{ item.columnName }}
+							<icon custom="iconfont icon-huatifuhao" v-else />{{ item.columnName }}
 						</Option>
 					</Select>
 				</template>
@@ -92,6 +97,11 @@ export default {
 			symbolList: ["=", "<>", "<", "<=", ">", ">="],
 			sourceList: [],
 			targetList: [],
+			incidenceList: [
+				{ label: "左连接", value: "left join" },
+				{ label: "右连接", value: "right join" },
+				{ label: "内连接", value: "inner join" },
+			],
 		};
 	},
 	methods: {
@@ -208,7 +218,9 @@ export default {
 <style lang="less" scoped>
 .add-box {
 	color: #6f6f6f;
+	margin-top: 10px;
 	margin-bottom: 10px;
+	cursor: pointer;
 	.add-icon {
 		text-align: right;
 		margin-right: 5px;
