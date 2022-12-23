@@ -166,7 +166,7 @@ export default {
 		//提交
 		submitClick() {
 			this.getLevel(); //节点层级
-			const { id, datasetName, datasetCode } = this.submitData;
+			const { id, datasetName, datasetCode, enabled } = this.submitData;
 			const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
 			this.data.edges = this.data.edges.map((item) => {
 				const { id, type, relations, source, target, startPoint, style } = item;
@@ -178,6 +178,7 @@ export default {
 				datasetCode,
 				content: JSON.stringify(this.data),
 				sourceCode: Array.from(new Set(sourceList)).toString(),
+				enabled,
 			};
 			console.log("结果值", obj, this.data);
 			//return;

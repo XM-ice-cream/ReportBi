@@ -14,8 +14,12 @@
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 数据集编码 -->
-										<FormItem :label="$t('setCode')" prop="setCode">
-											<Input v-model="req.setCode" :placeholder="$t('pleaseEnter') + $t('setCode')" @on-search="searchClick" />
+										<FormItem :label="$t('setCode')" prop="datasetCode">
+											<Input v-model="req.datasetCode" :placeholder="$t('pleaseEnter') + $t('setCode')" />
+										</FormItem>
+										<!-- 数据集名称 -->
+										<FormItem :label="$t('setName')" prop="datasetName">
+											<Input v-model="req.datasetName" :placeholder="$t('pleaseEnter') + $t('setCode')" />
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
