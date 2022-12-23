@@ -4,28 +4,53 @@
     <!-- 右侧抽屉 Form表单 -->
     <Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
       <Form ref="submitData" :model="submitData" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
-        <!-- 员工工号 -->
-        <FormItem label="员工工号" prop="userID">
-            <Input v-model="submitData.userID" :placeholder="$t('pleaseEnter') + '员工工号'" :disabled="!isAdd"/>
+        <!-- APN -->
+        <FormItem label="APN" prop="apn">
+            <Input v-model="submitData.apn" :placeholder="$t('pleaseEnter') + 'APN'"/>
         </FormItem>
-         <!-- 员工姓名 -->
-         <FormItem label="员工姓名" prop="userName">
-            <Input v-model="submitData.userName" :placeholder="$t('pleaseEnter') + '员工姓名'"/>
+         <!-- MPQ -->
+         <FormItem label="MPQ" prop="mpq">
+            <Input v-model="submitData.mpq" :placeholder="$t('pleaseEnter') + 'MPQ'"/>
         </FormItem>
-         <!-- 部门名称 -->
-         <FormItem label="部门名称" prop="deptName">
-            <Select v-model="submitData.deptName" clearable filterable :placeholder="$t('pleaseSelect') + '部门名称'" transfer>
-              <Option v-for="(item, i) in deptList" :value="item.detailName" :key="i">
+         <!-- Factory -->
+         <FormItem label="Factory" prop="factory">
+            <Select v-model="submitData.factory" clearable filterable :placeholder="$t('pleaseSelect') + 'Factory'" transfer>
+              <Option v-for="(item, i) in factoryList" :value="item.detailName" :key="i">
                 {{ item.detailName }}
               </Option>
             </Select>
         </FormItem>
-        <!-- Enabled-->
-         <FormItem label="是否在职" prop="enabled">
-            <i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
-                <span slot="open">{{ $t("yes") }}</span>
-                <span slot="close">{{ $t("no") }}</span>
-            </i-switch>
+         <!-- Location -->
+         <FormItem label="Location" prop="location">
+            <Input v-model="submitData.location" :placeholder="$t('pleaseEnter') + 'Location,多个用逗号间隔'"/>
+        </FormItem>
+         <!-- IPN -->
+         <FormItem label="IPN" prop="ipn">
+            <Input v-model="submitData.ipn" :placeholder="$t('pleaseEnter') + 'IPN'" :disabled="!isAdd"/>
+        </FormItem>
+         <!-- WareHouse -->
+         <FormItem label="WareHouse" prop="wareHouse">
+            <Select v-model="submitData.wareHouse" clearable filterable :placeholder="$t('pleaseSelect') + 'WareHouse'" transfer>
+              <Option v-for="(item, i) in wareHouseList" :value="item.detailName" :key="i">
+                {{ item.detailName }}
+              </Option>
+            </Select>
+        </FormItem>
+         <!-- Project -->
+         <FormItem label="Project" prop="project">
+            <Select v-model="submitData.project" clearable filterable :placeholder="$t('pleaseSelect') + 'Project'" transfer>
+              <Option v-for="(item, i) in projectList" :value="item.detailName" :key="i">
+                {{ item.detailName }}
+              </Option>
+            </Select>
+        </FormItem>
+         <!-- Vendor -->
+         <FormItem label="Vendor" prop="vendor">
+            <Input v-model="submitData.vendor" :placeholder="$t('pleaseEnter') + 'Vendor,多个用逗号间隔'"/>
+        </FormItem>
+         <!-- Dppm limit -->
+         <FormItem label="Dppm limit" prop="dppmLimit">
+            <Input v-model="submitData.dppmLimit" :placeholder="$t('pleaseEnter') + 'Dppm limit'"/>
         </FormItem>
          <!-- 备注 -->
          <FormItem :label="$t('remark')" prop="remark">
@@ -58,28 +83,41 @@
                     <FormItem :label="$t('endTime')" prop="endTime">
                       <DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
                     </FormItem>
-                    <!-- 员工工号 -->
-                    <FormItem label="员工工号" prop="userID">
-                      <Input v-model="req.userID" :placeholder="$t('pleaseEnter') + '员工工号'"/>
-                    </FormItem>
-                     <!-- 员工姓名 -->
-                    <FormItem label="员工姓名" prop="userName">
-                      <Input v-model="req.userName" :placeholder="$t('pleaseEnter') + '员工姓名'"/>
-                    </FormItem>
-                    <!-- 部门名称 -->
-                    <FormItem label="部门名称" prop="deptName">
-                      <Select v-model="req.deptName" clearable filterable :placeholder="$t('pleaseSelect') + '部门名称'" transfer>
-                        <Option v-for="(item, i) in deptList" :value="item.detailName" :key="i">
+                    <!-- Project -->
+                    <FormItem label="Project" prop="project">
+                      <Select v-model="req.project" clearable filterable :placeholder="$t('pleaseSelect') + 'Project'" transfer>
+                        <Option v-for="(item, i) in projectList" :value="item.detailName" :key="i">
                           {{ item.detailName }}
                         </Option>
                       </Select>
                     </FormItem>
-                    <!-- 是否在职 -->
-                    <FormItem label="是否在职" prop="enabled">
-                      <Select v-model="req.enabled" transfer filterable clearable :placeholder="$t('pleaseSelect') + '是否在职'">
-                        <Option value=1>是</Option>
-                        <Option value=0>否</Option>
+                     <!-- Factory -->
+                    <FormItem label="Factory" prop="factory">
+                      <Select v-model="req.factory" clearable filterable :placeholder="$t('pleaseSelect') + 'Factory'" transfer>
+                        <Option v-for="(item, i) in factoryList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
                       </Select>
+                    </FormItem>
+                    <!-- Warehouse -->
+                    <FormItem label="Warehouse" prop="warehouse">
+                      <Select v-model="req.warehouse" clearable filterable :placeholder="$t('pleaseSelect') + 'Warehouse'" transfer>
+                        <Option v-for="(item, i) in warehouseList" :value="item.detailName" :key="i">
+                          {{ item.detailName }}
+                        </Option>
+                      </Select>
+                    </FormItem>
+                     <!-- Component -->
+                    <FormItem label="Component" prop="location">
+                      <Input v-model="req.location" :placeholder="$t('pleaseEnter') + 'Component'"/>
+                    </FormItem>
+                     <!-- IPN -->
+                    <FormItem label="IPN" prop="ipn">
+                      <Input v-model="req.ipn" :placeholder="$t('pleaseEnter') + 'IPN'"/>
+                    </FormItem>
+                     <!-- APN -->
+                    <FormItem label="APN" prop="apn">
+                      <Input v-model="req.apn" :placeholder="$t('pleaseEnter') + 'APN'"/>
                     </FormItem>
                   </Form>
                   <div class="poptip-style-button">
@@ -98,17 +136,6 @@
         <page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
       </Card>
     </div>
-    <!-- 批量导入 -->
-    <Modal
-        v-model="modalFlag"
-        title="批量导入"
-        @on-cancel="cancelClick">
-       <upload-custom class="upload-con" :uploadUrl="uploadUrl" :uploadHeight="33" uploadIcon="ios-cloud-upload-outline" :uploadFormat="['xlsx']" @upload-success="uploadSuccess">
-          <div slot="button">
-            <Button type="success">{{ $t("clickUpload") }}</Button>
-          </div>
-        </upload-custom>
-    </Modal>
   </div>
 </template>
 
@@ -117,11 +144,9 @@ import { getpagelistReq ,addReq,modifyReq,uploadUrl, exportReq } from "@/api/bil
 import {  getButtonBoolean,formatDate, renderDate,renderIsEnabled,exportFile } from "@/libs/tools";
 import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 import { errorType } from "@/libs/tools";
-import UploadCustom from "@/components/upload-custom";
 
 export default {
-  name: "db-user",
-  components: { UploadCustom },
+  name: "send-ahead-list",
   data () {
     return {
       searchPoptipModal: false,
@@ -135,14 +160,19 @@ export default {
       selectObj:null,// 表格选中数据
       data: [], // 表格数据
       btnData: [],
-      deptList: [],// 部门下拉框
+      projectList: [],// 机种下拉框
+      factoryList: [],// 工厂下拉框
+      warehouseList: [],// 仓位下拉框
       req: {
         startTime: "",
         endTime: "",
-        userID: "", 
-        userName:"",
+        project: "", 
+        factory:"",
         deptName: "",
-        enabled: "",
+        warehouse: "",
+        location: "",
+        ipn: "",
+        apn: "",
         ...this.$config.pageConfig,
       }, //查询数据
       columns: [
@@ -163,11 +193,13 @@ export default {
         { title: "修改时间", key: "modifyDate", align: "center", render: renderDate, minWidth: 120, tooltip: true },
       ], // 表格数据
       submitData:{
-        userID: "",
-        userName: "",
+        project: "", 
+        factory:"",
         deptName: "",
-        remark: "",
-        enabled: 1,
+        warehouse: "",
+        location: "",
+        ipn: "",
+        apn: "",
         id: ""  
       },
       ruleValidate: {
