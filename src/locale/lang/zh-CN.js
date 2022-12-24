@@ -1979,6 +1979,7 @@ export default {
   'maverick-info': 'Maverick Info',
   'workbook-manage': '工作簿管理',
   'dateset-config': '数据集配置',
+  'key-part-warning': 'KeyParts预警配置',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
