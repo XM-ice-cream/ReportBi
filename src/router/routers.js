@@ -50,6 +50,25 @@ const otherRouter = [{
     component: () => import( /* webpackChunkName: "paperless-preview" */ '@/views/bill-design-manage/paperless/paperless-preview.vue')
   },
   {
+    path: '/bill-design-manage/workbook-preview',
+    name: 'workbook-preview',
+    meta: {
+      title: '工作簿 - 预览',
+      hideInMenu: true,
+      notCache: true
+    },
+    component: () => import( /* webpackChunkName: "workbook-preview" */ '@/views/bill-design-manage/workbook-manage/workbook-preview.vue')
+  }, {
+    path: '/bill-design-manage/workbook-design',
+    name: 'workbook-design',
+    meta: {
+      title: '工作簿 - 设计',
+      hideInMenu: true,
+      notCache: true
+    },
+    component: () => import( /* webpackChunkName: "workbook-design" */ '@/views/bill-design-manage/workbook-manage/workbook-design.vue')
+  },
+  {
     path: '/',
     redirect: '/home',
     component: Main,

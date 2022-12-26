@@ -284,15 +284,15 @@ export default {
 		//设计
 		design(data) {
 			this.selectObj = { ...data };
-			const { reportCode, reportName } = data;
-			const href = this.skipUrl(data.reportType + "Design", reportCode, reportName);
+			const { workBookName, workBookCode } = data;
+			const href = this.skipUrl("workbookDesign", workBookCode, workBookName);
 			window.open(href, "_blank");
 		},
 		// 预览
 		preview(data) {
 			this.selectObj = { ...data };
-			const { reportCode, reportName } = data;
-			const href = this.skipUrl(data.reportType + "Preview", reportCode, reportName);
+			const { workBookName, workBookCode } = data;
+			const href = this.skipUrl("workbookPreview", workBookCode, workBookName);
 			window.open(href, "_blank");
 		},
 
@@ -308,10 +308,8 @@ export default {
 		},
 		skipUrl(key, reportCode, reportName) {
 			const obj = {
-				excelPreview: "/bill-design-manage/excelreport-preview",
-				largescreenPreview: "/bill-design-manage/screenreport-preview",
-				excelDesign: "/bill-design-manage/excelreport-design",
-				largescreenDesign: "/bill-design-manage/screenreport-design",
+				workbookPreview: "/bill-design-manage/workbook-preview",
+				workbookDesign: "/bill-design-manage/workbook-design",
 			};
 			const { href } = this.$router.resolve({
 				path: obj[key],

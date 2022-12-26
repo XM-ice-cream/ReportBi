@@ -6,6 +6,27 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "9306050",
+      "name": "标记标签",
+      "font_class": "biaojibiaoqian",
+      "unicode": "e80d",
+      "unicode_decimal": 59405
+    },
+    {
+      "icon_id": "9318626",
+      "name": "大小",
+      "font_class": "daxiao",
+      "unicode": "e823",
+      "unicode_decimal": 59427
+    },
+    {
+      "icon_id": "21813168",
+      "name": "颜色方案",
+      "font_class": "yansefangan",
+      "unicode": "ed93",
+      "unicode_decimal": 60819
+    },
+    {
       "icon_id": "587122",
       "name": "string",
       "font_class": "string",
@@ -18,13 +39,6 @@
       "font_class": "shuzishurukuang",
       "unicode": "e69c",
       "unicode_decimal": 59036
-    },
-    {
-      "icon_id": "4766919",
-      "name": "table",
-      "font_class": "table",
-      "unicode": "e7de",
-      "unicode_decimal": 59358
     },
     {
       "icon_id": "11372667",
