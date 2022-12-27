@@ -14,22 +14,12 @@
 					</ul>
 				</li>
 			</ul>
-			<!-- <Tree :data="data" :load-data="loadData" :render="renderContent" @on-contextmenu="handleContextMenu">
-				<template #contextMenu>
-					<DropdownItem>编辑</DropdownItem>
-					<DropdownItem style="color: #ed4014">删除</DropdownItem>
-				</template>
-			</Tree> -->
-			<!-- <Tabs value="tabValue">
-				<TabPane label="数据" name="data">标签一的内容</TabPane>
-				<TabPane label="分析" name="analyse">标签二的内容</TabPane>
-			</Tabs> -->
 		</div>
 		<div class="center-box">
 			<div class="filter">
 				<div class="title">筛选器</div>
 				<draggable group="site" v-model="filterData" @end="filterDragEnd" :move="onMove" style="height: 99%">
-					<span v-for="(item, index) in filterData" :key="index" class="filter-cell">{{ item.title }}</span>
+					<span v-for="(item, index) in filterData" :key="index" class="drag-cell">{{ item.title }}</span>
 				</draggable>
 			</div>
 			<div class="mark">
@@ -45,7 +35,22 @@
 				</div>
 			</div>
 		</div>
-		<div class="right-box"></div>
+		<div class="right-box">
+			<div class="row-column">
+				<div class="row">
+					<span class="title">列</span>
+					<draggable group="site" v-model="columnData" class="drag-right">
+						<span v-for="(item, index) in columnData" :key="index" class="drag-cell">{{ item.title }}</span>
+					</draggable>
+				</div>
+				<div class="column">
+					<span class="title">行</span>
+					<draggable group="site" v-model="rowData" class="drag-right">
+						<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.title }}</span>
+					</draggable>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 <script>
@@ -85,126 +90,14 @@ export default {
 				{ label: "散点图", value: "scatter" },
 				{ label: "盒须图", value: "boxplot" },
 			],
-			filterData: [],
+			filterData: [], //过滤值
+			columnData: [], //列值
+			rowData: [], //行值
 			moveId: -1,
 		};
 	},
 	activated() {},
 	methods: {
-		handleContextMenu(data) {
-			this.contextData = data;
-		},
-		loadData(item, callback) {
-			console.log(item);
-			const data = [
-				{
-					title: "children",
-					loading: false,
-					children: [],
-				},
-				{
-					title: "children",
-					loading: false,
-					children: [],
-				},
-			];
-			callback(data);
-		},
-		renderContent(h, { root, node, data }) {
-			if (!node.children) {
-				return h(
-					"span",
-					{
-						class: { "children-tree": true },
-						style: {
-							display: "inline-block",
-							width: "100%",
-							fontWeight: "normal",
-							color: "#000010",
-						},
-						attrs: {
-							draggable: "true",
-						},
-						on: {
-							dragstart: () => this.handleDragStart(root, node, data),
-							dragover: () => this.handleDragOver(root, node, data),
-							dragend: () => this.handleDragEnd(root, node, data),
-							drop: () => this.handleDrop(root, node, data),
-						},
-					},
-					[
-						h("span", data.title),
-						h("Button", {
-							props: Object.assign({}, this.buttonProps, {
-								icon: "ios-arrow-down",
-							}),
-							style: {
-								marginRight: "8px",
-								border: "none",
-								background: "transparent",
-								boxShadow: "none !important",
-							},
-							on: {
-								click: () => {
-									this.append(data);
-								},
-							},
-						}),
-					]
-				);
-			} else {
-				return h("span", [
-					h("span", [
-						h("Icon", {
-							props: {
-								type: "md-apps",
-							},
-							style: {
-								marginRight: "8px",
-								fontSize: "14px",
-							},
-						}),
-						h("span", data.title),
-					]),
-				]);
-			}
-		},
-
-		handleDragStart(root, node, data) {
-			console.log("开始拖拽", node, data);
-			const event = window.event || arguments[0];
-			this.dragstartNode = node;
-			this.dragstartData = data;
-		},
-		handleDragOver(root, node, data) {
-			const event = window.event || arguments[0];
-			event.preventDefault();
-		},
-		handleDragEnd(root, node, data) {
-			const event = window.event || arguments[0];
-			console.log("拖拽结束", event);
-
-			event.preventDefault();
-		},
-		handleDrop(root, node, data) {
-			const event = window.event || arguments[0];
-
-			event.preventDefault();
-
-			// if (node === this.dragstartNode) return;
-			// const target_parentKey = root.find((el) => el === node).parent;
-			// const target_parent = root.find((el) => el.nodeKey === target_parentKey).node;
-			// const target_index = target_parent.children.indexOf(data);
-			// const target_children = data.children || [];
-			// target_children.push(this.dragstartData);
-			// this.$set(data, "children", target_children);
-
-			// const source_parentKey = root.find((el) => el === this.dragstartNode).parent;
-			// const source_parent = root.find((el) => el.nodeKey === source_parentKey).node;
-			// const source_index = source_parent.children.indexOf(this.dragstartData);
-			// source_parent.children.splice(source_index, 1);
-			// console.log(this.data5, "data5");
-		},
 		//===================过滤器
 		filterDragEnd(e) {
 			console.log("拖拽结束", e);
@@ -260,14 +153,6 @@ export default {
 			padding: 10px;
 			border: 1px dashed #ccc;
 			border-bottom: none;
-			.filter-cell {
-				padding: 4px 20px;
-				background: #4996b2;
-				color: #fff;
-				border-radius: 10px;
-				margin: 4px;
-				display: inline-block;
-			}
 		}
 		.mark {
 			width: 100%;
@@ -308,6 +193,35 @@ export default {
 	}
 	.right-box {
 		flex: 1;
+		margin-left: 10px;
+		.row-column {
+			.row,
+			.column {
+				height: 40px;
+				border: 1px solid #ccc;
+				margin-bottom: 10px;
+				.title {
+					display: inline-block;
+					width: 40px;
+					line-height: 40px;
+					font-weight: bold;
+					text-align: center;
+					border-right: 1px solid #ccc;
+				}
+				.drag-right {
+					display: inline-block;
+					width: calc(100% - 40px);
+				}
+			}
+		}
+	}
+	.drag-cell {
+		padding: 4px 20px;
+		background: #4996b2;
+		color: #fff;
+		border-radius: 10px;
+		margin: 4px;
+		display: inline-block;
 	}
 }
 :deep(.ivu-tree ul) {
