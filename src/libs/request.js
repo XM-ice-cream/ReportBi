@@ -188,7 +188,10 @@ export function requestCenter(params) {
       method,
       data: res.config.data,
       params: res.config.params,
-      Authorization
+      Authorization,
+      resData: {
+        ...res.data
+      }
     }
   }, error => {
     // 响应失败

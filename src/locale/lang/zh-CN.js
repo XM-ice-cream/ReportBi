@@ -1981,6 +1981,7 @@ export default {
   'dateset-config': '数据集配置',
   'key-part-warning': 'KeyParts预警配置',
   'workbook-design': '工作簿设计',
+  'auto-nxt-data': 'NXT打件资料',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
