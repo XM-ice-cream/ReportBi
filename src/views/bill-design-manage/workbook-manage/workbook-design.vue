@@ -2,21 +2,35 @@
 	<div class="workbook-container">
 		<div class="left-box">
 			<Input v-model="submitData.filterTable" placeholder="请筛选信息" clearable suffix="ios-search" />
-			<Tree :data="data" :load-data="loadData" :render="renderContent" @on-contextmenu="handleContextMenu">
+			<ul class="tree">
+				<li v-for="(item, index) in data" :key="index" class="tree-father">
+					<Icon type="md-apps" /> {{ item.title }}
+					<ul class="subtree" v-if="true">
+						<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%">
+							<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
+								{{ subitem.title }}
+							</li>
+						</draggable>
+					</ul>
+				</li>
+			</ul>
+			<!-- <Tree :data="data" :load-data="loadData" :render="renderContent" @on-contextmenu="handleContextMenu">
 				<template #contextMenu>
 					<DropdownItem>编辑</DropdownItem>
 					<DropdownItem style="color: #ed4014">删除</DropdownItem>
 				</template>
-			</Tree>
+			</Tree> -->
 			<!-- <Tabs value="tabValue">
 				<TabPane label="数据" name="data">标签一的内容</TabPane>
 				<TabPane label="分析" name="analyse">标签二的内容</TabPane>
 			</Tabs> -->
 		</div>
 		<div class="center-box">
-			<div class="filter" :draggable="true" @dragover.native.prevent="filterDragEnd($event)">
+			<div class="filter">
 				<div class="title">筛选器</div>
-				<span v-for="(item, index) in filterData" :key="index">{{ item.title }}</span>
+				<draggable group="site" v-model="filterData" @end="filterDragEnd" :move="onMove" style="height: 99%">
+					<span v-for="(item, index) in filterData" :key="index" class="filter-cell">{{ item.title }}</span>
+				</draggable>
 			</div>
 			<div class="mark">
 				<div class="title">标记</div>
@@ -35,8 +49,10 @@
 	</div>
 </template>
 <script>
+import draggable from "vuedraggable";
 export default {
 	name: "workbook-design",
+	components: { draggable },
 	data() {
 		return {
 			tabValue: "data",
@@ -70,6 +86,7 @@ export default {
 				{ label: "盒须图", value: "boxplot" },
 			],
 			filterData: [],
+			moveId: -1,
 		};
 	},
 	activated() {},
@@ -189,9 +206,13 @@ export default {
 			// console.log(this.data5, "data5");
 		},
 		//===================过滤器
-		filterDragEnd() {
-			console.log("拖拽结束");
-			this.filterData.push(this.dragstartData);
+		filterDragEnd(e) {
+			console.log("拖拽结束", e);
+			this.filterData.splice(this.moveId, 1);
+		},
+		onMove(e, originalEvent) {
+			console.log(e, originalEvent);
+			this.moveId = e.draggedContext.index;
 		},
 	},
 };
@@ -206,6 +227,28 @@ export default {
 		padding: 10px;
 		border: 1px solid #27ce88;
 		background: #f8fffc;
+		.tree {
+			li {
+				list-style: none;
+			}
+			.tree-father {
+				padding: 10px 5px 0 5px;
+				font-weight: bold;
+			}
+			.subtree {
+				padding: 10px;
+				font-weight: normal;
+				.subtree-li {
+					padding: 4px 15px;
+					cursor: pointer;
+					&:hover {
+						background: #4795b3;
+						color: #fff;
+						border-radius: 10px;
+					}
+				}
+			}
+		}
 	}
 	.center-box {
 		width: 200px;
@@ -217,6 +260,14 @@ export default {
 			padding: 10px;
 			border: 1px dashed #ccc;
 			border-bottom: none;
+			.filter-cell {
+				padding: 4px 20px;
+				background: #4996b2;
+				color: #fff;
+				border-radius: 10px;
+				margin: 4px;
+				display: inline-block;
+			}
 		}
 		.mark {
 			width: 100%;
