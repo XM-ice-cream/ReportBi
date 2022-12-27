@@ -4,11 +4,23 @@
 			<Input v-model="submitData.filterTable" placeholder="请筛选信息" clearable suffix="ios-search" />
 			<ul class="tree">
 				<li v-for="(item, index) in data" :key="index" class="tree-father">
-					<Icon type="md-apps" /> {{ item.title }}
-					<ul class="subtree" v-if="true">
+					<div @click="item.isShow = !item.isShow">
+						<Icon type="ios-arrow-forward" :style="{ transform: item.isShow ? 'rotate(90deg)' : 'rotate(0deg)' }" />
+						<Icon type="md-apps" /> {{ item.title }}
+					</div>
+
+					<ul class="subtree" v-if="item.isShow">
 						<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%">
 							<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
 								{{ subitem.title }}
+								<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
+									<Icon type="ios-arrow-down"></Icon>
+									<template #list>
+										<DropdownMenu>
+											<DropdownItem name="createField">创建计算字段</DropdownItem>
+										</DropdownMenu>
+									</template>
+								</Dropdown>
 							</li>
 						</draggable>
 					</ul>
@@ -18,7 +30,7 @@
 		<div class="center-box">
 			<div class="filter">
 				<div class="title">筛选器</div>
-				<draggable group="site" v-model="filterData" @end="filterDragEnd" :move="onMove" style="height: 99%">
+				<draggable group="site" v-model="filterData" id="filter" style="height: 99%" @end="filterDragEnd">
 					<span v-for="(item, index) in filterData" :key="index" class="drag-cell">{{ item.title }}</span>
 				</draggable>
 			</div>
@@ -39,13 +51,13 @@
 			<div class="row-column">
 				<div class="row">
 					<span class="title">列</span>
-					<draggable group="site" v-model="columnData" class="drag-right">
+					<draggable group="site" v-model="columnData" class="drag-right" id="column" @end="columnDragEnd">
 						<span v-for="(item, index) in columnData" :key="index" class="drag-cell">{{ item.title }}</span>
 					</draggable>
 				</div>
 				<div class="column">
 					<span class="title">行</span>
-					<draggable group="site" v-model="rowData" class="drag-right">
+					<draggable group="site" v-model="rowData" class="drag-right" id="row" @end="rowDragEnd">
 						<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.title }}</span>
 					</draggable>
 				</div>
@@ -71,16 +83,10 @@ export default {
 			data: [
 				{
 					title: "APS_BASE_INFO",
-					children: [
-						{ title: "Workdayid", contextmenu: true },
-						{ title: "ID", contextmenu: true },
-						{ title: "CreateDate", contextmenu: true },
-						{ title: "OPT1", contextmenu: true },
-						{ title: "OPT2", contextmenu: true },
-					],
-					loading: false,
+					isShow: false,
+					children: [{ title: "Workdayid" }, { title: "ID" }, { title: "CreateDate" }, { title: "OPT1" }, { title: "OPT2" }],
 				},
-				{ title: "自定义SQL查询", children: [{ title: "WorkOrder" }] },
+				{ title: "自定义SQL查询", isShow: false, children: [{ title: "WorkOrder" }] },
 			],
 			chartList: [
 				{ label: "表格", value: "table" },
@@ -93,19 +99,32 @@ export default {
 			filterData: [], //过滤值
 			columnData: [], //列值
 			rowData: [], //行值
-			moveId: -1,
 		};
 	},
 	activated() {},
 	methods: {
-		//===================过滤器
-		filterDragEnd(e) {
-			console.log("拖拽结束", e);
-			this.filterData.splice(this.moveId, 1);
+		//下拉
+		dropDownClick(name, row) {
+			console.log("下拉", name, row);
 		},
-		onMove(e, originalEvent) {
-			console.log(e, originalEvent);
-			this.moveId = e.draggedContext.index;
+		filterDragEnd(e) {
+			console.log("拖拽结束--过滤器", e);
+			// this.filterData.splice(this.moveId, 1);
+			if (e.to.id === "filter" && e.oldIndex === e.newIndex) {
+				this.filterData.splice(e.oldIndex, 1);
+			}
+		},
+		columnDragEnd(e) {
+			console.log("拖拽结束--列", e);
+			if (e.to.id === "column" && e.oldIndex === e.newIndex) {
+				this.columnData.splice(e.oldIndex, 1);
+			}
+		},
+		rowDragEnd(e) {
+			console.log("拖拽结束--行", e);
+			if (e.to.id === "row" && e.oldIndex === e.newIndex) {
+				this.rowData.splice(e.oldIndex, 1);
+			}
 		},
 	},
 };
