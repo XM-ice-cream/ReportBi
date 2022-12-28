@@ -78,10 +78,10 @@
 						<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.title }}</span>
 					</draggable>
 				</div>
-				<div class="right-content">
-					<div class="title">{{ submitData.title }}</div>
-					<componentsTemp :type="submitData.chartType" :visib="true" />
-				</div>
+			</div>
+			<div class="right-content">
+				<div class="title">{{ submitData.title }}</div>
+				<componentsTemp :type="submitData.chartType" :visib="true" />
 			</div>
 		</div>
 	</div>
@@ -113,11 +113,11 @@ export default {
 			],
 			chartList: [
 				{ label: "表格", value: "componentTable" },
-				{ label: "柱状图", value: "bar" },
-				{ label: "折线图", value: "line" },
-				{ label: "饼图", value: "pie" },
-				{ label: "散点图", value: "scatter" },
-				{ label: "盒须图", value: "boxplot" },
+				{ label: "柱状图", value: "componentBar" },
+				{ label: "折线图", value: "componentLine" },
+				{ label: "饼图", value: "componentPie" },
+				{ label: "散点图", value: "componentScatter" },
+				{ label: "盒须图", value: "componentBoxplot" },
 			],
 			filterData: [], //过滤值
 			columnData: [], //列值
@@ -281,6 +281,7 @@ export default {
 			}
 		}
 		.right-content {
+			height: calc(100% - 100px);
 			.title {
 				padding: 5px 10px;
 				font-weight: bold;

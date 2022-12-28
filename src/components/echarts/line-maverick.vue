@@ -2,7 +2,7 @@
 	<div :id="'maverickLineChart' + index" class="maverickLineChart" v-if="isShow"></div>
 </template>
 <script>
-import echarts from "echarts"
+import * as echarts from "echarts";
 export default {
 	name: "line-maverick",
 	props: {
@@ -22,13 +22,13 @@ export default {
 		return {
 			isShow: false,
 			maverickLineChart: {},
-		}
+		};
 	},
 	methods: {
 		initChart() {
-			this.isShow = true
+			this.isShow = true;
 			// 基于准备好的dom，初始化echarts实例
-			this.maverickLineChart = echarts.init(document.getElementById("maverickLineChart" + this.index))
+			this.maverickLineChart = echarts.init(document.getElementById("maverickLineChart" + this.index));
 			let option = {
 				color: ["#76d9be", "#f9b90b", "#7aa8ff"],
 				title: {
@@ -44,11 +44,16 @@ export default {
 				tooltip: {
 					trigger: "axis",
 					formatter: function (params) {
-						let aa = ["日期：" + params[0].data.createtime, "站点：" + params[0].data.station, "数值：" + params[0].data.value + "%", "预警线：" + params[0].data.yielD_TARGET + "%"]
+						let aa = [
+							"日期：" + params[0].data.createtime,
+							"站点：" + params[0].data.station,
+							"数值：" + params[0].data.value + "%",
+							"预警线：" + params[0].data.yielD_TARGET + "%",
+						];
 						// params.map((item) => {
 						//   aa.push([item.seriesName] + "：" + item.value);
 						// });
-						return aa.join("<br>")
+						return aa.join("<br>");
 					},
 				},
 				xAxis: {
@@ -74,17 +79,17 @@ export default {
 					},
 				},
 				series: this.data.series,
-			}
-			this.maverickLineChart.setOption(option, true)
+			};
+			this.maverickLineChart.setOption(option, true);
 			window.addEventListener("resize", () => {
-				this.maverickLineChart.resize()
-			})
+				this.maverickLineChart.resize();
+			});
 		},
 	},
 	mounted() {
-		this.initChart()
+		this.initChart();
 	},
-}
+};
 </script>
 <style lang="less" scoped>
 .maverickLineChart {
