@@ -31,8 +31,14 @@
 						<Form>
 							<label class="name-label">数据源：</label>
 							<FormItem prop="sourceCode">
-								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getTableList" clearable>
+								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getUserList" clearable>
 									<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
+								</Select>
+							</FormItem>
+							<label class="name-label">架构：</label>
+							<FormItem prop="sourceCode">
+								<Select v-model.trim="submitData.user" size="small" placeholder="请选择用户" @on-change="getTableList" clearable>
+									<Option v-for="item in userList" :key="item" :label="item" :value="item" />
 								</Select>
 							</FormItem>
 							<label class="name-label">筛选表名称：</label>
@@ -64,7 +70,7 @@
 </template>
 <script>
 import { getAllDatasourceReq } from "@/api/bill-design-manage/data-set.js";
-import { addReq, modifyReq, getTableListReq } from "@/api/bill-design-manage/data-set-config.js";
+import { addReq, modifyReq, getTableListReq, getUsersReq } from "@/api/bill-design-manage/data-set-config.js";
 
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
@@ -88,7 +94,7 @@ export default {
 			if (newVal) {
 				this.getDataSourceList(); //获取数据源
 			} else {
-				this.submitData = { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "" };
+				this.submitData = { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "", user: "" };
 				this.filterList = [];
 			}
 		},
@@ -100,8 +106,9 @@ export default {
 			connectModalFlag: false,
 			isShake: false, //右侧卡片是否抖动
 			connectObj: {}, //关联表
-			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "" },
+			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "", user: "" },
 			filterList: [], //过滤后的值
+			userList: [], //数据源对应所有用户
 			splitValue: 0.2,
 			graph: "",
 			sourceList: [], //数据源集合
@@ -145,12 +152,32 @@ export default {
 			});
 			console.log(this.submitData);
 		},
-		//获取表
-		getTableList() {
+		//获取用户
+		getUserList() {
 			const obj = {
 				sourceCode: this.submitData.sourceCode,
 			};
 			if (obj.sourceCode) {
+				getUsersReq(obj).then((res) => {
+					if (res.code === 200) {
+						this.userList = res?.result || [];
+						this.treeData = [];
+						this.submitData.user = "";
+						this.filterData(); //过滤值
+					} else {
+						this.$Message.error("获取用户失败", res.message);
+					}
+				});
+			}
+		},
+		//获取表
+		getTableList() {
+			const { sourceCode, user } = this.submitData;
+			const obj = {
+				sourceCode: sourceCode,
+				user: user,
+			};
+			if (obj.sourceCode && obj.user) {
 				getTableListReq(obj).then((res) => {
 					if (res.code === 200) {
 						this.treeData = res?.result || [];
@@ -509,7 +536,7 @@ export default {
 			font-weight: bold;
 		}
 		.left-tree {
-			height: calc(100% - 150px);
+			height: calc(100% - 215px);
 			padding: 10px;
 			overflow-y: auto;
 			font-weight: bold;

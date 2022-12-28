@@ -48,6 +48,15 @@ export const getTableListReq = data => {
     data
   })
 }
+// 获取当前数据源所有用户
+export const getUsersReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/bidataset/gettablelist',
+    method: 'post',
+    data
+  })
+}
 // 获取当前DB用户下的表的所有字段
 export const getColumnListReq = data => {
   return requestCenter({

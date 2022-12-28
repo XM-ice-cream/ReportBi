@@ -10,7 +10,7 @@
 					</div>
 
 					<ul class="subtree" v-if="item.isShow">
-						<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%">
+						<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%" @end="treeDragEnd">
 							<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
 								{{ subitem.title }}
 								<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
@@ -40,10 +40,27 @@
 					<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				</Select>
 				<div class="mark-box">
-					<div class="color box-cell"><Icon custom="iconfont icon-yansefangan" />颜色</div>
-					<div class="size box-cell"><Icon custom="iconfont icon-daxiao" />大小</div>
-					<div class="tag box-cell"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
-					<div class="detail-info box-cell"><Icon type="ios-more" />详细信息</div>
+					<draggable group="site" v-model="markData" id="color" class="box-cell">
+						<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
+					</draggable>
+					<draggable group="site" v-model="markData" id="size" class="box-cell">
+						<div class="size"><Icon custom="iconfont icon-daxiao" />大小</div>
+					</draggable>
+					<draggable group="site" v-model="markData" id="mark" class="box-cell">
+						<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
+					</draggable>
+					<draggable group="site" v-model="markData" id="info" class="box-cell">
+						<div class="detail-info"><Icon type="ios-more" />详细信息</div>
+					</draggable>
+					<draggable group="site" v-model="markData" id="mark-box" @end="markDragEnd">
+						<div v-for="(item, index) in markData" :key="index">
+							<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
+							<Icon custom="iconfont icon-daxiao" v-if="item.innerText === 'size'" />
+							<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
+							<Icon type="ios-more" v-if="item.innerText === 'info'" />
+							<div class="drag-cell">{{ item.title }}</div>
+						</div>
+					</draggable>
 				</div>
 			</div>
 		</div>
@@ -61,21 +78,27 @@
 						<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.title }}</span>
 					</draggable>
 				</div>
+				<div class="right-content">
+					<div class="title">{{ submitData.title }}</div>
+					<componentsTemp :type="submitData.chartType" :visib="true" />
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script>
 import draggable from "vuedraggable";
+import componentsTemp from "./components/temp.vue";
 export default {
 	name: "workbook-design",
-	components: { draggable },
+	components: { draggable, componentsTemp },
 	data() {
 		return {
 			tabValue: "data",
 			submitData: {
 				filterTable: "",
-				chartType: "",
+				chartType: "componentTable",
+				title: "工作表",
 			},
 			dragstartNode: "",
 			dragstartData: "",
@@ -89,7 +112,7 @@ export default {
 				{ title: "自定义SQL查询", isShow: false, children: [{ title: "WorkOrder" }] },
 			],
 			chartList: [
-				{ label: "表格", value: "table" },
+				{ label: "表格", value: "componentTable" },
 				{ label: "柱状图", value: "bar" },
 				{ label: "折线图", value: "line" },
 				{ label: "饼图", value: "pie" },
@@ -99,6 +122,7 @@ export default {
 			filterData: [], //过滤值
 			columnData: [], //列值
 			rowData: [], //行值
+			markData: [],
 		};
 	},
 	activated() {},
@@ -125,6 +149,29 @@ export default {
 			if (e.to.id === "row" && e.oldIndex === e.newIndex) {
 				this.rowData.splice(e.oldIndex, 1);
 			}
+		},
+		markDragEnd(e) {
+			console.log("拖拽结束--标记", e);
+			if (e.to.id === "mark-box" && e.oldIndex === e.newIndex) {
+				this.markData.splice(e.oldIndex, 1);
+			}
+		},
+		treeDragEnd(e) {
+			console.log("拖拽结束--树", e);
+			if (e.to.id === "color") {
+				this.markData[e.newIndex].innerText = "color";
+			}
+			if (e.to.id === "size") {
+				this.markData[e.newIndex].innerText = "size";
+			}
+			if (e.to.id === "mark") {
+				this.markData[e.newIndex].innerText = "mark";
+			}
+			if (e.to.id === "info") {
+				this.markData[e.newIndex].innerText = "info";
+			}
+			this.markData = JSON.parse(JSON.stringify(this.markData));
+			console.log(this.markData);
 		},
 	},
 };
@@ -231,6 +278,13 @@ export default {
 					display: inline-block;
 					width: calc(100% - 40px);
 				}
+			}
+		}
+		.right-content {
+			.title {
+				padding: 5px 10px;
+				font-weight: bold;
+				font-size: 18px;
 			}
 		}
 	}
