@@ -1982,6 +1982,8 @@ export default {
   'key-part-warning': 'KeyParts预警配置',
   'workbook-design': '工作簿设计',
   'auto-nxt-data': 'NXT打件资料',
+  'sendahead-report': 'Sendahead Report',
+  'sendahead-list': 'Sendahead List',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',

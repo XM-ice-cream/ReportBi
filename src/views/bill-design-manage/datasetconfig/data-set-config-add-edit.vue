@@ -143,7 +143,7 @@ export default {
 				this.submitData = { ...val };
 				this.submitData.sourceCode = val.sourceCode?.split(",")[0] || "";
 				this.$nextTick(() => {
-					this.getTableList(); //获取数据源对应表
+					this.getUserList(); //获取数据源对应用户
 				});
 			}
 
@@ -193,7 +193,7 @@ export default {
 		//提交
 		submitClick() {
 			this.getLevel(); //节点层级
-			const { id, datasetName, datasetCode, enabled } = this.submitData;
+			const { id, datasetName, datasetCode, enabled, user } = this.submitData;
 			const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
 			this.data.edges = this.data.edges.map((item) => {
 				const { id, type, relations, source, target, startPoint, style, incidenceRelation } = item;
@@ -201,6 +201,7 @@ export default {
 			});
 			const obj = {
 				id,
+				user,
 				datasetName,
 				datasetCode,
 				content: JSON.stringify(this.data),

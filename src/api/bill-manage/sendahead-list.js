@@ -7,7 +7,7 @@ import {
 export const getpagelistReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadlist/getpagelist',
     method: 'post',
     data
@@ -18,7 +18,7 @@ export const getpagelistReq = data => {
 export const exportReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadlist/export',
     responseType: 'arraybuffer',
     method: 'post',
@@ -29,7 +29,7 @@ export const exportReq = data => {
 export const addReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadlist/add',
     method: 'post',
     data
@@ -39,7 +39,7 @@ export const addReq = data => {
 export const modifyReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadlist/modify',
     method: 'post',
     data
@@ -49,7 +49,7 @@ export const modifyReq = data => {
 export const deleteReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadlist/delete',
     method: 'post',
     data
@@ -59,7 +59,7 @@ export const deleteReq = data => {
 export const getStepReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadlist/getstep',
     method: 'post',
     data
@@ -69,7 +69,7 @@ export const getStepReq = data => {
 export const setupStepReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadlist/setupstep',
     method: 'post',
     data

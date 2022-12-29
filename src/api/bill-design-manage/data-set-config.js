@@ -52,7 +52,7 @@ export const getTableListReq = data => {
 export const getUsersReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/gettablelist',
+    url: '/api/autoreportcenter/anonymous/v1/bidataset/getuserlist',
     method: 'post',
     data
   })

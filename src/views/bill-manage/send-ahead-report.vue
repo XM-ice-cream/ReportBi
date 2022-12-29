@@ -128,7 +128,7 @@
 				>
 					<!-- 操作 -->
 					<template slot-scope="{ row }" slot="operator">
-						<div style="cursor: pointer; color: blue" @click="lcwo(row)">LC-WO</div>
+						<div class="tableBtn" @click="lcwo(row)">LC-WO</div>
 					</template></Table
 				>
 				<page-custom
@@ -203,6 +203,7 @@ export default {
 					type: "selection",
 					width: 60,
 					align: "center",
+					fixed: "left",
 				},
 				{
 					type: "index",
@@ -212,18 +213,20 @@ export default {
 					indexMethod: (row) => {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
+					fixed: "left",
 				},
-
-				{ title: "机种", key: "project", align: "center", minWidth: 140, tooltip: true },
-				{ title: "脚位", key: "location", align: "center", minWidth: 140, tooltip: true },
-				{ title: "工单", key: "wo", align: "center", minWidth: 140, tooltip: true },
+				{ title: "Operator", slot: "operator", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "status", key: "status", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "机种", key: "project", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "脚位", key: "location", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "工单", key: "wo", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "料号", key: "ipn", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "LC", key: "lc", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "DC", key: "dc", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "分组标识", key: "groupID", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "记第几周", key: "week", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
 				{ title: "仓位", key: "wareHouse", align: "center", tooltip: true, width: 80 },
-				{ title: "工厂", key: "factory", align: "center", minWidth: 200, tooltip: true },
-				{ title: "料号", key: "ipn", align: "center", minWidth: 200, tooltip: true },
-				{ title: "LC", key: "lc", align: "center", minWidth: 200, tooltip: true },
-				{ title: "DC", key: "dc", align: "center", minWidth: 200, tooltip: true },
-				{ title: "分组标识", key: "groupID", align: "center", minWidth: 200, tooltip: true },
-				{ title: "记第几周", key: "week", align: "center", minWidth: 200, tooltip: true },
+				{ title: "工厂", key: "factory", align: "center", minWidth: 100, tooltip: true },
 				{ title: "ReelID", key: "reel", align: "center", minWidth: 200, tooltip: true },
 				{ title: "预警值", key: "dppmLimit", align: "center", minWidth: 200, tooltip: true },
 				{ title: "Fail数量", key: "failQty", align: "center", minWidth: 200, tooltip: true },
@@ -243,9 +246,7 @@ export default {
 				{ title: "wifiBtTest", key: "wifiBtTest", align: "center", minWidth: 200, tooltip: true },
 				{ title: "wifiAssoc", key: "wifiAssoc", align: "center", minWidth: 200, tooltip: true },
 				{ title: "gateKeeper", key: "gateKeeper", align: "center", minWidth: 200, tooltip: true },
-				{ title: "status", key: "status", align: "center", minWidth: 200, tooltip: true },
 				{ title: "备注", key: "remark", align: "center", minWidth: 200, tooltip: true },
-				{ title: "Operator", slot: "operator", align: "center", minWidth: 200, tooltip: true },
 			], // 表格数据
 			submitData: {
 				wo: "",
@@ -381,13 +382,25 @@ export default {
 		},
 		modalSubmitClick() {
 			const data = this.selectArr.map((item) => {
-				item.hold_flag = this.isHold ? "Y" : "N";
+				let { factory, wareHouse, dc, lc, ipn, hold_flag, unhold_reasondesc, hold_reasoncode, hold_reasondesc } = item;
+
+				hold_flag = this.isHold ? "Y" : "N";
 				if (this.isHold) {
-					item.hold_reasondesc = this.mark;
+					hold_reasondesc = this.mark;
 				} else {
-					item.unhold_reasondesc = this.mark;
+					unhold_reasondesc = this.mark;
 				}
-				return { ...item };
+				return {
+					plant_code: factory,
+					warehouse_code: wareHouse,
+					date_code: dc,
+					lot_code: lc,
+					pn: ipn,
+					hold_flag,
+					unhold_reasondesc,
+					hold_reasoncode,
+					hold_reasondesc,
+				};
 			});
 			holdReq(data).then((res) => {
 				if (res.code === 200) {
@@ -402,6 +415,7 @@ export default {
 		// 点击新增按钮触发
 		holdClick() {
 			if (this.selectArr.length > 0) {
+				this.mark = "";
 				this.isHold = true;
 				this.modalFlag = true;
 			} else this.$Msg.warning(this.$t("oneData"));
@@ -409,6 +423,7 @@ export default {
 		// 点击编辑按钮触发
 		unholdClick() {
 			if (this.selectArr.length > 0) {
+				this.mark = "";
 				this.isHold = false;
 				this.modalFlag = true;
 			} else this.$Msg.warning(this.$t("oneData"));
@@ -450,3 +465,20 @@ export default {
 	},
 };
 </script>
+<style scoped lang="less">
+.tableBtn {
+	display: inline-block;
+	padding: 0.2rem;
+	color: #1890ff;
+	background: #f5f5f5;
+
+	border-radius: 0.2rem;
+	box-shadow: 0px 2px 3px #ccc;
+	cursor: pointer;
+	&:active {
+		background: #40e49f;
+		color: #fff;
+		box-shadow: none;
+	}
+}
+</style>

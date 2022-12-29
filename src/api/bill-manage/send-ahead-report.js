@@ -7,7 +7,7 @@ import {
 export const getpagelistReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadreport/getpagelist',
     method: 'post',
     data
@@ -18,7 +18,7 @@ export const getpagelistReq = data => {
 export const exportReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadreport/export',
     responseType: 'arraybuffer',
     method: 'post',
@@ -29,7 +29,7 @@ export const exportReq = data => {
 export const holdReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadreport/hold',
     method: 'post',
     data
@@ -39,7 +39,7 @@ export const holdReq = data => {
 export const groupReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadreport/group',
     method: 'post',
     data
@@ -49,7 +49,7 @@ export const groupReq = data => {
 export const lclinkwoReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.116:8700" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/sendahead/v1/sendaheadreport/lclinkwo',
     method: 'post',
     data
