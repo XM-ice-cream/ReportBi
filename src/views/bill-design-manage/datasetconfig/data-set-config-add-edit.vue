@@ -344,6 +344,7 @@ export default {
 			this.graph.data(this.data);
 			this.graph.render();
 			this.graph.refresh(); //刷新
+			this.graph.layout(true); //数据变更后，重新布局，刷新视图
 			// 设置层级
 			const canvas = this.graph.get("canvas");
 			canvas.get("el").style.zIndex = 2;
@@ -369,10 +370,28 @@ export default {
 				console.log("创建边", e, e.edge._cfg, e.edge.getModel());
 				if (e.edge.getModel()) {
 					const { id, target, source } = e.edge.getModel();
-					this.data.edges.push({ id, target, source });
-					this.graph.changeData(this.data);
-					this.edgeDblclick(e.edge.getModel());
-					console.log(this.graph, this.data);
+
+					//不允许自己与自己关联
+					if (target !== source) {
+						const targetEdges = this.data.edges.filter((item) => {
+							return item.target === target;
+						});
+
+						if (targetEdges.length >= 1) {
+							this.$Message.error("禁止多对一连接！");
+							//删除自己和自己关联的边
+							this.graph.changeData(this.data);
+							return;
+						} else {
+							this.data.edges.push({ id, target, source });
+							this.graph.changeData(this.data);
+							this.edgeDblclick(e.edge.getModel());
+							console.log(this.graph, this.data);
+						}
+					} else {
+						//删除自己和自己关联的边
+						this.graph.changeData(this.data);
+					}
 				}
 			});
 			//边的双击事件
@@ -505,7 +524,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .base-info {
-	width: 14%;
+	width: 300px;
 	position: absolute;
 	right: 10px;
 	color: #fff !important;
