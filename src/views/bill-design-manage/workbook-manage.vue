@@ -241,7 +241,7 @@ export default {
 							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.pageLoad(); //刷新表格
 							this.cancelClick();
-						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + "报表编码不可重复!");
+						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
 					});
 				}
 			});

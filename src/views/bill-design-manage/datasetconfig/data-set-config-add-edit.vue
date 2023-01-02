@@ -10,21 +10,24 @@
 			</template>
 			<div class="modal-content">
 				<div class="base-info" :class="[isShake ? 'shake-constant' : '']">
-					<Form ref="submitRef" :model="submitData" inline :label-width="90" :rules="rulesValidate">
-						<FormItem label="数据集名称:" prop="datasetName">
-							<Input v-model="submitData.datasetName" :placeholder="$t('pleaseEnter') + '数据集名称'" />
-						</FormItem>
-						<FormItem label="数据集编码:" prop="datasetCode">
-							<Input v-model="submitData.datasetCode" :placeholder="$t('pleaseEnter') + '数据集编码'" />
-						</FormItem>
-						<!-- 是否有效 -->
-						<FormItem :label="$t('enabled')" prop="enabled">
-							<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
-								<span slot="open">{{ $t("open") }}</span>
-								<span slot="close">{{ $t("close") }}</span>
-							</i-switch>
-						</FormItem>
-					</Form>
+					<Card style="width: 100%; height: 100%">
+						<template #title> 基础信息 </template>
+						<Form ref="submitRef" :model="submitData" inline :label-width="90" :rules="rulesValidate">
+							<FormItem label="数据集名称:" prop="datasetName">
+								<Input v-model="submitData.datasetName" :placeholder="$t('pleaseEnter') + '数据集名称'" />
+							</FormItem>
+							<FormItem label="数据集编码:" prop="datasetCode">
+								<Input v-model="submitData.datasetCode" :placeholder="$t('pleaseEnter') + '数据集编码'" />
+							</FormItem>
+							<!-- 是否有效 -->
+							<FormItem :label="$t('enabled')" prop="enabled">
+								<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+									<span slot="open">{{ $t("open") }}</span>
+									<span slot="close">{{ $t("close") }}</span>
+								</i-switch>
+							</FormItem>
+						</Form>
+					</Card>
 				</div>
 				<Split v-model="splitValue">
 					<div slot="left" class="left-box">
@@ -191,14 +194,27 @@ export default {
 		},
 
 		//提交
-		submitClick() {
-			this.getLevel(); //节点层级
+		async submitClick() {
+			let connectEdge = false;
+			await this.getLevel(); //节点层级
+			const depth0 = this.data.nodes.filter((item) => item.depth === 0);
+			if (depth0.length > 1) {
+				this.$Message.error("根节点有且只有一个，请确认！");
+				return;
+			}
 			const { id, datasetName, datasetCode, enabled, user } = this.submitData;
 			const sourceList = this.data.nodes.map((item) => item.id.split(":")[0]);
 			this.data.edges = this.data.edges.map((item) => {
+				if (!item.style || item.style.stroke === "#fb5531") {
+					connectEdge = true;
+				}
 				const { id, type, relations, source, target, startPoint, style, incidenceRelation } = item;
 				return { id, type, relations, source, target, startPoint, style, incidenceRelation };
 			});
+			if (connectEdge) {
+				this.$Message.error("请关联每个数据集之间的关系，谢谢！");
+				return;
+			}
 			const obj = {
 				id,
 				user,
@@ -209,7 +225,7 @@ export default {
 				enabled,
 			};
 			console.log("结果值", obj, this.data);
-			//return;
+
 			this.$refs.submitRef.validate((validate) => {
 				if (validate) {
 					this.isShake = false; //停止抖动
@@ -232,12 +248,13 @@ export default {
 			});
 		},
 		//获取二叉树层级
-		getLevel() {
+		async getLevel() {
 			let depth = 0;
 			let { nodes, edges } = this.data;
 			const edge = edges.map((item) => item.target);
-			nodes.forEach((item) => {
+			await nodes.forEach((item) => {
 				if (!edge.includes(item.id)) {
+					depth = 0;
 					// 获取根节点
 					item.depth = depth;
 					let chilArr = [];
@@ -290,7 +307,31 @@ export default {
 				height: height,
 				plugins: [],
 				modes: {
-					default: ["drag-node", "click-select", "drag-canvas", "zoom-canvas", "brush-select", "create-edge"],
+					default: [
+						"drag-node",
+						"click-select",
+						"drag-canvas",
+						"zoom-canvas",
+						"brush-select",
+						{
+							type: "create-edge",
+							// shouldEnd【v4.3.8 后支持】
+							shouldEnd: (e, self) => {
+								console.log(e.item.getModel());
+								if (e.item) {
+									const { id } = e.item.getModel();
+									const targetEdges = this.data.edges.filter((item) => {
+										return item.target === id;
+									});
+									if (targetEdges.length >= 1) {
+										this.$Message.error("禁止多对一连接！");
+										return false;
+									}
+								}
+								return true;
+							},
+						},
+					],
 				},
 				// 节点
 				defaultNode: {
@@ -369,29 +410,10 @@ export default {
 			this.graph.on("aftercreateedge", (e) => {
 				console.log("创建边", e, e.edge._cfg, e.edge.getModel());
 				if (e.edge.getModel()) {
-					const { id, target, source } = e.edge.getModel();
-
-					//不允许自己与自己关联
-					if (target !== source) {
-						const targetEdges = this.data.edges.filter((item) => {
-							return item.target === target;
-						});
-
-						if (targetEdges.length >= 1) {
-							this.$Message.error("禁止多对一连接！");
-							//删除自己和自己关联的边
-							this.graph.changeData(this.data);
-							return;
-						} else {
-							this.data.edges.push({ id, target, source });
-							this.graph.changeData(this.data);
-							this.edgeDblclick(e.edge.getModel());
-							console.log(this.graph, this.data);
-						}
-					} else {
-						//删除自己和自己关联的边
-						this.graph.changeData(this.data);
-					}
+					this.data.edges.push({ id, target, source });
+					this.graph.changeData(this.data);
+					this.edgeDblclick(e.edge.getModel());
+					console.log(this.graph, this.data);
 				}
 			});
 			//边的双击事件
@@ -527,22 +549,23 @@ export default {
 	width: 300px;
 	position: absolute;
 	right: 10px;
-	color: #fff !important;
-	background: #72c424;
+	// color: #fff !important;
+	// background: #72c424;
 	margin: 5px;
 	padding: 15px 5px;
 	vertical-align: baseline;
 	border-radius: 5px;
 	z-index: 9999999;
-	:deep(.ivu-form .ivu-form-item-label) {
-		color: #fff;
+	:deep(.ivu-card-head) {
+		background: #f8f8f9;
+		font-weight: bold;
 	}
-	:deep(input) {
-		border-radius: 5px;
-		background: transparent;
-		color: #fff;
-		border: 1px dashed;
-	}
+	// :deep(input) {
+	// 	border-radius: 5px;
+	// 	background: transparent;
+	// 	color: #fff;
+	// 	border: 1px dashed;
+	// }
 }
 .modal-content {
 	height: 100%;
