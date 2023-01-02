@@ -124,7 +124,7 @@ export default {
 			const { source } = this.connectObj;
 			const sourceObj = {
 				sourceCode: source.split(":")[0],
-				tableName: source.split(":")[1],
+				tableName: source.split(":")[1].split("(")[0],
 			};
 			getColumnListReq(sourceObj).then((res) => {
 				if (res.code == 200) {
@@ -137,7 +137,7 @@ export default {
 			const { target } = this.connectObj;
 			const targetObj = {
 				sourceCode: target.split(":")[0],
-				tableName: target.split(":")[1],
+				tableName: target.split(":")[1].split("(")[0],
 			};
 			getColumnListReq(targetObj).then((res) => {
 				if (res.code == 200) {

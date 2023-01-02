@@ -317,7 +317,6 @@ export default {
 							type: "create-edge",
 							// shouldEnd【v4.3.8 后支持】
 							shouldEnd: (e, self) => {
-								console.log(e.item.getModel());
 								if (e.item) {
 									const { id } = e.item.getModel();
 									const targetEdges = this.data.edges.filter((item) => {
@@ -410,6 +409,7 @@ export default {
 			this.graph.on("aftercreateedge", (e) => {
 				console.log("创建边", e, e.edge._cfg, e.edge.getModel());
 				if (e.edge.getModel()) {
+					const { id, target, source } = e.edge.getModel();
 					this.data.edges.push({ id, target, source });
 					this.graph.changeData(this.data);
 					this.edgeDblclick(e.edge.getModel());
@@ -434,19 +434,26 @@ export default {
 
 		// 添加节点
 		addNodeImage(e, row) {
-			console.log("添加节点", e);
+			console.log("添加节点", e, row, this.data.nodes);
+			const isExistTable = this.data.nodes
+				.map((item) => item.label)
+				.filter((item) => {
+					return item?.split("(")[0] === row;
+				});
+			console.log("isExistTable", isExistTable);
+			const label = isExistTable.length === 0 ? row : `${row}(${isExistTable.length})`;
 			const { sourceCode } = this.submitData;
 			const point = this.graph.getPointByClient(e.x, e.y); //将屏幕坐标转换为渲染坐标
 			const model = {
-				id: `${sourceCode}:${row}:${Math.random()}`,
-				label: row,
+				id: `${sourceCode}:${label}`,
+				label: `${label}`,
 				nodeType: 0,
 				x: point.x,
 				y: point.y,
 				type: "rect",
 			};
 			this.data.nodes.push({ ...model });
-			console.log("this.data", this.data);
+			console.log("model", model);
 			this.graph.changeData(this.data);
 		},
 		//更新边
