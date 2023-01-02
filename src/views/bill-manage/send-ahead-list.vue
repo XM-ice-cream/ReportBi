@@ -272,10 +272,10 @@ export default {
 					},
 				},
 				{ title: "ID", key: "formID", align: "center" },
-				{ title: "排序", key: "sortBy", align: "center" },
+				//{ title: "排序", key: "sortBy", align: "center" },
 				{ title: "系统", key: "systemName", align: "center" },
-				{ title: "站点", key: "stepName", align: "center", tooltip: true },
 				{ title: "系统站点", key: "sysStepName", align: "center", tooltip: true },
+				{ title: "站点", key: "stepName", align: "center", tooltip: true },
 				{ title: "检查状态", slot: "checkState", align: "center", tooltip: true },
 				{ title: "最后一站检查", slot: "checkOut", align: "center", tooltip: true },
 			], // 表格数据
@@ -463,7 +463,6 @@ export default {
 		// 点击重置按钮触发
 		resetClick() {
 			this.$refs.searchReq.resetFields();
-			this.$refs.workOrder.remove();
 		},
 		// 自动改变表格高度
 		autoSize() {

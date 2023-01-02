@@ -156,7 +156,7 @@
 		</Modal>
 		<!-- 组 -->
 		<Modal v-model="groupModalFlag" title="Group" width="800" :mask="false" :mask-closable="false" @on-cancel="groupModalFlag = false">
-			Group:<Input type="text" placeholder="格式：YYYYMMDD-01(例如：20221228-01)" />
+			Group:<Input type="text" disabled placeholder="格式：YYYYMMDD-01(例如：20221228-01)" />
 			<span>tips:GROUP编码系统自动生成</span>
 			<template #footer>
 				<Button @click="groupModalFlag = false">关闭</Button>
@@ -261,7 +261,11 @@ export default {
 				ipn: "",
 				factory: "",
 			},
-			ruleValidate: {},
+            ruleValidate: {
+                wo:[
+                    { required: true, message: "工单必填", trigger: "blur" },
+                ]
+            },
 		};
 	},
 	mounted() {
