@@ -95,7 +95,11 @@
 										</FormItem>
 										<!-- 状态 -->
 										<FormItem label="状态" prop="status">
-											<Input v-model="req.status" :placeholder="$t('pleaseEnter') + '状态'" />
+                                            <Select v-model="req.status" clearable filterable :placeholder="$t('pleaseSelect') + '状态'" transfer>
+                                            <Option v-for="(item, i) in statusList" :value="item.detailName" :key="i">
+                                                {{ item.detailName }}
+                                            </Option>
+                                            </Select>
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -166,6 +170,7 @@
 import { getpagelistReq, holdReq, groupReq, lclinkwoReq, exportReq } from "@/api/bill-manage/send-ahead-report";
 import { getButtonBoolean, formatDate, exportFile } from "@/libs/tools";
 import { errorType } from "@/libs/tools";
+import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
 
 export default {
 	name: "send-ahead-report",
@@ -183,7 +188,7 @@ export default {
 			selectObj: null, // 表格选中数据
 			data: [], // 表格数据
 			btnData: [],
-			deptList: [], // 部门下拉框
+			statusList: [], // 部门下拉框
 			selectArr: [],
 			mark: "", //hold/unhold备注
 			req: {
@@ -265,6 +270,7 @@ export default {
 		window.addEventListener("resize", () => this.autoSize());
 		getButtonBoolean(this, this.btnData);
 		this.tableConfig.loading = false;
+        this.getDataItemData();
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
@@ -433,6 +439,20 @@ export default {
 				this.groupModalFlag = true;
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
+        // 获取业务数据
+        async getDataItemData () {
+        this.statusList = await this.getDataItemDetailList("SendAheadStatus"); 
+        },
+        // 获取数据字典数据
+        async getDataItemDetailList (itemCode) {
+        let arr = [];
+        await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+            if (res.code === 200) {
+            arr = res.result || [];
+            }
+        });
+        return arr;
+        },
 		// 某一行高亮时触发
 		currentClick(currentRow) {
 			this.selectObj = currentRow;
