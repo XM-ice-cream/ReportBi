@@ -21,6 +21,7 @@ import ECharts from 'vue-echarts'
 import mixins from './libs/queryform'
 import '@/assets/iconfont/iconfont.css'
 import moment from "moment";
+import XEUtils from 'xe-utils';
 // 引入elementui 部分组件
 import {
   Input
@@ -50,6 +51,7 @@ importDirective(Vue)
  * @description 全局注册应用配置
  */
 Vue.prototype.$moment = moment;
+Vue.prototype.$XEUtiles = XEUtils;
 Vue.prototype.$config = config
 Vue.prototype.$triggerTab = enterTriggerTab
 Vue.prototype.$inhibitingInput = inhibitingInput

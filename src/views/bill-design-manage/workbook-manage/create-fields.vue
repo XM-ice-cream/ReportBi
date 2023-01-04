@@ -1,37 +1,17 @@
+/**创建计算字段 */
 <template>
 	<!-- 函数管理 -->
-	<Modal title="数据集管理" v-model="outerVisible" class="functionModal" width="1200">
-		<div class="function-editor" id="function-editor">
-			<monaco-editor v-model.trim="rightForm.v" language="sql" style="height: 200px" v-if="outerVisible" />
+	<Modal title="创建计算字段" v-model="modelFlag" width="1200">
+		<div class="left-box">
+			<Input type="text" v-model="selectObject.columnName" clearabled />
+			<Input v-model="selectObject.function" type="textarea" :autosize="{ minRows: 5, maxRows: 5 }" />
 		</div>
-		<div class="function-content">
-			<div class="function-type">
-				<Menu :active-name="menuType" @on-select="(name) => (menuType = name)">
-					<MenuGroup title="函数类型">
-						<MenuItem :name="index" v-for="(item, index) in dataItemList" :key="index">
-							{{ item.itemName }}
-						</MenuItem>
-					</MenuGroup>
-				</Menu>
-			</div>
-			<div class="function-name">
-				<Menu :active-name="menuName" @on-select="(name) => (menuName = name)">
-					<MenuGroup title="函数名">
-						<MenuItem
-							:name="index"
-							v-for="(item, index) in dataItemList[parseInt(menuType)].children"
-							:key="index"
-							@dblclick.native="menuDblclick(item)"
-						>
-							{{ item.detailCode }}
-						</MenuItem>
-					</MenuGroup>
-				</Menu>
-			</div>
-			<div class="function-remark">
-				{{ dataItemList[parseInt(menuType)].children[parseInt(menuName)].remark }}
-			</div>
+		<div class="right-box">
+			<Select v-model="selectObject.type" style="width: 200px">
+				<Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+			</Select>
 		</div>
+
 		<div slot="footer" class="dialog-footer">
 			<Button @click="outerVisible = false">取 消</Button>
 			<Button type="primary" @click="autoChangeFunc">确定 </Button>
@@ -40,19 +20,18 @@
 </template>
 <script>
 import { getlistReq as getDataItemReq, getlisttreeReq } from "@/api/system-manager/data-item";
-import MonacoEditor from "@/components/monaco-editor/monaco-editor.vue";
 
 export default {
-	name: "function-manage",
-	components: { MonacoEditor },
+	name: "create-fields",
+	components: {},
 	props: {
-		formData: {
+		selectObject: {
 			type: Object,
 			default: () => {},
 		},
 	},
 	watch: {
-		formData: {
+		selectObject: {
 			handler() {
 				this.rightForm = { ...this.formData };
 			},
@@ -62,11 +41,36 @@ export default {
 	},
 	data() {
 		return {
-			rightForm: {},
-			outerVisible: false,
-			menuType: "0",
-			menuName: "0",
-			dataItemList: [],
+			typeList: [
+				{
+					value: "",
+					label: "全部",
+				},
+				{
+					value: "number",
+					label: "数字",
+				},
+				{
+					value: "string",
+					label: "字符串",
+				},
+				{
+					value: "date",
+					label: "日期",
+				},
+				{
+					value: "类型转换",
+					label: "changeType",
+				},
+				{
+					value: "逻辑",
+					label: "logic",
+				},
+				{
+					value: "聚合",
+					label: "syndication",
+				},
+			],
 		};
 	},
 	methods: {

@@ -51,9 +51,10 @@
     "vuedraggable": "^2.24.1",
     "vuex": "^3.1.2",
     "vxe-table": "^3.3.9",
+    "vxe-utils": "^2.0.1",
     "wangeditor": "^4.7.8",
     "watermark-dom": "^2.3.0",
-    "xe-utils": "^3.3.1",
+    "xe-utils": "^3.5.7",
     "xlsx": "^0.16.0"
   },
   "devDependencies": {

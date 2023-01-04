@@ -9,45 +9,48 @@
 				</div>
 			</template>
 			<div class="modal-content">
-				<div class="base-info" :class="[isShake ? 'shake-constant' : '']">
-					<Card style="width: 100%; height: 100%">
-						<template #title> 基础信息 </template>
-						<Form ref="submitRef" :model="submitData" inline :label-width="90" :rules="rulesValidate">
-							<FormItem label="数据集名称:" prop="datasetName">
-								<Input v-model="submitData.datasetName" :placeholder="$t('pleaseEnter') + '数据集名称'" />
-							</FormItem>
-							<FormItem label="数据集编码:" prop="datasetCode">
-								<Input v-model="submitData.datasetCode" :placeholder="$t('pleaseEnter') + '数据集编码'" />
-							</FormItem>
-							<!-- 是否有效 -->
-							<FormItem :label="$t('enabled')" prop="enabled">
-								<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
-									<span slot="open">{{ $t("open") }}</span>
-									<span slot="close">{{ $t("close") }}</span>
-								</i-switch>
-							</FormItem>
-						</Form>
-					</Card>
-				</div>
 				<Split v-model="splitValue">
 					<div slot="left" class="left-box">
-						<Form>
-							<label class="name-label">数据源：</label>
-							<FormItem prop="sourceCode">
+						<div class="left-top">
+							<div class="left-title">基础信息</div>
+							<Form ref="submitRef" :model="submitData" :label-width="90" :rules="rulesValidate">
+								<FormItem label="数据集名称" prop="datasetName">
+									<Input v-model="submitData.datasetName" :placeholder="$t('pleaseEnter') + '数据集名称'" />
+								</FormItem>
+								<FormItem label="数据集编码" prop="datasetCode">
+									<Input v-model="submitData.datasetCode" :placeholder="$t('pleaseEnter') + '数据集编码'" />
+								</FormItem>
+								<!-- 是否有效 -->
+								<FormItem :label="$t('enabled')" prop="enabled">
+									<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+										<span slot="open">{{ $t("open") }}</span>
+										<span slot="close">{{ $t("close") }}</span>
+									</i-switch>
+								</FormItem>
+							</Form>
+						</div>
+						<Form ref="submitRef" :model="submitData" :label-width="60">
+							<!-- 数据源 -->
+							<FormItem label="数据源" prop="sourceCode">
 								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getUserList" clearable>
 									<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
 								</Select>
 							</FormItem>
-							<label class="name-label">架构：</label>
-							<FormItem prop="sourceCode">
+							<!-- 架构 -->
+							<FormItem label="架构" prop="user">
 								<Select v-model.trim="submitData.user" size="small" placeholder="请选择用户" @on-change="getTableList" clearable>
 									<Option v-for="item in userList" :key="item" :label="item" :value="item" />
 								</Select>
 							</FormItem>
-							<label class="name-label">筛选表名称：</label>
-							<FormItem prop="filterTable">
-								<Input v-model="submitData.filterTable" :placeholder="$t('pleaseEnter') + '表名称'" clearable @keyup.native="filterData" />
-							</FormItem>
+							<!-- 筛选表名称 -->
+							<Input
+								v-model="submitData.filterTable"
+								suffix="ios-search"
+								placeholder="筛选表名称"
+								clearable
+								@keyup.native="filterData"
+								style="margin-top: 10px"
+							/>
 						</Form>
 						<!-- 树 -->
 						<div class="left-tree">
@@ -107,7 +110,6 @@ export default {
 		return {
 			modalTitle: "数据集配置",
 			connectModalFlag: false,
-			isShake: false, //右侧卡片是否抖动
 			connectObj: {}, //关联表
 			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "", user: "" },
 			filterList: [], //过滤后的值
@@ -228,7 +230,6 @@ export default {
 
 			this.$refs.submitRef.validate((validate) => {
 				if (validate) {
-					this.isShake = false; //停止抖动
 					const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 					requestApi.then((res) => {
 						if (res.code === 200) {
@@ -239,11 +240,6 @@ export default {
 							this.$Message.error("提交异常", res.message);
 						}
 					});
-				} else {
-					this.isShake = true;
-					setTimeout(() => {
-						this.isShake = false;
-					}, 1000 * 0.8); //0.8秒后抖动恢复原值
 				}
 			});
 		},
@@ -445,7 +441,7 @@ export default {
 			const { sourceCode } = this.submitData;
 			const point = this.graph.getPointByClient(e.x, e.y); //将屏幕坐标转换为渲染坐标
 			const model = {
-				id: `${sourceCode}:${label}`,
+				id: `${sourceCode}:${row}:${isExistTable.length}`,
 				label: `${label}`,
 				nodeType: 0,
 				x: point.x,
@@ -546,50 +542,42 @@ export default {
 				combos: [],
 			};
 			this.createGraphic();
-			this.isShake = false;
 		},
 	},
 };
 </script>
 <style lang="less" scoped>
-.base-info {
-	width: 300px;
-	position: absolute;
-	right: 10px;
-	// color: #fff !important;
-	// background: #72c424;
-	margin: 5px;
-	padding: 15px 5px;
-	vertical-align: baseline;
-	border-radius: 5px;
-	z-index: 9999999;
-	:deep(.ivu-card-head) {
-		background: #f8f8f9;
-		font-weight: bold;
-	}
-	// :deep(input) {
-	// 	border-radius: 5px;
-	// 	background: transparent;
-	// 	color: #fff;
-	// 	border: 1px dashed;
-	// }
-}
 .modal-content {
 	height: 100%;
 
 	.left-box {
 		height: 100%;
 		padding: 10px;
+		.left-top {
+			background: #f2f2f2;
+			padding: 10px;
+			/* border: 1px solid #78ce780f; */
+			margin-bottom: 10px;
+			border-radius: 5px;
+			.left-title {
+				padding: 5px;
+				margin-bottom: 10px;
+				font-weight: bold;
+				border-bottom: 2px solid #fff;
+			}
+		}
+
 		.name-label {
 			margin: 5px 0;
 			display: inline-block;
 			font-weight: bold;
 		}
 		.left-tree {
-			height: calc(100% - 215px);
+			height: calc(100% - 320px);
 			padding: 10px;
 			overflow-y: auto;
 			font-weight: bold;
+			margin-top: 10px;
 			li {
 				list-style: none;
 				padding-bottom: 10px;
@@ -630,9 +618,10 @@ export default {
 	width: 15px;
 	border: none;
 	border-right: 1px solid #d7d7d7;
+	background-color: #fff;
 }
 :deep(.left-pane) {
-	background: #f8f8f9;
+	background: #fff;
 }
 :deep(.right-pane) {
 	margin-left: 15px;
@@ -647,163 +636,7 @@ export default {
 // :deep(.ivu-modal-fullscreen .ivu-modal-body) {
 // 	top: 20px;
 // }
-.shake-constant {
-	animation-name: shake-hard;
-	animation-duration: 0.8s; //动画持续时间
-	animation-timing-function: ease-in-out;
-	// animation-iteration-count: infinite; /*定义循环资料，infinite为无限次*/
-}
-@keyframes shake-hard {
-	2% {
-		transform: translate(3px, -8px) rotate(-0.5deg);
-	}
-	4% {
-		transform: translate(-9px, 5px) rotate(-0.5deg);
-	}
-	6% {
-		transform: translate(-6px, 9px) rotate(2.5deg);
-	}
-	8% {
-		transform: translate(-8px, 9px) rotate(0.5deg);
-	}
-	10% {
-		transform: translate(-6px, -1px) rotate(0.5deg);
-	}
-	12% {
-		transform: translate(-9px, 2px) rotate(2.5deg);
-	}
-	14% {
-		transform: translate(-2px, 9px) rotate(-1.5deg);
-	}
-	16% {
-		transform: translate(0px, 10px) rotate(-0.5deg);
-	}
-	18% {
-		transform: translate(-3px, -3px) rotate(3.5deg);
-	}
-	20% {
-		transform: translate(8px, -1px) rotate(3.5deg);
-	}
-	22% {
-		transform: translate(10px, -4px) rotate(-0.5deg);
-	}
-	24% {
-		transform: translate(0px, -8px) rotate(0.5deg);
-	}
-	26% {
-		transform: translate(-1px, 2px) rotate(-1.5deg);
-	}
-	28% {
-		transform: translate(8px, 8px) rotate(-1.5deg);
-	}
-	30% {
-		transform: translate(-9px, 5px) rotate(-0.5deg);
-	}
-	32% {
-		transform: translate(1px, 10px) rotate(1.5deg);
-	}
-	34% {
-		transform: translate(7px, -4px) rotate(3.5deg);
-	}
-	36% {
-		transform: translate(2px, -8px) rotate(-1.5deg);
-	}
-	38% {
-		transform: translate(6px, 10px) rotate(-2.5deg);
-	}
-	40% {
-		transform: translate(3px, -1px) rotate(0.5deg);
-	}
-	42% {
-		transform: translate(-5px, -4px) rotate(-0.5deg);
-	}
-	44% {
-		transform: translate(-3px, 10px) rotate(-2.5deg);
-	}
-	46% {
-		transform: translate(-7px, 2px) rotate(-2.5deg);
-	}
-	48% {
-		transform: translate(-5px, -1px) rotate(3.5deg);
-	}
-	50% {
-		transform: translate(-7px, -1px) rotate(1.5deg);
-	}
-	52% {
-		transform: translate(2px, 8px) rotate(-1.5deg);
-	}
-	54% {
-		transform: translate(7px, -9px) rotate(0.5deg);
-	}
-	56% {
-		transform: translate(-4px, 1px) rotate(1.5deg);
-	}
-	58% {
-		transform: translate(-2px, -8px) rotate(1.5deg);
-	}
-	60% {
-		transform: translate(-7px, 1px) rotate(-0.5deg);
-	}
-	62% {
-		transform: translate(-5px, -2px) rotate(-0.5deg);
-	}
-	64% {
-		transform: translate(-2px, 5px) rotate(-2.5deg);
-	}
-	66% {
-		transform: translate(-2px, 7px) rotate(3.5deg);
-	}
-	68% {
-		transform: translate(-7px, -1px) rotate(-0.5deg);
-	}
-	70% {
-		transform: translate(-5px, 8px) rotate(-2.5deg);
-	}
-	72% {
-		transform: translate(-3px, -9px) rotate(-2.5deg);
-	}
-	74% {
-		transform: translate(-2px, -7px) rotate(3.5deg);
-	}
-	76% {
-		transform: translate(-5px, -4px) rotate(2.5deg);
-	}
-	78% {
-		transform: translate(-2px, 10px) rotate(-1.5deg);
-	}
-	80% {
-		transform: translate(4px, 9px) rotate(3.5deg);
-	}
-	82% {
-		transform: translate(3px, -1px) rotate(-1.5deg);
-	}
-	84% {
-		transform: translate(4px, -6px) rotate(0.5deg);
-	}
-	86% {
-		transform: translate(-1px, 4px) rotate(-0.5deg);
-	}
-	88% {
-		transform: translate(10px, -5px) rotate(3.5deg);
-	}
-	90% {
-		transform: translate(-3px, 7px) rotate(-0.5deg);
-	}
-	92% {
-		transform: translate(5px, -2px) rotate(2.5deg);
-	}
-	94% {
-		transform: translate(-2px, -7px) rotate(-0.5deg);
-	}
-	96% {
-		transform: translate(0px, 10px) rotate(-2.5deg);
-	}
-	98% {
-		transform: translate(-4px, 3px) rotate(2.5deg);
-	}
-	0%,
-	100% {
-		transform: translate(0, 0) rotate(0);
-	}
+:deep(.ivu-modal-fullscreen .ivu-modal-body) {
+	bottom: 35px;
 }
 </style>

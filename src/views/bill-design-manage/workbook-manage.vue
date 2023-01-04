@@ -14,8 +14,15 @@
 					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
 						<!-- 工作簿编码 -->
 						<FormItem :label="$t('workBookCode')" prop="workBookCode">
-							<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" v-if="this.isAdd" cleabler />
-							<span v-else>{{ submitData.workBookCode }}</span>
+							<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" cleabler />
+						</FormItem>
+					</Col>
+					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+						<!-- 数据集 -->
+						<FormItem :label="$t('setName')" prop="datasetId">
+							<Select v-model="submitData.datasetId" filterable clearable :placeholder="$t('pleaseSelect') + $t('setName')">
+								<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
+							</Select>
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -89,6 +96,9 @@
 					@on-current-change="currentClick"
 					@on-selection-change="selectClick"
 				>
+					<template slot="datasetId" slot-scope="{ row }">
+						<span>{{ dataSetIdName[row.datasetId] }}</span>
+					</template>
 					<template slot="operator" slot-scope="{ row }">
 						<Button class="tableBtn" type="text" @click="design(row)">设计</Button>&nbsp;
 						<Button class="tableBtn" type="text" @click="preview(row)">预览</Button>
@@ -111,7 +121,7 @@
 <script>
 import { getpagelistReq, addReq, deleteReq, modifyReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
-
+import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 export default {
 	components: {},
 	name: "workbook-manage",
@@ -123,13 +133,16 @@ export default {
 			data: [], // 表格数据
 			drawerTitle: this.$t("add"),
 			btnData: [],
+			datasetList: [], //获取所有数据集
 			isAdd: true,
 			selectObj: {}, //表格选中
+			dataSetIdName: {},
 			submitData: {
 				id: "",
 				remark: "",
 				workBookName: "",
 				workBookCode: "",
+				datasetId: "",
 				desc: "", //描述
 				enabled: 1, //是否有效
 			},
@@ -137,6 +150,7 @@ export default {
 			req: {
 				workBookName: "",
 				workBookCode: "",
+
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -150,6 +164,7 @@ export default {
 				},
 				{ title: this.$t("workBookName"), key: "workBookName", align: "center", tooltip: true },
 				{ title: this.$t("workBookCode"), key: "workBookCode", align: "center", tooltip: true },
+				{ title: this.$t("setName"), slot: "datasetId", align: "center", tooltip: true },
 				{ title: "备注", key: "remark", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
 				{ title: this.$t("operator"), slot: "operator", align: "center", width: "100" },
@@ -174,6 +189,7 @@ export default {
 	activated() {
 		this.pageLoad();
 		this.autoSize();
+		this.getDataSetList();
 		window.addEventListener("resize", () => this.autoSize());
 		getButtonBoolean(this, this.btnData);
 	},
@@ -268,6 +284,19 @@ export default {
 				});
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
+		//获取所有数据集
+		getDataSetList() {
+			this.dataSetIdName = {};
+			getDataSetListReq().then((res) => {
+				if (res.code === 200) {
+					this.datasetList = res?.result || [];
+					this.datasetList.forEach((item) => {
+						this.dataSetIdName[item.id] = item.datasetName;
+					});
+					this.dataSetIdName = JSON.parse(JSON.stringify(this.dataSetIdName));
+				}
+			});
+		},
 
 		// 某一行高亮时触发
 		currentClick(currentRow) {
@@ -284,15 +313,15 @@ export default {
 		//设计
 		design(data) {
 			this.selectObj = { ...data };
-			const { workBookName, workBookCode } = data;
-			const href = this.skipUrl("workbookDesign", workBookCode, workBookName);
+			const { workBookName, workBookCode, datasetId } = data;
+			const href = this.skipUrl("workbookDesign", workBookCode, workBookName, datasetId);
 			window.open(href, "_blank");
 		},
 		// 预览
 		preview(data) {
 			this.selectObj = { ...data };
-			const { workBookName, workBookCode } = data;
-			const href = this.skipUrl("workbookPreview", workBookCode, workBookName);
+			const { workBookName, workBookCode, datasetId } = data;
+			const href = this.skipUrl("workbookPreview", workBookCode, workBookName, datasetId);
 			window.open(href, "_blank");
 		},
 
@@ -306,14 +335,14 @@ export default {
 			});
 			return arr;
 		},
-		skipUrl(key, reportCode, reportName) {
+		skipUrl(key, workBookCode, workBookName, datasetId) {
 			const obj = {
 				workbookPreview: "/bill-design-manage/workbook-preview",
 				workbookDesign: "/bill-design-manage/workbook-design",
 			};
 			const { href } = this.$router.resolve({
 				path: obj[key],
-				query: { reportCode, reportName },
+				query: { workBookCode, workBookName, datasetId },
 			});
 			return href;
 		},
