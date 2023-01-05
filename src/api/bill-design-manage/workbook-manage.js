@@ -49,3 +49,31 @@ export const getTabelColumnReq = data => {
     data
   })
 }
+//新增自定义字段
+export const addCustomerFieldReq = data => {
+  return requestCenter({
+    baseUrl: "http://10.32.44.115:8700" || window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/insert',
+    method: 'post',
+    data
+  })
+}
+//编辑自定义字段
+export const modifyCustomerFieldReq = data => {
+  return requestCenter({
+    baseUrl: "http://10.32.44.115:8700" || window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/modify',
+    method: 'post',
+    data
+  })
+}
+
+//获取自定义字段
+export const getCustomerFieldReq = data => {
+  return requestCenter({
+    baseUrl: "http://10.32.44.115:8700" || window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/getentity',
+    method: 'post',
+    data
+  })
+}

@@ -2,8 +2,9 @@
 	<div class="workbook-container">
 		<div class="workbook-title">{{ req.workBookName }}</div>
 		<div class="top-container">
+			<!-- 左侧数据集 -->
 			<div class="left-box">
-				<Input v-model="submitData.filterTable" placeholder="请筛选信息" clearable suffix="ios-search" />
+				<Input v-model="submitData.columnName" placeholder="请筛选信息" clearable suffix="ios-search" @on-change="getColumnList" />
 				<div class="left-tree">
 					<ul class="tree">
 						<li v-for="(item, index) in data" :key="index" class="tree-father">
@@ -15,12 +16,34 @@
 							<ul class="subtree" v-if="item.isShow">
 								<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%" @end="treeDragEnd">
 									<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
-										{{ subitem.columnName }}
+										<!-- 字符串 -->
+										<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(subitem.columnType.toUpperCase())" />
+										<!-- 数字 -->
+										<icon
+											custom="iconfont icon-shuzishurukuang"
+											v-else-if="columnTypeList[1].detailCode.includes(subitem.columnType.toUpperCase())"
+										/>
+										<!-- 时间 -->
+										<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(subitem.columnType.toUpperCase())" />
+										<!-- 任意类型 -->
+										<icon custom="iconfont icon-huatifuhao" v-else />{{ subitem.columnName }}
 										<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
 											<Icon type="ios-arrow-down"></Icon>
 											<template #list>
 												<DropdownMenu>
-													<DropdownItem name="createField">创建计算字段</DropdownItem>
+													<DropdownItem name="createField-edit">编辑...</DropdownItem>
+													<!-- 创建 -->
+													<Dropdown placement="right-start">
+														<DropdownItem>
+															创建
+															<Icon type="ios-arrow-forward" style="float: right"></Icon>
+														</DropdownItem>
+														<template #list>
+															<DropdownMenu>
+																<DropdownItem name="createField-create">计算字段</DropdownItem>
+															</DropdownMenu>
+														</template>
+													</Dropdown>
 												</DropdownMenu>
 											</template>
 										</Dropdown>
@@ -93,24 +116,30 @@
 			<Button>预览</Button>
 			<Button type="primary" @click="submitClick()" style="color: #fff">保存</Button>
 		</div>
+		<CreateFields ref="createField" :selectObj="selectObj" :isAdd="isAdd" @getColumnList="getColumnList" />
 	</div>
 </template>
 <script>
 import draggable from "vuedraggable";
 import componentsTemp from "./components/temp.vue";
 import { getTabelColumnReq } from "@/api/bill-design-manage/workbook-manage.js";
+import CreateFields from "./create-fields.vue";
+import { getlistReq } from "@/api/system-manager/data-item";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp },
+	components: { draggable, componentsTemp, CreateFields },
 	data() {
 		return {
+			isAdd: true,
 			tabValue: "data",
 			submitData: {
-				filterTable: "",
+				columnName: "",
 				chartType: "componentTable",
 				title: "工作表",
 			},
+			columnTypeList: [],
+			selectObj: {},
 			dragstartNode: "",
 			dragstartData: "",
 			contextData: "", //菜单
@@ -139,21 +168,21 @@ export default {
 		//     "datasetId": "FDB363A6D5DA41C4A8F42FB743F19D53"
 		// }
 		this.req = { ...this.$route.query };
-		this.getColumnList();
+		this.getDataItemData(); //数据字典 获取类型
+		this.getColumnList(); //获取左侧列
 	},
 	methods: {
 		//获取左侧数据集对应表及字段
 		getColumnList() {
-			this.data = [];
 			const { datasetId } = this.req;
-			const obj = { datasetId, enabled: 1 };
+			const obj = { datasetId, enabled: 1, columnName: this.submitData.columnName };
 			getTabelColumnReq(obj).then((res) => {
 				if (res.code === 200) {
 					const data = res?.result || [];
 					const tableNameList = Array.from(new Set(data.map((item) => item.tableName)));
 					const groupTableName = this.$XEUtiles.groupBy(data, "tableName");
-					this.data = tableNameList.map((item) => {
-						return { tableName: item, children: groupTableName[item], isShow: false };
+					this.data = tableNameList.map((item, index) => {
+						return { tableName: item, children: groupTableName[item], isShow: this.data[index]?.isShow || true };
 					});
 					console.log(this.data);
 				}
@@ -162,6 +191,24 @@ export default {
 		//下拉
 		dropDownClick(name, row) {
 			console.log("下拉", name, row);
+			let dropDownItem = name.split("-");
+			if (dropDownItem[1] === "create") this.isAdd = true;
+			if (dropDownItem[1] === "edit") this.isAdd = false;
+			const { datasetId } = this.req;
+			this.selectObj = { ...row, type: "all", datasetId };
+			this.$refs[dropDownItem[0]].modelFlag = true;
+		},
+		// 获取数据字典数据
+		async getDataItemData() {
+			this.columnTypeList = await this.getDataItemDetailList("columnType");
+			console.log("数据字典", this.columnTypeList);
+		},
+		async getDataItemDetailList(itemCode) {
+			let arr = [];
+			await getlistReq({ itemCode, enabled: 1 }).then((res) => {
+				if (res.code === 200) arr = res.result || [];
+			});
+			return arr;
 		},
 		filterDragEnd(e) {
 			console.log("拖拽结束--过滤器", e);
@@ -249,6 +296,7 @@ export default {
 				margin-top: 5px;
 				.tree {
 					height: 100%;
+					overflow: auto;
 					li {
 						list-style: none;
 					}
@@ -266,6 +314,15 @@ export default {
 								background: #4795b3;
 								color: #fff;
 								border-radius: 10px;
+							}
+							& > i {
+								color: #299aff;
+								width: 20px;
+								text-align: center;
+								background: #fff;
+								border-radius: 10px;
+								padding: 2px;
+								margin-right: 5px;
 							}
 						}
 					}
