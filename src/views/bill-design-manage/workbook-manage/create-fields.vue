@@ -1,29 +1,30 @@
 /**创建计算字段 */
 <template>
 	<!-- 函数管理 -->
-	<Modal title="创建计算字段" v-model="modelFlag" width="1500">
+	<Modal :title="isAdd ? '新建计算字段' : '编辑计算字段'" v-model="modelFlag" width="1500" draggable :mask-closable="false" :mask="false">
 		<div class="create-field">
 			<div class="left-box">
-				<Input type="text" v-model="selectObj.columnName" clearabled />
-				<Input
-					v-model="selectObj.fieldFunction"
-					type="textarea"
-					style="margin-top: 10px"
-					:autosize="{ minRows: 20, maxRows: 20 }"
-					@on-focus="setCaret"
-					@on-blur="setCaret"
-					@on-keyup="setCaret"
-				/>
+				<Input type="text" v-model="submitData.columnName" clearabled />
+				<draggable group="site" v-model="submitData.fieldFunction" id="filter">
+					<Input
+						v-model="submitData.fieldFunction"
+						type="textarea"
+						ref="fieldFunction"
+						draggable
+						:autosize="{ minRows: 20, maxRows: 20 }"
+						style="margin-top: 10px"
+					></Input>
+				</draggable>
 			</div>
 			<div class="right-box">
 				<div style="width: 200px">
-					<Select v-model="selectObj.type">
+					<Select v-model="submitData.type">
 						<Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					</Select>
-					<Input v-model="selectObj.filterColumn" placeholder="输入搜索文本" clearable suffix="ios-search" />
+					<Input v-model="submitData.filterColumn" placeholder="输入搜索文本" clearable suffix="ios-search" />
 					<ul class="tree">
 						<li
-							v-for="(item, index) in dataItemList[selectObj.type]"
+							v-for="(item, index) in dataItemList[submitData.type]"
 							class="tree-father"
 							:key="index"
 							:class="[item.detailName === liObj.detailName ? 'tree-select' : '']"
@@ -53,10 +54,12 @@
 <script>
 import { getlistReq as getDataItemReq, getlisttreeReq } from "@/api/system-manager/data-item";
 import { addCustomerFieldReq, getCustomerFieldReq, modifyCustomerFieldReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { inputSelectContent } from "@/libs/tools";
+import draggable from "vuedraggable";
 
 export default {
 	name: "create-fields",
-	components: {},
+	components: { draggable },
 	props: {
 		selectObj: {
 			type: Object,
@@ -70,13 +73,20 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
+				this.submitData = { ...this.selectObj };
 				this.getDataItemData();
-				this.pageLoad(); //
+				this.pageLoad();
+				this.$nextTick(() => {
+					//光标聚焦
+					inputSelectContent(this.$refs.fieldFunction);
+					console.log(this.$refs.fieldFunction.$el.children[0]);
+				});
 			}
 		},
 	},
 	data() {
 		return {
+			submitData: {},
 			modelFlag: false,
 			dataItemList: { all: [] },
 			blurIndex: 0,
@@ -116,10 +126,10 @@ export default {
 	methods: {
 		//获取自定义字段信息
 		pageLoad() {
-			const { nodeId } = this.selectObj;
+			const { nodeId } = this.submitData;
 			getCustomerFieldReq({ id: nodeId }).then((res) => {
 				if (res.code == 200) {
-					this.selectObj = { ...this.selectObj, ...res.result };
+					this.submitData = { ...this.submitData, ...res.result };
 				}
 			});
 		},
@@ -130,22 +140,32 @@ export default {
 		},
 		//li 标签 双击
 		dbliClick(row) {
-			let index = this.blurIndex;
-			let str = this.selectObj?.fieldFunction || "";
-			this.selectObj.fieldFunction = str.slice(0, index) + `${row.detailName}()` + str.slice(index);
-			console.log("this.selectObj", this.selectObj, row);
+			this.insertAtCursor(`${row.detailName}()`);
 		},
-		//获取光标位置
-		setCaret(e) {
-			this.blurIndex = e.srcElement.selectionStart;
-			console.log("光标位置", this.blurIndex);
-			// console.log(e);
-			// console.log(e.srcElement);
-			// console.log(e.srcElement.selectionStart); //光标所在的位置
+		//插入数据至光标处
+		async insertAtCursor(myValue) {
+			console.log("myValue", myValue);
+			const myField = this.$refs.fieldFunction.$el.children[0];
+
+			if (myField.selectionStart || myField.selectionStart === 0) {
+				let startPos = myField.selectionStart; //开始位置
+				let endPos = myField.selectionEnd; //结束位置
+				let selectionPos = endPos + myValue.length - 1; //光标选中位置
+
+				const fieldFunction = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+				this.submitData = { ...this.submitData, fieldFunction };
+
+				await this.$nextTick(); // 这句是重点, 圈起来,不加的话后面两步有问题
+				myField.focus();
+				myField.setSelectionRange(selectionPos, selectionPos);
+			} else {
+				this.submitData = { ...this.submitData, fieldFunction: (this.submitData.fieldFunction += myValue) };
+			}
 		},
+
 		//提交
 		submitClick() {
-			const { fieldFunction, tableName, datasetId, columnName, id } = this.selectObj;
+			const { fieldFunction, tableName, datasetId, columnName, id } = this.submitData;
 			const obj = { fieldFunction, tableName, datasetCode: datasetId, fieldCode: columnName, id, remark: 2 };
 			const requestApi = this.isAdd ? addCustomerFieldReq(obj) : modifyCustomerFieldReq(obj);
 			requestApi.then((res) => {
@@ -213,7 +233,8 @@ export default {
 		display: flex;
 		flex: 1;
 		background-color: #eeeeee;
-		padding: 5px 0 10px 10px;
+		padding: 10px;
+		border-radius: 10px;
 		.tree {
 			height: calc(100% - 50px);
 			background: #fff;

@@ -16,37 +16,52 @@
 							<ul class="subtree" v-if="item.isShow">
 								<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%" @end="treeDragEnd">
 									<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
-										<!-- 字符串 -->
-										<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(subitem.columnType.toUpperCase())" />
-										<!-- 数字 -->
-										<icon
-											custom="iconfont icon-shuzishurukuang"
-											v-else-if="columnTypeList[1].detailCode.includes(subitem.columnType.toUpperCase())"
-										/>
-										<!-- 时间 -->
-										<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(subitem.columnType.toUpperCase())" />
-										<!-- 任意类型 -->
-										<icon custom="iconfont icon-huatifuhao" v-else />{{ subitem.columnName }}
-										<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
-											<Icon type="ios-arrow-down"></Icon>
-											<template #list>
-												<DropdownMenu>
-													<DropdownItem name="createField-edit">编辑...</DropdownItem>
-													<!-- 创建 -->
-													<Dropdown placement="right-start">
-														<DropdownItem>
-															创建
-															<Icon type="ios-arrow-forward" style="float: right"></Icon>
-														</DropdownItem>
-														<template #list>
-															<DropdownMenu>
-																<DropdownItem name="createField-create">计算字段</DropdownItem>
-															</DropdownMenu>
-														</template>
-													</Dropdown>
-												</DropdownMenu>
-											</template>
-										</Dropdown>
+										<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
+										<template v-if="['0', '1', '2'].includes(subitem.columnType)">
+											<icon custom="iconfont icon-huatifuhao" style="color: #13d613" />
+										</template>
+										<!-- 表 对应字段 -->
+										<template v-else>
+											<!-- 字符串 -->
+											<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(subitem.columnType.toUpperCase())" />
+											<!-- 数字 -->
+											<icon
+												custom="iconfont icon-shuzishurukuang"
+												v-else-if="columnTypeList[1].detailCode.includes(subitem.columnType.toUpperCase())"
+											/>
+											<!-- 时间 -->
+											<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(subitem.columnType.toUpperCase())" />
+											<!-- 任意类型 -->
+											<icon custom="iconfont icon-huatifuhao" v-else />
+										</template>
+
+										<div class="value">
+											{{ subitem.columnName }}
+											<!-- 下拉框 -->
+											<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
+												<Icon type="ios-arrow-down"></Icon>
+												<template #list>
+													<DropdownMenu>
+														<!-- 编辑 -->
+														<DropdownItem name="createField-edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
+														<!-- 创建 -->
+														<Dropdown placement="right-start">
+															<DropdownItem>
+																创建
+																<Icon type="ios-arrow-forward" style="float: right"></Icon>
+															</DropdownItem>
+															<template #list>
+																<DropdownMenu>
+																	<DropdownItem name="createField-create">计算字段</DropdownItem>
+																</DropdownMenu>
+															</template>
+														</Dropdown>
+														<!-- 删除 -->
+														<DropdownItem name="deleteFields" v-if="subitem.columnType == '2'">删除</DropdownItem>
+													</DropdownMenu>
+												</template>
+											</Dropdown>
+										</div>
 									</li>
 								</draggable>
 							</ul>
@@ -96,13 +111,13 @@
 					<div class="row">
 						<span class="title">列</span>
 						<draggable group="site" v-model="columnData" class="drag-right" id="column" @end="columnDragEnd">
-							<span v-for="(item, index) in columnData" :key="index" class="drag-cell">{{ item.title }}</span>
+							<span v-for="(item, index) in columnData" :key="index" class="drag-cell">{{ item.columnName }}</span>
 						</draggable>
 					</div>
 					<div class="column">
 						<span class="title">行</span>
 						<draggable group="site" v-model="rowData" class="drag-right" id="row" @end="rowDragEnd">
-							<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.title }}</span>
+							<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.columnName }}</span>
 						</draggable>
 					</div>
 				</div>
@@ -122,7 +137,7 @@
 <script>
 import draggable from "vuedraggable";
 import componentsTemp from "./components/temp.vue";
-import { getTabelColumnReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { getTabelColumnReq, deleteCustomerFieldReq } from "@/api/bill-design-manage/workbook-manage.js";
 import CreateFields from "./create-fields.vue";
 import { getlistReq } from "@/api/system-manager/data-item";
 
@@ -191,12 +206,34 @@ export default {
 		//下拉
 		dropDownClick(name, row) {
 			console.log("下拉", name, row);
-			let dropDownItem = name.split("-");
-			if (dropDownItem[1] === "create") this.isAdd = true;
-			if (dropDownItem[1] === "edit") this.isAdd = false;
+			//删除自定义字段
+			if (name === "deleteFields") {
+				this.deleteFields(row);
+				return;
+			}
+			let dropDownItem = name?.split("-") || [name];
+			if (dropDownItem[1]) {
+				if (dropDownItem[1] === "create") this.isAdd = true;
+				if (dropDownItem[1] === "edit") this.isAdd = false;
+			} else {
+				this.isAdd = true;
+			}
+
 			const { datasetId } = this.req;
 			this.selectObj = { ...row, type: "all", datasetId };
 			this.$refs[dropDownItem[0]].modelFlag = true;
+		},
+		//删除自定义字段
+		deleteFields(row) {
+			const { nodeId } = row;
+			deleteCustomerFieldReq({ id: nodeId }).then((res) => {
+				if (res.code === 200) {
+					this.getColumnList(); //重新获取左侧数据
+					this.$Message.success("删除成功！");
+				} else {
+					this.$Message.error("删除失败", res.message);
+				}
+			});
 		},
 		// 获取数据字典数据
 		async getDataItemData() {
@@ -308,19 +345,26 @@ export default {
 						padding: 10px;
 						font-weight: normal;
 						.subtree-li {
-							padding: 4px 15px;
+							padding: 4px 10px;
 							cursor: pointer;
-							&:hover {
-								background: #4795b3;
-								color: #fff;
-								border-radius: 10px;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							.value {
+								width: calc(100% - 20px);
+								height: 20px;
+								line-height: 20px;
+								padding: 0px 8px;
+								&:hover {
+									background: #4795b3;
+									color: #fff;
+								}
 							}
+
 							& > i {
 								color: #299aff;
 								width: 20px;
 								text-align: center;
-								background: #fff;
-								border-radius: 10px;
 								padding: 2px;
 								margin-right: 5px;
 							}
