@@ -50,7 +50,14 @@
 								</div>
 
 								<ul class="subtree" v-if="item.isShow">
-									<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%" @end="treeDragEnd">
+									<draggable
+										v-model="item.children"
+										:group="{ name: 'site', pull: 'clone', put: 'false' }"
+										style="height: 99%"
+										:forceFallback="true"
+										dragClass="dragClass"
+										@end="(e) => dragEnd(e, 'tree')"
+									>
 										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
 											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
 											<template v-if="['0', '1', '2'].includes(subitem.columnType)">
@@ -105,7 +112,14 @@
 				<div class="center-box">
 					<div class="filter">
 						<div class="title">筛选器</div>
-						<draggable group="site" v-model="filterData" id="filter" style="height: 99%" @end="filterDragEnd">
+						<draggable
+							group="site"
+							v-model="filterData"
+							id="filter"
+							ghost-class="ghost"
+							style="height: calc(100% - 50px); overflow: auto"
+							@end="(e) => dragEnd(e, 'filter')"
+						>
 							<span v-for="(item, index) in filterData" :key="index" class="drag-cell">{{ item.columnName }}</span>
 						</draggable>
 					</div>
@@ -115,19 +129,26 @@
 							<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 						</Select>
 						<div class="mark-box">
-							<draggable group="site" v-model="markData" id="color" class="box-cell">
+							<draggable group="site" v-model="markData" id="color" ghost-class="ghost" class="box-cell">
 								<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
 							</draggable>
-							<draggable group="site" v-model="markData" id="size" class="box-cell">
+							<draggable group="site" v-model="markData" id="size" ghost-class="ghost" class="box-cell">
 								<div class="size"><Icon custom="iconfont icon-daxiao" />大小</div>
 							</draggable>
-							<draggable group="site" v-model="markData" id="mark" class="box-cell">
+							<draggable group="site" v-model="markData" id="mark" ghost-class="ghost" class="box-cell">
 								<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
 							</draggable>
-							<draggable group="site" v-model="markData" id="info" class="box-cell">
+							<draggable group="site" v-model="markData" id="info" ghost-class="ghost" class="box-cell">
 								<div class="detail-info"><Icon type="ios-more" />详细信息</div>
 							</draggable>
-							<draggable group="site" v-model="markData" id="mark-box" @end="markDragEnd">
+							<draggable
+								group="site"
+								v-model="markData"
+								id="mark-box"
+								ghost-class="ghost"
+								@end="(e) => dragEnd(e, 'mark-box')"
+								style="width: 100%; height: 100%; overflow: auto"
+							>
 								<div v-for="(item, index) in markData" :key="index">
 									<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
 									<Icon custom="iconfont icon-daxiao" v-if="item.innerText === 'size'" />
@@ -143,14 +164,14 @@
 					<div class="row-column">
 						<div class="row">
 							<span class="title">列</span>
-							<draggable group="site" v-model="columnData" class="drag-right" id="column" @end="columnDragEnd">
-								<span v-for="(item, index) in columnData" :key="index" class="drag-cell">{{ item.columnName }}</span>
+							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
+								<span v-for="(item, index) in columnData" :key="index" class="drag-cell" style="width: fit-content">{{ item.columnName }}</span>
 							</draggable>
 						</div>
 						<div class="column">
 							<span class="title">行</span>
-							<draggable group="site" v-model="rowData" class="drag-right" id="row" @end="rowDragEnd">
-								<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.columnName }}</span>
+							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
+								<span v-for="(item, index) in rowData" :key="index" class="drag-cell" style="width: fit-content">{{ item.columnName }}</span>
 							</draggable>
 						</div>
 					</div>
@@ -330,48 +351,79 @@ export default {
 			});
 			return arr;
 		},
-		filterDragEnd(e) {
-			console.log("拖拽结束--过滤器", e);
-			// this.filterData.splice(this.moveId, 1);
-			if (e.to.id === "filter" && e.oldIndex === e.newIndex) {
-				this.filterData.splice(e.oldIndex, 1);
+		//拖拽结束
+		dragEnd(e, type) {
+			console.log(e.to.id, type);
+			switch (type) {
+				case "filter":
+					e.to.id === "filter" && e.oldIndex === e.newIndex ? this.filterData.splice(e.oldIndex, 1) : "";
+					break;
+				case "column":
+					e.to.id === "column" && e.oldIndex === e.newIndex ? this.columnData.splice(e.oldIndex, 1) : "";
+					break;
+				case "row":
+					e.to.id === "row" && e.oldIndex === e.newIndex ? this.rowData.splice(e.oldIndex, 1) : "";
+					break;
+				case "mark-box":
+					e.to.id === "mark-box" && e.oldIndex === e.newIndex ? this.markData.splice(e.oldIndex, 1) : "";
+					break;
+				case "tree":
+					console.log(type, e.to.id);
+					if (["color", "size", "mark", "info"].includes(e.to.id)) {
+						this.markData[e.newIndex].innerText = e.to.id;
+					}
+
+					// e.to.id === "color" ? (this.markData[e.newIndex].innerText = "color") : "";
+					// e.to.id === "size" ? (this.markData[e.newIndex].innerText = "size") : "";
+					// e.to.id === "mark" ? (this.markData[e.newIndex].innerText = "mark") : "";
+					// e.to.id === "info" ? (this.markData[e.newIndex].innerText = "info") : "";
+					this.markData = JSON.parse(JSON.stringify(this.markData));
+					break;
 			}
-		},
-		columnDragEnd(e) {
-			console.log("拖拽结束--列", e);
-			if (e.to.id === "column" && e.oldIndex === e.newIndex) {
-				this.columnData.splice(e.oldIndex, 1);
-			}
-		},
-		rowDragEnd(e) {
-			console.log("拖拽结束--行", e);
-			if (e.to.id === "row" && e.oldIndex === e.newIndex) {
-				this.rowData.splice(e.oldIndex, 1);
-			}
-		},
-		markDragEnd(e) {
-			console.log("拖拽结束--标记", e);
-			if (e.to.id === "mark-box" && e.oldIndex === e.newIndex) {
-				this.markData.splice(e.oldIndex, 1);
-			}
-		},
-		treeDragEnd(e) {
-			console.log("拖拽结束--树", e);
-			if (e.to.id === "color") {
-				this.markData[e.newIndex].innerText = "color";
-			}
-			if (e.to.id === "size") {
-				this.markData[e.newIndex].innerText = "size";
-			}
-			if (e.to.id === "mark") {
-				this.markData[e.newIndex].innerText = "mark";
-			}
-			if (e.to.id === "info") {
-				this.markData[e.newIndex].innerText = "info";
-			}
-			this.markData = JSON.parse(JSON.stringify(this.markData));
 			console.log(this.markData);
 		},
+		// filterDragEnd(e) {
+		// 	console.log("拖拽结束--过滤器", e);
+		// 	// this.filterData.splice(this.moveId, 1);
+		// 	if (e.to.id === "filter" && e.oldIndex === e.newIndex) {
+		// 		this.filterData.splice(e.oldIndex, 1);
+		// 	}
+		// },
+		// columnDragEnd(e) {
+		// 	console.log("拖拽结束--列", e);
+		// 	if (e.to.id === "column" && e.oldIndex === e.newIndex) {
+		// 		this.columnData.splice(e.oldIndex, 1);
+		// 	}
+		// },
+		// rowDragEnd(e) {
+		// 	console.log("拖拽结束--行", e);
+		// 	if (e.to.id === "row" && e.oldIndex === e.newIndex) {
+		// 		this.rowData.splice(e.oldIndex, 1);
+		// 	}
+		// },
+		// markDragEnd(e) {
+		// 	console.log("拖拽结束--标记", e);
+		// 	if (e.to.id === "mark-box" && e.oldIndex === e.newIndex) {
+		// 		this.markData.splice(e.oldIndex, 1);
+		// 	}
+		// },
+		// treeDragEnd(e) {
+		// 	console.log("拖拽结束--树", e);
+		// 	if (e.to.id === "color") {
+		// 		this.markData[e.newIndex].innerText = "color";
+		// 	}
+		// 	if (e.to.id === "size") {
+		// 		this.markData[e.newIndex].innerText = "size";
+		// 	}
+		// 	if (e.to.id === "mark") {
+		// 		this.markData[e.newIndex].innerText = "mark";
+		// 	}
+		// 	if (e.to.id === "info") {
+		// 		this.markData[e.newIndex].innerText = "info";
+		// 	}
+		// 	this.markData = JSON.parse(JSON.stringify(this.markData));
+		// 	console.log(this.markData);
+		// },
 		//获取所有数据集
 		getDataSetList() {
 			this.dataSetIdName = {};
@@ -493,8 +545,11 @@ export default {
 				padding: 10px;
 				border: 1px dashed #ccc;
 				.mark-box {
+					width: 100%;
+					height: calc(100% - 200px);
 					display: flex;
 					flex-wrap: wrap;
+					align-content: flex-start;
 					margin-top: 10px;
 					.box-cell {
 						width: calc(50% - 10px);
@@ -560,12 +615,43 @@ export default {
 	}
 
 	.drag-cell {
-		padding: 4px 20px;
+		width: calc(100% - 25px);
+		padding: 2px 20px;
+		text-align: center;
 		background: #4996b2;
 		color: #fff;
 		border-radius: 10px;
 		margin: 4px;
 		display: inline-block;
+	}
+	.ghost {
+		background: #4996b2 !important;
+		list-style: none;
+		color: #fff;
+		z-index: 9999999999999999;
+		width: fit-content;
+		padding: 2px 20px;
+		height: 20px;
+		display: none;
+		font-size: 10px !important;
+		& > i {
+			display: none;
+		}
+	}
+	.dragClass {
+		background: #4996b2 !important;
+		list-style: none;
+		color: #fff;
+		z-index: 9999999999999999;
+		width: fit-content;
+		padding: 2px 20px;
+		height: 20px;
+		display: inline-block;
+		font-size: 10px !important;
+		border-radius: 10px !important;
+		& > i {
+			display: none;
+		}
 	}
 }
 :deep(.ivu-tree ul) {

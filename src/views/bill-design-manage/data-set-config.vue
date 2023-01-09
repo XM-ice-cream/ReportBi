@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
+import { getButtonBoolean, renderIsEnabled, renderDate } from "@/libs/tools";
 import DataSetConfigAddEdit from "./datasetconfig/data-set-config-add-edit.vue";
 import { getpagelistReq, deleteReq } from "@/api/bill-design-manage/data-set-config.js";
 
@@ -95,9 +95,20 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: this.$t("setCode"), key: "datasetCode", align: "center", tooltip: true },
-				{ title: this.$t("setName"), key: "datasetName", align: "center", tooltip: true },
-				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled },
+				{ title: this.$t("setName"), key: "datasetName", align: "center", tooltip: true, minWidth: 150 },
+				{ title: this.$t("setCode"), key: "datasetCode", align: "center", tooltip: true, minWidth: 150 },
+				{ title: this.$t("createUser"), key: "createUserName", minWidth: 100, align: "center", tooltip: true },
+				{ title: this.$t("createDate"), key: "createDate", minWidth: 150, render: renderDate, align: "center", tooltip: true },
+				{ title: this.$t("modifyUser"), key: "modifyUserName", minWidth: 100, align: "center", tooltip: true },
+				{
+					title: this.$t("modifyDate"),
+					key: "modifyDate",
+					minWidth: 150,
+					align: "center",
+					render: renderDate,
+					tooltip: true,
+				},
+				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {},
