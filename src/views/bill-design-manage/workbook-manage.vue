@@ -69,7 +69,7 @@
 
 <script>
 import { getpagelistReq, deleteReq } from "@/api/bill-design-manage/workbook-manage.js";
-import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
+import { getButtonBoolean, renderIsEnabled, renderDate } from "@/libs/tools";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import WorkbookDesign from "./workbook-manage/workbook-design.vue";
 export default {
@@ -111,10 +111,20 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: this.$t("workBookName"), key: "workBookName", align: "center", tooltip: true },
-				{ title: this.$t("workBookCode"), key: "workBookCode", align: "center", tooltip: true },
-				{ title: this.$t("setName"), slot: "datasetId", align: "center", tooltip: true },
-				{ title: "备注", key: "remark", align: "center", tooltip: true },
+				{ title: this.$t("workBookName"), key: "workBookName", align: "center", tooltip: true, minWidth: 80 },
+				{ title: this.$t("workBookCode"), key: "workBookCode", align: "center", tooltip: true, minWidth: 80 },
+				{ title: this.$t("setName"), slot: "datasetId", align: "center", tooltip: true, minWidth: 80 },
+				{ title: this.$t("createUser"), key: "createUserName", minWidth: 80, align: "center", tooltip: true },
+				{ title: this.$t("createDate"), key: "createDate", minWidth: 125, render: renderDate, align: "center", tooltip: true },
+				{ title: this.$t("modifyUser"), key: "modifyUserName", minWidth: 80, align: "center", tooltip: true },
+				{
+					title: this.$t("modifyDate"),
+					key: "modifyDate",
+					minWidth: 125,
+					align: "center",
+					render: renderDate,
+					tooltip: true,
+				},
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
 			], // 表格数据
 		};

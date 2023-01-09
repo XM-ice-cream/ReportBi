@@ -22,7 +22,13 @@
 						</FormItem>
 						<!-- 数据集 -->
 						<FormItem :label="$t('setName')" prop="datasetId">
-							<Select v-model="submitData.datasetId" filterable clearable :placeholder="$t('pleaseSelect') + $t('setName')">
+							<Select
+								v-model="submitData.datasetId"
+								filterable
+								clearable
+								:placeholder="$t('pleaseSelect') + $t('setName')"
+								@on-change="getColumnList"
+							>
 								<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
 							</Select>
 						</FormItem>
@@ -388,7 +394,8 @@ export default {
 					request.then((res) => {
 						if (res.code === 200) {
 							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
-							this.pageLoad(); //刷新表格
+							this.$parent.pageLoad(); //刷新表格
+							this.cancelClick(); //关闭弹框
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
 					});
 				}
