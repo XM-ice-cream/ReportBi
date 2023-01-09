@@ -1,5 +1,12 @@
 <template>
-	<Modal v-model="modelFlag" title="123" fullscreen :mask-closable="false" :closable="true" :before-close="cancelClick">
+	<Modal
+		v-model="modelFlag"
+		:title="workbookIsAdd ? '新增工作簿' : `编辑工作簿【${submitData.workBookName}】`"
+		fullscreen
+		:mask-closable="false"
+		:closable="true"
+		:before-close="cancelClick"
+	>
 		<div class="workbook-container">
 			<div class="top-container">
 				<!-- 左侧数据集 -->
@@ -58,7 +65,7 @@
 											<div class="value">
 												{{ subitem.columnName }}
 												<!-- 下拉框 -->
-												<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
+												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem)">
 													<Icon type="ios-arrow-down"></Icon>
 													<template #list>
 														<DropdownMenu>
@@ -289,7 +296,7 @@ export default {
 				this.isAdd = true;
 			}
 
-			const { datasetId } = this.columnName;
+			const { datasetId } = this.submitData;
 			this.selectObj = { ...row, type: "all", datasetId };
 			this.$refs[dropDownItem[0]].modelFlag = true;
 		},

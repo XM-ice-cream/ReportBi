@@ -1,27 +1,27 @@
 /**创建计算字段 */
 <template>
 	<!-- 函数管理 -->
-	<Modal :title="isAdd ? '新建计算字段' : '编辑计算字段'" v-model="modelFlag" width="1500" draggable :mask-closable="false" :mask="false">
+	<Modal :title="isAdd ? '新建计算字段' : '编辑计算字段'" v-model="modelFlag" width="1500" draggable :mask-closable="false" :mask="true">
 		<div class="create-field">
 			<div class="left-box">
 				<Input type="text" v-model="submitData.columnName" clearabled />
-				<draggable group="site" v-model="submitData.fieldFunction" id="filter">
-					<Input
-						v-model="submitData.fieldFunction"
-						type="textarea"
-						ref="fieldFunction"
-						draggable
-						:autosize="{ minRows: 20, maxRows: 20 }"
-						style="margin-top: 10px"
-					></Input>
-				</draggable>
+				<!-- <draggable group="site" v-model="submitData.fieldFunction" id="filter"> -->
+				<Input
+					v-model="submitData.fieldFunction"
+					type="textarea"
+					ref="fieldFunction"
+					draggable
+					:autosize="{ minRows: 20, maxRows: 20 }"
+					style="margin-top: 10px"
+				></Input>
+				<!-- </draggable> -->
 			</div>
 			<div class="right-box">
 				<div style="width: 200px">
 					<Select v-model="submitData.type">
 						<Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					</Select>
-					<Input v-model="submitData.filterColumn" placeholder="输入搜索文本" clearable suffix="ios-search" />
+					<Input v-model="submitData.filterColumn" placeholder="输入搜索文本" clearable suffix="ios-search" style="margin-top: 10px" />
 					<ul class="tree">
 						<li
 							v-for="(item, index) in dataItemList[submitData.type]"
@@ -236,7 +236,7 @@ export default {
 		padding: 10px;
 		border-radius: 10px;
 		.tree {
-			height: calc(100% - 50px);
+			height: calc(100% - 60px);
 			background: #fff;
 			overflow: auto;
 			li {
