@@ -54,7 +54,7 @@
 										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
 											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
 											<template v-if="['0', '1', '2'].includes(subitem.columnType)">
-												<icon custom="iconfont icon-huatifuhao" style="color: #13d613" />
+												<icon custom="iconfont icon-wenhao" style="color: #13d613" />
 											</template>
 											<!-- 表 对应字段 -->
 											<template v-else>
@@ -65,7 +65,7 @@
 												<!-- 时间 -->
 												<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
 												<!-- 任意类型 -->
-												<icon custom="iconfont icon-huatifuhao" v-else />
+												<icon custom="iconfont icon-wenhao" v-else />
 											</template>
 
 											<div class="value">

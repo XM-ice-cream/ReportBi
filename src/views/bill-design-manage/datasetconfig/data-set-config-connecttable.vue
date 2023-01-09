@@ -22,7 +22,7 @@
 							<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-shuzishurukuang" v-else-if="columnTypeList[1].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-huatifuhao" v-else />{{ item.columnName }}
+							<icon custom="iconfont icon-wenhao" v-else />{{ item.columnName }}
 						</Option>
 					</Select>
 				</template>
@@ -41,7 +41,7 @@
 							<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-shuzishurukuang" v-else-if="columnTypeList[1].detailCode.includes(item.columnType.toUpperCase())" />
 							<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-huatifuhao" v-else />{{ item.columnName }}
+							<icon custom="iconfont icon-wenhao" v-else />{{ item.columnName }}
 						</Option>
 					</Select>
 				</template>
