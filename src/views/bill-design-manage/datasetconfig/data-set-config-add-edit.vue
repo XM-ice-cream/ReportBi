@@ -633,9 +633,6 @@ export default {
 :deep(.g6-component-contextmenu) {
 	z-index: 999 !important;
 }
-// :deep(.ivu-modal-fullscreen .ivu-modal-body) {
-// 	top: 20px;
-// }
 :deep(.ivu-modal-fullscreen .ivu-modal-body) {
 	bottom: 35px;
 }

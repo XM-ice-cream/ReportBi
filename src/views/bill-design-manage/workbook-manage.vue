@@ -1,59 +1,6 @@
 /* 工作簿管理 */
 <template>
 	<div class="page-style">
-		<!-- 左侧抽屉 -->
-		<Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true" :before-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
-				<Row :gutter="10">
-					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-						<!-- 工作簿名称 -->
-						<FormItem :label="$t('workBookName')" prop="workBookName">
-							<Input v-model.trim="submitData.workBookName" :placeholder="$t('pleaseEnter') + $t('workBookName')" cleabler />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-						<!-- 工作簿编码 -->
-						<FormItem :label="$t('workBookCode')" prop="workBookCode">
-							<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" cleabler />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-						<!-- 数据集 -->
-						<FormItem :label="$t('setName')" prop="datasetId">
-							<Select v-model="submitData.datasetId" filterable clearable :placeholder="$t('pleaseSelect') + $t('setName')">
-								<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
-							</Select>
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-						<!-- 描述 -->
-						<FormItem :label="$t('description')" prop="des">
-							<Input v-model.trim="submitData.des" :placeholder="$t('pleaseEnter') + $t('description')" cleabler />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-						<!-- 备注 -->
-						<FormItem :label="$t('remark')" prop="remark">
-							<Input v-model.trim="submitData.remark" :placeholder="$t('pleaseEnter') + $t('remark')" cleabler />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 是否有效 -->
-						<FormItem :label="$t('enabled')" prop="enabled">
-							<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
-								<span slot="open">{{ $t("open") }}</span>
-								<span slot="close">{{ $t("close") }}</span>
-							</i-switch>
-						</FormItem>
-					</Col>
-				</Row>
-			</Form>
-			<!-- 按钮 -->
-			<div slot="footer">
-				<Button size="small" @click="cancelClick">取消</Button>
-				<Button size="small" @click="submitClick">确定</Button>
-			</div>
-		</Modal>
 		<!-- 页面表格 -->
 		<div class="comment">
 			<Card :bordered="false" dis-hover class="card-style">
@@ -115,15 +62,18 @@
 				/>
 			</Card>
 		</div>
+		<!-- 工作簿新增/编辑 -->
+		<WorkbookDesign :modelFlag.sync="modelFlag" :workbookIsAdd="isAdd" :workbookSelectObj="selectObj" />
 	</div>
 </template>
 
 <script>
-import { getpagelistReq, addReq, deleteReq, modifyReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { getpagelistReq, deleteReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
+import WorkbookDesign from "./workbook-manage/workbook-design.vue";
 export default {
-	components: {},
+	components: { WorkbookDesign },
 	name: "workbook-manage",
 	data() {
 		return {
@@ -131,7 +81,7 @@ export default {
 			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
 			tableConfig: { ...this.$config.tableConfig }, // table配置
 			data: [], // 表格数据
-			drawerTitle: this.$t("add"),
+
 			btnData: [],
 			datasetList: [], //获取所有数据集
 			isAdd: true,
@@ -146,11 +96,10 @@ export default {
 				desc: "", //描述
 				enabled: 1, //是否有效
 			},
-			drawerFlag: false,
+			modelFlag: false,
 			req: {
 				workBookName: "",
 				workBookCode: "",
-
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -167,23 +116,7 @@ export default {
 				{ title: this.$t("setName"), slot: "datasetId", align: "center", tooltip: true },
 				{ title: "备注", key: "remark", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
-				{ title: this.$t("operator"), slot: "operator", align: "center", width: "100" },
 			], // 表格数据
-			// 验证实体
-			ruleValidate: {
-				workBookName: [
-					{
-						required: true,
-						message: this.$t("pleaseEnter") + this.$t("workBookName"),
-					},
-				],
-				workBookCode: [
-					{
-						required: true,
-						message: this.$t("pleaseEnter") + this.$t("workBookCode"),
-					},
-				],
-			},
 		};
 	},
 	activated() {
@@ -233,39 +166,18 @@ export default {
 		},
 		// 点击新增按钮触发
 		addClick() {
-			this.drawerFlag = true;
+			this.modelFlag = true;
 			this.isAdd = true;
-			this.drawerTitle = this.$t("add");
 		},
 		// 点击编辑按钮触发
 		editClick() {
 			if (this.selectObj) {
-				this.submitData = { ...this.selectObj };
-				this.drawerFlag = true;
+				console.log(this.selectObj);
+				this.modelFlag = true;
 				this.isAdd = false;
-				this.drawerTitle = this.$t("edit");
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
-		//提交
-		submitClick() {
-			this.$refs.submitReq.validate((validate) => {
-				if (validate) {
-					let obj = { ...this.submitData };
-					let request = this.isAdd ? addReq(obj) : modifyReq(obj);
-					request.then((res) => {
-						if (res.code === 200) {
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
-							this.pageLoad(); //刷新表格
-							this.cancelClick();
-						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
-					});
-				}
-			});
-		},
-		cancelClick() {
-			this.drawerFlag = false;
-			this.$refs.submitReq.resetFields(); //清除表单红色提示
-		},
+
 		//删除
 		deleteClick() {
 			if (this.selectObj) {

@@ -1,166 +1,227 @@
 <template>
-	<div class="workbook-container">
-		<div class="workbook-title">{{ req.workBookName }}</div>
-		<div class="top-container">
-			<!-- 左侧数据集 -->
-			<div class="left-box">
-				<Input v-model="submitData.columnName" placeholder="请筛选信息" clearable suffix="ios-search" @on-change="getColumnList" />
-				<div class="left-tree">
-					<ul class="tree">
-						<li v-for="(item, index) in data" :key="index" class="tree-father">
-							<div @click="item.isShow = !item.isShow">
-								<Icon type="ios-arrow-forward" :style="{ transform: item.isShow ? 'rotate(90deg)' : 'rotate(0deg)' }" />
-								<Icon type="md-apps" /> {{ item.tableName }}
-							</div>
+	<Modal v-model="modelFlag" title="123" fullscreen :mask-closable="false" :closable="true" :before-close="cancelClick">
+		<div class="workbook-container">
+			<div class="top-container">
+				<!-- 左侧数据集 -->
+				<div class="left-box">
+					<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
+						<!-- 工作簿名称 -->
+						<FormItem :label="$t('workBookName')" prop="workBookName">
+							<Input v-model.trim="submitData.workBookName" :placeholder="$t('pleaseEnter') + $t('workBookName')" cleabler />
+						</FormItem>
+						<!-- 工作簿编码 -->
+						<FormItem :label="$t('workBookCode')" prop="workBookCode">
+							<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" cleabler />
+						</FormItem>
+						<!-- 数据集 -->
+						<FormItem :label="$t('setName')" prop="datasetId">
+							<Select v-model="submitData.datasetId" filterable clearable :placeholder="$t('pleaseSelect') + $t('setName')">
+								<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
+							</Select>
+						</FormItem>
+						<!-- 是否有效 -->
+						<FormItem :label="$t('enabled')" prop="enabled">
+							<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+								<span slot="open">{{ $t("open") }}</span>
+								<span slot="close">{{ $t("close") }}</span>
+							</i-switch>
+						</FormItem>
+					</Form>
+					<Input v-model="submitData.columnName" placeholder="请筛选信息" clearable suffix="ios-search" @on-change="getColumnList" />
+					<div class="left-tree">
+						<ul class="tree">
+							<li v-for="(item, index) in data" :key="index" class="tree-father">
+								<div @click="item.isShow = !item.isShow">
+									<Icon type="ios-arrow-forward" :style="{ transform: item.isShow ? 'rotate(90deg)' : 'rotate(0deg)' }" />
+									<Icon type="md-apps" /> {{ item.tableName }}
+								</div>
 
-							<ul class="subtree" v-if="item.isShow">
-								<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%" @end="treeDragEnd">
-									<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
-										<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
-										<template v-if="['0', '1', '2'].includes(subitem.columnType)">
-											<icon custom="iconfont icon-huatifuhao" style="color: #13d613" />
-										</template>
-										<!-- 表 对应字段 -->
-										<template v-else>
-											<!-- 字符串 -->
-											<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(subitem.columnType.toUpperCase())" />
-											<!-- 数字 -->
-											<icon
-												custom="iconfont icon-shuzishurukuang"
-												v-else-if="columnTypeList[1].detailCode.includes(subitem.columnType.toUpperCase())"
-											/>
-											<!-- 时间 -->
-											<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(subitem.columnType.toUpperCase())" />
-											<!-- 任意类型 -->
-											<icon custom="iconfont icon-huatifuhao" v-else />
-										</template>
+								<ul class="subtree" v-if="item.isShow">
+									<draggable v-model="item.children" :group="{ name: 'site', pull: 'clone', put: 'false' }" style="height: 99%" @end="treeDragEnd">
+										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
+											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
+											<template v-if="['0', '1', '2'].includes(subitem.columnType)">
+												<icon custom="iconfont icon-huatifuhao" style="color: #13d613" />
+											</template>
+											<!-- 表 对应字段 -->
+											<template v-else>
+												<!-- 字符串 -->
+												<icon custom="iconfont icon-string" v-if="subitem.dataType === 'String'" />
+												<!-- 数字 -->
+												<icon custom="iconfont icon-shuzishurukuang" v-else-if="subitem.dataType === 'Number'" />
+												<!-- 时间 -->
+												<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
+												<!-- 任意类型 -->
+												<icon custom="iconfont icon-huatifuhao" v-else />
+											</template>
 
-										<div class="value">
-											{{ subitem.columnName }}
-											<!-- 下拉框 -->
-											<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
-												<Icon type="ios-arrow-down"></Icon>
-												<template #list>
-													<DropdownMenu>
-														<!-- 编辑 -->
-														<DropdownItem name="createField-edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
-														<!-- 创建 -->
-														<Dropdown placement="right-start">
-															<DropdownItem>
-																创建
-																<Icon type="ios-arrow-forward" style="float: right"></Icon>
-															</DropdownItem>
-															<template #list>
-																<DropdownMenu>
-																	<DropdownItem name="createField-create">计算字段</DropdownItem>
-																</DropdownMenu>
-															</template>
-														</Dropdown>
-														<!-- 删除 -->
-														<DropdownItem name="deleteFields" v-if="subitem.columnType == '2'">删除</DropdownItem>
-													</DropdownMenu>
-												</template>
-											</Dropdown>
-										</div>
-									</li>
-								</draggable>
-							</ul>
-						</li>
-					</ul>
+											<div class="value">
+												{{ subitem.columnName }}
+												<!-- 下拉框 -->
+												<Dropdown style="float: right" trigger="contextMenu" @on-click="(name) => dropDownClick(name, subitem)">
+													<Icon type="ios-arrow-down"></Icon>
+													<template #list>
+														<DropdownMenu>
+															<!-- 编辑 -->
+															<DropdownItem name="createField-edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
+															<!-- 创建 -->
+															<Dropdown placement="right-start">
+																<DropdownItem>
+																	创建
+																	<Icon type="ios-arrow-forward" style="float: right"></Icon>
+																</DropdownItem>
+																<template #list>
+																	<DropdownMenu>
+																		<DropdownItem name="createField-create">计算字段</DropdownItem>
+																	</DropdownMenu>
+																</template>
+															</Dropdown>
+															<!-- 删除 -->
+															<DropdownItem name="deleteFields" v-if="subitem.columnType == '2'">删除</DropdownItem>
+														</DropdownMenu>
+													</template>
+												</Dropdown>
+											</div>
+										</li>
+									</draggable>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</div>
-			</div>
-			<div class="center-box">
-				<div class="filter">
-					<div class="title">筛选器</div>
-					<draggable group="site" v-model="filterData" id="filter" style="height: 99%" @end="filterDragEnd">
-						<span v-for="(item, index) in filterData" :key="index" class="drag-cell">{{ item.columnName }}</span>
-					</draggable>
+				<div class="center-box">
+					<div class="filter">
+						<div class="title">筛选器</div>
+						<draggable group="site" v-model="filterData" id="filter" style="height: 99%" @end="filterDragEnd">
+							<span v-for="(item, index) in filterData" :key="index" class="drag-cell">{{ item.columnName }}</span>
+						</draggable>
+					</div>
+					<div class="mark">
+						<div class="title">标记</div>
+						<Select v-model="submitData.chartType" clearable placeholder="请选择图表">
+							<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+						</Select>
+						<div class="mark-box">
+							<draggable group="site" v-model="markData" id="color" class="box-cell">
+								<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
+							</draggable>
+							<draggable group="site" v-model="markData" id="size" class="box-cell">
+								<div class="size"><Icon custom="iconfont icon-daxiao" />大小</div>
+							</draggable>
+							<draggable group="site" v-model="markData" id="mark" class="box-cell">
+								<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
+							</draggable>
+							<draggable group="site" v-model="markData" id="info" class="box-cell">
+								<div class="detail-info"><Icon type="ios-more" />详细信息</div>
+							</draggable>
+							<draggable group="site" v-model="markData" id="mark-box" @end="markDragEnd">
+								<div v-for="(item, index) in markData" :key="index">
+									<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
+									<Icon custom="iconfont icon-daxiao" v-if="item.innerText === 'size'" />
+									<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
+									<Icon type="ios-more" v-if="item.innerText === 'info'" />
+									<div class="drag-cell">{{ item.columnName }}</div>
+								</div>
+							</draggable>
+						</div>
+					</div>
 				</div>
-				<div class="mark">
-					<div class="title">标记</div>
-					<Select v-model="submitData.chartType" clearable placeholder="请选择图表">
-						<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-					</Select>
-					<div class="mark-box">
-						<draggable group="site" v-model="markData" id="color" class="box-cell">
-							<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
-						</draggable>
-						<draggable group="site" v-model="markData" id="size" class="box-cell">
-							<div class="size"><Icon custom="iconfont icon-daxiao" />大小</div>
-						</draggable>
-						<draggable group="site" v-model="markData" id="mark" class="box-cell">
-							<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
-						</draggable>
-						<draggable group="site" v-model="markData" id="info" class="box-cell">
-							<div class="detail-info"><Icon type="ios-more" />详细信息</div>
-						</draggable>
-						<draggable group="site" v-model="markData" id="mark-box" @end="markDragEnd">
-							<div v-for="(item, index) in markData" :key="index">
-								<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
-								<Icon custom="iconfont icon-daxiao" v-if="item.innerText === 'size'" />
-								<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
-								<Icon type="ios-more" v-if="item.innerText === 'info'" />
-								<div class="drag-cell">{{ item.columnName }}</div>
-							</div>
-						</draggable>
+				<div class="right-box">
+					<div class="row-column">
+						<div class="row">
+							<span class="title">列</span>
+							<draggable group="site" v-model="columnData" class="drag-right" id="column" @end="columnDragEnd">
+								<span v-for="(item, index) in columnData" :key="index" class="drag-cell">{{ item.columnName }}</span>
+							</draggable>
+						</div>
+						<div class="column">
+							<span class="title">行</span>
+							<draggable group="site" v-model="rowData" class="drag-right" id="row" @end="rowDragEnd">
+								<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.columnName }}</span>
+							</draggable>
+						</div>
+					</div>
+					<div class="right-content">
+						<div class="title">{{ submitData.title }}</div>
+						<componentsTemp :type="submitData.chartType" :visib="true" />
 					</div>
 				</div>
 			</div>
-			<div class="right-box">
-				<div class="row-column">
-					<div class="row">
-						<span class="title">列</span>
-						<draggable group="site" v-model="columnData" class="drag-right" id="column" @end="columnDragEnd">
-							<span v-for="(item, index) in columnData" :key="index" class="drag-cell">{{ item.columnName }}</span>
-						</draggable>
-					</div>
-					<div class="column">
-						<span class="title">行</span>
-						<draggable group="site" v-model="rowData" class="drag-right" id="row" @end="rowDragEnd">
-							<span v-for="(item, index) in rowData" :key="index" class="drag-cell">{{ item.columnName }}</span>
-						</draggable>
-					</div>
-				</div>
-				<div class="right-content">
-					<div class="title">{{ submitData.title }}</div>
-					<componentsTemp :type="submitData.chartType" :visib="true" />
-				</div>
-			</div>
+
+			<CreateFields ref="createField" :selectObj="selectObj" :isAdd="isAdd" @getColumnList="getColumnList" />
 		</div>
-		<div class="bottom-container">
-			<Button>预览</Button>
-			<Button type="primary" @click="submitClick()" style="color: #fff">保存</Button>
+		<div slot="footer" style="text-align: center">
+			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
+			<Button type="primary" @click="submitClick">{{ $t("submit") }}</Button>
 		</div>
-		<CreateFields ref="createField" :selectObj="selectObj" :isAdd="isAdd" @getColumnList="getColumnList" />
-	</div>
+	</Modal>
 </template>
 <script>
 import draggable from "vuedraggable";
 import componentsTemp from "./components/temp.vue";
-import { getTabelColumnReq, deleteCustomerFieldReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { getTabelColumnReq, deleteCustomerFieldReq, addReq, modifyReq } from "@/api/bill-design-manage/workbook-manage.js";
 import CreateFields from "./create-fields.vue";
 import { getlistReq } from "@/api/system-manager/data-item";
+import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 
 export default {
 	name: "workbook-design",
 	components: { draggable, componentsTemp, CreateFields },
+	props: {
+		modelFlag: {
+			type: Boolean,
+			default: () => false,
+		},
+		workbookIsAdd: {
+			type: Boolean,
+			default: () => false,
+		},
+		workbookSelectObj: {
+			type: Object,
+			default: () => {},
+		},
+	},
+	watch: {
+		modelFlag(newVal) {
+			if (newVal) {
+				this.$nextTick(() => {
+					if (!this.workbookIsAdd) this.submitData = { ...this.submitData, ...this.workbookSelectObj };
+					this.getDataSetList();
+					this.getDataItemData(); //数据字典 获取类型
+					this.getColumnList(); //获取左侧列
+				});
+			}
+		},
+	},
 	data() {
 		return {
 			isAdd: true,
 			tabValue: "data",
+			drawerTitle: this.$t("add"),
+			dragstartNode: "",
+			dragstartData: "",
+			contextData: "", //菜单
+			selectObj: {},
 			submitData: {
+				id: "",
+				remark: "",
+				workBookName: "",
+				workBookCode: "",
+				datasetId: "",
+				desc: "", //描述
+				enabled: 1, //是否有效
 				columnName: "",
 				chartType: "componentTable",
 				title: "工作表",
 			},
-			columnTypeList: [],
-			selectObj: {},
-			dragstartNode: "",
-			dragstartData: "",
-			contextData: "", //菜单
-			req: {},
 			columnList: [],
+			columnTypeList: [],
 			data: [],
+			datasetList: [],
+			filterData: [], //过滤值
+			columnData: [], //列值
+			rowData: [], //行值
+			markData: [],
 			chartList: [
 				{ label: "表格", value: "componentTable" },
 				{ label: "柱状图", value: "componentBar" },
@@ -169,28 +230,37 @@ export default {
 				{ label: "散点图", value: "componentScatter" },
 				{ label: "盒须图", value: "componentBoxplot" },
 			],
-			filterData: [], //过滤值
-			columnData: [], //列值
-			rowData: [], //行值
-			markData: [],
+
+			// 验证实体
+			ruleValidate: {
+				workBookName: [
+					{
+						required: true,
+						message: this.$t("pleaseEnter") + this.$t("workBookName"),
+					},
+				],
+				workBookCode: [
+					{
+						required: true,
+						message: this.$t("pleaseEnter") + this.$t("workBookCode"),
+					},
+				],
+			},
 		};
 	},
 	activated() {},
-	mounted() {
-		//{
-		//     "reportCode": "8",
-		//     "reportName": "9",
-		//     "datasetId": "FDB363A6D5DA41C4A8F42FB743F19D53"
-		// }
-		this.req = { ...this.$route.query };
-		this.getDataItemData(); //数据字典 获取类型
-		this.getColumnList(); //获取左侧列
-	},
+	// mounted() {
+	// 	//{
+	// 	//     "reportCode": "8",
+	// 	//     "reportName": "9",
+	// 	//     "datasetId": "FDB363A6D5DA41C4A8F42FB743F19D53"
+	// 	// }
+	// },
 	methods: {
 		//获取左侧数据集对应表及字段
 		getColumnList() {
-			const { datasetId } = this.req;
-			const obj = { datasetId, enabled: 1, columnName: this.submitData.columnName };
+			const { datasetId, columnName } = this.submitData;
+			const obj = { datasetId, enabled: 1, columnName };
 			getTabelColumnReq(obj).then((res) => {
 				if (res.code === 200) {
 					const data = res?.result || [];
@@ -219,7 +289,7 @@ export default {
 				this.isAdd = true;
 			}
 
-			const { datasetId } = this.req;
+			const { datasetId } = this.columnName;
 			this.selectObj = { ...row, type: "all", datasetId };
 			this.$refs[dropDownItem[0]].modelFlag = true;
 		},
@@ -289,33 +359,52 @@ export default {
 			this.markData = JSON.parse(JSON.stringify(this.markData));
 			console.log(this.markData);
 		},
+		//获取所有数据集
+		getDataSetList() {
+			this.dataSetIdName = {};
+			getDataSetListReq().then((res) => {
+				if (res.code === 200) {
+					this.datasetList = res?.result || [];
+					this.datasetList.forEach((item) => {
+						this.dataSetIdName[item.id] = item.datasetName;
+					});
+					this.dataSetIdName = JSON.parse(JSON.stringify(this.dataSetIdName));
+				}
+			});
+		},
+		//提交
+		submitClick() {
+			this.$refs.submitReq.validate((validate) => {
+				if (validate) {
+					let obj = { ...this.submitData };
+					let request = this.workbookIsAdd ? addReq(obj) : modifyReq(obj);
+					request.then((res) => {
+						if (res.code === 200) {
+							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.pageLoad(); //刷新表格
+						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
+					});
+				}
+			});
+		},
+		cancelClick() {
+			this.data = [];
+			this.filterData = []; //过滤值
+			this.columnData = []; //列值
+			this.rowData = []; //行值
+			this.markData = [];
+			this.$emit("update:modelFlag", false);
+			this.$refs.submitReq.resetFields(); //清除表单红色提示
+		},
 	},
 };
 </script>
 <style scoped lang="less">
 .workbook-container {
 	height: calc(100% - 20px);
-	margin: 10px;
-	.workbook-title {
-		height: 25px;
-		border-bottom: 1px solid #dbdcdd;
-		margin-bottom: 10px;
-		font-weight: bold;
-		font-size: 14px;
-		padding-left: 10px;
-		&:before {
-			content: "";
-			width: 5px;
-			height: 25px;
-			background: #5dd4ff;
-			position: absolute;
-			left: 12px;
-			top: 5px;
-		}
-	}
 	.top-container {
 		display: flex;
-		height: calc(100% - 100px);
+		height: 100%;
 		.left-box {
 			width: 300px;
 			padding: 10px;
@@ -329,7 +418,7 @@ export default {
 				margin-bottom: 10px;
 			}
 			.left-tree {
-				height: calc(100% - 30px);
+				height: calc(100% - 200px);
 				margin-top: 5px;
 				.tree {
 					height: 100%;
@@ -455,22 +544,6 @@ export default {
 			}
 		}
 	}
-	.bottom-container {
-		width: 100%;
-		height: 50px;
-		margin: 0 auto;
-		line-height: 50px;
-		text-align: center;
-		position: absolute;
-		bottom: 0px;
-
-		button {
-			padding: 5px 10px;
-			margin-right: 10px;
-			border: 1px solid #27ce88;
-			color: #27ce88;
-		}
-	}
 
 	.drag-cell {
 		padding: 4px 20px;
@@ -512,5 +585,8 @@ export default {
 }
 :deep(.ivu-tree-title.ivu-tree-title-selected, .ivu-tree-title:hover) {
 	background-color: #4795b3;
+}
+:deep(.ivu-modal-fullscreen .ivu-modal-body) {
+	bottom: 35px;
 }
 </style>
