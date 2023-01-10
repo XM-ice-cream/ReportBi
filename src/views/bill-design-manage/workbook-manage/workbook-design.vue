@@ -68,7 +68,7 @@
 												<!-- 字符串 -->
 												<icon custom="iconfont icon-string" v-if="subitem.dataType === 'String'" />
 												<!-- 数字 -->
-												<icon custom="iconfont icon-shuzishurukuang" v-else-if="subitem.dataType === 'Number'" />
+												<icon custom="iconfont icon-shuzishurukuang" v-else-if="subitem.dataType === 'Number'" style="color: #13d613" />
 												<!-- 时间 -->
 												<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
 												<!-- 任意类型 -->
@@ -84,6 +84,10 @@
 														<DropdownMenu>
 															<!-- 编辑 -->
 															<DropdownItem name="createField-edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
+															<!-- 维度转指标 传0 -->
+															<DropdownItem name="0-change">转换为指标</DropdownItem>
+															<!-- 指标转维度 传1 -->
+															<DropdownItem name="0-change">转换为度量</DropdownItem>
 															<!-- 创建 -->
 															<Dropdown placement="right-start">
 																<DropdownItem>
@@ -298,12 +302,24 @@ export default {
 			getTabelColumnReq(obj).then((res) => {
 				if (res.code === 200) {
 					const data = res?.result || [];
+					//获取所有tableName
 					const tableNameList = Array.from(new Set(data.map((item) => item.tableName)));
+					//tableName 分组
 					const groupTableName = this.$XEUtiles.groupBy(data, "tableName");
+					// 指标、维度分类
 					this.data = tableNameList.map((item, index) => {
-						return { tableName: item, children: groupTableName[item], isShow: this.data[index]?.isShow || true };
+						const children = groupTableName[item].map((item) => {
+							let index = 0;
+							switch (item.dataType) {
+								case "Number":
+									item.columnType == "2" ? (index = 2) : (index = 1);
+									break;
+							}
+							return { ...item, index };
+						});
+						console.log(children);
+						return { tableName: item, children: this.$XEUtiles.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
 					});
-					console.log(this.data);
 				}
 			});
 		},
@@ -353,7 +369,6 @@ export default {
 		},
 		//拖拽结束
 		dragEnd(e, type) {
-			console.log(e.to.id, type);
 			switch (type) {
 				case "filter":
 					e.to.id === "filter" && e.oldIndex === e.newIndex ? this.filterData.splice(e.oldIndex, 1) : "";
@@ -368,62 +383,15 @@ export default {
 					e.to.id === "mark-box" && e.oldIndex === e.newIndex ? this.markData.splice(e.oldIndex, 1) : "";
 					break;
 				case "tree":
-					console.log(type, e.to.id);
 					if (["color", "size", "mark", "info"].includes(e.to.id)) {
 						this.markData[e.newIndex].innerText = e.to.id;
+						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
-
-					// e.to.id === "color" ? (this.markData[e.newIndex].innerText = "color") : "";
-					// e.to.id === "size" ? (this.markData[e.newIndex].innerText = "size") : "";
-					// e.to.id === "mark" ? (this.markData[e.newIndex].innerText = "mark") : "";
-					// e.to.id === "info" ? (this.markData[e.newIndex].innerText = "info") : "";
-					this.markData = JSON.parse(JSON.stringify(this.markData));
 					break;
 			}
 			console.log(this.markData);
 		},
-		// filterDragEnd(e) {
-		// 	console.log("拖拽结束--过滤器", e);
-		// 	// this.filterData.splice(this.moveId, 1);
-		// 	if (e.to.id === "filter" && e.oldIndex === e.newIndex) {
-		// 		this.filterData.splice(e.oldIndex, 1);
-		// 	}
-		// },
-		// columnDragEnd(e) {
-		// 	console.log("拖拽结束--列", e);
-		// 	if (e.to.id === "column" && e.oldIndex === e.newIndex) {
-		// 		this.columnData.splice(e.oldIndex, 1);
-		// 	}
-		// },
-		// rowDragEnd(e) {
-		// 	console.log("拖拽结束--行", e);
-		// 	if (e.to.id === "row" && e.oldIndex === e.newIndex) {
-		// 		this.rowData.splice(e.oldIndex, 1);
-		// 	}
-		// },
-		// markDragEnd(e) {
-		// 	console.log("拖拽结束--标记", e);
-		// 	if (e.to.id === "mark-box" && e.oldIndex === e.newIndex) {
-		// 		this.markData.splice(e.oldIndex, 1);
-		// 	}
-		// },
-		// treeDragEnd(e) {
-		// 	console.log("拖拽结束--树", e);
-		// 	if (e.to.id === "color") {
-		// 		this.markData[e.newIndex].innerText = "color";
-		// 	}
-		// 	if (e.to.id === "size") {
-		// 		this.markData[e.newIndex].innerText = "size";
-		// 	}
-		// 	if (e.to.id === "mark") {
-		// 		this.markData[e.newIndex].innerText = "mark";
-		// 	}
-		// 	if (e.to.id === "info") {
-		// 		this.markData[e.newIndex].innerText = "info";
-		// 	}
-		// 	this.markData = JSON.parse(JSON.stringify(this.markData));
-		// 	console.log(this.markData);
-		// },
+
 		//获取所有数据集
 		getDataSetList() {
 			this.dataSetIdName = {};
