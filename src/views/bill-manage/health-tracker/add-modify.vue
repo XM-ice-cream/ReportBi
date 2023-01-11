@@ -21,7 +21,7 @@
 					<Table :columns="columns" :data="tableData" :height="tableConfig.height" :border="tableConfig.border" disabled-hover draggable>
 						<template slot-scope="{ row, index }" slot="operation">
 							<Button type="success" class="row-button" custom-icon="iconfont icon-add" @click="addRowClick(index)"></Button>
-							<Button type="error" ghost class="row-button" icon="iconfont icon-delete" @click="deleteClick(index)"></Button>
+							<Button type="error" ghost class="row-button" custom-icon="iconfont icon-delete" @click="deleteClick(index)"></Button>
 						</template>
 					</Table>
 					<Alert type="warning">输入SN和Location后，回车带出相关信息！</Alert>
@@ -132,6 +132,11 @@ export default {
 		// 提交
 		submitClick(isClose = false) {
 			this.submitData.detailsList = this.tableData;
+			const desLength = this.tableData.every((item) => item.issuedescription.length <= 120);
+			if (!desLength) {
+				this.$Message.error("Issue Description 内容长度超出120,请核验");
+				return;
+			}
 			let request = addReq(this.submitData);
 			request.then((res) => {
 				if (res.code === 200) {
