@@ -7,7 +7,16 @@
 				<div slot="title">
 					<Row>
 						<i-col span="24">
-							<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" inline :rules="ruleValidate" @submit.native.prevent @keyup.native.enter="searchClick">
+							<Form
+								ref="searchReq"
+								:model="req"
+								:label-width="80"
+								:label-colon="true"
+								inline
+								:rules="ruleValidate"
+								@submit.native.prevent
+								@keyup.native.enter="searchClick"
+							>
 								<!-- 是否刷新 -->
 								<FormItem label="自动刷新" prop="isRefresh">
 									<i-switch v-model="req.isRefresh" style="width: 50px">
@@ -25,21 +34,49 @@
 								</FormItem>
 								<!-- 起始时间 -->
 								<FormItem :label="$t('startTime')" prop="startTime" v-if="!req.isRefresh">
-									<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
+									<DatePicker
+										transfer
+										type="datetime"
+										:placeholder="$t('pleaseSelect') + $t('startTime')"
+										format="yyyy-MM-dd HH:mm:ss"
+										:options="$config.datetimeOptions"
+										v-model="req.startTime"
+									></DatePicker>
 								</FormItem>
 								<!-- 结束时间 -->
 								<FormItem :label="$t('endTime')" prop="endTime" v-if="!req.isRefresh">
-									<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
+									<DatePicker
+										transfer
+										type="datetime"
+										:placeholder="$t('pleaseSelect') + $t('endTime')"
+										format="yyyy-MM-dd HH:mm:ss"
+										:options="$config.datetimeOptions"
+										v-model="req.endTime"
+									></DatePicker>
 								</FormItem>
 								<!-- 线体 -->
 								<FormItem label="线体" prop="line">
-									<Select v-model.tirm="req.line" transfer style="width: 200px" :placeholder="$t('pleaseSelect') + '线体'" clearable @on-change="getStation">
+									<Select
+										v-model.tirm="req.line"
+										transfer
+										style="width: 200px"
+										:placeholder="$t('pleaseSelect') + '线体'"
+										clearable
+										@on-change="getStation"
+									>
 										<Option v-for="(item, index) in lineList" :key="index" :value="item">{{ item }}</Option>
 									</Select>
 								</FormItem>
 								<!-- 站点 -->
 								<FormItem label="站点" prop="station">
-									<Select v-model.tirm="req.station" transfer style="width: 200px" :placeholder="$t('pleaseSelect') + '站点'" clearable @on-change="getModel">
+									<Select
+										v-model.tirm="req.station"
+										transfer
+										style="width: 200px"
+										:placeholder="$t('pleaseSelect') + '站点'"
+										clearable
+										@on-change="getModel"
+									>
 										<Option v-for="(item, index) in stationList" :key="index" :value="item">{{ item }}</Option>
 									</Select>
 								</FormItem>
@@ -69,7 +106,7 @@ import { getpagelistReq, getLineReq, getStationReq, getModelReq } from "@/api/bi
 import { formatDate } from "@/libs/tools";
 import LineMaverick from "@/components/echarts/line-maverick.vue";
 export default {
-	name: "maverick-email-setting",
+	name: "maverick-report",
 	components: { LineMaverick },
 	data() {
 		return {
