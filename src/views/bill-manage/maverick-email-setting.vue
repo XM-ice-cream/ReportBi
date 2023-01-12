@@ -95,7 +95,7 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: "群组类型", key: "grouP_TYPE", align: "center", tooltip: true, width: 100 },
+				{ title: "群组类型", key: "grouP_TYPE", align: "center", tooltip: true, width: 150 },
 				{ title: "群组名称", key: "grouP_NAME", align: "center", tooltip: true, width: 80 },
 				{ title: "机种", key: "grouP_MODEL", align: "center", tooltip: true, width: 80 },
 				{ title: "线体", key: "grouP_LINE", align: "center", tooltip: true, width: 100 },
