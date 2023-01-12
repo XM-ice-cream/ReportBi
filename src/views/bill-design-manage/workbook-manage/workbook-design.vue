@@ -54,13 +54,12 @@
 										v-model="item.children"
 										:group="{ name: 'site', pull: 'clone', put: 'false' }"
 										style="height: 99%"
-										:forceFallback="true"
 										dragClass="dragClass"
 										@end="(e) => dragEnd(e, 'tree')"
 									>
 										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
 											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
-											<template v-if="['0', '1', '2'].includes(subitem.columnType)">
+											<template v-if="['2'].includes(subitem.columnType)">
 												<icon custom="iconfont icon-wenhao" style="color: #13d613" />
 											</template>
 											<!-- 表 对应字段 -->
@@ -68,11 +67,11 @@
 												<!-- 字符串 -->
 												<icon custom="iconfont icon-string" v-if="subitem.dataType === 'String'" />
 												<!-- 数字 -->
-												<icon custom="iconfont icon-shuzishurukuang" v-else-if="subitem.dataType === 'Number'" style="color: #13d613" />
+												<icon custom="iconfont icon-huatifuhao" v-else-if="subitem.dataType === 'Number'" style="color: #13d613" />
 												<!-- 时间 -->
 												<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
 												<!-- 任意类型 -->
-												<icon custom="iconfont icon-wenhao" v-else />
+												<icon custom="iconfont icon-huatifuhao" v-else />
 											</template>
 
 											<div class="value">
@@ -84,10 +83,14 @@
 														<DropdownMenu>
 															<!-- 编辑 -->
 															<DropdownItem name="createField-edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
-															<!-- 维度转指标 传0 -->
-															<DropdownItem name="0-change">转换为指标</DropdownItem>
-															<!-- 指标转维度 传1 -->
-															<DropdownItem name="0-change">转换为度量</DropdownItem>
+															<!-- 维度转指标 传0【自定义字段不可转】 -->
+															<DropdownItem name="indicators" v-if="subitem.columnType != '2' && subitem.dataType !== 'Number'"
+																>转换为指标</DropdownItem
+															>
+															<!-- 指标转维度 传1【自定义字段不可转】 -->
+															<DropdownItem name="dimension" v-if="subitem.columnType != '2' && subitem.dataType == 'Number'"
+																>转换为维度</DropdownItem
+															>
 															<!-- 创建 -->
 															<Dropdown placement="right-start">
 																<DropdownItem>
@@ -197,7 +200,14 @@
 <script>
 import draggable from "vuedraggable";
 import componentsTemp from "./components/temp.vue";
-import { getTabelColumnReq, deleteCustomerFieldReq, addReq, modifyReq } from "@/api/bill-design-manage/workbook-manage.js";
+import {
+	getTabelColumnReq,
+	deleteCustomerFieldReq,
+	addReq,
+	modifyReq,
+	addCustomerFieldReq,
+	modifyCustomerFieldReq,
+} from "@/api/bill-design-manage/workbook-manage.js";
 import CreateFields from "./create-fields.vue";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
@@ -221,6 +231,7 @@ export default {
 	},
 	watch: {
 		modelFlag(newVal) {
+			console.log("modelFlag", this.modelFlag);
 			if (newVal) {
 				this.$nextTick(() => {
 					if (!this.workbookIsAdd) this.submitData = { ...this.submitData, ...this.workbookSelectObj };
@@ -325,23 +336,63 @@ export default {
 		},
 		//下拉
 		dropDownClick(name, row) {
-			console.log("下拉", name, row);
-			//删除自定义字段
-			if (name === "deleteFields") {
-				this.deleteFields(row);
-				return;
-			}
-			let dropDownItem = name?.split("-") || [name];
-			if (dropDownItem[1]) {
-				if (dropDownItem[1] === "create") this.isAdd = true;
-				if (dropDownItem[1] === "edit") this.isAdd = false;
-			} else {
-				this.isAdd = true;
-			}
-
 			const { datasetId } = this.submitData;
-			this.selectObj = { ...row, type: "all", datasetId };
-			this.$refs[dropDownItem[0]].modelFlag = true;
+			this.selectObj = { ...row, type: "all", datasetId, labelName: row.tableName, fieldCode: row.columnName, id: row.nodeId };
+			console.log("下拉", name, row);
+
+			switch (name) {
+				// 删除自定义字段
+				case "deleteFields":
+					this.deleteFields(row);
+					break;
+				// 创建自定义字段
+				case "createField-create":
+					this.isAdd = true;
+					this.$refs.createField.modelFlag = true;
+					break;
+				//编辑自定义字段
+				case "createField-edit":
+					this.isAdd = false;
+					this.$refs.createField.modelFlag = true;
+					break;
+				//转换为指标
+				case "indicators":
+					this.changeToProperty(this.selectObj, 0);
+					break;
+				//转换为维度
+				case "dimension":
+					this.changeToProperty(this.selectObj, 1);
+					break;
+			}
+		},
+		//转换为指标 0 或 维度 1
+		changeToProperty(row, type) {
+			let requestApi = addCustomerFieldReq;
+			let obj = { ...row, typeConvert: type, remark: 1 };
+			console.log("指标转换", obj);
+			switch (row.columnType) {
+				case "1":
+					//删除
+					requestApi = deleteCustomerFieldReq;
+					break;
+				case "2":
+					//编辑
+					obj = { ...row, typeConvert: type, remark: 2 };
+					requestApi = modifyCustomerFieldReq;
+					break;
+				default:
+					//新增
+					obj = { ...row, typeConvert: type, remark: 1 };
+					requestApi = addCustomerFieldReq;
+					break;
+			}
+			requestApi(obj).then((res) => {
+				if (res.code === 200) {
+					this.getColumnList(); //重新刷新左侧数据
+				} else {
+					this.$Message.error(`操作失败！${res.message}`);
+				}
+			});
 		},
 		//删除自定义字段
 		deleteFields(row) {

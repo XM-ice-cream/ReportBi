@@ -166,7 +166,7 @@ export default {
 		//提交
 		submitClick() {
 			const { fieldFunction, tableName, datasetId, columnName, id } = this.submitData;
-			const obj = { fieldFunction, tableName, datasetCode: datasetId, fieldCode: columnName, id, remark: 2 };
+			const obj = { fieldFunction, labelName: tableName, datasetId, fieldCode: columnName, id, remark: 2 };
 			const requestApi = this.isAdd ? addCustomerFieldReq(obj) : modifyCustomerFieldReq(obj);
 			requestApi.then((res) => {
 				if (res.code === 200) {
