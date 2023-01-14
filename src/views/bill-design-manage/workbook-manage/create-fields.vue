@@ -79,7 +79,6 @@ export default {
 				this.$nextTick(() => {
 					//光标聚焦
 					inputSelectContent(this.$refs.fieldFunction);
-					console.log(this.$refs.fieldFunction.$el.children[0]);
 				});
 			}
 		},

@@ -53,6 +53,8 @@
 									<draggable
 										v-model="item.children"
 										:group="{ name: 'site', pull: 'clone', put: 'false' }"
+										:sort="false"
+										:forceFallback="true"
 										style="height: 99%"
 										dragClass="dragClass"
 										@end="(e) => dragEnd(e, 'tree')"
@@ -60,21 +62,19 @@
 										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
 											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
 											<template v-if="['2'].includes(subitem.columnType)">
-												<icon custom="iconfont icon-wenhao" style="color: #13d613" />
+												<span style="color: #47a67f; margin-right: -5px; margin-top: -2px">=</span>
 											</template>
 											<!-- 表 对应字段 -->
-											<template v-else>
-												<!-- 字符串 -->
-												<icon custom="iconfont icon-string" v-if="subitem.dataType === 'String'" />
-												<!-- 数字 -->
-												<icon custom="iconfont icon-huatifuhao" v-else-if="subitem.dataType === 'Number'" style="color: #13d613" />
-												<!-- 时间 -->
-												<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
-												<!-- 任意类型 -->
-												<icon custom="iconfont icon-huatifuhao" v-else />
-											</template>
+											<!-- 字符串 -->
+											<icon custom="iconfont icon-string" v-if="subitem.dataType === 'String'" />
+											<!-- 数字 -->
+											<icon custom="iconfont icon-huatifuhao" v-else-if="subitem.dataType === 'Number'" style="color: #47a67f" />
+											<!-- 时间 -->
+											<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
+											<!-- 任意类型 -->
+											<icon custom="iconfont icon-huatifuhao" v-else />
 
-											<div class="value">
+											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'">
 												{{ subitem.columnName }}
 												<!-- 下拉框 -->
 												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem)">
@@ -116,6 +116,7 @@
 						</ul>
 					</div>
 				</div>
+				<!-- 筛选器、标记 -->
 				<div class="center-box">
 					<div class="filter">
 						<div class="title">筛选器</div>
@@ -127,7 +128,9 @@
 							style="height: calc(100% - 50px); overflow: auto"
 							@end="(e) => dragEnd(e, 'filter')"
 						>
-							<span v-for="(item, index) in filterData" :key="index" class="drag-cell">{{ item.columnName }}</span>
+							<span v-for="(item, index) in filterData" :key="index" :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">{{
+								item.columnName
+							}}</span>
 						</draggable>
 					</div>
 					<div class="mark">
@@ -161,24 +164,91 @@
 									<Icon custom="iconfont icon-daxiao" v-if="item.innerText === 'size'" />
 									<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
 									<Icon type="ios-more" v-if="item.innerText === 'info'" />
-									<div class="drag-cell">{{ item.columnName }}</div>
+									<div :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">{{ item.columnName }}</div>
 								</div>
 							</draggable>
 						</div>
 					</div>
 				</div>
+				<!-- 行列 -->
 				<div class="right-box">
 					<div class="row-column">
 						<div class="row">
 							<span class="title">列</span>
 							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
-								<span v-for="(item, index) in columnData" :key="index" class="drag-cell" style="width: fit-content">{{ item.columnName }}</span>
+								<span
+									v-for="(item, index) in columnData"
+									:key="index"
+									:class="item.dataType === 'Number' || item.calculatorFunction ? 'drag-number' : 'drag-cell'"
+									style="width: fit-content"
+								>
+									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
+									<!-- 下拉框 -->
+									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'column')">
+										<Icon type="ios-arrow-down"></Icon>
+										<template #list>
+											<DropdownItem name="">维度</DropdownItem>
+											<DropdownMenu>
+												<Dropdown placement="right-start">
+													<DropdownItem>
+														指标
+														<Icon type="ios-arrow-forward"></Icon>
+													</DropdownItem>
+													<template #list>
+														<DropdownMenu>
+															<DropdownItem name="sum">总和</DropdownItem>
+															<DropdownItem name="avg">平均值</DropdownItem>
+															<DropdownItem name="count">计数</DropdownItem>
+															<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
+															<DropdownItem name="max">最大值</DropdownItem>
+															<DropdownItem name="min">最小值</DropdownItem>
+															<DropdownItem name="stdev">标准差</DropdownItem>
+														</DropdownMenu>
+													</template>
+												</Dropdown>
+											</DropdownMenu>
+										</template>
+									</Dropdown>
+								</span>
 							</draggable>
 						</div>
 						<div class="column">
 							<span class="title">行</span>
 							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
-								<span v-for="(item, index) in rowData" :key="index" class="drag-cell" style="width: fit-content">{{ item.columnName }}</span>
+								<span
+									v-for="(item, index) in rowData"
+									:key="index"
+									:class="item.dataType === 'Number' || item.calculatorFunction ? 'drag-number' : 'drag-cell'"
+									style="width: fit-content"
+								>
+									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
+									<!-- 下拉框 -->
+									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'row')">
+										<Icon type="ios-arrow-down"></Icon>
+										<template #list>
+											<DropdownItem name="">维度</DropdownItem>
+											<DropdownMenu>
+												<Dropdown placement="right-start">
+													<DropdownItem>
+														指标
+														<Icon type="ios-arrow-forward"></Icon>
+													</DropdownItem>
+													<template #list>
+														<DropdownMenu>
+															<DropdownItem name="sum">总和</DropdownItem>
+															<DropdownItem name="avg">平均值</DropdownItem>
+															<DropdownItem name="count">计数</DropdownItem>
+															<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
+															<DropdownItem name="max">最大值</DropdownItem>
+															<DropdownItem name="min">最小值</DropdownItem>
+															<DropdownItem name="stdev">标准差</DropdownItem>
+														</DropdownMenu>
+													</template>
+												</Dropdown>
+											</DropdownMenu>
+										</template>
+									</Dropdown>
+								</span>
 							</draggable>
 						</div>
 					</div>
@@ -365,6 +435,20 @@ export default {
 					break;
 			}
 		},
+		//行列下拉框
+		rowColumnDropDownClick(name, index, type) {
+			switch (type) {
+				case "row":
+					this.rowData[index].calculatorFunction = name;
+					this.rowData = JSON.parse(JSON.stringify(this.rowData));
+					break;
+				case "column":
+					this.columnData[index].calculatorFunction = name;
+					this.columnData = JSON.parse(JSON.stringify(this.columnData));
+					break;
+			}
+			console.log("row", this.rowData, "column", this.columnData);
+		},
 		//转换为指标 0 或 维度 1
 		changeToProperty(row, type) {
 			let requestApi = addCustomerFieldReq;
@@ -420,6 +504,7 @@ export default {
 		},
 		//拖拽结束
 		dragEnd(e, type) {
+			console.log(e, type);
 			switch (type) {
 				case "filter":
 					e.to.id === "filter" && e.oldIndex === e.newIndex ? this.filterData.splice(e.oldIndex, 1) : "";
@@ -472,6 +557,7 @@ export default {
 				}
 			});
 		},
+		//取消
 		cancelClick() {
 			this.data = [];
 			this.filterData = []; //过滤值
@@ -480,6 +566,19 @@ export default {
 			this.markData = [];
 			this.$emit("update:modelFlag", false);
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
+		},
+		//计算属性对应中文
+		calculatorObj(name) {
+			const obj = {
+				sum: "总和",
+				avg: "平均值",
+				count: "计数",
+				countDistinct: "计数(不同)",
+				max: "最大值",
+				min: "最小值",
+				stdev: "标准差",
+			};
+			return obj[name];
 		},
 	},
 };
@@ -530,13 +629,23 @@ export default {
 								line-height: 20px;
 								padding: 0px 8px;
 								&:hover {
-									background: #4795b3;
+									background: #4996b2;
+									color: #fff;
+								}
+							}
+							.number-value {
+								width: calc(100% - 20px);
+								height: 20px;
+								line-height: 20px;
+								padding: 0px 8px;
+								&:hover {
+									background: #00b180;
 									color: #fff;
 								}
 							}
 
 							& > i {
-								color: #299aff;
+								color: #367e9c;
 								width: 20px;
 								text-align: center;
 								padding: 2px;
@@ -621,6 +730,9 @@ export default {
 						width: calc(100% - 40px);
 					}
 				}
+				/deep/.ivu-dropdown {
+					margin-left: 5px;
+				}
 			}
 			.right-content {
 				height: calc(100% - 100px);
@@ -638,6 +750,16 @@ export default {
 		padding: 2px 20px;
 		text-align: center;
 		background: #4996b2;
+		color: #fff;
+		border-radius: 10px;
+		margin: 4px;
+		display: inline-block;
+	}
+	.drag-number {
+		width: calc(100% - 25px);
+		padding: 2px 20px;
+		text-align: center;
+		background: #00b180;
 		color: #fff;
 		border-radius: 10px;
 		margin: 4px;
@@ -707,5 +829,8 @@ export default {
 }
 :deep(.ivu-modal-fullscreen .ivu-modal-body) {
 	bottom: 35px;
+}
+:deep(.ivu-modal-header p, .ivu-modal-header-inner) {
+	color: #17233d;
 }
 </style>
