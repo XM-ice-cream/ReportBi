@@ -1,0 +1,199 @@
+/**过滤字段 */
+<template>
+	<!-- 函数管理 -->
+	<Modal
+		:title="isAdd ? '筛选器' : '筛选器'"
+		v-model="modelFlag"
+		width="500"
+		draggable
+		:mask-closable="false"
+		:mask="true"
+		:before-close="cancelClick"
+	>
+		<div class="filter-fields">
+			<Form ref="submitReq" :model="submitData" :label-width="100" :label-colon="true">
+				<!-- 显示数据 -->
+				<FormItem label="显示数据" prop="showData">
+					<i-switch size="small" v-model="submitData.showData" :true-value="1" :false-value="0"> </i-switch>
+				</FormItem>
+				<template v-if="submitData.columnType == 'DATE'">
+					<!-- 时间类别 -->
+					<FormItem label="时间类别" prop="timeType">
+						<RadioGroup v-model="submitData.timeType">
+							<Radio label="year">年</Radio>
+							<Radio label="month">年-月</Radio>
+							<Radio label="datetime">年-月-日 时:分:秒</Radio>
+						</RadioGroup>
+					</FormItem>
+					<!-- 起始时间 -->
+					<FormItem :label="$t('startTime')" prop="startTime">
+						<DatePicker
+							transfer
+							:type="submitData.timeType"
+							:placeholder="$t('pleaseSelect') + $t('startTime')"
+							:options="$config.datetimeOptions"
+							v-model="submitData.startTime"
+						></DatePicker>
+					</FormItem>
+					<!-- 结束时间 -->
+					<FormItem :label="$t('endTime')" prop="endTime">
+						<DatePicker
+							transfer
+							:type="submitData.timeType"
+							:placeholder="$t('pleaseSelect') + $t('endTime')"
+							:options="$config.datetimeOptions"
+							v-model="submitData.endTime"
+						></DatePicker>
+					</FormItem>
+				</template>
+				<template v-else>
+					<!-- 筛选信息 -->
+					<FormItem label="筛选信息" prop="filterValue">
+						<Input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model="submitData.filterValue" clearabled />
+					</FormItem>
+				</template>
+			</Form>
+			<template v-if="submitData.showData">
+				<Table
+					ref="selection"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-selection-change="selectClick"
+				></Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
+			</template>
+		</div>
+
+		<div slot="footer" class="dialog-footer">
+			<Button @click="cancelClick">取 消</Button>
+			<Button type="primary" @click="submitClick">确定 </Button>
+		</div>
+	</Modal>
+</template>
+<script>
+import { formatDate, commaSplitString } from "@/libs/tools";
+
+export default {
+	name: "filter-fields",
+	components: {},
+	props: {
+		selectObj: {
+			type: Object,
+			default: () => {},
+		},
+		isAdd: {
+			type: Boolean,
+			default: () => true,
+		},
+	},
+	watch: {
+		modelFlag(newVal) {
+			if (newVal) {
+				this.submitData = { ...this.selectObj };
+				console.log(this.submitData);
+				this.pageLoad();
+				this.autoSize();
+				window.addEventListener("resize", () => this.autoSize());
+			}
+		},
+		"submitData.showData"(newVal) {
+			//关闭显示数据，清空
+			if (newVal == 0) {
+				// this.submitData.selectArr = [];
+				// this.submitData.filterValue = "";
+				console.log("newVal", newVal);
+			}
+		},
+	},
+	data() {
+		return {
+			submitData: {},
+			modelFlag: false,
+			tableConfig: { ...this.$config.tableConfig }, // table配置
+			columns: [
+				{
+					type: "selection",
+					width: 60,
+					align: "center",
+				},
+				{
+					title: "全选",
+					key: "value",
+				},
+			],
+			data: [
+				{ value: "苹果" },
+				{ value: "香蕉" },
+				{ value: "橘子" },
+				{ value: "1" },
+				{ value: "2" },
+				{ value: "3" },
+				{ value: "4" },
+				{ value: "5" },
+				{ value: "6" },
+			],
+			req: {
+				...this.$config.pageConfig,
+			}, //查询数据
+		};
+	},
+	methods: {
+		//获取数据
+		pageLoad() {
+			this.tableConfig.loading = false;
+		},
+		//提交
+		submitClick() {
+			const { newIndex, startTime, endTime, columnType, filterValue } = this.submitData;
+			if (columnType === "DATE") this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
+			else (this.submitData.filterValue = commaSplitString(filterValue).join()), (this.modelFlag = false);
+
+			this.$emit("updateFilter", newIndex, this.submitData); //取消后 删除拖拽的cell
+			this.modelFlag = false;
+		},
+		handleSelectAll(status) {
+			this.$refs.selection.selectAll(status);
+		},
+		//选择的数据
+		selectClick(selection) {
+			console.log(selection);
+			this.submitData.selectArr = selection;
+			this.submitData.filterValue = selection.map((item) => item.value).toString();
+			this.submitData = JSON.parse(JSON.stringify(this.submitData));
+		},
+		cancelClick() {
+			const { newIndex } = this.submitData;
+			this.modelFlag = false;
+			this.$refs.submitReq.resetFields();
+			this.$emit("deleteFilter", newIndex); //取消后 删除拖拽的cell
+		},
+		// 自动改变表格高度
+		autoSize() {
+			this.tableConfig.height = document.body.clientHeight / 2 - 60;
+		},
+		// 选择第几页
+		pageChange(index) {
+			this.req.pageIndex = index;
+			this.pageLoad();
+		},
+		// 选择一页有条数据
+		pageSizeChange(index) {
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
+		},
+	},
+};
+</script>
+<style lang="less" scoped></style>

@@ -128,9 +128,21 @@
 							style="height: calc(100% - 50px); overflow: auto"
 							@end="(e) => dragEnd(e, 'filter')"
 						>
-							<span v-for="(item, index) in filterData" :key="index" :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">{{
-								item.columnName
-							}}</span>
+							<span v-for="(item, index) in filterData" :key="index" :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">
+								{{ item.columnName }}
+								<!-- 下拉框 -->
+								<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index)">
+									<Icon type="ios-arrow-down"></Icon>
+									<template #list>
+										<DropdownMenu>
+											<!-- 编辑 -->
+											<DropdownItem name="filterField-edit">编辑筛选器</DropdownItem>
+											<!-- 删除 -->
+											<DropdownItem name="filterField-delete">删除筛选器</DropdownItem>
+										</DropdownMenu>
+									</template>
+								</Dropdown>
+							</span>
 						</draggable>
 					</div>
 					<div class="mark">
@@ -260,6 +272,7 @@
 			</div>
 
 			<CreateFields ref="createField" :selectObj="selectObj" :isAdd="isAdd" @getColumnList="getColumnList" />
+			<FilterFields ref="filterField" :selectObj="selectObj" :isAdd="isAdd" @updateFilter="updateFilter" @deleteFilter="deleteFilter" />
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
@@ -279,12 +292,14 @@ import {
 	modifyCustomerFieldReq,
 } from "@/api/bill-design-manage/workbook-manage.js";
 import CreateFields from "./create-fields.vue";
+import FilterFields from "./filter-fields.vue";
+
 import { getlistReq } from "@/api/system-manager/data-item";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp, CreateFields },
+	components: { draggable, componentsTemp, CreateFields, FilterFields },
 	props: {
 		modelFlag: {
 			type: Boolean,
@@ -405,7 +420,7 @@ export default {
 			});
 		},
 		//下拉
-		dropDownClick(name, row) {
+		dropDownClick(name, row, index) {
 			const { datasetId } = this.submitData;
 			this.selectObj = { ...row, type: "all", datasetId, labelName: row.tableName, fieldCode: row.columnName, id: row.nodeId };
 			console.log("下拉", name, row);
@@ -432,6 +447,14 @@ export default {
 				//转换为维度
 				case "dimension":
 					this.changeToProperty(this.selectObj, 1);
+					break;
+				//编辑筛选器
+				case "filterField-edit":
+					this.$refs.filterField.modelFlag = true;
+					break;
+				//删除筛选器
+				case "filterField-delete":
+					this.deleteFilter(index);
 					break;
 			}
 		},
@@ -478,6 +501,39 @@ export default {
 				}
 			});
 		},
+		//拖拽结束
+		dragEnd(e, type) {
+			console.log(e, type);
+			const { oldIndex, newIndex, to } = e;
+			const { id } = to;
+			switch (type) {
+				case "filter":
+					id === "filter" && oldIndex === newIndex ? this.filterData.splice(oldIndex, 1) : "";
+					break;
+				case "column":
+					id === "column" && oldIndex === newIndex ? this.columnData.splice(oldIndex, 1) : "";
+					break;
+				case "row":
+					id === "row" && oldIndex === newIndex ? this.rowData.splice(oldIndex, 1) : "";
+					break;
+				case "mark-box":
+					id === "mark-box" && oldIndex === newIndex ? this.markData.splice(oldIndex, 1) : "";
+					break;
+				case "tree":
+					if (["color", "size", "mark", "info"].includes(id)) {
+						this.markData[newIndex].innerText = id;
+						this.markData = JSON.parse(JSON.stringify(this.markData));
+					}
+					break;
+			}
+			//数据拖拽至筛选器
+			//过滤器
+			if (id === "filter" && type !== "filter") {
+				this.selectObj = { ...this.filterData[newIndex], newIndex };
+				this.$refs.filterField.modelFlag = true;
+			}
+			console.log(this.markData);
+		},
 		//删除自定义字段
 		deleteFields(row) {
 			const { nodeId } = row;
@@ -490,6 +546,16 @@ export default {
 				}
 			});
 		},
+		//更新过滤器数据
+		updateFilter(newIndex, obj) {
+			this.filterData[newIndex] = { ...obj };
+			this.filterData = JSON.parse(JSON.stringify(this.filterData));
+			console.log("更新过滤器数据", this.filterData[newIndex]);
+		},
+		// 删除过滤数据
+		deleteFilter(newIndex) {
+			this.filterData.splice(newIndex, 1);
+		},
 		// 获取数据字典数据
 		async getDataItemData() {
 			this.columnTypeList = await this.getDataItemDetailList("columnType");
@@ -501,31 +567,6 @@ export default {
 				if (res.code === 200) arr = res.result || [];
 			});
 			return arr;
-		},
-		//拖拽结束
-		dragEnd(e, type) {
-			console.log(e, type);
-			switch (type) {
-				case "filter":
-					e.to.id === "filter" && e.oldIndex === e.newIndex ? this.filterData.splice(e.oldIndex, 1) : "";
-					break;
-				case "column":
-					e.to.id === "column" && e.oldIndex === e.newIndex ? this.columnData.splice(e.oldIndex, 1) : "";
-					break;
-				case "row":
-					e.to.id === "row" && e.oldIndex === e.newIndex ? this.rowData.splice(e.oldIndex, 1) : "";
-					break;
-				case "mark-box":
-					e.to.id === "mark-box" && e.oldIndex === e.newIndex ? this.markData.splice(e.oldIndex, 1) : "";
-					break;
-				case "tree":
-					if (["color", "size", "mark", "info"].includes(e.to.id)) {
-						this.markData[e.newIndex].innerText = e.to.id;
-						this.markData = JSON.parse(JSON.stringify(this.markData));
-					}
-					break;
-			}
-			console.log(this.markData);
 		},
 
 		//获取所有数据集
