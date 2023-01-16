@@ -13,11 +13,15 @@
 										<div :title="item.value" :style="item.divStyle">
 											<template v-if="item.cellType?.type">
 												<!-- 输入框 -->
-												<template v-if="item.cellType.type === 'input'"> <Input clearable v-model.trim="resultData.celldata[item.index].v.v" /> </template>
+												<template v-if="item.cellType.type === 'input'">
+													<Input clearable v-model.trim="resultData.celldata[item.index].v.v" />
+												</template>
 												<!-- 复选框 -->
 												<template v-if="item.cellType.type === 'checkbox'">
 													<CheckboxGroup v-model="resultData.celldata[item.index].v.v">
-														<Checkbox v-for="cellItem in item.cellType.data" :key="cellItem.value" :label="cellItem.value">{{ cellItem.name }}</Checkbox>
+														<Checkbox v-for="cellItem in item.cellType.data" :key="cellItem.value" :label="cellItem.value">{{
+															cellItem.name
+														}}</Checkbox>
 													</CheckboxGroup>
 												</template>
 												<!-- 下拉框 -->
@@ -28,7 +32,14 @@
 												</template>
 												<!-- 时间选择器 -->
 												<template v-if="item.cellType.type === 'datePicker'">
-													<DatePicker type="datetime" v-model="resultData.celldata[item.index].v.v" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable transfer></DatePicker>
+													<DatePicker
+														type="datetime"
+														v-model="resultData.celldata[item.index].v.v"
+														format="yyyy-MM-dd HH:mm:ss"
+														:options="$config.datetimeOptions"
+														clearable
+														transfer
+													></DatePicker>
 												</template>
 												<!-- 数字输入框 -->
 												<template v-if="item.cellType.type === 'inputnumber'">
@@ -146,7 +157,7 @@ export default {
 				if (res.code == 200) {
 					this.$Message.success("提交成功！");
 				} else {
-					this.$Message.error("提交失败", res.message);
+					this.$Message.error(`提交失败,${res.message}`);
 				}
 			});
 			console.log("结果集：", this.resultData);

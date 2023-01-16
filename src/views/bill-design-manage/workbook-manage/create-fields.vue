@@ -173,7 +173,7 @@ export default {
 					this.modelFlag = false;
 					this.$emit("getColumnList");
 				} else {
-					this.$Message.error("提交失败！", res.message);
+					this.$Message.error(`提交失败！,${res.message}`);
 				}
 			});
 		},

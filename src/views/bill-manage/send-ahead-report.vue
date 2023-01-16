@@ -95,11 +95,11 @@
 										</FormItem>
 										<!-- 状态 -->
 										<FormItem label="状态" prop="status">
-                                            <Select v-model="req.status" clearable filterable :placeholder="$t('pleaseSelect') + '状态'" transfer>
-                                            <Option v-for="(item, i) in statusList" :value="item.detailName" :key="i">
-                                                {{ item.detailName }}
-                                            </Option>
-                                            </Select>
+											<Select v-model="req.status" clearable filterable :placeholder="$t('pleaseSelect') + '状态'" transfer>
+												<Option v-for="(item, i) in statusList" :value="item.detailName" :key="i">
+													{{ item.detailName }}
+												</Option>
+											</Select>
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -170,7 +170,7 @@
 import { getpagelistReq, holdReq, groupReq, lclinkwoReq, exportReq } from "@/api/bill-manage/send-ahead-report";
 import { getButtonBoolean, formatDate, exportFile } from "@/libs/tools";
 import { errorType } from "@/libs/tools";
-import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
+import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item";
 
 export default {
 	name: "send-ahead-report",
@@ -261,11 +261,9 @@ export default {
 				ipn: "",
 				factory: "",
 			},
-            ruleValidate: {
-                wo:[
-                    { required: true, message: "工单必填", trigger: "blur" },
-                ]
-            },
+			ruleValidate: {
+				wo: [{ required: true, message: "工单必填", trigger: "blur" }],
+			},
 		};
 	},
 	mounted() {
@@ -274,7 +272,7 @@ export default {
 		window.addEventListener("resize", () => this.autoSize());
 		getButtonBoolean(this, this.btnData);
 		this.tableConfig.loading = false;
-        this.getDataItemData();
+		this.getDataItemData();
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
@@ -386,7 +384,7 @@ export default {
 					this.pageLoad();
 					this.groupModalFlag = false;
 				} else {
-					this.$Message.error("提交失败", res.message);
+					this.$Message.error(`提交失败, ${res.message}`);
 				}
 			});
 		},
@@ -418,7 +416,7 @@ export default {
 					this.pageLoad();
 					this.modalFlag = false;
 				} else {
-					this.$Message.error("提交失败", res.message);
+					this.$Message.error(`提交失败, ${res.message}`);
 				}
 			});
 		},
@@ -443,20 +441,20 @@ export default {
 				this.groupModalFlag = true;
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
-        // 获取业务数据
-        async getDataItemData () {
-        this.statusList = await this.getDataItemDetailList("SendAheadStatus"); 
-        },
-        // 获取数据字典数据
-        async getDataItemDetailList (itemCode) {
-        let arr = [];
-        await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
-            if (res.code === 200) {
-            arr = res.result || [];
-            }
-        });
-        return arr;
-        },
+		// 获取业务数据
+		async getDataItemData() {
+			this.statusList = await this.getDataItemDetailList("SendAheadStatus");
+		},
+		// 获取数据字典数据
+		async getDataItemDetailList(itemCode) {
+			let arr = [];
+			await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+				if (res.code === 200) {
+					arr = res.result || [];
+				}
+			});
+			return arr;
+		},
 		// 某一行高亮时触发
 		currentClick(currentRow) {
 			this.selectObj = currentRow;

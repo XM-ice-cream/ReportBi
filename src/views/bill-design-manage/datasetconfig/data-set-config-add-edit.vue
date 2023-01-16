@@ -170,7 +170,7 @@ export default {
 						this.submitData.user = "";
 						this.filterData(); //过滤值
 					} else {
-						this.$Message.error("获取用户失败", res.message);
+						this.$Message.error(`获取用户失败, ${res.message}`);
 					}
 				});
 			}
@@ -189,7 +189,7 @@ export default {
 						this.submitData.filterTable = ""; //清空搜索栏数据
 						this.filterData(); //过滤值
 					} else {
-						this.$Message.error("获取表失败", res.message);
+						this.$Message.error(`获取表失败, ${res.message}`);
 					}
 				});
 			}
@@ -237,7 +237,7 @@ export default {
 							this.$parent.pageLoad(); //刷新数据
 							this.closeDialog(); //关闭弹框
 						} else {
-							this.$Message.error("提交异常", res.message);
+							this.$Message.error(`提交异常, ${res.message}`);
 						}
 					});
 				}

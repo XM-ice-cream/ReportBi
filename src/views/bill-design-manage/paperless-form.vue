@@ -80,12 +80,27 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick">
+				<Table
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+				>
 					<template slot="operator" slot-scope="{ row }">
 						<Button class="tableBtn" type="text" @click="signForm(row)">审核</Button>
 					</template>
 				</Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 	</div>
@@ -221,7 +236,7 @@ export default {
 					this.cancelClick();
 					this.pageLoad();
 				} else {
-					this.$Message.error("提交失败", res.message);
+					this.$Message.error(`提交失败,${res.message}`);
 				}
 			});
 		},

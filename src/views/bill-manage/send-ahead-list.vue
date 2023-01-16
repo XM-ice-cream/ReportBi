@@ -5,27 +5,27 @@
 			<Form ref="submitReq" :model="submitData" :label-width="80" :label-colon="true" @submit.native.prevent>
 				<!-- 机种 -->
 				<FormItem label="机种" prop="project">
-                    <Select v-model="submitData.project" clearable filterable :placeholder="$t('pleaseSelect') + '机种'" transfer>
-                    <Option v-for="(item, i) in projectList" :value="item.detailName" :key="i">
-                        {{ item.detailName }}
-                    </Option>
-                    </Select>
+					<Select v-model="submitData.project" clearable filterable :placeholder="$t('pleaseSelect') + '机种'" transfer>
+						<Option v-for="(item, i) in projectList" :value="item.detailName" :key="i">
+							{{ item.detailName }}
+						</Option>
+					</Select>
 				</FormItem>
 				<!-- 工厂 -->
 				<FormItem label="工厂" prop="factory">
-                    <Select v-model="submitData.factory" clearable filterable :placeholder="$t('pleaseSelect') + '工厂'" transfer :disabled="!isAdd">
-                    <Option v-for="(item, i) in factoryList" :value="item.detailName" :key="i">
-                        {{ item.detailName }}
-                    </Option>
-                    </Select>
+					<Select v-model="submitData.factory" clearable filterable :placeholder="$t('pleaseSelect') + '工厂'" transfer :disabled="!isAdd">
+						<Option v-for="(item, i) in factoryList" :value="item.detailName" :key="i">
+							{{ item.detailName }}
+						</Option>
+					</Select>
 				</FormItem>
 				<!-- 仓位 -->
 				<FormItem label="仓位" prop="wareHouse">
-                    <Select v-model="submitData.wareHouse" clearable filterable :placeholder="$t('pleaseSelect') + '仓位'" transfer :disabled="!isAdd">
-                    <Option v-for="(item, i) in wareHouseList" :value="item.detailName" :key="i">
-                        {{ item.detailName }}
-                    </Option>
-                    </Select>
+					<Select v-model="submitData.wareHouse" clearable filterable :placeholder="$t('pleaseSelect') + '仓位'" transfer :disabled="!isAdd">
+						<Option v-for="(item, i) in wareHouseList" :value="item.detailName" :key="i">
+							{{ item.detailName }}
+						</Option>
+					</Select>
 				</FormItem>
 				<!-- 脚位 -->
 				<FormItem label="脚位" prop="location">
@@ -98,27 +98,27 @@
 										</FormItem>
 										<!-- 机种 -->
 										<FormItem label="机种" prop="project">
-                                            <Select v-model="req.project" clearable filterable :placeholder="$t('pleaseSelect') + '机种'" transfer>
-                                            <Option v-for="(item, i) in projectList" :value="item.detailName" :key="i">
-                                                {{ item.detailName }}
-                                            </Option>
-                                            </Select>
+											<Select v-model="req.project" clearable filterable :placeholder="$t('pleaseSelect') + '机种'" transfer>
+												<Option v-for="(item, i) in projectList" :value="item.detailName" :key="i">
+													{{ item.detailName }}
+												</Option>
+											</Select>
 										</FormItem>
 										<!-- 工厂 -->
 										<FormItem label="工厂" prop="factory">
-                                            <Select v-model="req.factory" clearable filterable :placeholder="$t('pleaseSelect') + '工厂'" transfer>
-                                            <Option v-for="(item, i) in factoryList" :value="item.detailName" :key="i">
-                                                {{ item.detailName }}
-                                            </Option>
-                                            </Select>
+											<Select v-model="req.factory" clearable filterable :placeholder="$t('pleaseSelect') + '工厂'" transfer>
+												<Option v-for="(item, i) in factoryList" :value="item.detailName" :key="i">
+													{{ item.detailName }}
+												</Option>
+											</Select>
 										</FormItem>
 										<!-- 仓位 -->
 										<FormItem label="仓位" prop="wareHouse">
-                                            <Select v-model="req.wareHouse" clearable filterable :placeholder="$t('pleaseSelect') + '仓位'" transfer>
-                                            <Option v-for="(item, i) in wareHouseList" :value="item.detailName" :key="i">
-                                                {{ item.detailName }}
-                                            </Option>
-                                            </Select>
+											<Select v-model="req.wareHouse" clearable filterable :placeholder="$t('pleaseSelect') + '仓位'" transfer>
+												<Option v-for="(item, i) in wareHouseList" :value="item.detailName" :key="i">
+													{{ item.detailName }}
+												</Option>
+											</Select>
 										</FormItem>
 										<!-- 脚位 -->
 										<FormItem label="脚位" prop="location">
@@ -196,7 +196,7 @@
 <script>
 import { getpagelistReq, exportReq, addReq, modifyReq, deleteReq, getStepReq, setupStepReq } from "@/api/bill-manage/sendahead-list";
 import { formatDate, getButtonBoolean, exportFile, renderDate } from "@/libs/tools";
-import { getlistReq as getDataItemReq } from '@/api/system-manager/data-item'
+import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item";
 
 export default {
 	name: "sendahead-list",
@@ -290,7 +290,7 @@ export default {
 		this.autoSize();
 		window.addEventListener("resize", () => this.autoSize());
 		getButtonBoolean(this, this.btnData);
-        this.getDataItemData();
+		this.getDataItemData();
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
@@ -383,7 +383,7 @@ export default {
 					this.pageLoad();
 					this.cancelClick();
 				} else {
-					this.$Message.error("提交失败", res.message);
+					this.$Message.error(`提交失败, ${res.message}`);
 				}
 			});
 		},
@@ -440,22 +440,22 @@ export default {
 				console.log(this.setupData);
 			}
 		},
-        // 获取业务数据
-        async getDataItemData () {
-        this.projectList = await this.getDataItemDetailList("SendAheadProject"); 
-        this.factoryList = await this.getDataItemDetailList("SendAheadFactory");
-        this.warehouseList = await this.getDataItemDetailList("SendAheadWarehouse");
-        },
-        // 获取数据字典数据
-        async getDataItemDetailList (itemCode) {
-        let arr = [];
-        await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
-            if (res.code === 200) {
-            arr = res.result || [];
-            }
-        });
-        return arr;
-        },
+		// 获取业务数据
+		async getDataItemData() {
+			this.projectList = await this.getDataItemDetailList("SendAheadProject");
+			this.factoryList = await this.getDataItemDetailList("SendAheadFactory");
+			this.warehouseList = await this.getDataItemDetailList("SendAheadWarehouse");
+		},
+		// 获取数据字典数据
+		async getDataItemDetailList(itemCode) {
+			let arr = [];
+			await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
+				if (res.code === 200) {
+					arr = res.result || [];
+				}
+			});
+			return arr;
+		},
 		// 某一行高亮时触发
 		currentClick(currentRow) {
 			this.selectObj = currentRow;

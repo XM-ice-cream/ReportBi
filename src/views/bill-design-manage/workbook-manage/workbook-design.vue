@@ -486,7 +486,7 @@ export default {
 					this.getColumnList(); //重新获取左侧数据
 					this.$Message.success("删除成功！");
 				} else {
-					this.$Message.error("删除失败", res.message);
+					this.$Message.error(`删除失败, ${res.message}`);
 				}
 			});
 		},

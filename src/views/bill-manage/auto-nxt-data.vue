@@ -186,7 +186,7 @@ export default {
 					this.searchClick();
 					this.cancelClick();
 				} else {
-					this.$Message.error("提交失败", res.msg);
+					this.$Message.error(`提交失败,${res.msg}`);
 					this.modalFlag = true;
 				}
 				this.resultList = res?.result || [];

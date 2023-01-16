@@ -8,7 +8,14 @@
 					<Form ref="submitReq" :model="req" :label-width="150" :label-colon="false" :rules="ruleValidate" style="width: 70rem">
 						<!-- 小板码 -->
 						<FormItem label="UnitId" prop="unitId">
-							<Input type="textarea" v-model="req.unitId" size="default" :autosize="{ minRows: 15, maxRows: 15 }" placeholder="请以逗号或回车分隔,输入小板码" clearable></Input>
+							<Input
+								type="textarea"
+								v-model="req.unitId"
+								size="default"
+								:autosize="{ minRows: 15, maxRows: 15 }"
+								placeholder="请以逗号或回车分隔,输入小板码"
+								clearable
+							></Input>
 						</FormItem>
 						<FormItem>
 							<Button type="primary" ghost @click="reset()" size="default">{{ $t("reset") }}</Button> &nbsp;&nbsp;
@@ -57,7 +64,7 @@ export default {
 						if (res.code === 200) {
 							this.$Message.success("解Hold成功！");
 						} else {
-							this.$Message.error("解Hold失败！", res.message);
+							this.$Message.error(`解Hold失败！,${res.message}`);
 						}
 					});
 				}
