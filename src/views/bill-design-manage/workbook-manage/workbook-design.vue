@@ -184,7 +184,9 @@
 				</div>
 				<!-- 行列 -->
 				<div class="right-box">
+					<!-- 行列拖拽 -->
 					<div class="row-column">
+						<!-- 行 -->
 						<div class="row">
 							<span class="title">列</span>
 							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
@@ -224,6 +226,7 @@
 								</span>
 							</draggable>
 						</div>
+						<!-- 列 -->
 						<div class="column">
 							<span class="title">行</span>
 							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
@@ -263,10 +266,13 @@
 								</span>
 							</draggable>
 						</div>
+						<!-- 查询按钮 -->
+						<Button type="primary" @click="searchClick" class="search-btn">{{ $t("search") }}</Button>
 					</div>
+					<!-- 工作区 -->
 					<div class="right-content">
 						<div class="title">{{ submitData.title }}</div>
-						<componentsTemp :type="submitData.chartType" :visib="true" />
+						<componentsTemp :type="submitData.chartType" :visib="true" :value="chartsData" :row="rowData" :column="columnData" />
 					</div>
 				</div>
 			</div>
@@ -290,6 +296,7 @@ import {
 	modifyReq,
 	addCustomerFieldReq,
 	modifyCustomerFieldReq,
+	getChartsInfoReq,
 } from "@/api/bill-design-manage/workbook-manage.js";
 import CreateFields from "./create-fields.vue";
 import FilterFields from "./filter-fields.vue";
@@ -335,6 +342,7 @@ export default {
 			dragstartNode: "",
 			dragstartData: "",
 			contextData: "", //菜单
+			chartsData: [], //查询获取的图表信息
 			selectObj: {},
 			submitData: {
 				id: "",
@@ -391,6 +399,38 @@ export default {
 	// 	// }
 	// },
 	methods: {
+		//查询
+		searchClick() {
+			//数据集
+			const { datasetId } = this.submitData;
+			//拖拽的行
+			this.rowData = this.rowData.map((item, index) => {
+				return { ...item, axis: "x", orderBy: index, labelName: item.tableName };
+			});
+			//拖拽的列
+			this.columnData = this.columnData.map((item, index) => {
+				return { ...item, axis: "y", orderBy: index, labelName: item.tableName };
+			});
+			//过滤的列
+			this.filterData = this.filterData.map((item) => {
+				return { ...item, labelName: item.tableName };
+			});
+
+			const obj = {
+				datasetId,
+				filterItems: this.filterData,
+				calcItems: this.rowData.concat(this.columnData),
+			};
+			console.log("obj", obj);
+			getChartsInfoReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.chartsData = res?.result || [];
+				} else {
+					this.$Message.error(`查询失败，${res.message}`);
+				}
+			});
+		},
+
 		//获取左侧数据集对应表及字段
 		getColumnList() {
 			const { datasetId, columnName } = this.submitData;
@@ -433,6 +473,9 @@ export default {
 				// 创建自定义字段
 				case "createField-create":
 					this.isAdd = true;
+					//新增 默认值为字段名
+					const { columnName, tableName } = this.selectObj;
+					this.selectObj.fieldFunction = `[${columnName}(${tableName})]`;
 					this.$refs.createField.modelFlag = true;
 					break;
 				//编辑自定义字段
@@ -835,6 +878,11 @@ export default {
 			display: none;
 		}
 	}
+}
+.search-btn {
+	border-radius: 0px;
+	float: right;
+	padding: 0 10px;
 }
 :deep(.ivu-tree ul) {
 	list-style: none;

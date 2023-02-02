@@ -274,13 +274,15 @@ export default {
 	overflow-x: hidden;
 	align-content: flex-start;
 	background-color: #f5f7f9;
+	padding-bottom: 1rem;
 	.cardCell {
-		width: 19rem;
+		width: 19.9rem;
 		/* background: #ccc; */
 		border: 1px solid #fafcff;
 		box-shadow: 3px 5px 7px #d0dbf194;
 		padding: 0.3rem;
-		margin: 0.6rem 0.95rem;
+		margin-top: 1rem;
+		margin-left: 1rem;
 		position: relative;
 		background: #fff;
 		border-radius: 12px;

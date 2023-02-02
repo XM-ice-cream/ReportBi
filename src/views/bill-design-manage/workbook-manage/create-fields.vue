@@ -76,6 +76,7 @@ export default {
 				this.submitData = { ...this.selectObj };
 				this.getDataItemData();
 				this.pageLoad();
+
 				this.$nextTick(() => {
 					//光标聚焦
 					inputSelectContent(this.$refs.fieldFunction);

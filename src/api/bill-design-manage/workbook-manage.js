@@ -86,3 +86,12 @@ export const deleteCustomerFieldReq = data => {
     data
   })
 }
+//查询工作簿图表
+export const getChartsInfoReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/bicalculator/execute',
+    method: 'post',
+    data
+  })
+}

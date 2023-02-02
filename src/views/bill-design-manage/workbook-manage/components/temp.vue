@@ -1,6 +1,6 @@
 <template>
 	<div style="height: calc(100% - 30px)">
-		<component :is="type" :value="value" :ispreview="true" :visib="visib" />
+		<component :is="type" :value="value" :ispreview="true" :visib="visib" :row="row" :column="column" />
 	</div>
 </template>
 
@@ -22,8 +22,10 @@ export default {
 	props: {
 		type: String,
 		visib: Boolean,
+		row: Array,
+		column: Array,
 		value: {
-			type: [Object],
+			type: Array,
 			default: () => {},
 		},
 	},
