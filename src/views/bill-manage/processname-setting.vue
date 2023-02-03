@@ -12,7 +12,15 @@
 									{{ $t("selectQuery") }}
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" :rules="rulesValidate" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form
+										ref="searchReq"
+										:model="req"
+										:label-width="80"
+										:label-colon="true"
+										:rules="rulesValidate"
+										@submit.native.prevent
+										@keyup.native.enter="searchClick"
+									>
 										<!-- 当前流程 -->
 										<FormItem label="当前流程" prop="routID">
 											<v-selectpage
@@ -47,7 +55,15 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick"></Table>
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+				></Table>
 			</Card>
 		</div>
 		<!-- 新增 、编辑 -->
@@ -203,7 +219,7 @@ export default {
 						.then((res) => {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
-								this.data = [res.result] || [];
+								this.data = [{ ...res.result, processes: this.$XEUtiles.orderBy(res.result.processes, "seq") }] || [];
 							}
 						})
 						.catch(() => (this.tableConfig.loading = false));
