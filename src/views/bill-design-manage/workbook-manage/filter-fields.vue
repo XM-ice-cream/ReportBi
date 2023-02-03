@@ -63,7 +63,7 @@
 					:data="data"
 					@on-selection-change="selectClick"
 				></Table>
-				<page-custom
+				<!-- <page-custom
 					:elapsedMilliseconds="req.elapsedMilliseconds"
 					:total="req.total"
 					:totalPage="req.totalPage"
@@ -71,7 +71,7 @@
 					:page-size="req.pageSize"
 					@on-change="pageChange"
 					@on-page-size-change="pageSizeChange"
-				/>
+				/> -->
 			</template>
 		</div>
 
@@ -83,7 +83,7 @@
 </template>
 <script>
 import { formatDate, commaSplitString } from "@/libs/tools";
-
+import { getselectvalueReq } from "@/api/bill-design-manage/workbook-design.js";
 export default {
 	name: "filter-fields",
 	components: {},
@@ -100,7 +100,7 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				this.submitData = { ...this.selectObj };
+				this.submitData = { ...this.selectObj, showData: 0 };
 				console.log(this.submitData);
 				this.pageLoad();
 				this.autoSize();
@@ -132,17 +132,7 @@ export default {
 					key: "value",
 				},
 			],
-			data: [
-				{ value: "苹果" },
-				{ value: "香蕉" },
-				{ value: "橘子" },
-				{ value: "1" },
-				{ value: "2" },
-				{ value: "3" },
-				{ value: "4" },
-				{ value: "5" },
-				{ value: "6" },
-			],
+			data: [],
 			req: {
 				...this.$config.pageConfig,
 			}, //查询数据
@@ -152,6 +142,38 @@ export default {
 		//获取数据
 		pageLoad() {
 			this.tableConfig.loading = false;
+			const { nodeId, datasetId, tableName, columnName, columnType, dataType, columnComment } = this.submitData;
+			const obj = {
+				orderField: "string",
+				ascending: true,
+				pageSize: this.req.pageSize, // 分页大小
+				pageIndex: this.req.pageIndex, // 当前页码
+				total: 0,
+				data: {
+					nodeId,
+					datasetId,
+					tableName,
+					columnName,
+					columnType,
+					dataType,
+					columnComment,
+				},
+			};
+			console.log("过滤", obj);
+			getselectvalueReq(obj).then((res) => {
+				if (res.code == 200) {
+					let { data, pageSize, pageIndex, total, totalPage } = res.result;
+					this.data =
+						data.map((item) => {
+							return { value: item };
+						}) || [];
+					this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
+					this.submitData.selectArr = [];
+				} else {
+					this.$message.error(`查询失败,${res.message}`);
+					this.data = [];
+				}
+			});
 		},
 		//提交
 		submitClick() {

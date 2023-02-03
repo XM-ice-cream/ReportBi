@@ -34,7 +34,7 @@ export default {
 			const { xAxis, yAxis, grid, series } = await this.dataLogic();
 
 			let option = {
-				color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
+				// color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 				tooltip: {
 					trigger: "axis",
 					axisPointer: {
@@ -137,6 +137,11 @@ export default {
 
 		//数据逻辑处理
 		dataLogic() {
+			let xAxis = []; //行
+			let yAxis = []; //列
+			let grid = []; //
+			let series = [];
+
 			//行中是否有指标
 			const isNumberRow = this.row.some((item) => item.dataType === "Number");
 			//列中是否有指标
@@ -153,7 +158,10 @@ export default {
 			const stringTypeColumn = this.column.filter((item) => item.dataType !== "Number").map((item) => item.axis + item.orderBy);
 
 			console.log(numberTypeColumn, numberTypeRow, stringTypeRow, stringTypeColumn);
+			//行列均为维度
+			// if(!isNumberRow&&!isNumberColumn){
 
+			// };
 			let obj = {};
 			//如果列中有指标
 			if (isNumberColumn) {
@@ -226,7 +234,7 @@ export default {
 				},
 			];
 			//行
-			let xAxis = isNumberRow
+			xAxis = isNumberRow
 				? isNumberColumn
 					? numberTypeRow.map((item) => {
 							return {
@@ -252,7 +260,7 @@ export default {
 						};
 				  });
 			//列
-			let yAxis = isNumberColumn
+			yAxis = isNumberColumn
 				? axisNumber
 				: axisConst.map((item, index) => {
 						return {
@@ -286,27 +294,32 @@ export default {
 			}
 
 			//grid
-			const grid = isNumberColumn
+			grid = isNumberColumn
 				? [{ bottom: 100 * this.row.length - (numberTypeRow?.length || 0) }]
 				: [{ left: 100 * this.column.length - (numberTypeColumn?.length || 0) }];
 
 			//series
-			let series = [];
+			series = [];
 			let seriesType = ""; //获取行/列的指标
 			//如果行和列中均有指标
 			seriesType = isNumberColumn ? numberTypeColumn : numberTypeRow;
 			const aaa = isNumberColumn ? stringTypeRow : stringTypeColumn;
-			seriesType.forEach((item) => {
+			seriesType.forEach((item, index) => {
+				console.log(item, index);
 				Object.keys(obj).forEach((key) => {
 					obj[key].forEach((itemValue, itemIndex) => {
 						let name = "";
 						aaa.forEach((rowItem) => {
 							name += itemValue[rowItem];
 						});
-						if (series[itemIndex]) {
-							series[itemIndex].data.push(isNumberColumn ? [name, itemValue[item], { ...itemValue }] : [itemValue[item], name, { ...itemValue }]);
+						if (!series[index]) series[index] = [];
+						if (series[index][itemIndex]) {
+							console.log(item, index, 123);
+							series[index][itemIndex].data.push(
+								isNumberColumn ? [name, itemValue[item], { ...itemValue }] : [itemValue[item], name, { ...itemValue }]
+							);
 						} else {
-							series.push({
+							series[index].push({
 								type: "bar",
 								stack: item,
 								xAxisIndex: isNumberColumn ? aaa.length : 0,
@@ -316,8 +329,10 @@ export default {
 						}
 					});
 				});
+				console.log(series);
 			});
-			return { xAxis, yAxis, grid, series };
+
+			return { xAxis, yAxis, grid, series: series.flat() };
 		},
 
 		//轴名 对应 字段名称

@@ -193,7 +193,9 @@
 								<span
 									v-for="(item, index) in columnData"
 									:key="index"
-									:class="item.dataType === 'Number' || item.calculatorFunction ? 'drag-number' : 'drag-cell'"
+									:class="
+										item.dataType === 'Number' || (item.calculatorFunction && item.calculatorFunction !== 'toChar') ? 'drag-number' : 'drag-cell'
+									"
 									style="width: fit-content"
 								>
 									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
@@ -233,7 +235,9 @@
 								<span
 									v-for="(item, index) in rowData"
 									:key="index"
-									:class="item.dataType === 'Number' || item.calculatorFunction ? 'drag-number' : 'drag-cell'"
+									:class="
+										item.dataType === 'Number' || (item.calculatorFunction && item.calculatorFunction !== 'toChar') ? 'drag-number' : 'drag-cell'
+									"
 									style="width: fit-content"
 								>
 									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
@@ -547,6 +551,7 @@ export default {
 		//拖拽结束
 		dragEnd(e, type) {
 			console.log(e, type);
+			const { datasetId } = this.submitData;
 			const { oldIndex, newIndex, to } = e;
 			const { id } = to;
 			switch (type) {
@@ -572,8 +577,30 @@ export default {
 			//数据拖拽至筛选器
 			//过滤器
 			if (id === "filter" && type !== "filter") {
-				this.selectObj = { ...this.filterData[newIndex], newIndex };
+				this.selectObj = { ...this.filterData[newIndex], newIndex, datasetId };
 				this.$refs.filterField.modelFlag = true;
+			}
+			//数据拖拽至行
+			if (id === "row" && type !== "row") {
+				const { columnType, dataType } = this.rowData[newIndex];
+				console.log("数据拖拽至行", this.rowData[newIndex]);
+				//转换为维度
+				if (columnType === "1" && dataType === "String") this.rowData[newIndex].calculatorFunction = "toChar";
+				//转换为指标
+				if (columnType === "1" && dataType === "Number") this.rowData[newIndex].calculatorFunction = "countDistinct";
+				this.rowData = JSON.parse(JSON.stringify(this.rowData));
+				console.log(this.rowData);
+			}
+			//数据拖拽至列
+			if (id === "column" && type !== "column") {
+				const { columnType, dataType } = this.columnData[newIndex];
+				console.log("数据拖拽至列", this.columnData[newIndex]);
+				//转换为维度
+				if (columnType === "1" && dataType === "String") this.columnData[newIndex].calculatorFunction = "toChar";
+				//转换为指标
+				if (columnType === "1" && dataType === "Number") this.columnData[newIndex].calculatorFunction = "countDistinct";
+				this.columnData = JSON.parse(JSON.stringify(this.columnData));
+				console.log(this.columnData);
 			}
 			console.log(this.markData);
 		},

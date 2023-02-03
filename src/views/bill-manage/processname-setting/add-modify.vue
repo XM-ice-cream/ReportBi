@@ -26,7 +26,15 @@
 				</v-selectpage>
 			</FormItem>
 			<FormItem>
-				<transfer-table :shuttleDate="processList" :selectData.sync="keyRelations_" :lTableHeaderList="lTableHeaderList" :rTableHeaderList="rTableHeaderList" :isSort="isAdd" lWidth="45%" rWidth="45%" />
+				<transfer-table
+					:shuttleDate="processList"
+					:selectData.sync="keyRelations_"
+					:lTableHeaderList="lTableHeaderList"
+					:rTableHeaderList="rTableHeaderList"
+					:isSort="isAdd"
+					lWidth="45%"
+					rWidth="45%"
+				/>
 			</FormItem>
 		</Form>
 		<div style="text-align: center">
