@@ -141,6 +141,7 @@ export default {
 			let yAxis = []; //列
 			let grid = []; //
 			let series = [];
+			let obj = {}; //数据分组
 
 			//行中是否有指标
 			const isNumberRow = this.row.some((item) => item.dataType === "Number");
@@ -158,11 +159,33 @@ export default {
 			const stringTypeColumn = this.column.filter((item) => item.dataType !== "Number").map((item) => item.axis + item.orderBy);
 
 			console.log(numberTypeColumn, numberTypeRow, stringTypeRow, stringTypeColumn);
-			//行列均为维度
-			// if(!isNumberRow&&!isNumberColumn){
 
-			// };
-			let obj = {};
+			// if(isNumberRow&&isNumberColumn){//行列均为指标
+
+			// }else if(isNumberRow&&!isNumberColumn){//行有指标
+			//   this.value.forEach((item) => {
+			// 		let stringData = "";
+			// 		stringTypeColumn.forEach((rowItem) => {
+			// 			stringData += item[rowItem];
+			// 		});
+			// 		if (!obj[stringData]) obj[stringData] = [];
+			// 		obj[stringData].push(item);
+			// 	});
+
+			// }else if(!isNumberRow&&isNumberColumn){//列有指标
+			//   this.value.forEach((item) => {
+			// 		let stringData = "";
+			// 		stringTypeRow.forEach((rowItem) => {
+			// 			stringData += item[rowItem];
+			// 		});
+			// 		if (!obj[stringData]) obj[stringData] = [];
+			// 		obj[stringData].push(item);
+			// 	});
+
+			// }else if(!isNumberRow&&!isNumberColumn){//行列均为维度
+
+			// }
+
 			//如果列中有指标
 			if (isNumberColumn) {
 				this.value.forEach((item) => {

@@ -4,7 +4,7 @@
 	<Modal
 		:title="isAdd ? '筛选器' : '筛选器'"
 		v-model="modelFlag"
-		width="500"
+		width="800"
 		draggable
 		:mask-closable="false"
 		:mask="true"
@@ -16,7 +16,7 @@
 				<FormItem label="显示数据" prop="showData">
 					<i-switch size="small" v-model="submitData.showData" :true-value="1" :false-value="0"> </i-switch>
 				</FormItem>
-				<template v-if="submitData.columnType == 'DATE'">
+				<template v-if="submitData.columnType == 'DATE' && !submitData.showData">
 					<!-- 时间类别 -->
 					<FormItem label="时间类别" prop="timeType">
 						<RadioGroup v-model="submitData.timeType">
@@ -100,7 +100,7 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				this.submitData = { ...this.selectObj, showData: 0 };
+				this.submitData = { ...this.selectObj, showData: 0, dataType: "datetime" };
 				console.log(this.submitData);
 				this.pageLoad();
 				this.autoSize();
@@ -177,8 +177,8 @@ export default {
 		},
 		//提交
 		submitClick() {
-			const { newIndex, startTime, endTime, columnType, filterValue } = this.submitData;
-			if (columnType === "DATE") this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
+			const { newIndex, startTime, endTime, columnType, filterValue, showData } = this.submitData;
+			if (columnType === "DATE" && !showData) this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
 			else (this.submitData.filterValue = commaSplitString(filterValue).join()), (this.modelFlag = false);
 
 			this.$emit("updateFilter", newIndex, this.submitData); //取消后 删除拖拽的cell
