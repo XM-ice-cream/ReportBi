@@ -100,9 +100,8 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				this.submitData = { ...this.selectObj, showData: 0, dataType: "datetime" };
+				this.submitData = { ...this.selectObj };
 				console.log(this.submitData);
-				this.pageLoad();
 				this.autoSize();
 				window.addEventListener("resize", () => this.autoSize());
 			}
@@ -113,6 +112,13 @@ export default {
 				// this.submitData.selectArr = [];
 				// this.submitData.filterValue = "";
 				console.log("newVal", newVal);
+			}
+			//显示筛选器
+			if (newVal == 1) {
+				console.log("显示筛选器", newVal);
+				this.$nextTick(() => {
+					this.pageLoad();
+				});
 			}
 		},
 	},
@@ -141,7 +147,8 @@ export default {
 	methods: {
 		//获取数据
 		pageLoad() {
-			this.tableConfig.loading = false;
+			this.tableConfig.loading = true;
+			this.data = [];
 			const { nodeId, datasetId, tableName, columnName, columnType, dataType, columnComment } = this.submitData;
 			const obj = {
 				orderField: "string",
@@ -160,28 +167,40 @@ export default {
 				},
 			};
 			console.log("过滤", obj);
-			getselectvalueReq(obj).then((res) => {
-				if (res.code == 200) {
-					let { data, pageSize, pageIndex, total, totalPage } = res.result;
-					this.data =
-						data.map((item) => {
-							return { value: item };
-						}) || [];
-					this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
-					this.submitData.selectArr = [];
-				} else {
-					this.$message.error(`查询失败,${res.message}`);
-					this.data = [];
-				}
-			});
+			getselectvalueReq(obj)
+				.then((res) => {
+					if (res.code == 200) {
+						let { data, pageSize, pageIndex, total, totalPage } = res.result;
+						this.data =
+							data.map((item) => {
+								if (dataType === "DateTime") item = formatDate(item);
+								//默认选中数据
+								if ((this.submitData.filterValue?.split(",") || []).includes(item)) return { value: item, _checked: true };
+								return { value: item };
+							}) || [];
+						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
+						this.$nextTick(() => {
+							this.submitData.selectArr =
+								this.submitData.filterValue?.split(",").map((item) => {
+									return { value: item };
+								}) || [];
+							this.submitData = JSON.parse(JSON.stringify(this.submitData));
+						});
+					} else {
+						this.$message.error(`查询失败,${res.message}`);
+						this.data = [];
+					}
+				})
+				.finally(() => (this.tableConfig.loading = false));
 		},
 		//提交
 		submitClick() {
 			const { newIndex, startTime, endTime, columnType, filterValue, showData } = this.submitData;
 			if (columnType === "DATE" && !showData) this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
-			else (this.submitData.filterValue = commaSplitString(filterValue).join()), (this.modelFlag = false);
+			// else (this.submitData.filterValue = commaSplitString(filterValue).join()), (this.modelFlag = false);
 
 			this.$emit("updateFilter", newIndex, this.submitData); //取消后 删除拖拽的cell
+			this.$refs.submitReq.resetFields();
 			this.modelFlag = false;
 		},
 		handleSelectAll(status) {
@@ -194,6 +213,7 @@ export default {
 			this.submitData.filterValue = selection.map((item) => item.value).toString();
 			this.submitData = JSON.parse(JSON.stringify(this.submitData));
 		},
+		//删除过滤数据
 		cancelClick() {
 			const { newIndex } = this.submitData;
 			this.modelFlag = false;

@@ -420,6 +420,19 @@ export default {
 				return { ...item, labelName: item.tableName };
 			});
 
+			if (!this.filterData.length) {
+				this.$Message.error("请拖拽字段至筛选器");
+				return;
+			}
+			if (!this.rowData.length) {
+				this.$Message.error("请拖拽字段至行");
+				return;
+			}
+			if (!this.columnData.length) {
+				this.$Message.error("请拖拽字段至列");
+				return;
+			}
+
 			const obj = {
 				datasetId,
 				filterItems: this.filterData,
@@ -577,7 +590,7 @@ export default {
 			//数据拖拽至筛选器
 			//过滤器
 			if (id === "filter" && type !== "filter") {
-				this.selectObj = { ...this.filterData[newIndex], newIndex, datasetId };
+				this.selectObj = { ...this.filterData[newIndex], newIndex, datasetId, showData: 0 };
 				this.$refs.filterField.modelFlag = true;
 			}
 			//数据拖拽至行

@@ -144,19 +144,33 @@ export default {
 			let obj = {}; //数据分组
 
 			//行中是否有指标
-			const isNumberRow = this.row.some((item) => item.dataType === "Number");
+			const isNumberRow = this.row.some((item) => item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar"));
 			//列中是否有指标
-			const isNumberColumn = this.column.some((item) => item.dataType === "Number");
+			const isNumberColumn = this.column.some(
+				(item) => item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar")
+			);
 
 			//行中指标
-			const numberTypeRow = isNumberRow ? this.row.filter((item) => item.dataType === "Number").map((item) => item.axis + item.orderBy) : 0;
+			const numberTypeRow = isNumberRow
+				? this.row
+						.filter((item) => item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar"))
+						.map((item) => item.axis + item.orderBy)
+				: 0;
 			// 列中指标
-			const numberTypeColumn = isNumberColumn ? this.column.filter((item) => item.dataType === "Number").map((item) => item.axis + item.orderBy) : 0;
+			const numberTypeColumn = isNumberColumn
+				? this.column
+						.filter((item) => item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar"))
+						.map((item) => item.axis + item.orderBy)
+				: 0;
 
 			//行中维度
-			const stringTypeRow = this.row.filter((item) => item.dataType !== "Number").map((item) => item.axis + item.orderBy);
+			const stringTypeRow = this.row
+				.filter((item) => item.dataType !== "Number" || !item.calculatorFunction || item.calculatorFunction === "toChar")
+				.map((item) => item.axis + item.orderBy);
 			//列中维度
-			const stringTypeColumn = this.column.filter((item) => item.dataType !== "Number").map((item) => item.axis + item.orderBy);
+			const stringTypeColumn = this.column
+				.filter((item) => item.dataType !== "Number" || !item.calculatorFunction || item.calculatorFunction === "toChar")
+				.map((item) => item.axis + item.orderBy);
 
 			console.log(numberTypeColumn, numberTypeRow, stringTypeRow, stringTypeColumn);
 
