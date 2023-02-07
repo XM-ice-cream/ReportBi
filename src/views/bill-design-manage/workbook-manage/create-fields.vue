@@ -197,7 +197,7 @@ export default {
 							});
 						}
 					});
-					// this.fieldType = this.$XEUtiles.groupBy(this.dataItemList, "itemCode");
+					// this.fieldType = this.$XEUtils.groupBy(this.dataItemList, "itemCode");
 					// this.dataItemList.forEach((item) => {
 					// 	console.log(item);
 					// });

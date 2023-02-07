@@ -219,7 +219,7 @@ export default {
 						.then((res) => {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
-								this.data = [{ ...res.result, processes: this.$XEUtiles.orderBy(res.result.processes, "seq") }] || [];
+								this.data = [{ ...res.result, processes: this.$XEUtils.orderBy(res.result.processes, "seq") }] || [];
 							}
 						})
 						.catch(() => (this.tableConfig.loading = false));

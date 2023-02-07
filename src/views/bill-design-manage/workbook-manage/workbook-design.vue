@@ -458,7 +458,7 @@ export default {
 					//获取所有tableName
 					const tableNameList = Array.from(new Set(data.map((item) => item.tableName)));
 					//tableName 分组
-					const groupTableName = this.$XEUtiles.groupBy(data, "tableName");
+					const groupTableName = this.$XEUtils.groupBy(data, "tableName");
 					// 指标、维度分类
 					this.data = tableNameList.map((item, index) => {
 						const children = groupTableName[item].map((item) => {
@@ -471,7 +471,7 @@ export default {
 							return { ...item, index };
 						});
 						console.log(children);
-						return { tableName: item, children: this.$XEUtiles.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
+						return { tableName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
 					});
 				}
 			});

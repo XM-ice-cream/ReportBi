@@ -51,7 +51,7 @@ importDirective(Vue)
  * @description 全局注册应用配置
  */
 Vue.prototype.$moment = moment;
-Vue.prototype.$XEUtiles = XEUtils;
+Vue.prototype.$XEUtils = XEUtils;
 Vue.prototype.$config = config
 Vue.prototype.$triggerTab = enterTriggerTab
 Vue.prototype.$inhibitingInput = inhibitingInput
