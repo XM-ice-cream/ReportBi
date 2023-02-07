@@ -196,7 +196,11 @@ export default {
 		//提交
 		submitClick() {
 			const { newIndex, startTime, endTime, columnType, filterValue, showData } = this.submitData;
-			if (columnType === "DATE" && !showData) this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
+			if (columnType === "DATE" && !showData) {
+				this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
+				this.submitData.startTime = formatDate(startTime);
+				this.submitData.endTime = formatDate(endTime);
+			}
 			// else (this.submitData.filterValue = commaSplitString(filterValue).join()), (this.modelFlag = false);
 
 			this.$emit("updateFilter", newIndex, this.submitData); //取消后 删除拖拽的cell
@@ -215,10 +219,10 @@ export default {
 		},
 		//删除过滤数据
 		cancelClick() {
-			const { newIndex } = this.submitData;
+			// const { newIndex } = this.submitData;
 			this.modelFlag = false;
-			this.$refs.submitReq.resetFields();
-			this.$emit("deleteFilter", newIndex); //取消后 删除拖拽的cell
+			// this.$refs.submitReq.resetFields();
+			// this.$emit("deleteFilter", newIndex); //取消后 删除拖拽的cell
 		},
 		// 自动改变表格高度
 		autoSize() {
