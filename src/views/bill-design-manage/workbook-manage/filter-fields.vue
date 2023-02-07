@@ -195,7 +195,7 @@ export default {
 		},
 		//提交
 		submitClick() {
-			const { newIndex, startTime, endTime, columnType, filterValue, showData } = this.submitData;
+			const { newIndex, startTime, endTime, columnType, showData } = this.submitData;
 			if (columnType === "DATE" && !showData) {
 				this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
 				this.submitData.startTime = formatDate(startTime);

@@ -432,20 +432,24 @@ export default {
 				this.$Message.error("请拖拽字段至列");
 				return;
 			}
-
+			this.$Spin.show();
 			const obj = {
 				datasetId,
 				filterItems: this.filterData,
 				calcItems: this.rowData.concat(this.columnData),
 			};
 			console.log("obj", obj);
-			getChartsInfoReq(obj).then((res) => {
-				if (res.code == 200) {
-					this.chartsData = res?.result || [];
-				} else {
-					this.$Message.error(`查询失败，${res.message}`);
-				}
-			});
+			getChartsInfoReq(obj)
+				.then((res) => {
+					if (res.code == 200) {
+						this.chartsData = res?.result || [];
+					} else {
+						this.$Message.error(`查询失败，${res.message}`);
+					}
+				})
+				.finally(() => {
+					this.$Spin.hide();
+				});
 		},
 
 		//获取左侧数据集对应表及字段
