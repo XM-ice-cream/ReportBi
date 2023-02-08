@@ -79,8 +79,8 @@ export default {
 					{
 						//区域缩放组件的类型为滑块，默认作用在x轴上
 						type: "slider",
-						//区域缩放组件的过滤模式，weakFilter：在进行区域缩放时，允许图形的一部分在坐标系上(可见)，另一部分在坐标系外(隐藏)
-						filterMode: "weakFilter",
+						//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+						filterMode: "none",
 						showDataShadow: false,
 						bottom: 10,
 						height: 10,
@@ -107,15 +107,15 @@ export default {
 					{
 						//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
 						type: "inside",
-						//区域缩放组件的过滤模式，weakFilter：在进行区域缩放时，允许图形的一部分在坐标系上(可见)，另一部分在坐标系外(隐藏)
-						filterMode: "weakFilter",
+						//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+						filterMode: "none",
 						xAxisIndex: xAxis.map((item, index) => index),
 					},
 					{
 						//区域缩放组件的类型为滑块，默认作用在x轴上
 						type: "slider",
-						//区域缩放组件的过滤模式，weakFilter：在进行区域缩放时，允许图形的一部分在坐标系上(可见)，另一部分在坐标系外(隐藏)
-						filterMode: "weakFilter",
+						//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+						filterMode: "none",
 						showDataShadow: false,
 						width: 10,
 						//区域缩放组件边框颜色
@@ -141,8 +141,8 @@ export default {
 					{
 						//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
 						type: "inside",
-						//区域缩放组件的过滤模式，weakFilter：在进行区域缩放时，允许图形的一部分在坐标系上(可见)，另一部分在坐标系外(隐藏)
-						filterMode: "weakFilter",
+						//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+						filterMode: "none",
 						yAxisIndex: yAxis.map((item, index) => index),
 					},
 				],
