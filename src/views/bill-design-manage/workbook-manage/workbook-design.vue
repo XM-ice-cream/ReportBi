@@ -384,7 +384,7 @@ export default {
 				desc: "", //描述
 				enabled: 1, //是否有效
 				columnName: "",
-				chartType: "componentTable",
+				chartType: "componentBar",
 				title: "工作表",
 			},
 			columnList: [],
@@ -396,12 +396,12 @@ export default {
 			rowData: [], //行值
 			markData: [],
 			chartList: [
-				{ label: "表格", value: "componentTable" },
 				{ label: "柱状图", value: "componentBar" },
 				{ label: "折线图", value: "componentLine" },
 				{ label: "饼图", value: "componentPie" },
 				{ label: "散点图", value: "componentScatter" },
 				{ label: "盒须图", value: "componentBoxplot" },
+				{ label: "表格", value: "componentTable" },
 			],
 
 			// 验证实体
@@ -620,6 +620,7 @@ export default {
 					break;
 				case "tree":
 					if (["color", "size", "mark", "info", "labelWidth"].includes(id)) {
+						console.log(this.markData);
 						this.markData[newIndex].innerText = id;
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
