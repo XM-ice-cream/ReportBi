@@ -118,6 +118,7 @@
 				</div>
 				<!-- 筛选器、标记 -->
 				<div class="center-box">
+					<!-- 筛选器 -->
 					<div class="filter">
 						<div class="title">筛选器</div>
 						<draggable
@@ -145,6 +146,7 @@
 							</span>
 						</draggable>
 					</div>
+					<!-- 标记 -->
 					<div class="mark">
 						<div class="title">标记</div>
 						<Select v-model="submitData.chartType" clearable placeholder="请选择图表">
@@ -156,6 +158,9 @@
 							</draggable>
 							<draggable group="site" v-model="markData" id="size" ghost-class="ghost" class="box-cell">
 								<div class="size"><Icon custom="iconfont icon-daxiao" />大小</div>
+							</draggable>
+							<draggable group="site" v-model="markData" id="labelWidth" ghost-class="ghost" class="box-cell">
+								<div class="size"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
 							</draggable>
 							<draggable group="site" v-model="markData" id="mark" ghost-class="ghost" class="box-cell">
 								<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
@@ -172,11 +177,28 @@
 								style="width: 100%; height: 100%; overflow: auto"
 							>
 								<div v-for="(item, index) in markData" :key="index">
+									<!-- 图标 -->
 									<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
 									<Icon custom="iconfont icon-daxiao" v-if="item.innerText === 'size'" />
 									<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
 									<Icon type="ios-more" v-if="item.innerText === 'info'" />
-									<div :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">{{ item.columnName }}</div>
+									<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
+									<!-- 字段显示 -->
+									<div :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">
+										{{ item.columnName }}
+										<!-- 下拉框 -->
+										<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index)">
+											<Icon type="ios-arrow-down"></Icon>
+											<template #list>
+												<DropdownMenu>
+													<!-- 编辑 -->
+													<DropdownItem name="markField-edit">编辑标记字段</DropdownItem>
+													<!-- 删除 -->
+													<DropdownItem name="markField-delete">删除标记字段</DropdownItem>
+												</DropdownMenu>
+											</template>
+										</Dropdown>
+									</div>
 								</div>
 							</draggable>
 						</div>
@@ -276,13 +298,17 @@
 					<!-- 工作区 -->
 					<div class="right-content">
 						<div class="title">{{ submitData.title }}</div>
-						<componentsTemp :type="submitData.chartType" :visib="true" :value="chartsData" :row="rowData" :column="columnData" />
+						<componentsTemp :type="submitData.chartType" :visib="true" :value="chartsData" :row="rowData" :column="columnData" :mark="markData" />
 					</div>
 				</div>
 			</div>
 
+			<!-- 创建自定义字段 -->
 			<CreateFields ref="createField" :selectObj="selectObj" :isAdd="isAdd" @getColumnList="getColumnList" />
-			<FilterFields ref="filterField" :selectObj="selectObj" :isAdd="isAdd" @updateFilter="updateFilter" @deleteFilter="deleteFilter" />
+			<!-- 过滤字段属性设定 -->
+			<FilterFields ref="filterField" :selectObj="selectObj" :isAdd="isAdd" @updateFilter="updateFilter" />
+			<!-- 标记属性设定 -->
+			<MarkFields ref="markField" :selectObj="selectObj" :isAdd="isAdd" @updateMark="updateMark" />
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
@@ -304,13 +330,14 @@ import {
 } from "@/api/bill-design-manage/workbook-manage.js";
 import CreateFields from "./create-fields.vue";
 import FilterFields from "./filter-fields.vue";
+import MarkFields from "./mark-fields.vue";
 
 import { getlistReq } from "@/api/system-manager/data-item";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp, CreateFields, FilterFields },
+	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields },
 	props: {
 		modelFlag: {
 			type: Boolean,
@@ -483,8 +510,8 @@ export default {
 		//下拉
 		dropDownClick(name, row, index) {
 			const { datasetId } = this.submitData;
-			this.selectObj = { ...row, type: "all", datasetId, labelName: row.tableName, fieldCode: row.columnName, id: row.nodeId };
-			console.log("下拉", name, row);
+			this.selectObj = { ...row, type: "all", datasetId, labelName: row.tableName, fieldCode: row.columnName, id: row.nodeId, newIndex: index };
+			console.log("下拉", name, row, this.selectObj);
 
 			switch (name) {
 				// 删除自定义字段
@@ -518,7 +545,14 @@ export default {
 					break;
 				//删除筛选器
 				case "filterField-delete":
-					this.deleteFilter(index);
+					this.filterData.splice(newIndex, 1);
+					break;
+				//编辑标记字段
+				case "markField-edit":
+					this.$refs.markField.modelFlag = true;
+					break;
+				case "markField-delete":
+					this.markData.splice(index, 1);
 					break;
 			}
 		},
@@ -585,7 +619,7 @@ export default {
 					id === "mark-box" && oldIndex === newIndex ? this.markData.splice(oldIndex, 1) : "";
 					break;
 				case "tree":
-					if (["color", "size", "mark", "info"].includes(id)) {
+					if (["color", "size", "mark", "info", "labelWidth"].includes(id)) {
 						this.markData[newIndex].innerText = id;
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
@@ -597,29 +631,42 @@ export default {
 				this.selectObj = { ...this.filterData[newIndex], newIndex, datasetId, showData: 0 };
 				this.$refs.filterField.modelFlag = true;
 			}
+			//标记
+			if (["color", "size", "mark", "info", "labelWidth"].includes(id) && type !== "mark-box") {
+				this.selectObj = { ...this.markData[newIndex], newIndex, datasetId, markId: id };
+				this.$refs.markField.modelFlag = true;
+			}
 			//数据拖拽至行
 			if (id === "row" && type !== "row") {
 				const { columnType, dataType } = this.rowData[newIndex];
-				console.log("数据拖拽至行", this.rowData[newIndex]);
 				//转换为维度
 				if (columnType === "1" && dataType === "String") this.rowData[newIndex].calculatorFunction = "toChar";
 				//转换为指标
 				if (columnType === "1" && dataType === "Number") this.rowData[newIndex].calculatorFunction = "countDistinct";
 				this.rowData = JSON.parse(JSON.stringify(this.rowData));
-				console.log(this.rowData);
 			}
 			//数据拖拽至列
 			if (id === "column" && type !== "column") {
 				const { columnType, dataType } = this.columnData[newIndex];
-				console.log("数据拖拽至列", this.columnData[newIndex]);
 				//转换为维度
 				if (columnType === "1" && dataType === "String") this.columnData[newIndex].calculatorFunction = "toChar";
 				//转换为指标
 				if (columnType === "1" && dataType === "Number") this.columnData[newIndex].calculatorFunction = "countDistinct";
 				this.columnData = JSON.parse(JSON.stringify(this.columnData));
-				console.log(this.columnData);
 			}
-			console.log(this.markData);
+		},
+
+		//更新过滤器数据
+		updateFilter(newIndex, obj) {
+			this.filterData[newIndex] = { ...obj };
+			this.filterData = JSON.parse(JSON.stringify(this.filterData));
+			console.log("更新过滤器数据", this.filterData[newIndex]);
+		},
+		//更新标记数据
+		updateMark(newIndex, obj) {
+			this.markData[newIndex] = { ...obj };
+			this.markData = JSON.parse(JSON.stringify(this.markData));
+			console.log("更新标记数据", this.markData[newIndex]);
 		},
 		//删除自定义字段
 		deleteFields(row) {
@@ -632,16 +679,6 @@ export default {
 					this.$Message.error(`删除失败, ${res.message}`);
 				}
 			});
-		},
-		//更新过滤器数据
-		updateFilter(newIndex, obj) {
-			this.filterData[newIndex] = { ...obj };
-			this.filterData = JSON.parse(JSON.stringify(this.filterData));
-			console.log("更新过滤器数据", this.filterData[newIndex]);
-		},
-		// 删除过滤数据
-		deleteFilter(newIndex) {
-			this.filterData.splice(newIndex, 1);
 		},
 		// 获取数据字典数据
 		async getDataItemData() {
@@ -802,7 +839,7 @@ export default {
 				border: 1px dashed #ccc;
 				.mark-box {
 					width: 100%;
-					height: calc(100% - 200px);
+					height: calc(100% - 250px);
 					display: flex;
 					flex-wrap: wrap;
 					align-content: flex-start;

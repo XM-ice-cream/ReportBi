@@ -222,7 +222,6 @@ export default {
 			// const { newIndex } = this.submitData;
 			this.modelFlag = false;
 			// this.$refs.submitReq.resetFields();
-			// this.$emit("deleteFilter", newIndex); //取消后 删除拖拽的cell
 		},
 		// 自动改变表格高度
 		autoSize() {

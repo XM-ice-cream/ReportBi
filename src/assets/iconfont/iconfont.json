@@ -6,6 +6,13 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "762874",
+      "name": "宽度",
+      "font_class": "kuandu",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
       "icon_id": "5387481",
       "name": "问号",
       "font_class": "wenhao",

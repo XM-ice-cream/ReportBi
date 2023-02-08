@@ -9,6 +9,7 @@ export default {
 		value: Array,
 		row: Array,
 		column: Array,
+		mark: Array,
 	},
 	watch: {
 		value: {
@@ -240,10 +241,18 @@ export default {
 			//列中有指标
 			if (numberTypeColumn.length) {
 				yAxis = axisNumber;
-
+				let gridWidth = 0;
 				//行为指标?数字data:维度常量
 				this.$XEUtils.lastEach(axisConst, (item, index) => {
 					axisLabelData[index] = [];
+					//文本宽度
+					const labelWidth =
+						this.mark.filter((markItem) => {
+							return markItem.markId === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnName;
+						})[0]?.labelWidth || 90;
+
+					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+
 					xAxis.push({
 						...axisString[0],
 						data: item,
@@ -252,7 +261,7 @@ export default {
 							show: true,
 							interval: 0,
 							rotate: 90,
-							width: 90,
+							width: labelWidth,
 							overflow: "truncate",
 							formatter: function (value, valueIndex, data) {
 								axisLabelData[index][valueIndex] = value;
@@ -263,7 +272,7 @@ export default {
 						},
 
 						position: "bottom",
-						offset: (groupByString.length - index - 1) * 100,
+						offset: gridWidth - labelWidth,
 					});
 				});
 
@@ -272,12 +281,22 @@ export default {
 					data: objKeys,
 					show: false,
 				});
-				grid = [{ bottom: 100 * this.row.length - (numberTypeRow?.length || 0) }];
+				grid = [{ bottom: gridWidth + groupByString.length * 10 }];
 			} else {
 				//行中有指标，列均为维度
+				let gridWidth = 0;
+
 				xAxis = axisNumber;
 				this.$XEUtils.lastEach(axisConst, (item, index) => {
 					axisLabelData[index] = [];
+					//文本宽度
+					const labelWidth =
+						this.mark.filter((markItem) => {
+							return markItem.markId === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
+						})[0]?.labelWidth || 90;
+
+					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+
 					yAxis.push({
 						...axisString[0],
 						name: this.axisToField(`y${index}`),
@@ -287,7 +306,7 @@ export default {
 							show: true,
 							interval: 0,
 							rotate: 0,
-							width: 90,
+							width: labelWidth,
 							overflow: "truncate",
 							align: "right",
 							formatter: function (value, valueIndex, data) {
@@ -299,7 +318,7 @@ export default {
 						},
 						inverse: true, //反向坐标
 						position: "left",
-						offset: (groupByString.length - index - 1) * 100,
+						offset: gridWidth - labelWidth,
 					});
 				});
 
@@ -309,7 +328,7 @@ export default {
 					show: false,
 					inverse: true, //反向坐标
 				});
-				grid = [{ left: 100 * this.column.length - (numberTypeColumn?.length || 0) }];
+				grid = [{ left: gridWidth + groupByString.length * 10 }];
 			}
 			//series
 			series = [];
@@ -369,6 +388,7 @@ export default {
 				min: "最小值",
 				stdev: "标准差",
 				undefined: "",
+				toChar: "",
 			};
 			return obj[name];
 		},
