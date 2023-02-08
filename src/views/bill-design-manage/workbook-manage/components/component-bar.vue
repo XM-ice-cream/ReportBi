@@ -196,6 +196,7 @@ export default {
 			let numberTypeColumn = []; //列中指标
 			let stringTypeColumn = []; //列中维度
 			let axisConst = []; //维度常量
+			let axisLabelData = []; //文本显示数据
 
 			//行
 			this.row.forEach((item) => {
@@ -249,7 +250,7 @@ export default {
 
 				//行为指标?数字data:维度常量
 				this.$XEUtils.lastEach(axisConst, (item, index) => {
-					console.log(item, index);
+					axisLabelData[index] = [];
 					xAxis.push({
 						...axisString[0],
 						data: item,
@@ -260,7 +261,15 @@ export default {
 							rotate: 90,
 							width: 90,
 							overflow: "truncate",
+							formatter: function (value, valueIndex, data) {
+								axisLabelData[index][valueIndex] = value;
+								console.log(axisLabelData);
+								if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+								if (value === axisLabelData[index][valueIndex - 1]) return "";
+								else return value;
+							},
 						},
+
 						position: "bottom",
 						offset: (groupByString.length - index - 1) * 100,
 					});
@@ -276,7 +285,7 @@ export default {
 				//行中有指标，列均为维度
 				xAxis = axisNumber;
 				this.$XEUtils.lastEach(axisConst, (item, index) => {
-					console.log(item, index);
+					axisLabelData[index] = [];
 					yAxis.push({
 						...axisString[0],
 						name: this.axisToField(`y${index}`),
@@ -289,12 +298,12 @@ export default {
 							width: 90,
 							overflow: "truncate",
 							align: "right",
-							// formatter: function (value, valueIndex, data) {
-							// console.log(value, valueIndex, data);
-							// if (valueIndex === 0) return value;
-							// if (value === axisConst[index][valueIndex - 1]) return "";
-							// else return value;
-							// },
+							formatter: function (value, valueIndex, data) {
+								axisLabelData[index][valueIndex] = value;
+								if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+								if (value === axisLabelData[index][valueIndex - 1]) return "";
+								else return value;
+							},
 						},
 						inverse: true, //反向坐标
 						position: "left",
@@ -368,6 +377,7 @@ export default {
 				min: "最小值",
 				stdev: "标准差",
 				undefined: "",
+				toChar: "",
 			};
 			return obj[name];
 		},
