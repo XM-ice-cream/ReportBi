@@ -1,8 +1,18 @@
-
 <template>
-  <avue-draggable :step="step" :width="widgetsWidth" :height="widgetsHeight" :left="widgetsLeft" :top="widgetsTop" ref="draggable" :index="index" :z-index="-1" @focus="handleFocus" @blur="handleBlur">
-    <component :is="type" :value="value" />
-  </avue-draggable>
+	<avue-draggable
+		:step="step"
+		:width="widgetsWidth"
+		:height="widgetsHeight"
+		:left="widgetsLeft"
+		:top="widgetsTop"
+		ref="draggable"
+		:index="index"
+		:z-index="-1"
+		@focus="handleFocus"
+		@blur="handleBlur"
+	>
+		<component :is="type" :value="value" />
+	</avue-draggable>
 </template>
 
 <script>
@@ -35,112 +45,106 @@ import widgetMoreBarLineChart from "./bar/widgetMoreBarLineChart";
 import widgetWordCloud from "./wordcloud/widgetWordCloud";
 import widgetBarGridchart from "./bar/widgetBarGridchart"; // 多行 一列 多Grid
 export default {
-  name: "Widget",
-  components: {
-    widgetHref,
-    widgetText,
-    WidgetMarquee,
-    widgetTime,
-    widgetImage,
-    widgetSlider,
-    widgetVideo,
-    WidgetIframe,
-    widgetBarchart,
-    widgetGradientColorBarchart,
-    widgetLinechart,
-    widgetBarlinechart,
-    WidgetPiechart,
-    WidgetFunnel,
-    WidgetGauge,
-    WidgetPieNightingaleRoseArea,
-    widgetTable,
-    widgetMap,
-    widgetPiePercentageChart,
-    widgetAirBubbleMap,
-    widgetBarStackChart,
-    widgetLineStackChart,
-    widgetBarCompareChart,
-    widgetLineCompareChart,
-    widgetDecoratePieChart,
-    widgetMoreBarLineChart,
-    widgetWordCloud,
-    widgetBarGridchart
-  },
-  model: {
-    prop: "value",
-    event: "input"
-  },
-  props: {
-    index: Number, // 当前组件，在工作区变量widgetInWorkbench中的索引
-    type: String,
-    visib: Boolean,
-    value: {
-      type: [Object],
-      default: () => {
-      }
-    },
-    step: Number
-  },
-  watch: {
-    value: {
-      handler () {
-        console.log('value', this.value);
-      },
-      immediate: true
-    }
-  },
-  data () {
-    return {
-      data: {
-        setup: {},
-        data: {},
-        position: {}
-      }
-    };
-  },
-  computed: {
-    widgetsWidth () {
-      return this.value.position.width;
-    },
-    widgetsHeight () {
-      return this.value.position.height;
-    },
-    widgetsLeft () {
-      return this.value.position.left;
-    },
-    widgetsTop () {
-      return this.value.position.top;
-    },
-    widgetsZIndex () {
-      return this.value.position.zIndex || 1;
-    }
-  },
-  mounted () {
-  },
-  methods: {
-    handleFocus ({ index, left, top, width, height }) {
-      console.log('handleFocus', { index, left, top, width, height });
-    },
-    handleBlur ({ index, left, top, width, height }) {
-      this.$emit("onActivated", { index, left, top, width, height });
-      this.$refs.draggable.setActive(true);
-    }
-  }
+	name: "Widget",
+	components: {
+		widgetHref,
+		widgetText,
+		WidgetMarquee,
+		widgetTime,
+		widgetImage,
+		widgetSlider,
+		widgetVideo,
+		WidgetIframe,
+		widgetBarchart,
+		widgetGradientColorBarchart,
+		widgetLinechart,
+		widgetBarlinechart,
+		WidgetPiechart,
+		WidgetFunnel,
+		WidgetGauge,
+		WidgetPieNightingaleRoseArea,
+		widgetTable,
+		widgetMap,
+		widgetPiePercentageChart,
+		widgetAirBubbleMap,
+		widgetBarStackChart,
+		widgetLineStackChart,
+		widgetBarCompareChart,
+		widgetLineCompareChart,
+		widgetDecoratePieChart,
+		widgetMoreBarLineChart,
+		widgetWordCloud,
+		widgetBarGridchart,
+	},
+	model: {
+		prop: "value",
+		event: "input",
+	},
+	props: {
+		index: Number, // 当前组件，在工作区变量widgetInWorkbench中的索引
+		type: String,
+		visib: Boolean,
+		value: {
+			type: [Object],
+			default: () => {},
+		},
+		step: Number,
+	},
+	watch: {
+		value: {
+			handler() {},
+			immediate: true,
+		},
+	},
+	data() {
+		return {
+			data: {
+				setup: {},
+				data: {},
+				position: {},
+			},
+		};
+	},
+	computed: {
+		widgetsWidth() {
+			return this.value.position.width;
+		},
+		widgetsHeight() {
+			return this.value.position.height;
+		},
+		widgetsLeft() {
+			return this.value.position.left;
+		},
+		widgetsTop() {
+			return this.value.position.top;
+		},
+		widgetsZIndex() {
+			return this.value.position.zIndex || 1;
+		},
+	},
+	mounted() {},
+	methods: {
+		handleFocus({ index, left, top, width, height }) {},
+		handleBlur({ index, left, top, width, height }) {
+			this.$emit("onActivated", { index, left, top, width, height });
+			this.$refs.draggable.setActive(true);
+		},
+	},
 };
 </script>
 
 <style scoped lang="less">
 .vue-draggalbe {
-  position: absolute;
+	position: absolute;
 }
 
 .widget-active {
-  cursor: move;
-  border: 1px dashed #09f;
-  background-color: rgba(115, 170, 229, 0.5);
+	cursor: move;
+	border: 1px dashed #09f;
+	background-color: rgba(115, 170, 229, 0.5);
 }
 
 .avue-draggable {
-  padding: 0 !important;
+	padding: 0 !important;
 }
 </style>

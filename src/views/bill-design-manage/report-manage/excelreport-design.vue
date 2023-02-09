@@ -226,8 +226,6 @@ export default {
 
 		//设定RightForm
 		setRightForm(cell, postion, sheetFile, ctx, value) {
-			console.log(cell, postion, sheetFile, ctx, value, luckysheet.getAllSheets());
-
 			const { r, c } = postion;
 			//单元格属性扩展
 			let { expend, expendSort, leftParent, topParent, leftParentValue, topParentValue } = cell?.cellAttribute?.expend || {};
@@ -318,7 +316,6 @@ export default {
 			const { r, c, cellAttribute, cell } = right;
 			if (r !== undefined && c !== undefined) {
 				luckysheet.setCellValue(r, c, { ...right });
-				console.log("right", right);
 				this.$nextTick(() => {
 					luckysheet.refresh();
 					luckysheet.getCellValue(r, c);
@@ -353,7 +350,6 @@ export default {
 		async save() {
 			//设定传参
 			this.reportExcelDto = this.setReportExcelDto();
-			console.log("reportExcelDto", this.reportExcelDto);
 			//   return;
 			const requestReq = this.reportId == null ? insertExcelReportReq : modifyExcelReportReq;
 			this.reportExcelDto.id = this.reportId || null;
@@ -370,7 +366,6 @@ export default {
 			//   this.imageParentUpdate();
 
 			let jsonData = luckysheet.getAllSheets();
-			console.log("jsonData", jsonData);
 
 			//查询参数
 			const { setCodeList, setParams } = this.resetDataSet();
@@ -436,9 +431,12 @@ export default {
 						const startCell = startRela.split(",");
 						const endCell = endRela.split(",");
 						//   最小行B在最小行A与最大行A直接  || 最大行B在最小行A与最大行A直接
-						const isRow = (minRow >= Number(startCell[0]) && minRow <= Number(endCell[0])) || (maxRow >= Number(startCell[0]) && maxRow <= Number(endCell[0]));
+						const isRow =
+							(minRow >= Number(startCell[0]) && minRow <= Number(endCell[0])) || (maxRow >= Number(startCell[0]) && maxRow <= Number(endCell[0]));
 						// 最小列B在最小列A与最大列A之间 || 最大列B在最小列A与最大列A之间
-						const isColumn = (minColumn >= Number(startCell[1]) && minColumn <= Number(endCell[1])) || (maxColumn >= Number(startCell[1]) && maxColumn <= Number(endCell[1]));
+						const isColumn =
+							(minColumn >= Number(startCell[1]) && minColumn <= Number(endCell[1])) ||
+							(maxColumn >= Number(startCell[1]) && maxColumn <= Number(endCell[1]));
 						//以上条件为TRUE ，则为一个数据块
 						if (isRow && isColumn) {
 							jsonData[itemIndex].relationList[relationIndex] = this.compareValue(jsonData[itemIndex].relationList[relationIndex], startRela);

@@ -33,7 +33,6 @@ export default {
 	watch: {
 		shuttleDate() {
 			this.shuttleTableList = this.shuttleDate;
-			console.log("this.shuttleTableList", this.shuttleTableList);
 		},
 	},
 	data() {

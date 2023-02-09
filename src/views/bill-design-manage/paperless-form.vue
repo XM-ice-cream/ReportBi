@@ -227,7 +227,6 @@ export default {
 			//新增 或者编辑时当前模板修改为其他模板时，重新赋值json
 			if (this.isAdd || this.submitData.templateId !== this.selectObj.templateId) {
 				obj.json = this.templateList.filter((item) => item.id === templateId)[0].json;
-				console.log("obj.json", obj.json);
 			}
 			const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 			requestApi.then((res) => {

@@ -136,7 +136,6 @@ export default {
 		//li 标签选中事件
 		liClick(row) {
 			this.liObj = { ...row, remark: row.remark.split("\n\n") };
-			console.log(this.liObj);
 		},
 		//li 标签 双击
 		dbliClick(row) {
@@ -144,7 +143,6 @@ export default {
 		},
 		//插入数据至光标处
 		async insertAtCursor(myValue) {
-			console.log("myValue", myValue);
 			const myField = this.$refs.fieldFunction.$el.children[0];
 
 			if (myField.selectionStart || myField.selectionStart === 0) {
@@ -188,7 +186,6 @@ export default {
 						if (item.itemCode === "reportDesign") {
 							item?.children.forEach((citem) => {
 								if (citem.itemCode === "workbookCustomFields") {
-									console.log(citem.itemCode);
 									citem?.children.forEach((ccitem) => {
 										const { itemCode, itemName } = ccitem;
 										this.getDataItemDetailList(itemCode, itemName);
@@ -197,12 +194,6 @@ export default {
 							});
 						}
 					});
-					// this.fieldType = this.$XEUtils.groupBy(this.dataItemList, "itemCode");
-					// this.dataItemList.forEach((item) => {
-					// 	console.log(item);
-					// });
-					//  this.fieldType['all'] = this.dataItemList.
-					console.log(this.dataItemList, this.fieldType);
 				}
 			});
 		},

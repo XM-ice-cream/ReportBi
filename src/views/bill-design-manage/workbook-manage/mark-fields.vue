@@ -35,7 +35,6 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.submitData = { ...this.selectObj };
-				console.log("标记", this.submitData);
 			}
 		},
 	},

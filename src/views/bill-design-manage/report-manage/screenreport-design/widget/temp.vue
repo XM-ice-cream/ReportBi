@@ -1,8 +1,7 @@
-
 <template>
-  <div>
-    <component :is="type" :value="value" :ispreview="true" :visib='visib' />
-  </div>
+	<div>
+		<component :is="type" :value="value" :ispreview="true" :visib="visib" />
+	</div>
 </template>
 
 <script>
@@ -35,60 +34,56 @@ import widgetMoreBarLineChart from "./bar/widgetMoreBarLineChart";
 import widgetWordCloud from "./wordcloud/widgetWordCloud";
 
 export default {
-  name: "WidgetTemp",
-  components: {
-    widgetHref,
-    widgetText,
-    WidgetMarquee,
-    widgetTime,
-    widgetImage,
-    widgetSlider,
-    widgetVideo,
-    WidgetIframe,
-    widgetBarchart,
-    widgetGradientColorBarchart,
-    widgetLinechart,
-    widgetBarlinechart,
-    WidgetPiechart,
-    WidgetFunnel,
-    WidgetGauge,
-    WidgetPieNightingaleRoseArea,
-    widgetTable,
-    widgetMap,
-    widgetPiePercentageChart,
-    widgetAirBubbleMap,
-    widgetBarStackChart,
-    widgetLineStackChart,
-    widgetBarCompareChart,
-    widgetLineCompareChart,
-    widgetDecoratePieChart,
-    widgetMoreBarLineChart,
-    widgetWordCloud
-  },
-  model: {
-    prop: "value",
-    event: "input"
-  },
-  props: {
-    type: String,
-    visib: Boolean,
-    value: {
-      type: [Object],
-      default: () => {
-      }
-    }
-  },
-  watch: {
-    visib () {
-      console.log('temp', this.visib);
-    },
-  },
-  data () {
-    return {};
-  },
-  mounted () {
-  },
-  methods: {}
+	name: "WidgetTemp",
+	components: {
+		widgetHref,
+		widgetText,
+		WidgetMarquee,
+		widgetTime,
+		widgetImage,
+		widgetSlider,
+		widgetVideo,
+		WidgetIframe,
+		widgetBarchart,
+		widgetGradientColorBarchart,
+		widgetLinechart,
+		widgetBarlinechart,
+		WidgetPiechart,
+		WidgetFunnel,
+		WidgetGauge,
+		WidgetPieNightingaleRoseArea,
+		widgetTable,
+		widgetMap,
+		widgetPiePercentageChart,
+		widgetAirBubbleMap,
+		widgetBarStackChart,
+		widgetLineStackChart,
+		widgetBarCompareChart,
+		widgetLineCompareChart,
+		widgetDecoratePieChart,
+		widgetMoreBarLineChart,
+		widgetWordCloud,
+	},
+	model: {
+		prop: "value",
+		event: "input",
+	},
+	props: {
+		type: String,
+		visib: Boolean,
+		value: {
+			type: [Object],
+			default: () => {},
+		},
+	},
+	watch: {
+		visib() {},
+	},
+	data() {
+		return {};
+	},
+	mounted() {},
+	methods: {},
 };
 </script>
 

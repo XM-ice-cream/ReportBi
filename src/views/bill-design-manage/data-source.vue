@@ -31,7 +31,12 @@
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 数据源描述 -->
 						<FormItem :label="$t('dataSourceDesc')" prop="sourceDesc">
-							<Input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model.trim="submitData.sourceDesc" :placeholder="$t('pleaseEnter') + $t('dataSourceDesc')" />
+							<Input
+								type="textarea"
+								:autosize="{ minRows: 2, maxRows: 5 }"
+								v-model.trim="submitData.sourceDesc"
+								:placeholder="$t('pleaseEnter') + $t('dataSourceDesc')"
+							/>
 						</FormItem>
 					</Col>
 				</Row>
@@ -131,15 +136,38 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick"></Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+					@on-selection-change="selectClick"
+				></Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 	</div>
 </template>
 
 <script>
-import { getpagelistReq, insertDataSourceReq, deleteDataSourceReq, modifyDataSourceReq, testConnection } from "@/api/bill-design-manage/data-source.js";
+import {
+	getpagelistReq,
+	insertDataSourceReq,
+	deleteDataSourceReq,
+	modifyDataSourceReq,
+	testConnection,
+} from "@/api/bill-design-manage/data-source.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 import { getlistReq } from "@/api/system-manager/data-item";
 
@@ -340,7 +368,6 @@ export default {
 		//测试连接
 		testClick() {
 			//   const { sourceCode, sourceName, sourceDesc, sourceType, sourceConnect } = this.submitData;
-			//   console.log(sourceCode, sourceName, sourceDesc, sourceType, sourceConnect);
 			const obj = { ...this.submitData };
 			testConnection(obj).then((res) => {
 				if (res.code === 200) {

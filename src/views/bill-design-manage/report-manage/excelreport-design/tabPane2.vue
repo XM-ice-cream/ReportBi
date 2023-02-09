@@ -7,7 +7,14 @@
 					<Option v-for="item in showTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				</Select>
 				<!-- 分组为汇总的 -->
-				<Select v-model="rightForm.showTypeValue" size="small" transfer v-if="['summary'].includes(rightForm.showType)" class="showtype" @on-change="autoChangeFunc">
+				<Select
+					v-model="rightForm.showTypeValue"
+					size="small"
+					transfer
+					v-if="['summary'].includes(rightForm.showType)"
+					class="showtype"
+					@on-change="autoChangeFunc"
+				>
 					<Option v-for="item in showTypeList[2].children" :value="item.value" :key="item.value" :label="item.label"></Option>
 				</Select>
 			</FormItem>
@@ -42,7 +49,6 @@ export default {
 	watch: {
 		formData: {
 			handler() {
-				console.log("this.formData", this.formData);
 				this.rightForm = { ...this.formData };
 			},
 			deep: true,

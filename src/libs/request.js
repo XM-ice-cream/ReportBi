@@ -155,9 +155,7 @@ export function requestCenter(params) {
         apiUrl: params.url
       };
       let request = addUsageRecordReq(obj);
-      request.then((res) => {
-        console.log('==========request.res===========', res)
-      });
+      request.then((res) => {});
     }
     return config
   }, error => {

@@ -11,7 +11,13 @@
 				</FormItem>
 			</Form>
 			<!-- 过滤表格 -->
-			<ConditionSetting ref="conditionsetting" :drawerFlag.sync="modalAuthority" :rightForm="authority.data" :roleData="roleData" @updateData="updateData" />
+			<ConditionSetting
+				ref="conditionsetting"
+				:drawerFlag.sync="modalAuthority"
+				:rightForm="authority.data"
+				:roleData="roleData"
+				@updateData="updateData"
+			/>
 		</Modal>
 		<Tabs>
 			<TabPane label="信息" name="name3">
@@ -51,18 +57,45 @@
 						</Select>
 					</FormItem>
 					<FormItem label="默认值" prop="default">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.default" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType()"></DatePicker>
+						<DatePicker
+							v-if="cellType.type == 'datePicker'"
+							v-model.trim="cellType.default"
+							transfer
+							type="datetime"
+							clearable
+							format="yyyy-MM-dd HH:mm:ss"
+							:options="$config.datetimeOptions"
+							@on-change="submitType()"
+						></DatePicker>
 						<Input v-else type="text" v-model.trim="cellType.default" clearable @on-change="submitType()" />
 					</FormItem>
 				</Form>
 				<Button type="warning" class="add-btn" v-if="cellType.data.length == 0" size="small" @click="addRow(-1)">添加 </Button>
 				<Table :data="cellType.data" border :columns="typeColumns" :max-height="350" style="width: 100%">
 					<template slot-scope="{ index }" slot="name">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].name" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType()"></DatePicker>
+						<DatePicker
+							v-if="cellType.type == 'datePicker'"
+							v-model.trim="cellType.data[index].name"
+							transfer
+							type="datetime"
+							clearable
+							format="yyyy-MM-dd HH:mm:ss"
+							:options="$config.datetimeOptions"
+							@on-change="submitType()"
+						></DatePicker>
 						<Input v-else v-model.trim="cellType.data[index].name" clearable @on-change="submitType()" />
 					</template>
 					<template slot-scope="{ index }" slot="value">
-						<DatePicker v-if="cellType.type == 'datePicker'" v-model.trim="cellType.data[index].value" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" @on-change="submitType()"></DatePicker>
+						<DatePicker
+							v-if="cellType.type == 'datePicker'"
+							v-model.trim="cellType.data[index].value"
+							transfer
+							type="datetime"
+							clearable
+							format="yyyy-MM-dd HH:mm:ss"
+							:options="$config.datetimeOptions"
+							@on-change="submitType()"
+						></DatePicker>
 						<Input v-else v-model.trim="cellType.data[index].value" clearable @on-change="submitType()" />
 					</template>
 					<!-- 操作 -->
@@ -105,7 +138,6 @@ export default {
 	watch: {
 		formData: {
 			handler() {
-				console.log("right-setting", this.formData.authority, this.formData.cellType);
 				if (this.formData && JSON.stringify(this.formData) !== "{}" && (this.formData.authority || this.formData.cellType)) {
 					this.rightForm = { ...this.formData };
 					// 权限
@@ -214,7 +246,6 @@ export default {
 			}
 
 			if (flag) this.cancelClick();
-			console.log("更新", this.authorityData);
 			this.$emit("autoChangeFunc", "authority", this.authorityData);
 		},
 		// 左侧抽屉取消
@@ -243,7 +274,6 @@ export default {
 		},
 		//选择权限类别
 		changeAuthorityType() {
-			console.log(this.$refs.conditionsetting, this.authority.type);
 			if (this.authority.type === "checkTime") {
 				//默认为日期
 				this.$refs.conditionsetting.tableData[0].type = "date";
@@ -291,7 +321,6 @@ export default {
 					treeLoop(this.roleData, res.result, (node) => {
 						node.label = node.name;
 					});
-					console.log("this.roleData", this.roleData);
 				}
 			});
 		},

@@ -155,7 +155,6 @@ export default {
 		cancelClick() {
 			this.$emit("update:drawerFlag", false);
 			this.$refs.submitData.resetFields();
-			console.log("取消");
 		},
 	},
 };

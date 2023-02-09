@@ -31,9 +31,7 @@ export default {
 		},
 	},
 	watch: {
-		visib() {
-			console.log("temp", this.visib);
-		},
+		visib() {},
 	},
 	data() {
 		return {};

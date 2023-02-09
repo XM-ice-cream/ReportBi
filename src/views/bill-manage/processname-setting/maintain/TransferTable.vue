@@ -94,7 +94,6 @@ export default {
 					});
 				});
 				this.originDate = JSON.parse(JSON.stringify(this.originDate));
-				console.log(this.originDate, this.shuttledDate);
 			});
 		},
 		isSelectDateList() {
@@ -195,7 +194,6 @@ export default {
 				});
 			});
 			this.checkedQuotaList = arr;
-			console.log("---------", this.checkedQuotaList);
 		},
 		// 批量撤回
 		handleSelectionRebackChange(arr) {
@@ -274,7 +272,6 @@ export default {
 					this.shuttledDate.splice(evt.newIndex, 0, targetRow);
 					//数据去重后 赋排序码
 					this.shuttledDate.map((item, index) => (item.seq = (index + 1) * 10));
-					console.log("onEnd", this.shuttledDate);
 				},
 			});
 		},

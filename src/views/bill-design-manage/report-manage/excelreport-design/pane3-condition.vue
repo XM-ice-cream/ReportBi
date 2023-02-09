@@ -27,7 +27,13 @@
 			<!-- 过滤表格 -->
 			<ConditionSetting ref="conditionsetting" :drawerFlag.sync="drawerFlag" :rightForm="rightForm.data" @updateData="updateData" />
 
-			<drawer-button :text="drawerTitle" class="tree" @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
+			<drawer-button
+				:text="drawerTitle"
+				class="tree"
+				@on-cancel="cancelClick"
+				@on-ok="submitClick"
+				@on-okAndClose="submitClick(true)"
+			></drawer-button>
 		</Drawer>
 	</div>
 </template>
@@ -78,7 +84,6 @@ export default {
 		},
 		//条件设定值 ConditionSetting组件下
 		updateData(val) {
-			console.log(val);
 			this.data = val;
 		},
 		//删除

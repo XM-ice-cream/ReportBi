@@ -155,7 +155,6 @@ export default {
 			this.$nextTick(() => {
 				this.createGraphic();
 			});
-			console.log(this.submitData);
 		},
 		//获取用户
 		getUserList() {
@@ -226,7 +225,6 @@ export default {
 				sourceCode: Array.from(new Set(sourceList)).toString(),
 				enabled,
 			};
-			console.log("结果值", obj, this.data);
 
 			this.$refs.submitRef.validate((validate) => {
 				if (validate) {
@@ -258,15 +256,12 @@ export default {
 					// 寻找子节点
 					while (chilArr.length > 0) {
 						depth++;
-						//	console.log(depth);
 						let chilArrTmp = [];
 						edges.forEach((x) => {
 							if (chilArr.includes(x.source)) {
-								//	console.log(x.source);
 								chilArrTmp.push(x.target);
 								nodes.forEach((y, yIndex) => {
 									if (y.id == x.target) {
-										//	console.log(x.target, depth);
 										nodes[yIndex].depth = depth;
 									}
 								});
@@ -276,11 +271,9 @@ export default {
 					}
 				}
 			});
-			console.log("获取level", nodes);
 		},
 		filterData() {
 			const keyWord = this.submitData.filterTable?.toUpperCase() || "";
-			console.log("搜索", keyWord, this.submitData.filterTable);
 			const reg = new RegExp(keyWord);
 			const arr = [];
 			this.treeData.forEach((item) => {
@@ -392,7 +385,6 @@ export default {
 				// const { item } = event
 				// this.activation = item.getModel().id // 获取当前节点
 				// this.form.inputText = item.getModel().label
-				// console.log("event", e);
 			});
 
 			this.graph.on("node:mouseenter", (e) => {
@@ -403,13 +395,11 @@ export default {
 			});
 			//创建边
 			this.graph.on("aftercreateedge", (e) => {
-				console.log("创建边", e, e.edge._cfg, e.edge.getModel());
 				if (e.edge.getModel()) {
 					const { id, target, source } = e.edge.getModel();
 					this.data.edges.push({ id, target, source });
 					this.graph.changeData(this.data);
 					this.edgeDblclick(e.edge.getModel());
-					console.log(this.graph, this.data);
 				}
 			});
 			//边的双击事件
@@ -419,24 +409,20 @@ export default {
 		},
 		//边双击
 		edgeDblclick(model) {
-			console.log(model);
 			const { id, type, relations, source, target, startPoint, style, incidenceRelation } = model;
 			let obj = { id, type, relations, source, target, startPoint, style, incidenceRelation };
 			obj.incidenceRelation = obj?.incidenceRelation || "left join";
 			this.connectModalFlag = true;
 			this.connectObj = { ...obj };
-			console.log("边的双击事件", obj, this.graph);
 		},
 
 		// 添加节点
 		addNodeImage(e, row) {
-			console.log("添加节点", e, row, this.data.nodes);
 			const isExistTable = this.data.nodes
 				.map((item) => item.label)
 				.filter((item) => {
 					return item?.split("(")[0] === row;
 				});
-			console.log("isExistTable", isExistTable);
 			const label = isExistTable.length === 0 ? row : `${row}(${isExistTable.length})`;
 			const { sourceCode } = this.submitData;
 			const point = this.graph.getPointByClient(e.x, e.y); //将屏幕坐标转换为渲染坐标
@@ -449,12 +435,10 @@ export default {
 				type: "rect",
 			};
 			this.data.nodes.push({ ...model });
-			console.log("model", model);
 			this.graph.changeData(this.data);
 		},
 		//更新边
 		updateEdge(val) {
-			console.log(val);
 			val.style.lineDash = [];
 			val.style.stroke = "#cacaca";
 			const isEdgeId = this.data.edges.map((item) => item.id).includes(val.id);
@@ -468,7 +452,6 @@ export default {
 				this.data.edges.push({ ...val });
 			}
 			this.graph.changeData(this.data);
-			console.log(this.data, this.graph);
 		},
 		// 右键--节点的删除
 		getContextMenu() {
@@ -510,7 +493,6 @@ export default {
 						this.data.edges = this.data.edges.filter((item) => !edgeId.includes(item.id));
 						this.data.nodes = this.data.nodes.filter((item) => item.id !== nodeId);
 					}
-					console.log(item);
 
 					this.graph.changeData(this.data);
 				},
@@ -529,7 +511,6 @@ export default {
 
 		// 关闭模态框
 		closeDialog() {
-			console.log(this.$refs.submitRef);
 			this.$refs.submitRef.resetFields();
 			this.$emit("update:modalFlag", false);
 			// this.submitData = { ...this.submitData, sourceCode: "", filterTable: "" };

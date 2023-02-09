@@ -103,7 +103,6 @@ export default {
 				],
 			};
 
-			console.log(option);
 			charts.setOption(option, true);
 			window.addEventListener("resize", function () {
 				charts.resize();

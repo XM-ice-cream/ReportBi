@@ -16,11 +16,18 @@
 											<template v-for="item in tableData2">
 												<span class="title">{{ item.title }} </span>
 												<template v-for="(subitem, subindex) in item.children">
-													<FormItem :label="subitem.paramDesc" :prop="item.name + subitem.name" :rules="subitem.required == 1 ? [{ required: true, message: '必填项' }] : [{ required: false }]">
+													<FormItem
+														:label="subitem.paramDesc"
+														:prop="item.name + subitem.name"
+														:rules="subitem.required == 1 ? [{ required: true, message: '必填项' }] : [{ required: false }]"
+													>
 														<!-- 字符串 -->
 														<Input v-if="subitem.type === 'String'" type="text" v-model.trim="subitem.value" clearable />
 														<!-- 布尔 true/false/0/1-->
-														<RadioGroup v-else-if="subitem.type === 'Boolean' && ['true', 'false', '0', '1'].includes(subitem.value)" v-model="subitem.value">
+														<RadioGroup
+															v-else-if="subitem.type === 'Boolean' && ['true', 'false', '0', '1'].includes(subitem.value)"
+															v-model="subitem.value"
+														>
 															<template v-if="['true', 'false'].includes(subitem.value)">
 																<Radio label="true">true</Radio>
 																<Radio label="false">false</Radio>
@@ -31,9 +38,23 @@
 															</template>
 														</RadioGroup>
 														<!-- 数组 -->
-														<Input v-else-if="subitem.type === 'Array'" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model.trim="subitem.value" clearable />
+														<Input
+															v-else-if="subitem.type === 'Array'"
+															type="textarea"
+															:autosize="{ minRows: 2, maxRows: 5 }"
+															v-model.trim="subitem.value"
+															clearable
+														/>
 														<!-- 时间 -->
-														<DatePicker v-else-if="subitem.type === 'DateTime'" v-model="subitem.value" transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" clearable></DatePicker>
+														<DatePicker
+															v-else-if="subitem.type === 'DateTime'"
+															v-model="subitem.value"
+															transfer
+															type="datetime"
+															format="yyyy-MM-dd HH:mm:ss"
+															:options="$config.datetimeOptions"
+															clearable
+														></DatePicker>
 														<!-- 下拉框 -->
 														<v-selectpage
 															v-else-if="subitem.type === 'Select'"
@@ -81,16 +102,34 @@
 								<template #list>
 									<DropdownMenu>
 										<DropdownItem :name="1"
-											><Tooltip max-width="180" content="导出sql执行的直接结果,标题为sql查询字段【查询数量无上限】" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>数据源导出
+											><Tooltip max-width="180" content="导出sql执行的直接结果,标题为sql查询字段【查询数量无上限】" placement="left-start" transfer>
+												<Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip
+											>数据源导出
 										</DropdownItem>
 										<DropdownItem :name="2"
-											><Tooltip max-width="180" content="按照模板拖动字段,动态单元格,静态单元格位置导出【限制数量一百万】" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>快速导出</DropdownItem
+											><Tooltip
+												max-width="180"
+												content="按照模板拖动字段,动态单元格,静态单元格位置导出【限制数量一百万】"
+												placement="left-start"
+												transfer
+											>
+												<Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip
+											>快速导出</DropdownItem
 										>
 										<DropdownItem :name="3"
-											><Tooltip max-width="180" content="按照设计完整导出，适用于汇总，计算，筛选等复杂逻辑条件【限制数量一千】" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>模板设定导出</DropdownItem
+											><Tooltip
+												max-width="180"
+												content="按照设计完整导出，适用于汇总，计算，筛选等复杂逻辑条件【限制数量一千】"
+												placement="left-start"
+												transfer
+											>
+												<Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip
+											>模板设定导出</DropdownItem
 										>
 										<DropdownItem :name="4"
-											><Tooltip max-width="180" content="导出当前页面显示内容" placement="left-start" transfer> <Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip>表格导出</DropdownItem
+											><Tooltip max-width="180" content="导出当前页面显示内容" placement="left-start" transfer>
+												<Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip
+											>表格导出</DropdownItem
 										>
 									</DropdownMenu>
 								</template>
@@ -117,7 +156,16 @@
 							</template>
 						</tr>
 					</table>
-					<page-custom class="excel-page" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.requestCount" :page-size="req.pageSize" :elapsedMilliseconds="req.elapsedMilliseconds" @on-change="pageChange" @on-page-size-change="pageSizeChange">
+					<page-custom
+						class="excel-page"
+						:total="req.total"
+						:totalPage="req.totalPage"
+						:pageIndex="req.requestCount"
+						:page-size="req.pageSize"
+						:elapsedMilliseconds="req.elapsedMilliseconds"
+						@on-change="pageChange"
+						@on-page-size-change="pageSizeChange"
+					>
 						<template #right>
 							<Button class="total-btn" v-if="isLoading" :loading="loading" @click="getTotalPage">
 								<span v-if="!loading">加载右侧信息</span>
@@ -253,7 +301,6 @@ export default {
 			// 处理表格单元格样式
 			celldata.forEach((item, index) => {
 				const { r, c } = item;
-				//console.log(r, c, item);
 				if (!this.tableHtml[r]) this.tableHtml[r] = [];
 				if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
 
@@ -318,7 +365,6 @@ export default {
 			borderInfo?.forEach((borderItem, borderIndex) => {
 				const { borderType, color, range, rangeType } = borderItem;
 				if (rangeType === "range" && range[0]) {
-					//   console.log(range[0]);
 					//列号在范围内
 					const columnRang = range[0].column[0] <= c && range[0].column[1] >= c;
 					//行号在范围内
@@ -373,7 +419,14 @@ export default {
 				const children = [];
 				for (const y in extendObj[i]) {
 					if (!y.endsWith("required") && !y.endsWith("type") && !y.endsWith("paramAstrict") && !y.endsWith("paramDesc")) {
-						children.push({ name: y, value: extendObj[i][y], type: extendObj[i][y + "type"], required: extendObj[i][y + "required"], paramAstrict: extendObj[i][y + "paramAstrict"], paramDesc: extendObj[i][y + "paramDesc"] });
+						children.push({
+							name: y,
+							value: extendObj[i][y],
+							type: extendObj[i][y + "type"],
+							required: extendObj[i][y + "required"],
+							paramAstrict: extendObj[i][y + "paramAstrict"],
+							paramDesc: extendObj[i][y + "paramDesc"],
+						});
 						this.ruleValidate[i + y] = [{ required: true, message: "The name cannot be empty", trigger: "blur" }];
 					}
 				}
@@ -518,7 +571,6 @@ export default {
 						if (o.type === "Array" && o.value) {
 							const value = o.value.replace(/\n/gi, ",");
 							const length = value.split(",").length;
-							//console.log(value, length, o.paramAstrict);
 							if (length > parseInt(o.paramAstrict)) {
 								flag = true;
 								message = "超出最大数组长度,请重新输入";

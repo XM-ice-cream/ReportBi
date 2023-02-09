@@ -37,7 +37,6 @@ export default {
 	watch: {
 		formData: {
 			handler() {
-				console.log("this.formData", this.formData);
 				this.rightForm = this.formData.map((item) => item);
 			},
 			deep: true,

@@ -26,7 +26,14 @@
 				<Input v-model="tableData[index].content" v-if="['string', 'Function', 'cell'].includes(tableData[index].type)" />
 				<InputNumber v-model="tableData[index].content" v-if="tableData[index].type === 'int'" />
 				<!-- 时间 -->
-				<DatePicker transfer type="datetime" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="tableData[index].content" v-if="tableData[index].type === 'date'"></DatePicker>
+				<DatePicker
+					transfer
+					type="datetime"
+					format="yyyy-MM-dd HH:mm:ss"
+					:options="$config.datetimeOptions"
+					v-model="tableData[index].content"
+					v-if="tableData[index].type === 'date'"
+				></DatePicker>
 				<!-- 年 -->
 				<DatePicker transfer type="year" v-model="tableData[index].content" v-if="tableData[index].type === 'year'"></DatePicker>
 				<!-- 月 -->
@@ -113,7 +120,6 @@ export default {
 	watch: {
 		"data.length": {
 			handler() {
-				console.log(this.data);
 				this.$emit("updateData", this.data);
 			},
 			deep: true,
@@ -125,9 +131,7 @@ export default {
 					this.columns = this.columns.filter((item) => item.slot !== "selectItem");
 				}
 				if (this.rightForm) {
-					console.log("condition-setting", this.rightForm);
 					this.data = [...this.rightForm];
-					console.log("roleData", this.roleData);
 				}
 			} else {
 				this.cancelClick();
@@ -211,7 +215,10 @@ export default {
 			let logic = this.getLogic(type, selectItem, operator, content);
 
 			//添加值 第一笔不显示and/or
-			const obj = this.data.length > 0 ? { title: `${relation} ${curContent}`, contextmenu: true, logic: `${relation} ${logic}` } : { title: `${curContent}`, contextmenu: true, logic };
+			const obj =
+				this.data.length > 0
+					? { title: `${relation} ${curContent}`, contextmenu: true, logic: `${relation} ${logic}` }
+					: { title: `${curContent}`, contextmenu: true, logic };
 			this.data.push(obj);
 		},
 		//处理数据为js逻辑表达式
@@ -263,7 +270,6 @@ export default {
 			if (operator === "include in") {
 				logic = `${val}.indexOf(${item}) !==-1`;
 			}
-			console.log(logic);
 			return logic;
 		},
 		//递归判断值是否存在
@@ -284,7 +290,6 @@ export default {
 				let logic = "";
 				this.checkList.map((item, index) => {
 					item.checked = false;
-					console.log(item);
 					if (index == 0) {
 						const reg = /^and|^or/g;
 						title = `${item.title.match(reg) || ""} (`;
@@ -328,7 +333,13 @@ export default {
 						item?.children?.forEach((cItem, cIndex) => {
 							if (cIndex == 0) {
 								const reg = /^and|^or/g;
-								data[index + cIndex] = { ...cItem, checked: false, disableCheckbox: false, title: `${item.title.match(reg) || ""} ${cItem.title}`, logic: `${item.title.match(reg) || ""} ${cItem.logic}` };
+								data[index + cIndex] = {
+									...cItem,
+									checked: false,
+									disableCheckbox: false,
+									title: `${item.title.match(reg) || ""} ${cItem.title}`,
+									logic: `${item.title.match(reg) || ""} ${cItem.logic}`,
+								};
 							} else {
 								// 指定位置插入数据
 								data.splice(index + cIndex, 0, { ...cItem, checked: false, disableCheckbox: false });

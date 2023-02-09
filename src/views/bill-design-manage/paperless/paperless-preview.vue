@@ -91,7 +91,6 @@ export default {
 			getlistReq(obj).then((res) => {
 				if (res.code == 200) {
 					this.data = res?.result[0] || [];
-					console.log(this.data);
 					this.$nextTick(() => {
 						this.getTable();
 					});
@@ -107,9 +106,7 @@ export default {
 
 			// 处理表格单元格样式
 			celldata.forEach((item, index) => {
-				console.log(item);
 				const { r, c } = item;
-				//console.log(r, c, item);
 				if (!this.tableHtml[r]) this.tableHtml[r] = [];
 				if (!this.tableHtml[r][c]) this.tableHtml[r][c] = {};
 
@@ -144,7 +141,6 @@ export default {
 				this.resultData.celldata[index] = { ...item, v: { ...item?.v, v: v } };
 
 				this.tableHtml[r][c] = { r, c, style, colspan, rowspan, divStyle, value: v, cellType, index };
-				console.log(this.tableHtml[r][c]);
 			});
 		},
 		modalOk(type) {
@@ -160,14 +156,12 @@ export default {
 					this.$Message.error(`提交失败,${res.message}`);
 				}
 			});
-			console.log("结果集：", this.resultData);
 		},
 	},
 	mounted() {
 		const obj = window.localStorage.getItem("paperlessRow");
 		const parseObj = JSON.parse(obj);
 		if (parseObj?.row) {
-			console.log(obj.row);
 			this.data = parseObj.row;
 			this.isPreview = true;
 			document.title = `模板-${this.data.name}`;

@@ -31,7 +31,6 @@ export default {
 		formData: {
 			handler() {
 				this.rightForm = { ...this.formData };
-				console.log(this.rightForm);
 			},
 			deep: true,
 			immediate: true,
@@ -45,7 +44,6 @@ export default {
 	methods: {
 		autoChangeFunc(type, rightForm) {
 			this.rightForm[type] = rightForm instanceof Array ? [...rightForm] : { ...rightForm };
-			console.log("rightForm", rightForm, type, this.rightForm);
 			this.$emit("autoChangeFunc", this.rightForm);
 		},
 	},

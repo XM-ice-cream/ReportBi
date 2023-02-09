@@ -115,7 +115,6 @@ export default {
 	watch: {
 		drawerFlag(newValue) {
 			if (newValue) {
-				console.log(this.selectObj);
 				this.autoSize();
 			}
 		},

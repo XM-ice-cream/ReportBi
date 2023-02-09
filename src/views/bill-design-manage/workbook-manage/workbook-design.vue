@@ -354,7 +354,6 @@ export default {
 	},
 	watch: {
 		modelFlag(newVal) {
-			console.log("modelFlag", this.modelFlag);
 			if (newVal) {
 				this.$nextTick(() => {
 					if (!this.workbookIsAdd) this.submitData = { ...this.submitData, ...this.workbookSelectObj };
@@ -465,7 +464,6 @@ export default {
 				filterItems: this.filterData,
 				calcItems: this.rowData.concat(this.columnData),
 			};
-			console.log("obj", obj);
 			getChartsInfoReq(obj)
 				.then((res) => {
 					if (res.code == 200) {
@@ -501,7 +499,6 @@ export default {
 							}
 							return { ...item, index };
 						});
-						console.log(children);
 						return { tableName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
 					});
 				}
@@ -511,7 +508,6 @@ export default {
 		dropDownClick(name, row, index) {
 			const { datasetId } = this.submitData;
 			this.selectObj = { ...row, type: "all", datasetId, labelName: row.tableName, fieldCode: row.columnName, id: row.nodeId, newIndex: index };
-			console.log("下拉", name, row, this.selectObj);
 
 			switch (name) {
 				// 删除自定义字段
@@ -568,13 +564,11 @@ export default {
 					this.columnData = JSON.parse(JSON.stringify(this.columnData));
 					break;
 			}
-			console.log("row", this.rowData, "column", this.columnData);
 		},
 		//转换为指标 0 或 维度 1
 		changeToProperty(row, type) {
 			let requestApi = addCustomerFieldReq;
 			let obj = { ...row, typeConvert: type, remark: 1 };
-			console.log("指标转换", obj);
 			switch (row.columnType) {
 				case "1":
 					//删除
@@ -601,7 +595,6 @@ export default {
 		},
 		//拖拽结束
 		dragEnd(e, type) {
-			console.log(e, type);
 			const { datasetId } = this.submitData;
 			const { oldIndex, newIndex, to } = e;
 			const { id } = to;
@@ -620,7 +613,6 @@ export default {
 					break;
 				case "tree":
 					if (["color", "size", "mark", "info", "labelWidth"].includes(id)) {
-						console.log(this.markData);
 						this.markData[newIndex].innerText = id;
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
@@ -661,13 +653,11 @@ export default {
 		updateFilter(newIndex, obj) {
 			this.filterData[newIndex] = { ...obj };
 			this.filterData = JSON.parse(JSON.stringify(this.filterData));
-			console.log("更新过滤器数据", this.filterData[newIndex]);
 		},
 		//更新标记数据
 		updateMark(newIndex, obj) {
 			this.markData[newIndex] = { ...obj };
 			this.markData = JSON.parse(JSON.stringify(this.markData));
-			console.log("更新标记数据", this.markData[newIndex]);
 		},
 		//删除自定义字段
 		deleteFields(row) {
@@ -684,7 +674,6 @@ export default {
 		// 获取数据字典数据
 		async getDataItemData() {
 			this.columnTypeList = await this.getDataItemDetailList("columnType");
-			console.log("数据字典", this.columnTypeList);
 		},
 		async getDataItemDetailList(itemCode) {
 			let arr = [];

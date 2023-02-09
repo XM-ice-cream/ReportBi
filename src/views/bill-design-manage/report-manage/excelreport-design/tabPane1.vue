@@ -19,13 +19,27 @@
 				<Select v-model="rightForm.expend.topParent" size="small" transfer @on-change="resetParent('topParentValue')">
 					<Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				</Select>
-				<Input type="text" v-model="rightForm.expend.topParentValue.label" size="small" v-if="rightForm.expend.topParent == 'userDefined'" placeholder="例:A1" @on-blur="(evt) => changeInput(evt, 'topParentValue')"></Input>
+				<Input
+					type="text"
+					v-model="rightForm.expend.topParentValue.label"
+					size="small"
+					v-if="rightForm.expend.topParent == 'userDefined'"
+					placeholder="例:A1"
+					@on-blur="(evt) => changeInput(evt, 'topParentValue')"
+				></Input>
 			</FormItem>
 			<FormItem label="左父格">
 				<Select v-model="rightForm.expend.leftParent" size="small" transfer @on-change="resetParent('leftParentValue')">
 					<Option v-for="item in cellRelationList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				</Select>
-				<Input type="text" v-model="rightForm.expend.leftParentValue.label" size="small" v-if="rightForm.expend.leftParent == 'userDefined'" placeholder="例:A1" @on-blur="(evt) => changeInput(evt, 'leftParentValue')"></Input>
+				<Input
+					type="text"
+					v-model="rightForm.expend.leftParentValue.label"
+					size="small"
+					v-if="rightForm.expend.leftParent == 'userDefined'"
+					placeholder="例:A1"
+					@on-blur="(evt) => changeInput(evt, 'leftParentValue')"
+				></Input>
 			</FormItem>
 		</Form>
 	</div>
@@ -75,7 +89,6 @@ export default {
 		//监听父子格输入框
 		changeInput(evt, key) {
 			const value = evt.target.value;
-			console.log("监听父子格输入框", value, this.rightForm.expend);
 			const { leftParent, topParent, leftParentValue, topParentValue } = this.rightForm.expend;
 			//左父格，上父格为自定义时,修改值
 			if (leftParent === "userDefined") this.rightForm.expend.leftParentValue.value = this.setParentValue(leftParentValue.label); //行，列

@@ -80,7 +80,6 @@ export default {
 		menuDblclick(val) {
 			this.rightForm.v = `=${val.detailCode}()`;
 			this.rightForm.m = `=${val.detailCode}()`;
-			console.log("this.rightForm", this.rightForm);
 		},
 		// 获取业务数据
 		async getDataItemData() {
@@ -91,7 +90,6 @@ export default {
 						if (item.itemCode === "reportDesign") {
 							item?.children.forEach((citem) => {
 								if (citem.itemCode === "designFuncion") {
-									console.log(citem.itemCode);
 									citem?.children.forEach((ccitem) => {
 										const { itemCode, itemName } = ccitem;
 										this.getDataItemDetailList(itemCode, itemName);
@@ -100,7 +98,6 @@ export default {
 							});
 						}
 					});
-					console.log(this.dataItemList);
 				}
 			});
 		},

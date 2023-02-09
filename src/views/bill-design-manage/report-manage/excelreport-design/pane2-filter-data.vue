@@ -10,11 +10,24 @@
 				</FormItem>
 
 				<!-- 过滤表格 type=""说明默认不显示可选列-->
-				<ConditionSetting ref="conditionsetting" type="1" :drawerFlag.sync="drawerFlag" :selectItemList="selectItemList" :rightForm="rightForm.data" @updateData="updateData" />
+				<ConditionSetting
+					ref="conditionsetting"
+					type="1"
+					:drawerFlag.sync="drawerFlag"
+					:selectItemList="selectItemList"
+					:rightForm="rightForm.data"
+					@updateData="updateData"
+				/>
 
 				<!-- 按钮 -->
 				<FormItem>
-					<drawer-button :text="drawerTitle" class="tree" @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
+					<drawer-button
+						:text="drawerTitle"
+						class="tree"
+						@on-cancel="cancelClick"
+						@on-ok="submitClick"
+						@on-okAndClose="submitClick(true)"
+					></drawer-button>
 				</FormItem>
 			</Form>
 		</Drawer>
@@ -59,7 +72,6 @@ export default {
 		},
 		formData: {
 			handler() {
-				console.log("this.formData-panelfilter", this.formData);
 				this.rightForm = { ...this.formData };
 			},
 			deep: true,
@@ -70,7 +82,6 @@ export default {
 	methods: {
 		//更新数据
 		submitClick(flag) {
-			console.log(flag);
 			this.rightForm.filterData = "";
 			this.rightForm.data = [...this.data];
 			this.data.forEach((item) => {
@@ -80,7 +91,6 @@ export default {
 			this.$emit("autoChangeFunc", this.rightForm);
 		},
 		updateData(val) {
-			console.log(val);
 			this.data = val;
 		},
 		//获取全部数据集

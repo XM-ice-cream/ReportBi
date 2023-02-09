@@ -101,7 +101,6 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.submitData = { ...this.selectObj };
-				console.log(this.submitData);
 				this.autoSize();
 				window.addEventListener("resize", () => this.autoSize());
 			}
@@ -111,11 +110,9 @@ export default {
 			if (newVal == 0) {
 				// this.submitData.selectArr = [];
 				// this.submitData.filterValue = "";
-				console.log("newVal", newVal);
 			}
 			//显示筛选器
 			if (newVal == 1) {
-				console.log("显示筛选器", newVal);
 				this.$nextTick(() => {
 					this.pageLoad();
 				});
@@ -166,7 +163,6 @@ export default {
 					columnComment,
 				},
 			};
-			console.log("过滤", obj);
 			getselectvalueReq(obj)
 				.then((res) => {
 					if (res.code == 200) {
@@ -212,7 +208,6 @@ export default {
 		},
 		//选择的数据
 		selectClick(selection) {
-			console.log(selection);
 			this.submitData.selectArr = selection;
 			this.submitData.filterValue = selection.map((item) => item.value).toString();
 			this.submitData = JSON.parse(JSON.stringify(this.submitData));

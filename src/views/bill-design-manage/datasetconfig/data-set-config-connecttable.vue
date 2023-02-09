@@ -82,7 +82,6 @@ export default {
 					const { relations } = this.connectObj;
 					this.data = relations ? [...relations] : [];
 				});
-				console.log(this.connectObj);
 			}
 		},
 	},
@@ -174,7 +173,6 @@ export default {
 			if (target && source) {
 				const targetObj = this.targetList.filter((item) => item.columnName === target)[0];
 				const sourceObj = this.sourceList.filter((item) => item.columnName === source)[0];
-				console.log(targetObj, sourceObj, this.targetList, this.sourceList);
 				this.columnTypeList.forEach((item, index) => {
 					if (item.detailCode.includes(targetObj.columnType.toUpperCase())) {
 						obj.target = index;
@@ -194,7 +192,6 @@ export default {
 		// 获取数据字典数据
 		async getDataItemData() {
 			this.columnTypeList = await this.getDataItemDetailList("columnType");
-			console.log("数据字典", this.columnTypeList);
 		},
 		async getDataItemDetailList(itemCode) {
 			let arr = [];

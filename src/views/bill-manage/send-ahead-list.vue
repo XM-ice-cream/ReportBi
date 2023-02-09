@@ -410,7 +410,6 @@ export default {
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
 		getStepList(row) {
-			console.log("123", row);
 			this.modalFlag = true;
 			const obj = { fromID: row.id };
 
@@ -430,14 +429,12 @@ export default {
 		},
 		//checkbox 只能选一个
 		changeCheckOut(index) {
-			console.log(this.setupData);
 			if (this.setupData[index].checkOut === 1) {
 				this.setupData = this.setupData.map((item, iIndex) => {
 					if (iIndex !== index) item.checkOut = 0;
 					else item.checkOut = 1;
 					return { ...item };
 				});
-				console.log(this.setupData);
 			}
 		},
 		// 获取业务数据

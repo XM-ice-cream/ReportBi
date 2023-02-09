@@ -18,7 +18,13 @@
 						<TabPane label="图层" name="layer">
 							<draggable v-model="layerWidget" @update="datadragEnd" :options="{ animation: 300 }">
 								<transition-group>
-									<div v-for="(item, index) in layerWidget" :key="'item' + index" class="tools-item" :class="widgetIndex == index ? 'is-active' : ''" @click="layerClick(index)">
+									<div
+										v-for="(item, index) in layerWidget"
+										:key="'item' + index"
+										class="tools-item"
+										:class="widgetIndex == index ? 'is-active' : ''"
+										@click="layerClick(index)"
+									>
 										<span class="tools-item-icon">
 											<i class="iconfont" :class="item.icon"></i>
 										</span>
@@ -45,7 +51,16 @@
 					</div>
 					<div class="workbench-container" @mousedown="handleMouseDown">
 						<!-- 网页标尺辅助线 -->
-						<vue-ruler-tool v-model="dashboard.presetLine" class="vueRuler" :step-length="50" :parent="true" :position="'relative'" :is-scale-revise="true" :visible.sync="dashboard.presetLineVisible" style="height: 100%; width: 100%">
+						<vue-ruler-tool
+							v-model="dashboard.presetLine"
+							class="vueRuler"
+							:step-length="50"
+							:parent="true"
+							:position="'relative'"
+							:is-scale-revise="true"
+							:visible.sync="dashboard.presetLineVisible"
+							style="height: 100%; width: 100%"
+						>
 							<!-- workbench 工作台 -->
 							<div
 								id="workbench"
@@ -85,7 +100,12 @@
 							<dynamic-form ref="formData" :options="widgetOptions.setup" @onChanged="(val) => widgetValueChanged('setup', val)" />
 						</TabPane>
 						<TabPane v-if="isNotNull(widgetOptions.data)" name="second" label="数据" :index="2">
-							<dynamic-form ref="formData" :options="widgetOptions.data" @onChanged="(val) => widgetValueChanged('data', val)" @getSetParamsList="getSetParamsList" />
+							<dynamic-form
+								ref="formData"
+								:options="widgetOptions.data"
+								@onChanged="(val) => widgetValueChanged('data', val)"
+								@getSetParamsList="getSetParamsList"
+							/>
 						</TabPane>
 						<TabPane v-if="isNotNull(widgetOptions.position)" name="third" label="坐标" :index="3">
 							<dynamic-form ref="formData" :options="widgetOptions.position" @onChanged="(val) => widgetValueChanged('position', val)" />
@@ -94,7 +114,16 @@
 				</Sider>
 			</Layout>
 		</div>
-		<content-menu :visible.sync="visibleContentMenu" :style-obj="styleObj" @deletelayer="deletelayer" @copylayer="copylayer" @istopLayer="istopLayer" @setlowLayer="setlowLayer" @moveupLayer="moveupLayer" @movedownLayer="movedownLayer" />
+		<content-menu
+			:visible.sync="visibleContentMenu"
+			:style-obj="styleObj"
+			@deletelayer="deletelayer"
+			@copylayer="copylayer"
+			@istopLayer="istopLayer"
+			@setlowLayer="setlowLayer"
+			@moveupLayer="moveupLayer"
+			@movedownLayer="movedownLayer"
+		/>
 
 		<!-- 表字段 -->
 		<div class="field">
@@ -114,14 +143,14 @@
 	</div>
 </template>
 <script>
-import { widgetTools, getToolByCode } from "./screenreport-design/tools/index"
-import draggable from "vuedraggable"
-import VueRulerTool from "vue-ruler-tool" // 大屏设计页面的标尺插件
-import widget from "./screenreport-design/widget/widget.vue"
-import { deepClone, isNotNull } from "@/libs/tools.js"
-import DynamicForm from "./screenreport-design/components/dynamicForm.vue"
-import ContentMenu from "./screenreport-design/components/contentMenu.vue"
-import { addScreenReq, previewScreenReq } from "@/api/bill-design-manage/report-manage.js"
+import { widgetTools, getToolByCode } from "./screenreport-design/tools/index";
+import draggable from "vuedraggable";
+import VueRulerTool from "vue-ruler-tool"; // 大屏设计页面的标尺插件
+import widget from "./screenreport-design/widget/widget.vue";
+import { deepClone, isNotNull } from "@/libs/tools.js";
+import DynamicForm from "./screenreport-design/components/dynamicForm.vue";
+import ContentMenu from "./screenreport-design/components/contentMenu.vue";
+import { addScreenReq, previewScreenReq } from "@/api/bill-design-manage/report-manage.js";
 
 export default {
 	name: "excelreport-design",
@@ -130,7 +159,7 @@ export default {
 	watch: {
 		widgets: {
 			handler(val) {
-				this.handlerLayerWidget(val)
+				this.handlerLayerWidget(val);
 			},
 			deep: true,
 		},
@@ -142,44 +171,44 @@ export default {
     */
 		setParamListC: {
 			get() {
-				return [...new Set(this.setParamList)]
+				return [...new Set(this.setParamList)];
 			},
 			set() {},
 		},
 		step() {
-			return Number(100 / (this.bigscreenScaleInWorkbench * 100))
+			return Number(100 / (this.bigscreenScaleInWorkbench * 100));
 		},
 		// 左侧折叠切换时，动态计算中间区的宽度
 		middleWidth() {
-			let widthLeftAndRight = 0
+			let widthLeftAndRight = 0;
 			if (this.toolIsShow) {
-				widthLeftAndRight += this.widthLeftForTools // 左侧工具栏宽度
+				widthLeftAndRight += this.widthLeftForTools; // 左侧工具栏宽度
 			}
-			widthLeftAndRight += this.widthLeftForToolsHideButton // 左侧工具栏折叠按钮宽度
-			widthLeftAndRight += this.widthLeftForOptions // 右侧配置栏宽度
+			widthLeftAndRight += this.widthLeftForToolsHideButton; // 左侧工具栏折叠按钮宽度
+			widthLeftAndRight += this.widthLeftForOptions; // 右侧配置栏宽度
 
-			let middleWidth = this.bodyWidth - widthLeftAndRight
-			return middleWidth
+			let middleWidth = this.bodyWidth - widthLeftAndRight;
+			return middleWidth;
 		},
 		middleHeight() {
-			return this.bodyHeight
+			return this.bodyHeight;
 		},
 
 		workbenchTransform() {
-			return `scale(${this.bigscreenScaleInWorkbench}, ${this.bigscreenScaleInWorkbench})`
+			return `scale(${this.bigscreenScaleInWorkbench}, ${this.bigscreenScaleInWorkbench})`;
 		},
 		// 大屏在设计模式的大小
 		bigscreenWidthInWorkbench() {
-			return this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools
+			return this.getPXUnderScale(this.bigscreenWidth) + this.widthPaddingTools;
 		},
 		bigscreenHeightInWorkbench() {
-			return this.getPXUnderScale(this.bigscreenHeight) + this.widthPaddingTools
+			return this.getPXUnderScale(this.bigscreenHeight) + this.widthPaddingTools;
 		},
 		// 设计台按大屏的缩放比例
 		bigscreenScaleInWorkbench() {
-			let widthScale = (this.middleWidth - this.widthPaddingTools) / this.bigscreenWidth
-			let heightScale = (this.middleHeight - this.widthPaddingTools) / this.bigscreenHeight
-			return Math.min(widthScale, heightScale)
+			let widthScale = (this.middleWidth - this.widthPaddingTools) / this.bigscreenWidth;
+			let heightScale = (this.middleHeight - this.widthPaddingTools) / this.bigscreenHeight;
+			return Math.min(widthScale, heightScale);
 		},
 	},
 	data() {
@@ -254,38 +283,34 @@ export default {
 			reportCode: "",
 			setParamList: [], //数据集字段
 			isShowParamList: false, //显示参数列
-		}
+		};
 	},
 	methods: {
 		getSetParamsList(setParamList) {
-			// console.log('setParamList', setParamList);
-			this.setParamList = setParamList
-			this.isShowParamList = true
+			this.setParamList = setParamList;
+			this.isShowParamList = true;
 		},
 		//表字段拖拽到右侧行列里
-		paramOnDragged(evt, param) {
-			// console.log(evt, param);
-		},
+		paramOnDragged(evt, param) {},
 
 		// 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
 		widgetOnDragged(evt, widgetCode) {
-			console.log("0", evt, widgetCode)
-			let widgetType = widgetCode
+			let widgetType = widgetCode;
 
 			// 获取结束坐标和列名
-			let eventX = evt.originalEvent.clientX // 结束在屏幕的x坐标
-			let eventY = evt.originalEvent.clientY // 结束在屏幕的y坐标
+			let eventX = evt.originalEvent.clientX; // 结束在屏幕的x坐标
+			let eventY = evt.originalEvent.clientY; // 结束在屏幕的y坐标
 
-			let workbenchPosition = this.getDomTopLeftById("workbench")
+			let workbenchPosition = this.getDomTopLeftById("workbench");
 
-			let widgetTopInWorkbench = eventY - workbenchPosition.top
-			let widgetLeftInWorkbench = eventX - workbenchPosition.left
+			let widgetTopInWorkbench = eventY - workbenchPosition.top;
+			let widgetLeftInWorkbench = eventX - workbenchPosition.left;
 			// 计算在缩放模式下的x y
-			let x = widgetLeftInWorkbench / this.bigscreenScaleInWorkbench
-			let y = widgetTopInWorkbench / this.bigscreenScaleInWorkbench
+			let x = widgetLeftInWorkbench / this.bigscreenScaleInWorkbench;
+			let y = widgetTopInWorkbench / this.bigscreenScaleInWorkbench;
 
 			// 复制一个组件
-			let tool = getToolByCode(widgetType)
+			let tool = getToolByCode(widgetType);
 			let widgetJson = {
 				type: widgetType,
 				value: {
@@ -300,101 +325,101 @@ export default {
 					},
 				},
 				options: tool.options,
-			}
+			};
 			// 处理默认值
-			const widgetJsonValue = this.handleDefaultValue(widgetJson)
+			const widgetJsonValue = this.handleDefaultValue(widgetJson);
 			// 将选中的复制组件，放到工作区中去
-			this.widgets.push(deepClone(widgetJsonValue))
+			this.widgets.push(deepClone(widgetJsonValue));
 			// 激活新组件的配置属性
 			//   this.setOptionsOnClickWidget(this.widgets.length - 1);
 		},
 		//通过监听widgets 获取图层参数
 		handlerLayerWidget(val) {
-			const layerWidgetArr = []
+			const layerWidgetArr = [];
 			for (let i = 0; i < val.length; i++) {
-				const obj = {}
+				const obj = {};
 				// obj.icon = getToolByCode(val[i].type).icon;
-				const options = val[i].options["setup"]
+				const options = val[i].options["setup"];
 				options.forEach((el) => {
 					if (el.name == "layerName") {
-						obj.label = el.value
+						obj.label = el.value;
 					}
-				})
-				layerWidgetArr.push(obj)
+				});
+				layerWidgetArr.push(obj);
 			}
-			this.layerWidget = layerWidgetArr
+			this.layerWidget = layerWidgetArr;
 		},
 		// 渲染初始化大屏报表
 		async initEchartData() {
-			const reportCode = this.reportCode
+			const reportCode = this.reportCode;
 
-			const { code, result } = await previewScreenReq({ reportCode: reportCode })
-			if (code != 200) return
-			const processData = this.handleInitEchartsData(result)
-			const screenData = this.handleBigScreen(result.dashboard)
-			this.widgets = processData
-			this.dashboard = screenData
-			this.bigscreenWidth = this.dashboard.width
-			this.bigscreenHeight = this.dashboard.height
+			const { code, result } = await previewScreenReq({ reportCode: reportCode });
+			if (code != 200) return;
+			const processData = this.handleInitEchartsData(result);
+			const screenData = this.handleBigScreen(result.dashboard);
+			this.widgets = processData;
+			this.dashboard = screenData;
+			this.bigscreenWidth = this.dashboard.width;
+			this.bigscreenHeight = this.dashboard.height;
 		},
 		// 获取大屏参数--宽高，背景颜色，图片
 		handleBigScreen(data) {
-			const optionScreen = getToolByCode("screen").options
-			const setup = optionScreen.setup
+			const optionScreen = getToolByCode("screen").options;
+			const setup = optionScreen.setup;
 			for (const key in data) {
 				for (let i = 0; i < setup.length; i++) {
 					if (key == setup[i].name) {
-						setup[i].value = data[key]
+						setup[i].value = data[key];
 					}
 				}
 			}
-			this.setOptionsOnClickScreen()
+			this.setOptionsOnClickScreen();
 			return {
 				backgroundColor: (data && data.backgroundColor) || "",
 				backgroundImage: (data && data.backgroundImage) || "",
 				height: (data && data.height) || "1080",
 				title: (data && data.title) || "",
 				width: (data && data.width) || "1920",
-			}
+			};
 		},
 		// 大屏 图表
 		handleInitEchartsData(data) {
-			const widgets = data.dashboard ? data.dashboard.widgets : []
-			const widgetsData = []
+			const widgets = data.dashboard ? data.dashboard.widgets : [];
+			const widgetsData = [];
 			for (let i = 0; i < widgets.length; i++) {
-				let obj = {}
-				obj.type = widgets[i].type
+				let obj = {};
+				obj.type = widgets[i].type;
 				obj.value = {
 					setup: widgets[i].value.setup,
 					data: widgets[i].value.data,
 					position: widgets[i].value.position,
-				}
-				const tool = deepClone(getToolByCode(widgets[i].type))
-				const option = tool.options
+				};
+				const tool = deepClone(getToolByCode(widgets[i].type));
+				const option = tool.options;
 
-				const options = this.handleOptionsData(widgets[i].value, option)
-				obj.options = options
-				widgetsData.push(obj)
+				const options = this.handleOptionsData(widgets[i].value, option);
+				obj.options = options;
+				widgetsData.push(obj);
 			}
-			return widgetsData
+			return widgetsData;
 		},
 		// 大屏 右侧参数
 		handleOptionsData(data, option) {
 			for (const key in data.setup) {
 				for (let i = 0; i < option.setup.length; i++) {
-					let item = option.setup[i]
+					let item = option.setup[i];
 					if (Object.prototype.toString.call(item) == "[object Object]") {
 						if (key == option.setup[i].name) {
-							option.setup[i].value = data.setup[key]
+							option.setup[i].value = data.setup[key];
 						}
 					} else if (Object.prototype.toString.call(item) == "[object Array]") {
 						for (let j = 0; j < item.length; j++) {
-							const list = item[j].list
+							const list = item[j].list;
 							list.forEach((el) => {
 								if (key == el.name) {
-									el.value = data.setup[key]
+									el.value = data.setup[key];
 								}
-							})
+							});
 						}
 					}
 				}
@@ -403,7 +428,7 @@ export default {
 			for (const key in data.position) {
 				for (let i = 0; i < option.position.length; i++) {
 					if (key == option.position[i].name) {
-						option.position[i].value = data.position[key]
+						option.position[i].value = data.position[key];
 					}
 				}
 			}
@@ -411,17 +436,17 @@ export default {
 			for (const key in data.data) {
 				for (let i = 0; i < option.data.length; i++) {
 					if (key == option.data[i].name) {
-						option.data[i].value = data.data[key]
+						option.data[i].value = data.data[key];
 					}
 				}
 			}
-			return option
+			return option;
 		},
 		// 保存数据
 		async save(flag) {
 			if (!this.widgets || this.widgets.length == 0) {
-				this.$Message.error("请添加组件")
-				return
+				this.$Message.error("请添加组件");
+				return;
 			}
 			const screenData = {
 				reportCode: this.reportCode,
@@ -433,10 +458,10 @@ export default {
 					backgroundImage: this.dashboard.backgroundImage,
 				},
 				widgets: this.widgets,
-			}
-			const { code, data } = await addScreenReq(screenData)
+			};
+			const { code, data } = await addScreenReq(screenData);
 			if (code == 200) {
-				this.$Message.success("保存成功！")
+				this.$Message.success("保存成功！");
 			}
 		},
 		// 预览--跳转至新窗口
@@ -446,178 +471,176 @@ export default {
 				query: {
 					reportCode: this.reportCode,
 				},
-			})
-			window.open(href, "_blank")
+			});
+			window.open(href, "_blank");
 		},
 
 		// 在缩放模式下的大小
 		getPXUnderScale(px) {
-			return this.bigscreenScaleInWorkbench * px
+			return this.bigscreenScaleInWorkbench * px;
 		},
 
 		// 获取dom在屏幕中的top和left
 		getDomTopLeftById(id) {
-			let dom = document.getElementById(id)
-			return { top: dom?.getBoundingClientRect().top || 0, left: dom?.getBoundingClientRect().left || 0 }
+			let dom = document.getElementById(id);
+			return { top: dom?.getBoundingClientRect().top || 0, left: dom?.getBoundingClientRect().left || 0 };
 		},
 
 		// 对组件默认值处理
 		handleDefaultValue(widgetJson) {
-			console.log("1", widgetJson)
 			for (const key in widgetJson) {
 				if (key == "options") {
 					// collapse、data、position、setup
 					// setup 处理
 					for (let i = 0; i < widgetJson.options.setup.length; i++) {
-						const item = widgetJson.options.setup[i]
+						const item = widgetJson.options.setup[i];
 						if (Object.prototype.toString.call(item) == "[object Object]") {
-							widgetJson.value.setup[item.name] = item.value
+							widgetJson.value.setup[item.name] = item.value;
 						} else if (Object.prototype.toString.call(item) == "[object Array]") {
 							for (let j = 0; j < item.length; j++) {
-								const list = item[j].list
+								const list = item[j].list;
 								list.forEach((el) => {
-									widgetJson.value.setup[el.name] = el.value
-								})
+									widgetJson.value.setup[el.name] = el.value;
+								});
 							}
 						}
 					}
 					// position
 					for (let i = 0; i < widgetJson.options.position.length; i++) {
-						const item = widgetJson.options.position[i]
+						const item = widgetJson.options.position[i];
 						if (item.value) {
-							widgetJson.value.position[item.name] = item.value
+							widgetJson.value.position[item.name] = item.value;
 						}
 					}
 					// data 处理
 					if (widgetJson.options.data && widgetJson.options.data.length > 0) {
 						for (let i = 0; i < widgetJson.options.data.length; i++) {
-							const item = widgetJson.options.data[i]
+							const item = widgetJson.options.data[i];
 							if (item.value) {
-								widgetJson.value.data[item.name] = item.value
+								widgetJson.value.data[item.name] = item.value;
 							}
 						}
 					}
 				}
 			}
-			return widgetJson
+			return widgetJson;
 		},
 		layerClick(index) {
-			this.widgetIndex = index
-			this.widgetsClick(index)
+			this.widgetIndex = index;
+			this.widgetsClick(index);
 		},
 		// 如果是点击大屏设计器中的底层，加载大屏底层属性
 		setOptionsOnClickScreen() {
-			this.screenCode = "screen"
+			this.screenCode = "screen";
 			// 选中不同的组件 右侧都显示第一栏
-			this.activeName = "first"
-			this.widgetOptions = getToolByCode("screen")["options"]
+			this.activeName = "first";
+			this.widgetOptions = getToolByCode("screen")["options"];
 		},
 
 		// 点击组件
 		widgetsClick(index) {
-			const draggableArr = this.$refs.widgets
+			const draggableArr = this.$refs.widgets;
 			for (let i = 0; i < draggableArr.length; i++) {
 				if (i == index) {
-					this.$refs.widgets[i].$refs.draggable.setActive(true)
+					this.$refs.widgets[i].$refs.draggable.setActive(true);
 				} else {
-					this.$refs.widgets[i].$refs.draggable.setActive(false)
+					this.$refs.widgets[i].$refs.draggable.setActive(false);
 				}
 			}
 			// this.activeName = 'first';
-			this.setOptionsOnClickWidget(index)
-			this.grade = true
+			this.setOptionsOnClickWidget(index);
+			this.grade = true;
 		},
 		// 鼠标弹起不显示网格
 		widgetsMouseup(e) {
-			this.grade = false
+			this.grade = false;
 		},
 		// 如果是点击某个组件，获取该组件的配置项
 		setOptionsOnClickWidget(obj) {
-			this.screenCode = ""
+			this.screenCode = "";
 			if (typeof obj == "number") {
-				this.widgetOptions = { ...this.widgets[obj]["options"] }
-				return
+				this.widgetOptions = { ...this.widgets[obj]["options"] };
+				return;
 			}
 			if (obj.index < 0 || obj.index >= this.widgets.length) {
-				return
+				return;
 			}
-			this.widgetIndex = obj.index
-			this.widgets[obj.index].value.position = obj
+			this.widgetIndex = obj.index;
+			this.widgets[obj.index].value.position = obj;
 			this.widgets[obj.index].options.position.forEach((el) => {
 				for (const key in obj) {
 					if (el.name == key) {
-						el.value = obj[key]
+						el.value = obj[key];
 					}
 				}
-			})
-			this.widgetOptions = { ...this.widgets[obj.index]["options"] }
+			});
+			this.widgetOptions = { ...this.widgets[obj.index]["options"] };
 		},
 		// 激活组件拖拽
 		handleMouseDown() {
-			const draggableArr = this.$refs.widgets
+			const draggableArr = this.$refs.widgets;
 			for (let i = 0; i < draggableArr.length; i++) {
-				this.$refs.widgets[i].$refs.draggable.setActive(false)
+				this.$refs.widgets[i].$refs.draggable.setActive(false);
 			}
 		},
 		// 将当前选中的组件，右侧属性值更新
 		widgetValueChanged(key, val) {
 			if (this.screenCode == "screen") {
-				let newSetup = new Array()
-				this.dashboard = deepClone(val)
+				let newSetup = new Array();
+				this.dashboard = deepClone(val);
 				if (this.bigscreenWidth != this.dashboard.width) {
-					this.bigscreenWidth = this.dashboard.width
+					this.bigscreenWidth = this.dashboard.width;
 				}
 				if (this.bigscreenHeight != this.dashboard.height) {
-					this.bigscreenHeight = this.dashboard.height
+					this.bigscreenHeight = this.dashboard.height;
 				}
 				this.widgetOptions.setup.forEach((el) => {
 					if (el.name == "width") {
-						el.value = this.bigscreenWidth
+						el.value = this.bigscreenWidth;
 					} else if (el.name == "height") {
-						el.value = this.bigscreenHeight
+						el.value = this.bigscreenHeight;
 					}
-					newSetup.push(el)
-				})
-				this.widgetOptions.setup = newSetup
-				//  console.log('widgetValueChanged', '右侧属性值更新setup', this.widgetOptions.setup);
+					newSetup.push(el);
+				});
+				this.widgetOptions.setup = newSetup;
 			} else {
 				for (let i = 0; i < this.widgets.length; i++) {
 					if (this.widgetIndex == i) {
-						this.widgets[i].value[key] = deepClone(val)
-						this.setDefaultValue(this.widgets[i].options[key], val)
+						this.widgets[i].value[key] = deepClone(val);
+						this.setDefaultValue(this.widgets[i].options[key], val);
 					}
 				}
 			}
 		},
 		rightClick(event, index) {
-			this.rightClickIndex = index
-			const left = event.clientX
-			const top = event.clientY
+			this.rightClickIndex = index;
+			const left = event.clientX;
+			const top = event.clientY;
 			if (left || top) {
 				this.styleObj = {
 					left: left + "px",
 					top: top + "px",
 					display: "block",
-				}
+				};
 			}
-			this.visibleContentMenu = true
-			return false
+			this.visibleContentMenu = true;
+			return false;
 		},
 		setDefaultValue(options, val) {
 			for (let i = 0; i < options.length; i++) {
 				if (Object.prototype.toString.call(options[i]) == "[object Object]") {
 					for (const k in val) {
 						if (options[i].name == k) {
-							options[i].value = val[k]
+							options[i].value = val[k];
 						}
 					}
 				} else if (Object.prototype.toString.call(options[i]) == "[object Array]") {
 					for (let j = 0; j < options[i].length; j++) {
-						const list = options[i][j].list
+						const list = options[i][j].list;
 						for (let z = 0; z < list.length; z++) {
 							for (const k in val) {
 								if (list[z].name == k) {
-									list[z].value = val[k]
+									list[z].value = val[k];
 								}
 							}
 						}
@@ -627,66 +650,66 @@ export default {
 		},
 		//图层拖拉结束
 		datadragEnd(evt) {
-			evt.preventDefault()
-			this.widgets = this.swapArr(this.widgets, evt.oldIndex, evt.newIndex)
+			evt.preventDefault();
+			this.widgets = this.swapArr(this.widgets, evt.oldIndex, evt.newIndex);
 		},
 		// 数组 元素互换位置
 		swapArr(arr, oldIndex, newIndex) {
-			arr[oldIndex] = arr.splice(newIndex, 1, arr[oldIndex])[0]
-			return arr
+			arr[oldIndex] = arr.splice(newIndex, 1, arr[oldIndex])[0];
+			return arr;
 		},
 		// 删除
 		deletelayer() {
-			this.widgets.splice(this.rightClickIndex, 1)
+			this.widgets.splice(this.rightClickIndex, 1);
 		},
 		// 复制
 		copylayer() {
-			const obj = deepClone(this.widgets[this.rightClickIndex])
-			this.widgets.splice(this.widgets.length, 0, obj)
+			const obj = deepClone(this.widgets[this.rightClickIndex]);
+			this.widgets.splice(this.widgets.length, 0, obj);
 		},
 		// 置顶
 		istopLayer() {
 			if (this.rightClickIndex + 1 < this.widgets.length) {
-				const temp = this.widgets.splice(this.rightClickIndex, 1)[0]
-				this.widgets.push(temp)
+				const temp = this.widgets.splice(this.rightClickIndex, 1)[0];
+				this.widgets.push(temp);
 			}
 		},
 		// 置底
 		setlowLayer() {
 			if (this.rightClickIndex != 0) {
-				this.widgets.unshift(this.widgets.splice(this.rightClickIndex, 1)[0])
+				this.widgets.unshift(this.widgets.splice(this.rightClickIndex, 1)[0]);
 			}
 		},
 		// 上移一层
 		moveupLayer() {
 			if (this.rightClickIndex != 0) {
-				this.widgets[this.rightClickIndex] = this.widgets.splice(this.rightClickIndex - 1, 1, this.widgets[this.rightClickIndex])[0]
+				this.widgets[this.rightClickIndex] = this.widgets.splice(this.rightClickIndex - 1, 1, this.widgets[this.rightClickIndex])[0];
 			} else {
-				this.widgets.push(this.widgets.shift())
+				this.widgets.push(this.widgets.shift());
 			}
 		},
 		// 下移一层
 		movedownLayer() {
 			if (this.rightClickIndex != this.widgets.length - 1) {
-				this.widgets[this.rightClickIndex] = this.widgets.splice(this.rightClickIndex + 1, 1, this.widgets[this.rightClickIndex])[0]
+				this.widgets[this.rightClickIndex] = this.widgets.splice(this.rightClickIndex + 1, 1, this.widgets[this.rightClickIndex])[0];
 			} else {
-				this.widgets.unshift(this.widgets.splice(this.rightClickIndex, 1)[0])
+				this.widgets.unshift(this.widgets.splice(this.rightClickIndex, 1)[0]);
 			}
 		},
 	},
 	mounted() {
 		this.$nextTick(() => {
 			// 如果是新的设计工作台
-			this.reportCode = this.$route.query.reportCode
-			this.initEchartData()
-			this.widgets = []
+			this.reportCode = this.$route.query.reportCode;
+			this.initEchartData();
+			this.widgets = [];
 			window.addEventListener("mouseup", () => {
-				this.grade = false
-			})
-			this.getPXUnderScale(this.bigscreenWidth)
-		})
+				this.grade = false;
+			});
+			this.getPXUnderScale(this.bigscreenWidth);
+		});
 	},
-}
+};
 </script>
 <style>
 .luckysheet-input-box {
@@ -858,7 +881,8 @@ export default {
 				width: 100%;
 				height: 100%;
 				background-size: 30px 30px, 30px 30px;
-				background-image: linear-gradient(hsla(0, 0%, 100%, 0.1) 1px, transparent 0), linear-gradient(90deg, hsla(0, 0%, 100%, 0.1) 1px, transparent 0);
+				background-image: linear-gradient(hsla(0, 0%, 100%, 0.1) 1px, transparent 0),
+					linear-gradient(90deg, hsla(0, 0%, 100%, 0.1) 1px, transparent 0);
 				// z-index: 2;
 			}
 		}

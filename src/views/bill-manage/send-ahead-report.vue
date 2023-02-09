@@ -288,7 +288,6 @@ export default {
 		},
 		// 获取分页列表数据
 		pageLoad() {
-			console.log("分页");
 			this.data = [];
 			this.tableConfig.loading = false;
 			const { startTime, endTime, wo, location, lc, dc, ipn, groupID, status } = this.req;

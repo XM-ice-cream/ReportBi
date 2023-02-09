@@ -223,7 +223,6 @@ export default {
 			};
 			getpagelisttreeReq(obj).then((res) => {
 				if (res.code === 200) {
-					console.log(res.result.data);
 					const data = res.result.data;
 					this.roleBtn = data.length ? data.map((item) => item.name) : ["a"];
 					this.pageLoad();

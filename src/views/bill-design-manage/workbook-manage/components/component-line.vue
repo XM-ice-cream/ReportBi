@@ -1,3 +1,4 @@
+<!-- 折线图 -->
 <template>
 	<div id="linechart" class="charts"></div>
 </template>
@@ -14,7 +15,6 @@ export default {
 	watch: {
 		value: {
 			handler() {
-				console.log("折线图", this.value, this.row, this.column);
 				this.pageLoad();
 				// const data = this.$XEUtils.groupBy(data, "tableName");
 			},
@@ -40,14 +40,11 @@ export default {
 			const { xAxis, yAxis, grid, series, groupByString } = await this.dataLogic();
 
 			let option = {
-				color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 				tooltip: {
 					trigger: "axis",
 					formatter: function (params) {
-						console.log(params);
 						let aa = [];
 						params.forEach((item, index) => {
-							//	console.log(item, index);
 							aa.push("");
 							const { data, marker } = item;
 							Object.keys(data[2]).forEach((dataitem) => {
@@ -207,8 +204,6 @@ export default {
 				if (this.stringType(item)) stringTypeColumn.push(item.axis + item.orderBy);
 			});
 
-			console.log(numberTypeColumn, numberTypeRow, stringTypeRow, stringTypeColumn);
-
 			// 列中有指标，对所有行维度进行分组
 			const groupByString = numberTypeColumn.length ? stringTypeRow : stringTypeColumn;
 			const groupByNumber = numberTypeColumn.length ? numberTypeColumn : numberTypeRow;
@@ -233,8 +228,7 @@ export default {
 			});
 
 			const objKeys = Object.keys(obj);
-			console.log("列中有指标", obj, groupByString);
-			console.log("维度常量", axisConst);
+
 			//数据分组
 			// 行、列
 
@@ -341,7 +335,6 @@ export default {
 						});
 						if (!series[index]) series[index] = [];
 						if (series[index][itemIndex]) {
-							console.log(item, index, 123);
 							series[index][itemIndex].data.push(
 								numberTypeColumn.length ? [name, itemValue[item], { ...itemValue }, item] : [itemValue[item], name, { ...itemValue }, item]
 							);
@@ -356,7 +349,6 @@ export default {
 						}
 					});
 				});
-				console.log(series);
 			});
 
 			return { xAxis, yAxis, grid, series: series.flat(), groupByString };

@@ -67,7 +67,6 @@ export default {
 						that.setRightForm(cell, postion, sheetFile, ctx, that.draggableFieldLabel); //rightForm默认值
 					},
 					cellMousedown: function (cell, postion, sheetFile, ctx) {
-						console.log("cellMousedown");
 						const value = cell == null ? "" : cell.v;
 						that.setRightForm(cell, postion, sheetFile, ctx, value); //rightForm默认值
 					},
@@ -79,7 +78,6 @@ export default {
 						} else {
 							that.isSingleCell = false;
 						}
-						console.log("选区操作", range[0].row, range[0].column);
 					},
 				},
 				data: [
@@ -135,13 +133,11 @@ export default {
 		//设定RightForm
 		setRightForm(cell, postion, sheetFile, ctx) {
 			const { r, c } = postion;
-			console.log(cell, postion, sheetFile, ctx, window.luckysheet.getCellValue(r, c));
 			window.luckysheet.setCellValue(r, c, { ...cell });
 			this.rightForm = { ...cell };
 		},
 		//更新单元格信息，扩展、排序...
 		autoChangeFunc(type, right) {
-			console.log("更新单元格信息，扩展、排序", right);
 			const { rows, columns } = this.selectRange;
 			const temp = {};
 			temp[type] = right instanceof Array ? [...right] : { ...right };
@@ -151,7 +147,6 @@ export default {
 					luckysheet.setCellValue(i, j, { getCellValue, ...temp });
 				}
 			}
-			console.log(luckysheet.getAllSheets());
 		},
 
 		//保存
@@ -159,9 +154,11 @@ export default {
 			let jsonData = luckysheet.getAllSheets();
 			jsonData[0].data = [];
 			jsonData[0].celldata = jsonData[0].celldata.filter((item) => {
-				return JSON.stringify(item.v) !== "{}" && ((item.v.v && item.v.v != "") || (item.v.ct && item.v.ct.s) || (item.v.cellType && item.v.cellType.type) || item.v?.authority?.length);
+				return (
+					JSON.stringify(item.v) !== "{}" &&
+					((item.v.v && item.v.v != "") || (item.v.ct && item.v.ct.s) || (item.v.cellType && item.v.cellType.type) || item.v?.authority?.length)
+				);
 			});
-			console.log("jsonData", jsonData, "this.formInfo", this.formInfo, this.isAdd);
 			if (jsonData[0].celldata.length > 0) {
 				const { name, enCode, id } = this.formInfo;
 				const obj = { sortCode: 0, enabled: 1, remark: "", enCode, name, category: 0, json: JSON.stringify(jsonData), status: "", id };

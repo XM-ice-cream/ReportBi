@@ -182,7 +182,6 @@ export default {
 		// 点击编辑按钮触发
 		editClick() {
 			if (this.selectObj) {
-				console.log(this.selectObj);
 				this.modelFlag = true;
 				this.isAdd = false;
 			} else this.$Msg.warning(this.$t("oneData"));

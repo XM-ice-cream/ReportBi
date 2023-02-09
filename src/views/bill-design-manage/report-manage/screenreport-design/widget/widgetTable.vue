@@ -1,29 +1,30 @@
 <template>
-  <div :style="styleObj">
-    <superslide v-if="hackReset" :options="options" class="txtScroll-top">
-      <!--表头-->
-      <div class="title">
-        <div v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]" :key="index">
-          {{ item.name }}
-        </div>
-      </div>
-      <!--数据-->
-      <div class="bd" :style='{ background: optionsSetUp.tableBgColor}'>
-        <ul class="infoList">
-          <li v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
-            <div v-for="(itemChild, idx) in header" :key="idx" :style="[
-                bodyTableStyle,
-                bodyTable(index),
-                tableFiledWidth(idx),
-                tableRowHeight()
-              ]" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;" :title='item[itemChild.key]'>
-              {{ item[itemChild.key] }}
-            </div>
-          </li>
-        </ul>
-      </div>
-    </superslide>
-  </div>
+	<div :style="styleObj">
+		<superslide v-if="hackReset" :options="options" class="txtScroll-top">
+			<!--表头-->
+			<div class="title">
+				<div v-for="(item, index) in header" :style="[headerTableStlye, tableFiledWidth(index), tableRowHeight()]" :key="index">
+					{{ item.name }}
+				</div>
+			</div>
+			<!--数据-->
+			<div class="bd" :style="{ background: optionsSetUp.tableBgColor }">
+				<ul class="infoList">
+					<li v-for="(item, index) in list" :key="index" :style="tableRowHeight()">
+						<div
+							v-for="(itemChild, idx) in header"
+							:key="idx"
+							:style="[bodyTableStyle, bodyTable(index), tableFiledWidth(idx), tableRowHeight()]"
+							style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+							:title="item[itemChild.key]"
+						>
+							{{ item[itemChild.key] }}
+						</div>
+					</li>
+				</ul>
+			</div>
+		</superslide>
+	</div>
 </template>
 <script>
 import vue from "vue";
@@ -31,247 +32,243 @@ import VueSuperSlide from "vue-superslide";
 
 vue.use(VueSuperSlide);
 export default {
-  props: {
-    value: Object,
-    ispreview: Boolean,
-    visib: Boolean,
-  },
-  data () {
-    return {
-      hackReset: true,
-      options: {
-        titCell: ".hd ul",
-        mainCell: ".bd ul",
-        effect: "topLoop",
-        autoPage: true,
-        //effect: "top",
-        autoPlay: true,
-        vis: 5,
-        rowHeight: 50
-      },
-      header: [],
-      list: [],
-      optionsSetUp: {},
-      optionsPosition: {},
-      optionsData: {}
-    };
-  },
-  computed: {
-    styleObj () {
-      const allStyle = this.optionsPosition;
-      return {
-        position: this.ispreview ? "absolute" : "static",
-        width: allStyle.width + "px",
-        height: allStyle.height + "px",
-        left: allStyle.left + "px",
-        top: allStyle.top + "px",
+	props: {
+		value: Object,
+		ispreview: Boolean,
+		visib: Boolean,
+	},
+	data() {
+		return {
+			hackReset: true,
+			options: {
+				titCell: ".hd ul",
+				mainCell: ".bd ul",
+				effect: "topLoop",
+				autoPage: true,
+				//effect: "top",
+				autoPlay: true,
+				vis: 5,
+				rowHeight: 50,
+			},
+			header: [],
+			list: [],
+			optionsSetUp: {},
+			optionsPosition: {},
+			optionsData: {},
+		};
+	},
+	computed: {
+		styleObj() {
+			const allStyle = this.optionsPosition;
+			return {
+				position: this.ispreview ? "absolute" : "static",
+				width: allStyle.width + "px",
+				height: allStyle.height + "px",
+				left: allStyle.left + "px",
+				top: allStyle.top + "px",
+			};
+		},
+		headerTableStlye() {
+			const headStyle = this.optionsSetUp;
+			return {
+				"text-align": headStyle.textAlign,
+				"font-size": headStyle.fontSize + "px",
+				"border-style": headStyle.isLine ? "solid" : "none",
+				"border-width": headStyle.borderWidth + "px",
+				"border-color": headStyle.borderColor,
+				display: headStyle.isHeader ? "block" : "none",
+				color: headStyle.headColor,
+				"background-color": headStyle.headBackColor,
+				height: "20px",
+				"line-height": "20px",
+				"border-radius": "10px 10px 0px 0px",
+				margin: "0px 3px",
+			};
+		},
+		bodyTableStyle() {
+			const bodyStyle = this.optionsSetUp;
+			return {
+				"text-align": bodyStyle.textAlign,
+				"font-size": bodyStyle.fontSize + "px",
+				"border-style": bodyStyle.isLine ? "solid" : "none",
+				"border-width": bodyStyle.borderWidth + "px",
+				"border-color": bodyStyle.borderColor,
+				color: bodyStyle.bodyColor,
+				"background-color": bodyStyle.tableBgColor,
+				margin: "0px 3px",
+			};
+		},
+	},
+	watch: {
+		value: {
+			handler(val) {
+				this.optionsSetUp = val.setup;
+				this.optionsPosition = val.position;
+				this.optionsData = val.data;
+				this.initData();
+			},
+			deep: true,
+		},
+		visib() {
+			if (!this.visib) {
+				clearInterval(this.flagInter);
+			}
+		},
+	},
+	mounted() {
+		this.optionsSetUp = this.value.setup;
+		this.optionsPosition = this.value.position;
+		this.optionsData = this.value.data;
+		this.initData();
+	},
+	methods: {
+		initData() {
+			this.handlerRollFn();
+			this.handlerData();
+			this.visConfig();
+		},
+		visConfig() {
+			this.options.vis = this.optionsSetUp.vis;
+		},
+		handlerRollFn() {
+			const options = this.options;
+			const rollSet = this.optionsSetUp;
+			options.autoPlay = rollSet.isRoll;
+			options.effect = rollSet.effect;
+			options.interTime = rollSet.interTime;
+			options.delayTime = rollSet.delayTime;
+			options.scroll = rollSet.scroll;
+			this.options = options;
+			this.hackResetFun();
+		},
+		//修改title
+		handlerHead() {
+			const head = this.optionsSetUp.dynamicAddTable;
+			this.header = head;
+		},
+		//初始化title
+		setHead() {
+			if (this.list.length > 0) {
+				// const head = this.optionsSetUp.dynamicAddTable;
 
-      };
-    },
-    headerTableStlye () {
-      const headStyle = this.optionsSetUp;
-      return {
-        "text-align": headStyle.textAlign,
-        "font-size": headStyle.fontSize + "px",
-        "border-style": headStyle.isLine ? "solid" : "none",
-        "border-width": headStyle.borderWidth + "px",
-        "border-color": headStyle.borderColor,
-        display: headStyle.isHeader ? "block" : "none",
-        color: headStyle.headColor,
-        "background-color": headStyle.headBackColor,
-        'height': '20px',
-        'line-height': '20px',
-        'border-radius': '10px 10px 0px 0px',
-        'margin': '0px 3px'
-      };
-    },
-    bodyTableStyle () {
-      const bodyStyle = this.optionsSetUp;
-      return {
-        "text-align": bodyStyle.textAlign,
-        "font-size": bodyStyle.fontSize + "px",
-        "border-style": bodyStyle.isLine ? "solid" : "none",
-        "border-width": bodyStyle.borderWidth + "px",
-        "border-color": bodyStyle.borderColor,
-        color: bodyStyle.bodyColor,
-        "background-color": bodyStyle.tableBgColor,
-        'margin': '0px 3px'
-      };
-    }
-  },
-  watch: {
-    value: {
-      handler (val) {
-        this.optionsSetUp = val.setup;
-        this.optionsPosition = val.position;
-        this.optionsData = val.data;
-        this.initData();
-      },
-      deep: true
-    },
-    visib () {
-      if (!this.visib) {
-        clearInterval(this.flagInter)
-      }
-    },
-  },
-  mounted () {
-    this.optionsSetUp = this.value.setup;
-    this.optionsPosition = this.value.position;
-    this.optionsData = this.value.data;
-    this.initData();
-  },
-  methods: {
-    initData () {
-      this.handlerRollFn();
-      this.handlerData();
-      this.visConfig();
-    },
-    visConfig () {
-      this.options.vis = this.optionsSetUp.vis;
-    },
-    handlerRollFn () {
-      const options = this.options;
-      const rollSet = this.optionsSetUp;
-      options.autoPlay = rollSet.isRoll;
-      options.effect = rollSet.effect;
-      options.interTime = rollSet.interTime;
-      options.delayTime = rollSet.delayTime;
-      options.scroll = rollSet.scroll;
-      this.options = options;
-      this.hackResetFun();
-    },
-    //修改title
-    handlerHead () {
-      const head = this.optionsSetUp.dynamicAddTable;
-      console.log(head, "head");
-      this.header = head;
-    },
-    //初始化title
-    setHead () {
-      if (this.list.length > 0) {
-        // const head = this.optionsSetUp.dynamicAddTable;
-        // console.log(head, "head");
-
-        let head = []
-        Object.keys(this.list[0]).forEach(item => {
-          head.push({
-            key: item,
-            name: item,
-            width: "200",
-          })
-        })
-        // const head = this.header;
-        this.header = head;
-        // this.optionsSetUp.dynamicAddTable = head.map(item => { return { ...item } })
-        // this.optionsSetUp.dynamicAddTable = head;
-      }
-    },
-    // 处理数据
-    handlerData () {
-      const tableData = this.optionsData;
-      tableData.dataType == "staticData"
-        ? this.handlerStaticData(tableData.staticData)
-        : this.handlerDynamicData(tableData.dynamicData, tableData.refreshTime);
-    },
-    //静态数据
-    handlerStaticData (data) {
-      this.handlerHead();
-      this.list = data;
-    },
-    // 动态数据
-    handlerDynamicData (data, refreshTime) {
-      if (!data) return;
-      if (this.ispreview) {
-        this.getEchartData(data);
-        this.flagInter = setInterval(() => {
-          this.getEchartData(data);
-        }, refreshTime);
-      } else {
-        this.getEchartData(data);
-      }
-    },
-    getEchartData (val) {
-      const data = this.queryEchartsData(val);
-      data.then(res => {
-        console.log("表格数据", res);
-        this.list = res.data;
-        this.setHead(); //设定头部
-        this.hackResetFun();
-      });
-    },
-    // vue hack 之强制刷新组件
-    hackResetFun () {
-      this.hackReset = false;
-      this.$nextTick(() => {
-        this.hackReset = true;
-      });
-    },
-    // 计算 奇偶背景色
-    bodyTable (index) {
-      let styleJson = {};
-      if (index % 2) {
-        styleJson["background-color"] = this.optionsSetUp.eventColor;
-      } else {
-        styleJson["background-color"] = this.optionsSetUp.oldColor;
-      }
-      return styleJson;
-    },
-    tableRowHeight () {
-      let styleJson = {};
-      if (this.optionsSetUp.rowHeight) {
-        styleJson["height"] = this.optionsSetUp.rowHeight + "px";
-        styleJson["line-height"] = this.optionsSetUp.rowHeight + "px";
-      } else {
-        styleJson["height"] = this.options.rowHeight;
-        styleJson["line-height"] = this.optionsSetUp.rowHeight + "px";
-      }
-      return styleJson;
-    },
-    tableFiledWidth (index) {
-      let styleJson = {};
-      const tableWidth = this.header[index].width;
-      if (tableWidth) {
-        styleJson["min-width"] = tableWidth.indexOf('%') < 0 ? tableWidth + 'px' : tableWidth;
-      }
-      return styleJson;
-    }
-  }
+				let head = [];
+				Object.keys(this.list[0]).forEach((item) => {
+					head.push({
+						key: item,
+						name: item,
+						width: "200",
+					});
+				});
+				// const head = this.header;
+				this.header = head;
+				// this.optionsSetUp.dynamicAddTable = head.map(item => { return { ...item } })
+				// this.optionsSetUp.dynamicAddTable = head;
+			}
+		},
+		// 处理数据
+		handlerData() {
+			const tableData = this.optionsData;
+			tableData.dataType == "staticData"
+				? this.handlerStaticData(tableData.staticData)
+				: this.handlerDynamicData(tableData.dynamicData, tableData.refreshTime);
+		},
+		//静态数据
+		handlerStaticData(data) {
+			this.handlerHead();
+			this.list = data;
+		},
+		// 动态数据
+		handlerDynamicData(data, refreshTime) {
+			if (!data) return;
+			if (this.ispreview) {
+				this.getEchartData(data);
+				this.flagInter = setInterval(() => {
+					this.getEchartData(data);
+				}, refreshTime);
+			} else {
+				this.getEchartData(data);
+			}
+		},
+		getEchartData(val) {
+			const data = this.queryEchartsData(val);
+			data.then((res) => {
+				this.list = res.data;
+				this.setHead(); //设定头部
+				this.hackResetFun();
+			});
+		},
+		// vue hack 之强制刷新组件
+		hackResetFun() {
+			this.hackReset = false;
+			this.$nextTick(() => {
+				this.hackReset = true;
+			});
+		},
+		// 计算 奇偶背景色
+		bodyTable(index) {
+			let styleJson = {};
+			if (index % 2) {
+				styleJson["background-color"] = this.optionsSetUp.eventColor;
+			} else {
+				styleJson["background-color"] = this.optionsSetUp.oldColor;
+			}
+			return styleJson;
+		},
+		tableRowHeight() {
+			let styleJson = {};
+			if (this.optionsSetUp.rowHeight) {
+				styleJson["height"] = this.optionsSetUp.rowHeight + "px";
+				styleJson["line-height"] = this.optionsSetUp.rowHeight + "px";
+			} else {
+				styleJson["height"] = this.options.rowHeight;
+				styleJson["line-height"] = this.optionsSetUp.rowHeight + "px";
+			}
+			return styleJson;
+		},
+		tableFiledWidth(index) {
+			let styleJson = {};
+			const tableWidth = this.header[index].width;
+			if (tableWidth) {
+				styleJson["min-width"] = tableWidth.indexOf("%") < 0 ? tableWidth + "px" : tableWidth;
+			}
+			return styleJson;
+		},
+	},
 };
 </script>
 <style lang="less" scoped>
 /* 本例子css */
 .txtScroll-top {
-  overflow: hidden;
-  position: relative;
+	overflow: hidden;
+	position: relative;
 }
 
 .title {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
+	display: flex;
+	flex-direction: row;
+	width: 100%;
 }
 
 .title > div {
-  height: 50px;
-  line-height: 50px;
-  width: 100%;
+	height: 50px;
+	line-height: 50px;
+	width: 100%;
 }
 
 .txtScroll-top .bd {
-  width: 100%;
+	width: 100%;
 }
 
 .txtScroll-top .infoList li {
-  height: 50px;
-  line-height: 50px;
-  display: flex;
-  flex-direction: row;
-  //   display: inline-block;
+	height: 50px;
+	line-height: 50px;
+	display: flex;
+	flex-direction: row;
+	//   display: inline-block;
 }
 
 .txtScroll-top .infoList li > div {
-  width: 100%;
+	width: 100%;
 }
 
 /*.txtScroll-top .infoList li:nth-child(n) {

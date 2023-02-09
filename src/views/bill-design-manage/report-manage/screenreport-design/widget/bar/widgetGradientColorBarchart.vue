@@ -159,7 +159,6 @@ export default {
 	watch: {
 		value: {
 			handler(val) {
-				console.log("type", "widget-gradient-color-chart");
 				this.optionsStyle = val.position;
 				this.optionsData = val.data;
 				this.optionsCollapse = val.setup;
@@ -219,7 +218,6 @@ export default {
 			const optionsSetup = this.optionsSetup;
 			let xAxisData = [];
 			let offset = 0;
-			console.log(xAxis);
 
 			xAxis?.forEach((item) => {
 				xAxisData.push({
@@ -314,7 +312,6 @@ export default {
 			series.forEach((item, index) => {
 				if (series[index].type == "bar") {
 					if (optionsSetup.verticalShow) {
-						console.log("postion-right");
 						series[index].label = {
 							show: optionsSetup.isShow,
 							position: "right",
@@ -341,7 +338,6 @@ export default {
 							},
 						};
 					} else {
-						console.log("postion-top");
 						series[index].label = {
 							show: optionsSetup.isShow,
 							position: "top",
@@ -489,14 +485,12 @@ export default {
 			});
 		},
 		renderingFn(optionsSetup, val) {
-			console.log("val", val);
 			//还原x轴，y轴数据
 			this.restore();
 			//动态设定数值与type=value/category
 			optionsSetup.verticalShow ? this.setXData(val, optionsSetup) : this.setYData(val, optionsSetup);
 			// 数值设定 or 柱体设置
 			this.setOptionsTop();
-			console.log(this.options);
 		},
 		//还原x轴，y轴数据
 		restore() {
@@ -542,7 +536,6 @@ export default {
 		},
 		//X轴数据设定
 		setXData(val, optionsSetup) {
-			console.log("X轴");
 			// 动态多列
 			this.setOptionsY(val.xAxis);
 			// Y轴-类目类型
@@ -566,7 +559,6 @@ export default {
 		},
 		//Y轴数据设定
 		setYData(val, optionsSetup) {
-			console.log("Y轴");
 			// 动态多列
 			this.setOptionsX(val.xAxis);
 			//x轴--类目类型

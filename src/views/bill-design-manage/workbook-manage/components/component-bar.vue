@@ -1,3 +1,4 @@
+<!-- 柱状图 -->
 <template>
 	<div id="barchart" class="charts"></div>
 </template>
@@ -14,7 +15,6 @@ export default {
 	watch: {
 		value: {
 			handler() {
-				console.log("柱状图", this.value, this.row, this.column);
 				this.pageLoad();
 				// const data = this.$XEUtils.groupBy(data, "tableName");
 			},
@@ -48,10 +48,8 @@ export default {
 						type: "shadow",
 					},
 					formatter: function (params) {
-						//	console.log(params);
 						let aa = [];
 						params.forEach((item, index) => {
-							//	console.log(item, index);
 							aa.push("");
 							const { data, marker } = item;
 							Object.keys(data[2]).forEach((dataitem) => {
@@ -153,7 +151,6 @@ export default {
 				series: series,
 			};
 			this.myChart.setOption(option, true);
-			console.log(option);
 			window.addEventListener("resize", function () {
 				this.myChart.resize();
 			});
@@ -213,8 +210,6 @@ export default {
 				if (this.stringType(item)) stringTypeColumn.push(item.axis + item.orderBy);
 			});
 
-			console.log(numberTypeColumn, numberTypeRow, stringTypeRow, stringTypeColumn);
-
 			// 列中有指标，对所有行维度进行分组
 			const groupByString = numberTypeColumn.length ? stringTypeRow : stringTypeColumn;
 			const groupByNumber = numberTypeColumn.length ? numberTypeColumn : numberTypeRow;
@@ -239,8 +234,7 @@ export default {
 			});
 
 			const objKeys = Object.keys(obj);
-			console.log("列中有指标", obj, groupByString);
-			console.log("维度常量", axisConst);
+
 			//数据分组
 			// 行、列
 
@@ -272,7 +266,6 @@ export default {
 							overflow: "truncate",
 							formatter: function (value, valueIndex, data) {
 								axisLabelData[index][valueIndex] = value;
-								//	console.log(axisLabelData);
 								if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
 								if (value === axisLabelData[index][valueIndex - 1]) return "";
 								else return value;
@@ -349,7 +342,6 @@ export default {
 						});
 						if (!series[index]) series[index] = [];
 						if (series[index][itemIndex]) {
-							console.log(item, index, 123);
 							series[index][itemIndex].data.push(
 								numberTypeColumn.length ? [name, itemValue[item], { ...itemValue }, item] : [itemValue[item], name, { ...itemValue }, item]
 							);
@@ -364,7 +356,6 @@ export default {
 						}
 					});
 				});
-				console.log(series);
 			});
 
 			return { xAxis, yAxis, grid, series: series.flat(), groupByString, groupByNumber };
@@ -401,7 +392,9 @@ export default {
 			return obj[name];
 		},
 	},
-	mounted() {},
+	mounted() {
+		this.pageLoad();
+	},
 };
 </script>
 <style>

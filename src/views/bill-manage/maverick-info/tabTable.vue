@@ -325,7 +325,6 @@ export default {
 	methods: {
 		// 获取分页列表数据
 		pageLoad() {
-			console.log("获取分页");
 			this.tableConfig.loading = true;
 			let obj = {
 				orderField: "model", // 排序字段

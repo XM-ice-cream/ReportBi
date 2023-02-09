@@ -162,7 +162,6 @@ export default {
 				this.submitData = { ...this.selectObj };
 
 				const { json, name, enCode, id } = this.selectObj;
-				console.log(this.submitData, JSON.parse(json));
 				this.isAdd = false;
 				this.$refs["paperless-design"].modalFlag = true;
 				this.$refs["paperless-design"].sheetData = JSON.parse(json);
