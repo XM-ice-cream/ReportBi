@@ -39,12 +39,12 @@ export default {
 			let option = {
 				// color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 				tooltip: {
-					trigger: "axis",
+					trigger: "item",
 					axisPointer: {
 						type: "shadow",
 					},
 					formatter: function (params) {
-						return _this.$parent.tooltipFormatter(params, groupByString);
+						return _this.$parent.tooltipFormatter([params], groupByString);
 					},
 					appendToBody: true,
 					confine: true,

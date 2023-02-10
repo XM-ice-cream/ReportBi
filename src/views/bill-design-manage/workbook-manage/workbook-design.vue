@@ -298,7 +298,15 @@
 					<!-- 工作区 -->
 					<div class="right-content">
 						<div class="title">{{ submitData.title }}</div>
-						<componentsTemp :type="submitData.chartType" :visib="true" :value="chartsData" :row="rowData" :column="columnData" :mark="markData" />
+						<componentsTemp
+							v-if="modelFlag"
+							:type="submitData.chartType"
+							:visib="true"
+							:value="chartsData"
+							:row="rowData"
+							:column="columnData"
+							:mark="markData"
+						/>
 					</div>
 				</div>
 			</div>
@@ -719,6 +727,8 @@ export default {
 			this.columnData = []; //列值
 			this.rowData = []; //行值
 			this.markData = [];
+			this.selectObj = {};
+			this.chartsData = [];
 			this.$emit("update:modelFlag", false);
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
 		},
