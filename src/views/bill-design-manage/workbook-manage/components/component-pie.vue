@@ -5,52 +5,57 @@
 import * as echarts from "echarts";
 export default {
 	name: "componentPie",
+	props: {
+		chartData: Object,
+	},
+	watch: {
+		chartData: {
+			handler() {
+				this.pageLoad();
+				// const data = this.$XEUtils.groupBy(data, "tableName");
+			},
+			deep: true,
+			immediate: true,
+		},
+	},
 	data() {
-		return {};
+		return {
+			myChart: "",
+		};
 	},
 	methods: {
-		pageLoad() {
+		async pageLoad() {
+			if (this.myChart != null && this.myChart != "" && this.myChart != undefined) {
+				this.myChart.dispose();
+			}
 			// 基于准备好的dom，初始化echarts实例
-			const charts = echarts.init(document.getElementById("piechart"));
+			this.myChart = echarts.init(document.getElementById("piechart"));
+			const _this = this;
+
+			const { xAxis, yAxis, grid, series, groupByString, dataZoom } = this.chartData;
+
 			let option = {
-				color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
-				title: {
-					text: "Referer of a Website",
-					subtext: "Fake Data",
-					left: "center",
-				},
+				// color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 				tooltip: {
-					trigger: "item",
-				},
-				legend: {
-					orient: "vertical",
-					left: "left",
-				},
-				series: [
-					{
-						name: "Access From",
-						type: "pie",
-						radius: "50%",
-						data: [
-							{ value: 1048, name: "Search Engine" },
-							{ value: 735, name: "Direct" },
-							{ value: 580, name: "Email" },
-							{ value: 484, name: "Union Ads" },
-							{ value: 300, name: "Video Ads" },
-						],
-						emphasis: {
-							itemStyle: {
-								shadowBlur: 10,
-								shadowOffsetX: 0,
-								shadowColor: "rgba(0, 0, 0, 0.5)",
-							},
-						},
+					trigger: "axis",
+					axisPointer: {
+						type: "shadow",
 					},
-				],
+					formatter: function (params) {
+						return _this.$parent.tooltipFormatter(params, groupByString);
+					},
+					appendToBody: true,
+					confine: true,
+				},
+				legend: {},
+				series: series.map((item) => {
+					return { ...item, type: "pie", radius: "50%" };
+				}),
 			};
-			charts.setOption(option, true);
+
+			this.myChart.setOption(option, true);
 			window.addEventListener("resize", function () {
-				charts.resize();
+				this.myChart.resize();
 			});
 		},
 	},

@@ -35,6 +35,7 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.submitData = { ...this.selectObj };
+				this.submitData.labelWidth = this.submitData?.labelWidth || 90;
 			}
 		},
 	},
