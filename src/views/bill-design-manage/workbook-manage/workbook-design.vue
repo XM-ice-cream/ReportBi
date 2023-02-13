@@ -617,11 +617,12 @@ export default {
 					id === "row" && oldIndex === newIndex ? this.rowData.splice(oldIndex, 1) : "";
 					break;
 				case "mark-box":
+					console.log("mark-box", this.markData);
 					id === "mark-box" && oldIndex === newIndex ? this.markData.splice(oldIndex, 1) : "";
 					break;
 				case "tree":
 					if (["color", "size", "mark", "info", "labelWidth"].includes(id)) {
-						this.markData[newIndex].innerText = id;
+						this.markData[newIndex]["innerText"] = id;
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
 					break;
