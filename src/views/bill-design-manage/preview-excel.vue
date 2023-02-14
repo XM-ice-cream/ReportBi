@@ -275,17 +275,23 @@ export default {
 	background-color: #f5f7f9;
 	padding-bottom: 1rem;
 	.cardCell {
-		width: 19.9rem;
+		width: 320px;
 		/* background: #ccc; */
-		border: 1px solid #fafcff;
+		border: 2px solid #fafcff;
 		box-shadow: 3px 5px 7px #d0dbf194;
-		padding: 0.3rem;
-		margin-top: 1rem;
-		margin-left: 1rem;
+		padding: 2px;
+		margin-top: 15px;
+		margin-left: 15px;
 		position: relative;
 		background: #fff;
 		border-radius: 12px;
 		cursor: pointer;
+		transition: all 0.2s ease-out;
+		&:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 6px 16px 2px rgba(7 12 20 8%) !important;
+			border: 2px solid #52d8a0 !important;
+		}
 		.title {
 			width: 100%;
 			height: 4rem;
