@@ -75,6 +75,7 @@ export default {
 			let obj = {}; //数据分组
 			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] } };
 			let axisConst = []; //维度常量
+			let markObj = { color: {} };
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
@@ -110,12 +111,24 @@ export default {
 				});
 			});
 
+			//标记 颜色
+			this.mark.forEach((markItem) => {
+				const { innerText, markValue, axis, orderBy } = markItem;
+				if (innerText === "color") {
+					markValue.forEach((data) => {
+						const { title, color } = data;
+						if (!markObj.color[`${axis}${orderBy}`]) markObj.color[`${axis}${orderBy}`] = {};
+						markObj.color[`${axis}${orderBy}`][title] = color;
+					});
+				}
+			});
+			console.log("markObj", markObj);
 			const objKeys = Object.keys(obj);
 
 			// 行、列
 			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, objKeys, axisConst, groupByString);
 			//series
-			const series = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj);
+			const series = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj.color);
 
 			//dataZoom
 			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber);
@@ -141,8 +154,8 @@ export default {
 					//文本宽度
 					const labelWidth =
 						this.mark.filter((markItem) => {
-							return markItem.markId === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnName;
-						})[0]?.labelWidth || 90;
+							return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnName;
+						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
 
@@ -184,8 +197,8 @@ export default {
 					//文本宽度
 					const labelWidth =
 						this.mark.filter((markItem) => {
-							return markItem.markId === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
-						})[0]?.labelWidth || 90;
+							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
+						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
 
@@ -225,27 +238,42 @@ export default {
 			return { xAxis, yAxis, grid };
 		},
 		//获取series
-		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj) {
+		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObjColor) {
 			let series = [];
 			groupByNumber.forEach((item, index) => {
 				objKeys.forEach((key) => {
 					obj[key].forEach((itemValue, itemIndex) => {
 						let name = "";
+						let data = {};
 						groupByString.forEach((rowItem) => {
 							name += itemValue[rowItem];
 						});
+						const color = markObjColor[Object.keys(markObjColor)[0]][itemValue[Object.keys(markObjColor)[0]]];
+						console.log(color);
+						data = yNumber.length
+							? {
+									value: [name, itemValue[item], { ...itemValue }, item],
+									itemStyle: {
+										color: color,
+									},
+							  }
+							: {
+									value: [itemValue[item], name, { ...itemValue }, item],
+									itemStyle: {
+										color: color,
+									},
+							  };
+
 						if (!series[index]) series[index] = [];
 						if (series[index][itemIndex]) {
-							series[index][itemIndex].data.push(
-								yNumber.length ? [name, itemValue[item], { ...itemValue }, item] : [itemValue[item], name, { ...itemValue }, item]
-							);
+							series[index][itemIndex].data.push(data);
 						} else {
 							series[index].push({
 								type: "",
 								stack: item,
 								xAxisIndex: yNumber.length ? groupByString.length : 0,
 								yAxisIndex: !yNumber.length ? groupByString.length : 0,
-								data: yNumber.length ? [[name, itemValue[item], { ...itemValue }, item]] : [[itemValue[item], name, { ...itemValue }, item]],
+								data: [data],
 							});
 						}
 					});
@@ -338,18 +366,19 @@ export default {
 			params.forEach((item, index) => {
 				aa.push("");
 				const { data, marker } = item;
-				Object.keys(data[2]).forEach((dataitem) => {
+				const { value } = data;
+				Object.keys(value[2]).forEach((dataitem) => {
 					if (groupByString.includes(dataitem) && index == 0) {
 						aa.splice(
 							groupByString.findIndex((item) => item === dataitem),
 							0,
-							this.axisToField(dataitem) + `:  ${data[2][dataitem]}`
+							this.axisToField(dataitem) + `:  ${value[2][dataitem]}`
 						);
 					}
 
-					if (!groupByString.includes(dataitem) && (data[3] === dataitem || typeof data[2][dataitem] === "string")) {
-						if (data[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${data[2][dataitem]}`);
-						if (typeof data[2][dataitem] === "string") aa.push(this.axisToField(dataitem) + `:  ${data[2][dataitem]}`);
+					if (!groupByString.includes(dataitem) && (value[3] === dataitem || typeof value[2][dataitem] === "string")) {
+						if (value[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
+						if (typeof value[2][dataitem] === "string") aa.push(this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
 					}
 				});
 			});
@@ -370,6 +399,8 @@ export default {
 			let obj = {};
 			this.row.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
 			this.column.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
+			this.mark.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
+
 			return obj[name];
 		},
 		//计算属性对应中文

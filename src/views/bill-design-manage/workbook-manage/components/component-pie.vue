@@ -11,8 +11,9 @@ export default {
 	watch: {
 		chartData: {
 			handler() {
-				this.pageLoad();
-				// const data = this.$XEUtils.groupBy(data, "tableName");
+				this.$nextTick(() => {
+					this.pageLoad();
+				});
 			},
 			deep: true,
 			immediate: true,

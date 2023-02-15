@@ -12,7 +12,9 @@ export default {
 	watch: {
 		chartData: {
 			handler() {
-				this.pageLoad();
+				this.$nextTick(() => {
+					this.pageLoad();
+				});
 			},
 			deep: true,
 			immediate: true,

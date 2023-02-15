@@ -4,9 +4,13 @@
 	<Modal :title="isAdd ? '标记' : '标记'" v-model="modelFlag" width="800" draggable :mask-closable="false" :mask="true" :before-close="cancelClick">
 		<div class="mark-fields">
 			<Form ref="submitReq" :model="submitData" :label-width="100" :label-colon="true">
-				<!-- 显示数据 -->
-				<FormItem label="文本宽度" prop="labelWidth" v-if="submitData.markId === 'labelWidth'">
-					<InputNumber v-model="submitData.labelWidth" controls-outside :step="10" />
+				<!-- 文本宽度 -->
+				<FormItem label="文本宽度" prop="markValue" v-if="submitData.innerText === 'labelWidth'">
+					<InputNumber v-model="submitData.markValue" controls-outside :step="10" />
+				</FormItem>
+				<!-- 颜色设定 -->
+				<FormItem label="颜色设定" prop="markValue" v-if="submitData.innerText === 'color'">
+					<Tree :data="submitData.markValue" :render="renderContent"></Tree>
 				</FormItem>
 			</Form>
 		</div>
@@ -18,6 +22,9 @@
 	</Modal>
 </template>
 <script>
+import { getselectvalueReq } from "@/api/bill-design-manage/workbook-design.js";
+import { formatDate } from "@/libs/tools";
+
 export default {
 	name: "mark-fields",
 	components: {},
@@ -34,14 +41,26 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
+				console.log(this.isAdd);
 				this.submitData = { ...this.selectObj };
-				this.submitData.labelWidth = this.submitData?.labelWidth || 90;
+				const { innerText } = this.submitData;
+				if (innerText === "labelWidth") {
+					this.submitData.markValue = this.submitData?.markValue || 90;
+				}
+				//新增的时候 需要获取字段对应的所有值
+				if (innerText === "color" && this.isAdd) {
+					//获取对应字段的所有值
+					this.getAllValue();
+				}
+
+				console.log(this.submitData);
 			}
 		},
 	},
 	data() {
 		return {
 			submitData: {},
+			colorSelect: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 			modelFlag: false,
 		};
 	},
@@ -55,6 +74,81 @@ export default {
 			this.$refs.submitReq.resetFields();
 			this.cancelClick(); //关闭弹框
 		},
+		//获取字段对应的所有值
+		getAllValue() {
+			const { nodeId, datasetId, tableName, columnName, columnType, dataType, columnComment } = this.submitData;
+			const obj = {
+				orderField: "string",
+				ascending: true,
+				pageSize: 30, // 分页大小
+				pageIndex: 1, // 当前页码
+				total: 0,
+				data: {
+					nodeId,
+					datasetId,
+					tableName,
+					columnName,
+					columnType,
+					dataType,
+					columnComment,
+				},
+			};
+			getselectvalueReq(obj).then((res) => {
+				if (res.code == 200) {
+					let { data } = res.result;
+					this.submitData.markValue =
+						data.map((item, index) => {
+							if (dataType === "DateTime") item = formatDate(item);
+							const colorIndex = index % 9;
+							return { title: item, color: this.colorSelect[colorIndex], nodeKey: index };
+						}) || [];
+				} else {
+					this.$message.error(`查询失败,${res.message}`);
+					this.submitData.markValue = [];
+				}
+				this.submitData = JSON.parse(JSON.stringify(this.submitData));
+			});
+		},
+		renderContent(h, { root, node, data }) {
+			return h(
+				"span",
+				{
+					style: {
+						display: "inline-block",
+						width: "100%",
+						padding: "5px",
+					},
+				},
+				[
+					h("span", [
+						h("ColorPicker", {
+							props: {
+								size: "small",
+								value: data.color,
+							},
+							style: {
+								marginRight: "10px",
+							},
+							on: {
+								"on-change": (val) => {
+									data.color = val;
+									console.log(val);
+								},
+							},
+
+							// style: {
+							// 	width: "15px",
+							// 	height: "15px",
+							// 	backgroundColor: data.color,
+							// 	display: "inline-block",
+							// 	marginRight: "8px",
+							// },
+						}),
+						h("span", data.title),
+					]),
+				]
+			);
+		},
 
 		//关闭弹框
 		cancelClick() {
@@ -66,4 +160,9 @@ export default {
 	},
 };
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.mark-fields {
+	height: 500px;
+	overflow: auto;
+}
+</style>

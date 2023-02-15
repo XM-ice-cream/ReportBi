@@ -12,8 +12,9 @@ export default {
 	watch: {
 		chartData: {
 			handler() {
-				this.pageLoad();
-				// const data = this.$XEUtils.groupBy(data, "tableName");
+				this.$nextTick(() => {
+					this.pageLoad();
+				});
 			},
 			deep: true,
 			immediate: true,
@@ -60,6 +61,7 @@ export default {
 				}),
 			};
 			this.myChart.setOption(option, true);
+			console.log(option);
 			window.addEventListener("resize", function () {
 				this.myChart.resize();
 			});

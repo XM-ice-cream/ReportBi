@@ -453,6 +453,10 @@ export default {
 			this.filterData = this.filterData.map((item) => {
 				return { ...item, labelName: item.tableName };
 			});
+			//标记
+			this.markData = this.markData.map((item, index) => {
+				return { ...item, axis: "z", orderBy: index, labelName: item.tableName };
+			});
 
 			if (!this.filterData.length) {
 				this.$Message.error("请拖拽字段至筛选器");
@@ -470,8 +474,10 @@ export default {
 			const obj = {
 				datasetId,
 				filterItems: this.filterData,
-				calcItems: this.rowData.concat(this.columnData),
+				calcItems: this.rowData.concat(this.columnData).concat(this.markData),
+				markItems: this.markData,
 			};
+			console.log(obj);
 			getChartsInfoReq(obj)
 				.then((res) => {
 					if (res.code == 200) {
@@ -553,6 +559,7 @@ export default {
 					break;
 				//编辑标记字段
 				case "markField-edit":
+					this.isAdd = false;
 					this.$refs.markField.modelFlag = true;
 					break;
 				case "markField-delete":
@@ -622,6 +629,8 @@ export default {
 					break;
 				case "tree":
 					if (["color", "size", "mark", "info", "labelWidth"].includes(id)) {
+						//保证标记的数据中颜色设定只有一个
+
 						this.markData[newIndex]["innerText"] = id;
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
@@ -635,7 +644,8 @@ export default {
 			}
 			//标记
 			if (["color", "size", "mark", "info", "labelWidth"].includes(id) && type !== "mark-box") {
-				this.selectObj = { ...this.markData[newIndex], newIndex, datasetId, markId: id };
+				this.selectObj = { ...this.markData[newIndex], newIndex, datasetId };
+				this.isAdd = true; //新增
 				this.$refs.markField.modelFlag = true;
 			}
 			//数据拖拽至行
@@ -656,6 +666,8 @@ export default {
 				if (columnType === "1" && dataType === "Number") this.columnData[newIndex].calculatorFunction = "countDistinct";
 				this.columnData = JSON.parse(JSON.stringify(this.columnData));
 			}
+
+			console.log("this.markData", this.markData);
 		},
 
 		//更新过滤器数据
@@ -667,6 +679,7 @@ export default {
 		updateMark(newIndex, obj) {
 			this.markData[newIndex] = { ...obj };
 			this.markData = JSON.parse(JSON.stringify(this.markData));
+			console.log("this.markData", this.markData);
 		},
 		//删除自定义字段
 		deleteFields(row) {
@@ -966,38 +979,7 @@ export default {
 	float: right;
 	padding: 0 10px;
 }
-:deep(.ivu-tree ul) {
-	list-style: none;
-	margin: 0;
-	font-size: 12px;
-	font-weight: bold;
-	color: #000;
-}
-:deep(.ivu-tree-title.ivu-tree-title-selected, .ivu-tree-title:hover) {
-	color: #fff;
-}
-:deep(.ivu-tree-title) {
-	border-radius: 0px;
-	span {
-		display: inline-block;
-		width: 90%;
-	}
-}
-:deep(.ivu-tree-children .ivu-tree-title) {
-	width: 90%;
-	height: 18px;
-	line-height: 18px;
-	border-radius: 10px;
-	padding-left: 10px;
-	&:hover {
-		background: #4795b3;
-		color: #fff;
-		border-radius: 10px;
-	}
-}
-:deep(.ivu-tree-title.ivu-tree-title-selected, .ivu-tree-title:hover) {
-	background-color: #4795b3;
-}
+
 :deep(.ivu-modal-fullscreen .ivu-modal-body) {
 	bottom: 35px;
 }
