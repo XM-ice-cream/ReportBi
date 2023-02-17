@@ -75,7 +75,7 @@ export default {
 			let obj = {}; //数据分组
 			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] } };
 			let axisConst = []; //维度常量
-			let markObj = { color: {} };
+			let markObj = { color: {}, mark: [] };
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
@@ -111,9 +111,10 @@ export default {
 				});
 			});
 
-			//标记 颜色
+			//标记
 			this.mark.forEach((markItem) => {
 				const { innerText, markValue, axis, orderBy } = markItem;
+				//颜色
 				if (innerText === "color") {
 					markValue.forEach((data) => {
 						const { title, color } = data;
@@ -121,14 +122,17 @@ export default {
 						markObj.color[`${axis}${orderBy}`][title] = color;
 					});
 				}
+				//标签
+				if (innerText === "mark") {
+					markObj.mark.push(`${axis}${orderBy}`);
+				}
 			});
-			console.log("markObj", markObj);
 			const objKeys = Object.keys(obj);
 
 			// 行、列
 			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, objKeys, axisConst, groupByString);
 			//series
-			const series = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj.color);
+			const series = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj);
 
 			//dataZoom
 			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber);
@@ -238,32 +242,39 @@ export default {
 			return { xAxis, yAxis, grid };
 		},
 		//获取series
-		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObjColor) {
+		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj) {
+			//颜色、标签
+			const { color: markObjColor, mark: markArray } = markObj;
 			let series = [];
 			groupByNumber.forEach((item, index) => {
 				objKeys.forEach((key) => {
 					obj[key].forEach((itemValue, itemIndex) => {
 						let name = "";
-						let data = {};
 						groupByString.forEach((rowItem) => {
 							name += itemValue[rowItem];
 						});
-						const color = markObjColor[Object.keys(markObjColor)[0]][itemValue[Object.keys(markObjColor)[0]]];
-						console.log(color);
-						data = yNumber.length
-							? {
-									value: [name, itemValue[item], { ...itemValue }, item],
-									itemStyle: {
-										color: color,
-									},
-							  }
-							: {
-									value: [itemValue[item], name, { ...itemValue }, item],
-									itemStyle: {
-										color: color,
-									},
-							  };
 
+						const value = yNumber.length ? [name, itemValue[item], { ...itemValue }, item] : [itemValue[item], name, { ...itemValue }, item];
+						let data = {
+							value: value,
+							itemStyle: {},
+							// 图表文字显示
+							label: {
+								show: true,
+								position: "top",
+								formatter: function (val) {
+									let result = [];
+									markArray.forEach((item) => {
+										result.push(val.value[2][item]);
+									});
+									return result.join("\n");
+								},
+							},
+						};
+						// 图表颜色
+						if (JSON.stringify(markObjColor) !== "{}") {
+							data.itemStyle.color = markObjColor[Object.keys(markObjColor)[0]][itemValue[Object.keys(markObjColor)[0]]];
+						}
 						if (!series[index]) series[index] = [];
 						if (series[index][itemIndex]) {
 							series[index][itemIndex].data.push(data);
@@ -274,6 +285,9 @@ export default {
 								xAxisIndex: yNumber.length ? groupByString.length : 0,
 								yAxisIndex: !yNumber.length ? groupByString.length : 0,
 								data: [data],
+								labelLayout: {
+									hideOverlap: true,
+								},
 							});
 						}
 					});
@@ -376,14 +390,13 @@ export default {
 						);
 					}
 
-					if (!groupByString.includes(dataitem) && (value[3] === dataitem || typeof value[2][dataitem] === "string")) {
+					if (!groupByString.includes(dataitem) && (value[3] === dataitem || typeof value[2][dataitem] === "string" || dataitem.indexOf("z") > -1)) {
 						if (value[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
-						if (typeof value[2][dataitem] === "string") aa.push(this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
+						else aa.push(this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
 					}
 				});
 			});
-
-			return aa.join("<br>");
+			return Array.from(new Set([...aa])).join("<br>");
 		},
 		//数字类型
 		numberType(item) {
@@ -415,6 +428,7 @@ export default {
 				stdev: "标准差",
 				undefined: "",
 				toChar: "",
+				"": "",
 			};
 			return obj[name];
 		},

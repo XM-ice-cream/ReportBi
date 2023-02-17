@@ -11,3 +11,13 @@ export const getselectvalueReq = data => {
     data
   })
 }
+
+// 获取工作簿信息
+export const getEchoReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/biworkbook/getEcho',
+    method: 'post',
+    data
+  })
+}

@@ -156,11 +156,8 @@
 							<draggable group="site" v-model="markData" id="color" ghost-class="ghost" class="box-cell">
 								<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
 							</draggable>
-							<draggable group="site" v-model="markData" id="size" ghost-class="ghost" class="box-cell">
-								<div class="size"><Icon custom="iconfont icon-daxiao" />大小</div>
-							</draggable>
 							<draggable group="site" v-model="markData" id="labelWidth" ghost-class="ghost" class="box-cell">
-								<div class="size"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
+								<div class="labelWidth"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
 							</draggable>
 							<draggable group="site" v-model="markData" id="mark" ghost-class="ghost" class="box-cell">
 								<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
@@ -179,22 +176,44 @@
 								<div v-for="(item, index) in markData" :key="index">
 									<!-- 图标 -->
 									<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
-									<Icon custom="iconfont icon-daxiao" v-if="item.innerText === 'size'" />
 									<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
 									<Icon type="ios-more" v-if="item.innerText === 'info'" />
 									<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
 									<!-- 字段显示 -->
-									<div :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">
-										{{ item.columnName }}
+									<div
+										:class="
+											item.dataType === 'Number' || (item.calculatorFunction && item.calculatorFunction !== 'toChar') ? 'drag-number' : 'drag-cell'
+										"
+									>
+										<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}</div>
+
 										<!-- 下拉框 -->
-										<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index)">
+										<Dropdown style="float: right" @on-click="(name) => rowColumnDropDownClick(name, index, 'mark', item)">
 											<Icon type="ios-arrow-down"></Icon>
 											<template #list>
 												<DropdownMenu>
 													<!-- 编辑 -->
-													<DropdownItem name="markField-edit">编辑标记字段</DropdownItem>
+													<DropdownItem name="markField-edit">编辑</DropdownItem>
+													<DropdownItem name="">维度</DropdownItem>
+													<Dropdown placement="right-start">
+														<DropdownItem>
+															指标
+															<Icon type="ios-arrow-forward"></Icon>
+														</DropdownItem>
+														<template #list>
+															<DropdownMenu>
+																<DropdownItem name="sum">总和</DropdownItem>
+																<DropdownItem name="avg">平均值</DropdownItem>
+																<DropdownItem name="count">计数</DropdownItem>
+																<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
+																<DropdownItem name="max">最大值</DropdownItem>
+																<DropdownItem name="min">最小值</DropdownItem>
+																<DropdownItem name="stdev">标准差</DropdownItem>
+															</DropdownMenu>
+														</template>
+													</Dropdown>
 													<!-- 删除 -->
-													<DropdownItem name="markField-delete">删除标记字段</DropdownItem>
+													<DropdownItem name="markField-delete">移除</DropdownItem>
 												</DropdownMenu>
 											</template>
 										</Dropdown>
@@ -336,6 +355,7 @@ import {
 	modifyCustomerFieldReq,
 	getChartsInfoReq,
 } from "@/api/bill-design-manage/workbook-manage.js";
+import { getEchoReq } from "@/api/bill-design-manage/workbook-design";
 import CreateFields from "./create-fields.vue";
 import FilterFields from "./filter-fields.vue";
 import MarkFields from "./mark-fields.vue";
@@ -364,7 +384,11 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.$nextTick(() => {
-					if (!this.workbookIsAdd) this.submitData = { ...this.submitData, ...this.workbookSelectObj };
+					//编辑
+					if (!this.workbookIsAdd) {
+						this.submitData = { ...this.submitData, ...this.workbookSelectObj };
+						this.pageLoad(); //查询信息
+					}
 					this.getDataSetList();
 					this.getDataItemData(); //数据字典 获取类型
 					this.getColumnList(); //获取左侧列
@@ -437,26 +461,22 @@ export default {
 	// 	// }
 	// },
 	methods: {
+		//加载信息
+		pageLoad() {
+			getEchoReq({ id: this.submitData.id }).then((res) => {
+				if (res.code == 200) {
+					const { calcItems, filterItems, markStyle } = res;
+					this.markData = JSON.parse(markStyle); //标记
+					this.filterData = filterItems; //过滤器
+					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
+					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
+				}
+			});
+		},
 		//查询
 		searchClick() {
 			//数据集
 			const { datasetId } = this.submitData;
-			//拖拽的行
-			this.rowData = this.rowData.map((item, index) => {
-				return { ...item, axis: "x", orderBy: index, labelName: item.tableName };
-			});
-			//拖拽的列
-			this.columnData = this.columnData.map((item, index) => {
-				return { ...item, axis: "y", orderBy: index, labelName: item.tableName };
-			});
-			//过滤的列
-			this.filterData = this.filterData.map((item) => {
-				return { ...item, labelName: item.tableName };
-			});
-			//标记
-			this.markData = this.markData.map((item, index) => {
-				return { ...item, axis: "z", orderBy: index, labelName: item.tableName };
-			});
 
 			if (!this.filterData.length) {
 				this.$Message.error("请拖拽字段至筛选器");
@@ -470,6 +490,8 @@ export default {
 				this.$Message.error("请拖拽字段至列");
 				return;
 			}
+			//修改拖拽的数据
+			this.updateDragData();
 			this.$Spin.show();
 			const obj = {
 				datasetId,
@@ -518,7 +540,26 @@ export default {
 				}
 			});
 		},
-		//下拉
+
+		//行列下拉框
+		rowColumnDropDownClick(name, index, type, item) {
+			switch (type) {
+				case "row":
+					this.rowData[index].calculatorFunction = name;
+					this.rowData = JSON.parse(JSON.stringify(this.rowData));
+					break;
+				case "column":
+					this.columnData[index].calculatorFunction = name;
+					this.columnData = JSON.parse(JSON.stringify(this.columnData));
+					break;
+				case "mark":
+					if (!["markField-edit", "markField-delete"].includes(name)) this.markData[index].calculatorFunction = name;
+					this.markData = JSON.parse(JSON.stringify(this.markData));
+					this.dropDownClick(name, item, index); //标记下拉框属性
+					break;
+			}
+		},
+		//标记 下拉
 		dropDownClick(name, row, index) {
 			const { datasetId } = this.submitData;
 			this.selectObj = { ...row, type: "all", datasetId, labelName: row.tableName, fieldCode: row.columnName, id: row.nodeId, newIndex: index };
@@ -564,19 +605,6 @@ export default {
 					break;
 				case "markField-delete":
 					this.markData.splice(index, 1);
-					break;
-			}
-		},
-		//行列下拉框
-		rowColumnDropDownClick(name, index, type) {
-			switch (type) {
-				case "row":
-					this.rowData[index].calculatorFunction = name;
-					this.rowData = JSON.parse(JSON.stringify(this.rowData));
-					break;
-				case "column":
-					this.columnData[index].calculatorFunction = name;
-					this.columnData = JSON.parse(JSON.stringify(this.columnData));
 					break;
 			}
 		},
@@ -628,7 +656,7 @@ export default {
 					id === "mark-box" && oldIndex === newIndex ? this.markData.splice(oldIndex, 1) : "";
 					break;
 				case "tree":
-					if (["color", "size", "mark", "info", "labelWidth"].includes(id)) {
+					if (["color", "mark", "info", "labelWidth"].includes(id)) {
 						//保证标记的数据中颜色设定只有一个
 
 						this.markData[newIndex]["innerText"] = id;
@@ -642,8 +670,8 @@ export default {
 				this.selectObj = { ...this.filterData[newIndex], newIndex, datasetId, showData: 0 };
 				this.$refs.filterField.modelFlag = true;
 			}
-			//标记
-			if (["color", "size", "mark", "info", "labelWidth"].includes(id) && type !== "mark-box") {
+			//标记(颜色、文本宽度开启弹框)
+			if (["color", "labelWidth"].includes(id) && type !== "mark-box") {
 				this.selectObj = { ...this.markData[newIndex], newIndex, datasetId };
 				this.isAdd = true; //新增
 				this.$refs.markField.modelFlag = true;
@@ -668,6 +696,25 @@ export default {
 			}
 
 			console.log("this.markData", this.markData);
+		},
+		//修改拖拽的数据
+		updateDragData() {
+			//拖拽的行
+			this.rowData = this.rowData.map((item, index) => {
+				return { ...item, axis: "x", orderBy: index, labelName: item.tableName };
+			});
+			//拖拽的列
+			this.columnData = this.columnData.map((item, index) => {
+				return { ...item, axis: "y", orderBy: index, labelName: item.tableName };
+			});
+			//过滤的列
+			this.filterData = this.filterData.map((item) => {
+				return { ...item, labelName: item.tableName };
+			});
+			//标记
+			this.markData = this.markData.map((item, index) => {
+				return { ...item, axis: "z", orderBy: index, labelName: item.tableName };
+			});
 		},
 
 		//更新过滤器数据
@@ -722,7 +769,14 @@ export default {
 		submitClick() {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
-					let obj = { ...this.submitData };
+					//修改拖拽的数据
+					this.updateDragData();
+					let obj = {
+						...this.submitData,
+						markStyle: JSON.stringify(this.markData), //标记
+						filterItems: this.filterData, //过滤器
+						calcItems: this.rowData.concat(this.columnData), //行、列
+					};
 					let request = this.workbookIsAdd ? addReq(obj) : modifyReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {

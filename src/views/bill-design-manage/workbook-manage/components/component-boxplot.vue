@@ -48,14 +48,15 @@ export default {
 				const { data, stack } = seriesData;
 				if (!originData[stack]) originData[stack] = {};
 				data.forEach((item, itemIndex) => {
-					if (seriesIndex == 0 && itemIndex == 0) isReverse = item[3].indexOf("y") > -1 ? false : true;
+					const { value: itemValue } = item;
+					if (seriesIndex == 0 && itemIndex == 0) isReverse = itemValue[3].indexOf("y") > -1 ? false : true;
 
-					const key = isReverse ? item[1] : item[0];
-					const value = isReverse ? item[0] : item[1];
+					const key = isReverse ? itemValue[1] : itemValue[0];
+					const value = isReverse ? itemValue[0] : itemValue[1];
 					if (!originData[stack][key]) originData[stack][key] = [];
 					if (!scatterData[stack]) scatterData[stack] = [];
 					originData[stack][key].push(value);
-					scatterData[stack].push(item);
+					scatterData[stack].push(itemValue);
 				});
 			});
 

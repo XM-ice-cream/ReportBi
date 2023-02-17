@@ -14,7 +14,7 @@
 				</FormItem>
 			</Form>
 		</div>
-
+		<Spin size="large" fix v-if="spinShow"></Spin>
 		<div slot="footer" class="dialog-footer">
 			<Button @click="cancelClick">取 消</Button>
 			<Button type="primary" @click="submitClick">确定 </Button>
@@ -62,6 +62,7 @@ export default {
 			submitData: {},
 			colorSelect: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 			modelFlag: false,
+			spinShow: false,
 		};
 	},
 	methods: {
@@ -76,6 +77,7 @@ export default {
 		},
 		//获取字段对应的所有值
 		getAllValue() {
+			this.spinShow = true;
 			const { nodeId, datasetId, tableName, columnName, columnType, dataType, columnComment } = this.submitData;
 			const obj = {
 				orderField: "string",
@@ -93,21 +95,25 @@ export default {
 					columnComment,
 				},
 			};
-			getselectvalueReq(obj).then((res) => {
-				if (res.code == 200) {
-					let { data } = res.result;
-					this.submitData.markValue =
-						data.map((item, index) => {
-							if (dataType === "DateTime") item = formatDate(item);
-							const colorIndex = index % 9;
-							return { title: item, color: this.colorSelect[colorIndex], nodeKey: index };
-						}) || [];
-				} else {
-					this.$message.error(`查询失败,${res.message}`);
-					this.submitData.markValue = [];
-				}
-				this.submitData = JSON.parse(JSON.stringify(this.submitData));
-			});
+			getselectvalueReq(obj)
+				.then((res) => {
+					if (res.code == 200) {
+						let { data } = res.result;
+						this.submitData.markValue =
+							data.map((item, index) => {
+								if (dataType === "DateTime") item = formatDate(item);
+								const colorIndex = index % 9;
+								return { title: item, color: this.colorSelect[colorIndex], nodeKey: index };
+							}) || [];
+					} else {
+						this.$message.error(`查询失败,${res.message}`);
+						this.submitData.markValue = [];
+					}
+					this.submitData = JSON.parse(JSON.stringify(this.submitData));
+				})
+				.finally(() => {
+					this.spinShow = false;
+				});
 		},
 		renderContent(h, { root, node, data }) {
 			return h(
