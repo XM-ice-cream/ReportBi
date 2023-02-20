@@ -110,9 +110,8 @@ export default {
 					axisConst[index].push(obj[keyItem][0][rowItem]);
 				});
 			});
-
 			//标记
-			this.mark.forEach((markItem) => {
+			this.mark[0].data.forEach((markItem) => {
 				const { innerText, markValue, axis, orderBy } = markItem;
 				//颜色
 				if (innerText === "color") {
@@ -157,7 +156,8 @@ export default {
 
 					//文本宽度
 					const labelWidth =
-						this.mark.filter((markItem) => {
+						this.mark[0].data.filter((markItem) => {
+							console.log(markItem, this.axisToField(`x${index}`)?.trim(), markItem.columnName);
 							return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnName;
 						})[0]?.markValue || 90;
 
@@ -200,7 +200,7 @@ export default {
 
 					//文本宽度
 					const labelWidth =
-						this.mark.filter((markItem) => {
+						this.mark[0].data.filter((markItem) => {
 							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
 						})[0]?.markValue || 90;
 
@@ -412,7 +412,7 @@ export default {
 			let obj = {};
 			this.row.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
 			this.column.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
-			this.mark.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
+			this.mark[0].data.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
 
 			return obj[name];
 		},
@@ -429,6 +429,7 @@ export default {
 				undefined: "",
 				toChar: "",
 				"": "",
+				null: "",
 			};
 			return obj[name];
 		},

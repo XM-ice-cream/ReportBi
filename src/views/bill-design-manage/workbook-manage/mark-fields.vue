@@ -70,8 +70,8 @@ export default {
 		pageLoad() {},
 		//提交
 		submitClick() {
-			const { newIndex } = this.submitData;
-			this.$emit("updateMark", newIndex, this.submitData); //取消后 删除拖拽的cell
+			const { newIndex, markIndex } = this.submitData;
+			this.$emit("updateMark", newIndex, this.submitData, markIndex); //取消后 删除拖拽的cell
 			this.$refs.submitReq.resetFields();
 			this.cancelClick(); //关闭弹框
 		},

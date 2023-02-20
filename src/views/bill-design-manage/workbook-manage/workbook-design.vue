@@ -46,7 +46,7 @@
 							<li v-for="(item, index) in data" :key="index" class="tree-father">
 								<div @click="item.isShow = !item.isShow">
 									<Icon type="ios-arrow-forward" :style="{ transform: item.isShow ? 'rotate(90deg)' : 'rotate(0deg)' }" />
-									<Icon type="md-apps" /> {{ item.tableName }}
+									<Icon type="md-apps" /> {{ item.labelName }}
 								</div>
 
 								<ul class="subtree" v-if="item.isShow">
@@ -129,8 +129,8 @@
 							style="height: calc(100% - 50px); overflow: auto"
 							@end="(e) => dragEnd(e, 'filter')"
 						>
-							<span v-for="(item, index) in filterData" :key="index" :class="item.dataType === 'Number' ? 'drag-number' : 'drag-cell'">
-								{{ item.columnName }}
+							<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
+								<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}</div>
 								<!-- 下拉框 -->
 								<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index)">
 									<Icon type="ios-arrow-down"></Icon>
@@ -149,78 +149,83 @@
 					<!-- 标记 -->
 					<div class="mark">
 						<div class="title">标记</div>
-						<Select v-model="submitData.chartType" clearable placeholder="请选择图表">
-							<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-						</Select>
-						<div class="mark-box">
-							<draggable group="site" v-model="markData" id="color" ghost-class="ghost" class="box-cell">
-								<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
-							</draggable>
-							<draggable group="site" v-model="markData" id="labelWidth" ghost-class="ghost" class="box-cell">
-								<div class="labelWidth"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
-							</draggable>
-							<draggable group="site" v-model="markData" id="mark" ghost-class="ghost" class="box-cell">
-								<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
-							</draggable>
-							<draggable group="site" v-model="markData" id="info" ghost-class="ghost" class="box-cell">
-								<div class="detail-info"><Icon type="ios-more" />详细信息</div>
-							</draggable>
-							<draggable
-								group="site"
-								v-model="markData"
-								id="mark-box"
-								ghost-class="ghost"
-								@end="(e) => dragEnd(e, 'mark-box')"
-								style="width: 100%; height: 100%; overflow: auto"
-							>
-								<div v-for="(item, index) in markData" :key="index">
-									<!-- 图标 -->
-									<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
-									<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
-									<Icon type="ios-more" v-if="item.innerText === 'info'" />
-									<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
-									<!-- 字段显示 -->
-									<div
-										:class="
-											item.dataType === 'Number' || (item.calculatorFunction && item.calculatorFunction !== 'toChar') ? 'drag-number' : 'drag-cell'
-										"
-									>
-										<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}</div>
+						<!-- 手风琴 -->
+						<Collapse accordion v-model="collapse">
+							<Panel v-for="(item, markIndex) in markData" :key="markIndex" name="0" class="markPanel">
+								{{ item.name }}
 
-										<!-- 下拉框 -->
-										<Dropdown style="float: right" @on-click="(name) => rowColumnDropDownClick(name, index, 'mark', item)">
-											<Icon type="ios-arrow-down"></Icon>
-											<template #list>
-												<DropdownMenu>
-													<!-- 编辑 -->
-													<DropdownItem name="markField-edit">编辑</DropdownItem>
-													<DropdownItem name="">维度</DropdownItem>
-													<Dropdown placement="right-start">
-														<DropdownItem>
-															指标
-															<Icon type="ios-arrow-forward"></Icon>
-														</DropdownItem>
+								<template #content>
+									<Select v-model="markData[markIndex].chartType" clearable placeholder="请选择图表">
+										<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+									</Select>
+									<div class="mark-box">
+										<draggable group="site" v-model="markData[markIndex].data" id="color" ghost-class="ghost" class="box-cell">
+											<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
+										</draggable>
+										<draggable group="site" v-model="markData[markIndex].data" id="labelWidth" ghost-class="ghost" class="box-cell">
+											<div class="labelWidth"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
+										</draggable>
+										<draggable group="site" v-model="markData[markIndex].data" id="mark" ghost-class="ghost" class="box-cell">
+											<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
+										</draggable>
+										<draggable group="site" v-model="markData[markIndex].data" id="info" ghost-class="ghost" class="box-cell">
+											<div class="detail-info"><Icon type="ios-more" />详细信息</div>
+										</draggable>
+										<draggable
+											group="site"
+											v-model="markData[markIndex].data"
+											id="mark-box"
+											ghost-class="ghost"
+											@end="(e) => dragEnd(e, 'mark-box', markIndex)"
+											style="width: 100%; height: 100%; overflow: auto"
+										>
+											<div v-for="(item, index) in markData[markIndex].data" :key="index" style="display: flex; align-items: center">
+												<!-- 图标 -->
+												<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
+												<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
+												<Icon type="ios-more" v-if="item.innerText === 'info'" />
+												<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
+												<!-- 字段显示 -->
+												<div :class="isNumberCell(item)">
+													<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}</div>
+
+													<!-- 下拉框 -->
+													<Dropdown style="float: right" @on-click="(name) => rowColumnDropDownClick(name, index, 'mark', item, markIndex)">
+														<Icon type="ios-arrow-down"></Icon>
 														<template #list>
 															<DropdownMenu>
-																<DropdownItem name="sum">总和</DropdownItem>
-																<DropdownItem name="avg">平均值</DropdownItem>
-																<DropdownItem name="count">计数</DropdownItem>
-																<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
-																<DropdownItem name="max">最大值</DropdownItem>
-																<DropdownItem name="min">最小值</DropdownItem>
-																<DropdownItem name="stdev">标准差</DropdownItem>
+																<!-- 编辑 -->
+																<DropdownItem name="markField-edit">编辑</DropdownItem>
+																<DropdownItem name="">维度</DropdownItem>
+																<Dropdown placement="right-start">
+																	<DropdownItem>
+																		指标
+																		<Icon type="ios-arrow-forward"></Icon>
+																	</DropdownItem>
+																	<template #list>
+																		<DropdownMenu>
+																			<DropdownItem name="sum">总和</DropdownItem>
+																			<DropdownItem name="avg">平均值</DropdownItem>
+																			<DropdownItem name="count">计数</DropdownItem>
+																			<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
+																			<DropdownItem name="max">最大值</DropdownItem>
+																			<DropdownItem name="min">最小值</DropdownItem>
+																			<DropdownItem name="stdev">标准差</DropdownItem>
+																		</DropdownMenu>
+																	</template>
+																</Dropdown>
+																<!-- 删除 -->
+																<DropdownItem name="markField-delete">移除</DropdownItem>
 															</DropdownMenu>
 														</template>
 													</Dropdown>
-													<!-- 删除 -->
-													<DropdownItem name="markField-delete">移除</DropdownItem>
-												</DropdownMenu>
-											</template>
-										</Dropdown>
+												</div>
+											</div>
+										</draggable>
 									</div>
-								</div>
-							</draggable>
-						</div>
+								</template>
+							</Panel>
+						</Collapse>
 					</div>
 				</div>
 				<!-- 行列 -->
@@ -231,14 +236,7 @@
 						<div class="row">
 							<span class="title">列</span>
 							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
-								<span
-									v-for="(item, index) in columnData"
-									:key="index"
-									:class="
-										item.dataType === 'Number' || (item.calculatorFunction && item.calculatorFunction !== 'toChar') ? 'drag-number' : 'drag-cell'
-									"
-									style="width: fit-content"
-								>
+								<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
 									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
 									<!-- 下拉框 -->
 									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'column')">
@@ -273,14 +271,7 @@
 						<div class="column">
 							<span class="title">行</span>
 							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
-								<span
-									v-for="(item, index) in rowData"
-									:key="index"
-									:class="
-										item.dataType === 'Number' || (item.calculatorFunction && item.calculatorFunction !== 'toChar') ? 'drag-number' : 'drag-cell'
-									"
-									style="width: fit-content"
-								>
+								<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
 									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
 									<!-- 下拉框 -->
 									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'row')">
@@ -319,7 +310,7 @@
 						<div class="title">{{ submitData.title }}</div>
 						<componentsTemp
 							v-if="modelFlag"
-							:type="submitData.chartType"
+							:type="markData[0].chartType"
 							:visib="true"
 							:value="chartsData"
 							:row="rowData"
@@ -395,12 +386,32 @@ export default {
 				});
 			}
 		},
+		rowDataColumnData() {
+			// this.rowData.forEach(item=>{
+			//  if(this.numberType(item)){
+			//   this.markData.push({ name: item.labelName, chartType: "componentBar", data: [] })
+			//  }
+			// })
+			// this.columnData.forEach(item=>{
+			//  if(this.numberType(item)){
+			//   this.markData.push({ name: item.labelName, chartType: "componentBar", data: [] })
+			//  }
+			// })
+
+			console.log("监听", this.rowDataColumnData);
+		},
+	},
+	computed: {
+		rowDataColumnData() {
+			return this.rowData.concat(this.columnData);
+		},
 	},
 	data() {
 		return {
 			isAdd: true,
 			tabValue: "data",
 			drawerTitle: this.$t("add"),
+			collapse: "0",
 			dragstartNode: "",
 			dragstartData: "",
 			contextData: "", //菜单
@@ -429,10 +440,9 @@ export default {
 			chartList: [
 				{ label: "柱状图", value: "componentBar" },
 				{ label: "折线图", value: "componentLine" },
-				{ label: "饼图", value: "componentPie" },
 				{ label: "散点图", value: "componentScatter" },
 				{ label: "盒须图", value: "componentBoxplot" },
-				{ label: "表格", value: "componentTable" },
+				{ label: "饼图", value: "componentPie" },
 			],
 
 			// 验证实体
@@ -465,11 +475,15 @@ export default {
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
 				if (res.code == 200) {
-					const { calcItems, filterItems, markStyle } = res;
-					this.markData = JSON.parse(markStyle); //标记
+					const { calcItems, filterItems, marks } = res.result;
+					this.markData = JSON.parse(marks) || [{ name: "全部", chartType: "componentBar", data: [] }]; //标记
 					this.filterData = filterItems; //过滤器
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
 					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
+					this.$nextTick(() => {
+						//加载图表数据
+						this.searchClick();
+					});
 				}
 			});
 		},
@@ -496,7 +510,7 @@ export default {
 			const obj = {
 				datasetId,
 				filterItems: this.filterData,
-				calcItems: this.rowData.concat(this.columnData).concat(this.markData),
+				calcItems: this.rowData.concat(this.columnData).concat(this.markData[0].data),
 				markItems: this.markData,
 			};
 			console.log(obj);
@@ -520,12 +534,12 @@ export default {
 			getTabelColumnReq(obj).then((res) => {
 				if (res.code === 200) {
 					const data = res?.result || [];
-					//获取所有tableName
-					const tableNameList = Array.from(new Set(data.map((item) => item.tableName)));
-					//tableName 分组
-					const groupTableName = this.$XEUtils.groupBy(data, "tableName");
+					//获取所有labelName
+					const labelNameList = Array.from(new Set(data.map((item) => item.labelName)));
+					//labelName 分组
+					const groupTableName = this.$XEUtils.groupBy(data, "labelName");
 					// 指标、维度分类
-					this.data = tableNameList.map((item, index) => {
+					this.data = labelNameList.map((item, index) => {
 						const children = groupTableName[item].map((item) => {
 							let index = 0;
 							switch (item.dataType) {
@@ -535,14 +549,14 @@ export default {
 							}
 							return { ...item, index };
 						});
-						return { tableName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
+						return { labelName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
 					});
 				}
 			});
 		},
 
 		//行列下拉框
-		rowColumnDropDownClick(name, index, type, item) {
+		rowColumnDropDownClick(name, index, type, item, markIndex) {
 			switch (type) {
 				case "row":
 					this.rowData[index].calculatorFunction = name;
@@ -553,16 +567,25 @@ export default {
 					this.columnData = JSON.parse(JSON.stringify(this.columnData));
 					break;
 				case "mark":
-					if (!["markField-edit", "markField-delete"].includes(name)) this.markData[index].calculatorFunction = name;
+					if (!["markField-edit", "markField-delete"].includes(name)) this.markData[markIndex].data[index].calculatorFunction = name;
 					this.markData = JSON.parse(JSON.stringify(this.markData));
-					this.dropDownClick(name, item, index); //标记下拉框属性
+					this.dropDownClick(name, item, index, markIndex); //标记下拉框属性
 					break;
 			}
 		},
 		//标记 下拉
-		dropDownClick(name, row, index) {
+		dropDownClick(name, row, index, markIndex) {
 			const { datasetId } = this.submitData;
-			this.selectObj = { ...row, type: "all", datasetId, labelName: row.tableName, fieldCode: row.columnName, id: row.nodeId, newIndex: index };
+			this.selectObj = {
+				...row,
+				type: "all",
+				datasetId,
+				labelName: row.labelName,
+				fieldCode: row.columnName,
+				id: row.nodeId,
+				newIndex: index,
+				markIndex,
+			};
 
 			switch (name) {
 				// 删除自定义字段
@@ -573,8 +596,8 @@ export default {
 				case "createField-create":
 					this.isAdd = true;
 					//新增 默认值为字段名
-					const { columnName, tableName } = this.selectObj;
-					this.selectObj.fieldFunction = `[${columnName}(${tableName})]`;
+					const { columnName, labelName } = this.selectObj;
+					this.selectObj.fieldFunction = `[${columnName}(${labelName})]`;
 					this.$refs.createField.modelFlag = true;
 					break;
 				//编辑自定义字段
@@ -604,7 +627,7 @@ export default {
 					this.$refs.markField.modelFlag = true;
 					break;
 				case "markField-delete":
-					this.markData.splice(index, 1);
+					this.markData[markIndex].data.splice(index, 1);
 					break;
 			}
 		},
@@ -637,7 +660,8 @@ export default {
 			});
 		},
 		//拖拽结束
-		dragEnd(e, type) {
+		dragEnd(e, type, markIndex = 0) {
+			console.log(e, e.newIndex);
 			const { datasetId } = this.submitData;
 			const { oldIndex, newIndex, to } = e;
 			const { id } = to;
@@ -653,13 +677,14 @@ export default {
 					break;
 				case "mark-box":
 					console.log("mark-box", this.markData);
-					id === "mark-box" && oldIndex === newIndex ? this.markData.splice(oldIndex, 1) : "";
+					id === "mark-box" && oldIndex === newIndex ? this.markData[markIndex].data.splice(oldIndex, 1) : "";
 					break;
 				case "tree":
 					if (["color", "mark", "info", "labelWidth"].includes(id)) {
 						//保证标记的数据中颜色设定只有一个
-
-						this.markData[newIndex]["innerText"] = id;
+						if (!this.markData[markIndex].data[newIndex]) newIndex = 0;
+						console.log(this.markData[markIndex].data[newIndex], newIndex);
+						this.markData[markIndex].data[newIndex]["innerText"] = id;
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
 					break;
@@ -672,7 +697,7 @@ export default {
 			}
 			//标记(颜色、文本宽度开启弹框)
 			if (["color", "labelWidth"].includes(id) && type !== "mark-box") {
-				this.selectObj = { ...this.markData[newIndex], newIndex, datasetId };
+				this.selectObj = { ...this.markData[markIndex].data[newIndex], newIndex, datasetId, markIndex };
 				this.isAdd = true; //新增
 				this.$refs.markField.modelFlag = true;
 			}
@@ -701,20 +726,18 @@ export default {
 		updateDragData() {
 			//拖拽的行
 			this.rowData = this.rowData.map((item, index) => {
-				return { ...item, axis: "x", orderBy: index, labelName: item.tableName };
+				return { ...item, axis: "x", orderBy: index };
 			});
 			//拖拽的列
 			this.columnData = this.columnData.map((item, index) => {
-				return { ...item, axis: "y", orderBy: index, labelName: item.tableName };
+				return { ...item, axis: "y", orderBy: index };
 			});
-			//过滤的列
-			this.filterData = this.filterData.map((item) => {
-				return { ...item, labelName: item.tableName };
-			});
+
 			//标记
-			this.markData = this.markData.map((item, index) => {
-				return { ...item, axis: "z", orderBy: index, labelName: item.tableName };
+			this.markData[0].data.map((item, index) => {
+				this.markData[0].data[index] = { ...item, axis: "z", orderBy: index };
 			});
+			console.log("标记", this.markData[0]);
 		},
 
 		//更新过滤器数据
@@ -723,8 +746,8 @@ export default {
 			this.filterData = JSON.parse(JSON.stringify(this.filterData));
 		},
 		//更新标记数据
-		updateMark(newIndex, obj) {
-			this.markData[newIndex] = { ...obj };
+		updateMark(newIndex, obj, markIndex) {
+			this.markData[markIndex].data[newIndex] = { ...obj };
 			this.markData = JSON.parse(JSON.stringify(this.markData));
 			console.log("this.markData", this.markData);
 		},
@@ -773,7 +796,7 @@ export default {
 					this.updateDragData();
 					let obj = {
 						...this.submitData,
-						markStyle: JSON.stringify(this.markData), //标记
+						marks: JSON.stringify(this.markData), //标记
 						filterItems: this.filterData, //过滤器
 						calcItems: this.rowData.concat(this.columnData), //行、列
 					};
@@ -794,7 +817,7 @@ export default {
 			this.filterData = []; //过滤值
 			this.columnData = []; //列值
 			this.rowData = []; //行值
-			this.markData = [];
+			this.markData = [{ name: "全部", chartType: "componentBar", data: [] }];
 			this.selectObj = {};
 			this.chartsData = [];
 			this.$emit("update:modelFlag", false);
@@ -812,6 +835,18 @@ export default {
 				stdev: "标准差",
 			};
 			return obj[name];
+		},
+		//cell 样式 数字/字符串
+		isNumberCell(item) {
+			return item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar") ? "drag-number" : "drag-cell";
+		},
+		//数字类型
+		numberType(item) {
+			return item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar");
+		},
+		//字符串类型
+		stringType(item) {
+			return item.dataType !== "Number" || !item.calculatorFunction || item.calculatorFunction === "toChar";
 		},
 	},
 };
@@ -979,7 +1014,7 @@ export default {
 	}
 
 	.drag-cell {
-		width: calc(100% - 25px);
+		width: calc(100% - 23px);
 		padding: 2px 20px;
 		text-align: center;
 		background: #4996b2;
@@ -989,7 +1024,7 @@ export default {
 		display: inline-block;
 	}
 	.drag-number {
-		width: calc(100% - 25px);
+		width: calc(100% - 23px);
 		padding: 2px 20px;
 		text-align: center;
 		background: #00b180;
