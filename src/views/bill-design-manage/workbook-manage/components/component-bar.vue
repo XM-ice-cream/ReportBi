@@ -56,9 +56,7 @@ export default {
 				grid: grid,
 				xAxis: xAxis,
 				yAxis: yAxis,
-				series: series.map((item) => {
-					return { ...item, type: "bar" };
-				}),
+				series: series,
 			};
 			this.myChart.setOption(option, true);
 			console.log(option);

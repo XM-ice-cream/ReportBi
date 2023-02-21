@@ -130,7 +130,7 @@
 							@end="(e) => dragEnd(e, 'filter')"
 						>
 							<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
-								<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}</div>
+								<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction, item.columnName) }}</div>
 								<!-- 下拉框 -->
 								<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index)">
 									<Icon type="ios-arrow-down"></Icon>
@@ -151,7 +151,7 @@
 						<div class="title">标记</div>
 						<!-- 手风琴 -->
 						<Collapse accordion v-model="collapse">
-							<Panel v-for="(item, markIndex) in markData" :key="markIndex" name="0" class="markPanel">
+							<Panel v-for="(item, markIndex) in markData" :key="markIndex" :name="markIndex.toString()" class="markPanel">
 								{{ item.name }}
 
 								<template #content>
@@ -159,22 +159,37 @@
 										<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 									</Select>
 									<div class="mark-box">
-										<draggable group="site" v-model="markData[markIndex].data" id="color" ghost-class="ghost" class="box-cell">
+										<draggable
+											group="site"
+											v-model="markData[markIndex].data"
+											:id="`color,${markIndex}`"
+											ghost-class="ghost"
+											class="box-cell"
+											:name="markIndex"
+										>
 											<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
 										</draggable>
-										<draggable group="site" v-model="markData[markIndex].data" id="labelWidth" ghost-class="ghost" class="box-cell">
+										<!-- 文本宽度只能在 全部 中设定 -->
+										<draggable
+											group="site"
+											v-model="markData[markIndex].data"
+											:id="`labelWidth,${markIndex}`"
+											ghost-class="ghost"
+											class="box-cell"
+											v-if="markIndex == 0"
+										>
 											<div class="labelWidth"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
 										</draggable>
-										<draggable group="site" v-model="markData[markIndex].data" id="mark" ghost-class="ghost" class="box-cell">
+										<draggable group="site" v-model="markData[markIndex].data" :id="`mark,${markIndex}`" ghost-class="ghost" class="box-cell">
 											<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
 										</draggable>
-										<draggable group="site" v-model="markData[markIndex].data" id="info" ghost-class="ghost" class="box-cell">
+										<draggable group="site" v-model="markData[markIndex].data" :id="`info,${markIndex}`" ghost-class="ghost" class="box-cell">
 											<div class="detail-info"><Icon type="ios-more" />详细信息</div>
 										</draggable>
 										<draggable
 											group="site"
 											v-model="markData[markIndex].data"
-											id="mark-box"
+											:id="`mark-box,${markIndex}`"
 											ghost-class="ghost"
 											@end="(e) => dragEnd(e, 'mark-box', markIndex)"
 											style="width: 100%; height: 100%; overflow: auto"
@@ -187,7 +202,7 @@
 												<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
 												<!-- 字段显示 -->
 												<div :class="isNumberCell(item)">
-													<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}</div>
+													<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction, item.columnName) }}</div>
 
 													<!-- 下拉框 -->
 													<Dropdown style="float: right" @on-click="(name) => rowColumnDropDownClick(name, index, 'mark', item, markIndex)">
@@ -237,7 +252,7 @@
 							<span class="title">列</span>
 							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
 								<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
+									{{ calculatorObj(item.calculatorFunction, item.columnName) }}
 									<!-- 下拉框 -->
 									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'column')">
 										<Icon type="ios-arrow-down"></Icon>
@@ -272,7 +287,7 @@
 							<span class="title">行</span>
 							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
 								<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									{{ calculatorObj(item.calculatorFunction) }} {{ item.columnName }}
+									{{ calculatorObj(item.calculatorFunction, item.columnName) }}
 									<!-- 下拉框 -->
 									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'row')">
 										<Icon type="ios-arrow-down"></Icon>
@@ -386,26 +401,18 @@ export default {
 				});
 			}
 		},
-		rowDataColumnData() {
-			// this.rowData.forEach(item=>{
-			//  if(this.numberType(item)){
-			//   this.markData.push({ name: item.labelName, chartType: "componentBar", data: [] })
-			//  }
-			// })
-			// this.columnData.forEach(item=>{
-			//  if(this.numberType(item)){
-			//   this.markData.push({ name: item.labelName, chartType: "componentBar", data: [] })
-			//  }
-			// })
-
-			console.log("监听", this.rowDataColumnData);
+		changeRowColumn() {
+			this.$nextTick(() => {
+				this.changeRowColumnbyMark();
+			});
 		},
 	},
 	computed: {
-		rowDataColumnData() {
+		changeRowColumn() {
 			return this.rowData.concat(this.columnData);
 		},
 	},
+
 	data() {
 		return {
 			isAdd: true,
@@ -426,7 +433,7 @@ export default {
 				desc: "", //描述
 				enabled: 1, //是否有效
 				columnName: "",
-				chartType: "componentBar",
+				chartType: "bar",
 				title: "工作表",
 			},
 			columnList: [],
@@ -438,9 +445,9 @@ export default {
 			rowData: [], //行值
 			markData: [],
 			chartList: [
-				{ label: "柱状图", value: "componentBar" },
-				{ label: "折线图", value: "componentLine" },
-				{ label: "散点图", value: "componentScatter" },
+				{ label: "柱状图", value: "bar" },
+				{ label: "折线图", value: "line" },
+				{ label: "散点图", value: "scatter" },
 				{ label: "盒须图", value: "componentBoxplot" },
 				{ label: "饼图", value: "componentPie" },
 			],
@@ -463,20 +470,13 @@ export default {
 		};
 	},
 	activated() {},
-	// mounted() {
-	// 	//{
-	// 	//     "reportCode": "8",
-	// 	//     "reportName": "9",
-	// 	//     "datasetId": "FDB363A6D5DA41C4A8F42FB743F19D53"
-	// 	// }
-	// },
 	methods: {
 		//加载信息
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
 				if (res.code == 200) {
 					const { calcItems, filterItems, marks } = res.result;
-					this.markData = JSON.parse(marks) || [{ name: "全部", chartType: "componentBar", data: [] }]; //标记
+					this.markData = JSON.parse(marks) || [{ name: "全部", chartType: "bar", data: [] }]; //标记
 					this.filterData = filterItems; //过滤器
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
 					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
@@ -504,13 +504,15 @@ export default {
 				this.$Message.error("请拖拽字段至列");
 				return;
 			}
-			//修改拖拽的数据
-			this.updateDragData();
+			let markData = [];
+			this.markData.forEach((item) => {
+				markData.push(item.data);
+			});
 			this.$Spin.show();
 			const obj = {
 				datasetId,
 				filterItems: this.filterData,
-				calcItems: this.rowData.concat(this.columnData).concat(this.markData[0].data),
+				calcItems: this.rowData.concat(this.columnData).concat(markData.flat()),
 				markItems: this.markData,
 			};
 			console.log(obj);
@@ -560,11 +562,11 @@ export default {
 			switch (type) {
 				case "row":
 					this.rowData[index].calculatorFunction = name;
-					this.rowData = JSON.parse(JSON.stringify(this.rowData));
+					// this.rowData = JSON.parse(JSON.stringify(this.rowData));
 					break;
 				case "column":
 					this.columnData[index].calculatorFunction = name;
-					this.columnData = JSON.parse(JSON.stringify(this.columnData));
+					// this.columnData = JSON.parse(JSON.stringify(this.columnData));
 					break;
 				case "mark":
 					if (!["markField-edit", "markField-delete"].includes(name)) this.markData[markIndex].data[index].calculatorFunction = name;
@@ -572,6 +574,7 @@ export default {
 					this.dropDownClick(name, item, index, markIndex); //标记下拉框属性
 					break;
 			}
+			this.updateDragData(); //更新row,column数据
 		},
 		//标记 下拉
 		dropDownClick(name, row, index, markIndex) {
@@ -660,11 +663,12 @@ export default {
 			});
 		},
 		//拖拽结束
-		dragEnd(e, type, markIndex = 0) {
+		dragEnd(e, type) {
 			console.log(e, e.newIndex);
 			const { datasetId } = this.submitData;
-			const { oldIndex, newIndex, to } = e;
-			const { id } = to;
+			let { oldIndex, newIndex, to } = e;
+			const id = to.id.split(",")[0];
+			const markIndex = to.id.split(",")[1];
 			switch (type) {
 				case "filter":
 					id === "filter" && oldIndex === newIndex ? this.filterData.splice(oldIndex, 1) : "";
@@ -683,12 +687,14 @@ export default {
 					if (["color", "mark", "info", "labelWidth"].includes(id)) {
 						//保证标记的数据中颜色设定只有一个
 						if (!this.markData[markIndex].data[newIndex]) newIndex = 0;
-						console.log(this.markData[markIndex].data[newIndex], newIndex);
+
 						this.markData[markIndex].data[newIndex]["innerText"] = id;
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
 					break;
 			}
+			this.updateDragData(); //更新row,column数据
+
 			//数据拖拽至筛选器
 			//过滤器
 			if (id === "filter" && type !== "filter") {
@@ -734,10 +740,12 @@ export default {
 			});
 
 			//标记
-			this.markData[0].data.map((item, index) => {
-				this.markData[0].data[index] = { ...item, axis: "z", orderBy: index };
+			this.markData.forEach((item, index) => {
+				item.data.forEach((itemData, dataIndex) => {
+					this.markData[index].data[dataIndex] = { ...itemData, axis: "z", orderBy: `${index}${dataIndex}` };
+				});
 			});
-			console.log("标记", this.markData[0]);
+			console.log("标记", this.markData);
 		},
 
 		//更新过滤器数据
@@ -792,8 +800,6 @@ export default {
 		submitClick() {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
-					//修改拖拽的数据
-					this.updateDragData();
 					let obj = {
 						...this.submitData,
 						marks: JSON.stringify(this.markData), //标记
@@ -823,8 +829,39 @@ export default {
 			this.$emit("update:modelFlag", false);
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
 		},
+		//改变列、行信息的时候 修改标记
+		changeRowColumnbyMark() {
+			//判断列中是否有指标
+			const isColumnNumber = this.columnData.filter((item) => this.numberType(item));
+			const columnNumberId = isColumnNumber.map((item) => item.nodeId + this.calculatorObj(item.calculatorFunction, item.columnName));
+
+			//判断行中是否有指标
+			const isRowNumber = this.rowData.filter((item) => this.numberType(item));
+			const rowNumberId = isRowNumber.map((item) => item.nodeId + this.calculatorObj(item.calculatorFunction, item.columnName));
+
+			const data = isColumnNumber.length ? isColumnNumber : isRowNumber;
+			const dataId = isColumnNumber.length ? columnNumberId : rowNumberId;
+
+			//如果标记中有指标数据多余，需要删除。判断依据：当前标记的markId是否存在于列的指标,不存在则删除
+			this.markData = this.markData.filter((item) => item.name == "全部" || dataId.includes(item.markId));
+
+			data.forEach((item) => {
+				const { calculatorFunction, columnName, nodeId, axis, orderBy } = item;
+
+				const markIds = this.markData.map((item) => item.markId); //标记名称集合
+				const name = this.calculatorObj(calculatorFunction, columnName); //当前名称
+				const itemId = nodeId + name; //标记唯一id:nodeid+name
+
+				if (!markIds.includes(itemId)) {
+					this.markData.push({ ...this.markData[0], name, markId: itemId, stack: `${axis}${orderBy}` });
+				} else {
+					const index = markIds.findIndex((item) => item === itemId);
+					this.markData[index].stack = `${axis}${orderBy}`;
+				}
+			});
+		},
 		//计算属性对应中文
-		calculatorObj(name) {
+		calculatorObj(name, columnName) {
 			const obj = {
 				sum: "总和",
 				avg: "平均值",
@@ -833,8 +870,12 @@ export default {
 				max: "最大值",
 				min: "最小值",
 				stdev: "标准差",
+				undefined: "",
+				toChar: "",
+				"": "",
+				null: "",
 			};
-			return obj[name];
+			return `${obj[name]} ${columnName}`;
 		},
 		//cell 样式 数字/字符串
 		isNumberCell(item) {
@@ -851,6 +892,12 @@ export default {
 	},
 };
 </script>
+<style>
+.mark .ivu-collapse > .ivu-collapse-item > .ivu-collapse-header {
+	height: 25px;
+	line-height: 25px;
+}
+</style>
 <style scoped lang="less">
 .workbook-container {
 	height: calc(100% - 20px);

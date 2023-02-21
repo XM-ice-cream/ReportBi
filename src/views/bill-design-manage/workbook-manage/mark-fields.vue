@@ -44,8 +44,8 @@ export default {
 				console.log(this.isAdd);
 				this.submitData = { ...this.selectObj };
 				const { innerText } = this.submitData;
-				if (innerText === "labelWidth") {
-					this.submitData.markValue = this.submitData?.markValue || 90;
+				if (innerText === "labelWidth" && this.isAdd) {
+					this.submitData.markValue = 90;
 				}
 				//新增的时候 需要获取字段对应的所有值
 				if (innerText === "color" && this.isAdd) {

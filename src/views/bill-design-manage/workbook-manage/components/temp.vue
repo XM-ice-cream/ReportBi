@@ -6,7 +6,7 @@
 
 <script>
 import componentTable from "./component-table.vue";
-import componentBar from "./component-bar.vue"; //柱状图
+import bar from "./component-bar.vue"; //柱状图
 import componentLine from "./component-line.vue"; //折线图
 import componentPie from "./component-pie.vue"; //饼图
 import componentScatter from "./component-scatter.vue"; //散点图
@@ -14,7 +14,7 @@ import componentBoxplot from "./component-boxplot.vue"; //箱线图
 
 export default {
 	name: "componentsTemp",
-	components: { componentTable, componentBar, componentLine, componentPie, componentScatter, componentBoxplot },
+	components: { componentTable, bar, componentLine, componentPie, componentScatter, componentBoxplot },
 	model: {
 		prop: "value",
 		event: "input",
@@ -75,7 +75,7 @@ export default {
 			let obj = {}; //数据分组
 			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] } };
 			let axisConst = []; //维度常量
-			let markObj = { color: {}, mark: [] };
+			let markObj = {};
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
@@ -111,25 +111,29 @@ export default {
 				});
 			});
 			//标记
-			this.mark[0].data.forEach((markItem) => {
-				const { innerText, markValue, axis, orderBy } = markItem;
-				//颜色
-				if (innerText === "color") {
-					markValue.forEach((data) => {
-						const { title, color } = data;
-						if (!markObj.color[`${axis}${orderBy}`]) markObj.color[`${axis}${orderBy}`] = {};
-						markObj.color[`${axis}${orderBy}`][title] = color;
-					});
-				}
-				//标签
-				if (innerText === "mark") {
-					markObj.mark.push(`${axis}${orderBy}`);
-				}
+			this.mark.forEach((item) => {
+				markObj[item.stack] = { color: {}, mark: [], type: item.chartType };
+				item.data.forEach((markItem) => {
+					const { innerText, markValue, axis, orderBy } = markItem;
+					//颜色
+					if (innerText === "color") {
+						markValue.forEach((data) => {
+							const { title, color } = data;
+							if (!markObj[item.stack].color[`${axis}${orderBy}`]) markObj[item.stack].color[`${axis}${orderBy}`] = {};
+							markObj[item.stack].color[`${axis}${orderBy}`][title] = color;
+						});
+					}
+					//标签
+					if (innerText === "mark") {
+						markObj[item.stack].mark.push(`${axis}${orderBy}`);
+					}
+				});
 			});
+
 			const objKeys = Object.keys(obj);
 
 			// 行、列
-			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, objKeys, axisConst, groupByString);
+			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, objKeys, axisConst, groupByString, markObj);
 			//series
 			const series = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj);
 
@@ -198,7 +202,7 @@ export default {
 				this.$XEUtils.lastEach(axisConst, (item, index) => {
 					axisLabelData[index] = [];
 
-					//文本宽度
+					// 文本宽度;
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
 							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
@@ -243,10 +247,10 @@ export default {
 		},
 		//获取series
 		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj) {
-			//颜色、标签
-			const { color: markObjColor, mark: markArray } = markObj;
 			let series = [];
 			groupByNumber.forEach((item, index) => {
+				//颜色、标签
+				const { color: markObjColor, mark: markArray, type } = markObj[item];
 				objKeys.forEach((key) => {
 					obj[key].forEach((itemValue, itemIndex) => {
 						let name = "";
@@ -280,7 +284,7 @@ export default {
 							series[index][itemIndex].data.push(data);
 						} else {
 							series[index].push({
-								type: "",
+								type,
 								stack: item,
 								xAxisIndex: yNumber.length ? groupByString.length : 0,
 								yAxisIndex: !yNumber.length ? groupByString.length : 0,
@@ -410,14 +414,16 @@ export default {
 		//轴名 对应 字段名称
 		axisToField(name) {
 			let obj = {};
-			this.row.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
-			this.column.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
-			this.mark[0].data.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction) + ` ${item.columnName}`));
+			this.row.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnName)));
+			this.column.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnName)));
+			this.mark.forEach((markItem) => {
+				markItem.data.forEach((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnName)));
+			});
 
 			return obj[name];
 		},
 		//计算属性对应中文
-		calculatorObj(name) {
+		calculatorObj(name, columnName) {
 			const obj = {
 				sum: "总和",
 				avg: "平均值",
@@ -431,7 +437,7 @@ export default {
 				"": "",
 				null: "",
 			};
-			return obj[name];
+			return `${obj[name]} ${columnName}`;
 		},
 	},
 };
