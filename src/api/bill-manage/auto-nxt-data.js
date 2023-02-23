@@ -6,7 +6,7 @@ import {
 export const getlistReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.119:8024" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/v1/REPAIR_REFDES_API/GetNxtLogList',
     method: 'post',
     data
@@ -16,7 +16,7 @@ export const getlistReq = data => {
 export const addReq = data => {
   return requestCenter({
     timeout: 0,
-    baseUrl: "http://10.32.44.119:8024" || window.localStorage.getItem("reportip"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/v1/REPAIR_REFDES_API/AutoNxtData',
     method: 'post',
     data
