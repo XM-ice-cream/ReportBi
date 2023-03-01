@@ -168,9 +168,9 @@
 				</FormItem>
 			</Form>
 			<div class="drawer-button">
-				<Button ghost @click="submitClick(true, 'REJECT')">驳回</Button>
-				<Button ghost @click="submitClick(true, 'REBACK')">退回上一步</Button>
-				<Button type="primary" @click="submitClick(true, 'OK')">回复</Button>
+				<Button ghost @click="submitClick(true, 'REJECT')" :disabled="isEdit">驳回</Button>
+				<Button ghost @click="submitClick(true, 'REBACK')" :disabled="isEdit">退回上一步</Button>
+				<Button type="primary" @click="submitClick(true, 'OK')" :disabled="isEdit">回复</Button>
 			</div>
 		</div>
 	</div>
