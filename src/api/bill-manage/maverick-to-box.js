@@ -38,7 +38,7 @@ export const exportReq = data => {
   return requestCenter({
     loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
-    url: '/api/reportcenter/anonymous/v1/mavericktobox/export',
+    url: '/api/reportcenter/anonymous/v1/mavericktobox/getall',
     method: 'post',
     responseType: 'arraybuffer',
     data

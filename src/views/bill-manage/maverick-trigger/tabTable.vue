@@ -31,6 +31,7 @@
 <script>
 import { getSummaryReq } from "@/api/bill-manage/maverick-trigger";
 import { utils, writeFile } from "xlsx"; // 注意处理方法引入方式
+
 export default {
 	name: "tabTable",
 	data() {
@@ -203,6 +204,7 @@ export default {
 				pageIndex: 1, // 当前页码
 				data: this.queryObj,
 			};
+			const excelName = `MaverickTrigger-${this.queryObj.triggerstatus}`;
 			getSummaryReq(obj).then((res) => {
 				if (res.code === 200) {
 					let data = res.result.data;
@@ -249,8 +251,8 @@ export default {
 					});
 					let ws = utils.aoa_to_sheet(tableData);
 					let wb = utils.book_new();
-					utils.book_append_sheet(wb, ws, "MaverickTrigger"); // 工作簿名称
-					writeFile(wb, "MaverickTrigger.xlsx"); // 保存的文件名
+					utils.book_append_sheet(wb, ws, excelName); // 工作簿名称
+					writeFile(wb, `${excelName}.xlsx`); // 保存的文件名
 				}
 			});
 		},

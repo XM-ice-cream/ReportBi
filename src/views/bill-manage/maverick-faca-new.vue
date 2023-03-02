@@ -18,17 +18,17 @@
 											<Input v-model.trim="req.id" clearabled />
 										</FormItem>
 										<!-- SN -->
-										<FormItem label="SN" prop="sn">
+										<!-- <FormItem label="SN" prop="sn">
 											<Input v-model.trim="req.sn" clearabled />
-										</FormItem>
+										</FormItem> -->
 										<!-- GUID -->
-										<FormItem label="GUID" prop="guid">
+										<!-- <FormItem label="GUID" prop="guid">
 											<Input v-model.trim="req.guid" clearabled />
-										</FormItem>
+										</FormItem> -->
 										<!-- userId -->
-										<FormItem label="UserId" prop="userId">
+										<!-- <FormItem label="UserId" prop="userId">
 											<Input v-model.trim="req.userId" clearabled />
-										</FormItem>
+										</FormItem> -->
 									</Form>
 									<div class="poptip-style-button">
 										<Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -36,6 +36,9 @@
 									</div>
 								</div>
 							</Poptip>
+						</i-col>
+						<i-col span="18">
+							<button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
 						</i-col>
 					</Row>
 				</div>
@@ -62,6 +65,7 @@
 import { getlistReq } from "@/api/bill-manage/maverick-faca";
 import { getButtonBoolean, renderDate } from "@/libs/tools";
 import ReplyMaverick from "./maverick-faca/reply-maverick-new.vue";
+import { utils, writeFile } from "xlsx"; // 注意处理方法引入方式
 
 export default {
 	components: { ReplyMaverick },
@@ -100,30 +104,12 @@ export default {
 			selectArr: [], //表格选中数据
 		};
 	},
-	activated() {
-		this.autoSize();
-		this.tableConfig.loading = false;
-		window.addEventListener("resize", () => this.autoSize);
-		getButtonBoolean(this, this.btnData);
-	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
 		this.searchPoptipModal = false;
 		next();
 	},
-	watch: {
-		// selectArr() {
-		// 	console.log(1, this.data, this.selectArr);
-		// 	// this.data.forEach((item, index) => {
-		// 	// 	if (this.selectArr.length === 0 || (item.status === this.selectArr[0].status && item.status !== "Closed")) {
-		// 	// 		this.data[index]._disabled = false;
-		// 	// 	} else {
-		// 	// 		this.data[index]._disabled = true;
-		// 	// 	}
-		// 	// });
-		// 	this.data = JSON.parse(JSON.stringify(this.data));
-		// },
-	},
+	watch: {},
 	methods: {
 		// 点击搜索按钮触发
 		searchClick() {
@@ -165,9 +151,65 @@ export default {
 				this.$Message.error("选择状态必须一致,并且状态不可为Closed,请核对~");
 			}
 		},
+		exportClick() {
+			let obj = {
+				id: this.req.id,
+			};
+			getlistReq(obj).then((res) => {
+				this.tableConfig.loading = false;
+				if (res.code === 200) {
+					let data = res.result || [];
+					let titleList = [
+						"序号",
+						"ID",
+						"序列号",
+						"机种",
+						"ResultDate",
+						"Stage",
+						"工站",
+						"线体",
+						"TestStation",
+						"FailSymptom",
+						"Category",
+						"Location",
+						"RootCause",
+						"NextDRI",
+						"Status",
+					]; // 表格表头
+					let tableData = [titleList];
+					tableData[0][0] = "序号";
+					data.map((item, index) => {
+						let rowData = [];
+						//导出内容的字段
+						rowData = [
+							index + 1,
+							item.id,
+							item.serial_Number,
+							item.product,
+							item.resultdate,
+							item.stage,
+							item.station,
+							item.line,
+							item.teststationcode,
+							item.failuresymptom,
+							item.category,
+							item.location,
+							item.rootcause,
+							item.nextDRI,
+							item.status,
+						];
+						tableData.push(rowData);
+					});
+					let ws = utils.aoa_to_sheet(tableData);
+					let wb = utils.book_new();
+					utils.book_append_sheet(wb, ws, "MaverickFACA"); // 工作簿名称
+					writeFile(wb, "MaverickFACA.xlsx"); // 保存的文件名
+				}
+			});
+		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 120 - 60 - 420;
+			this.tableConfig.height = document.body.clientHeight - 120 - 60 - 430;
 		},
 		//获取url参数
 		getUrlParams() {
@@ -189,6 +231,10 @@ export default {
 		const params = this.getUrlParams();
 		this.req.id = params?.id || "";
 		this.searchClick();
+		this.autoSize();
+		this.tableConfig.loading = false;
+		window.addEventListener("resize", () => this.autoSize());
+		getButtonBoolean(this, this.btnData);
 	},
 };
 </script>

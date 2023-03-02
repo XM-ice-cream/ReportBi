@@ -76,7 +76,7 @@
 									</Poptip>
 								</i-col>
 								<i-col span="18">
-									<button-custom :btnData="btnData"></button-custom>
+									<button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
 								</i-col>
 							</Row>
 						</div>
@@ -127,6 +127,7 @@
 import { getPageListReq } from "@/api/bill-manage/maverick-trigger";
 import { formatDate, getButtonBoolean } from "@/libs/tools";
 import TabTable from "./maverick-trigger/tabTable.vue";
+import { utils, writeFile } from "xlsx"; // 注意处理方法引入方式
 
 export default {
 	name: "maverick-info",
@@ -197,7 +198,7 @@ export default {
 					align: "center",
 				},
 				{
-					title: "Yield type",
+					title: "Yield Type",
 					key: "yieldtype",
 					ellipsis: true,
 					tooltip: true,
@@ -329,6 +330,42 @@ export default {
 				this.$refs["tab" + index].req.pageIndex = 1;
 				this.$refs["tab" + index].queryObj = obj;
 				this.$refs["tab" + index].pageLoad(obj);
+			});
+		},
+		// 导出
+		exportClick() {
+			const { triggerid, model, station, line, yielD_TYPE, type, startTime, endTime } = this.req;
+			let obj = { triggerid, model, station, line, yielD_TYPE, type, startTime: formatDate(startTime), endTime: formatDate(endTime) };
+
+			const excelName = `MaverickTrigger`;
+			getPageListReq(obj).then((res) => {
+				if (res.code === 200) {
+					let data = res.result || [];
+					let titleList = ["序号", "机种", "区段", "制程", "线体", "Yield Type", "Open", "Ongoing", "Close", "Total"]; // 表格表头
+					let tableData = [titleList];
+					tableData[0][0] = "序号";
+					data.map((item, index) => {
+						let rowData = [];
+						//导出内容的字段
+						rowData = [
+							index + 1,
+							item.model,
+							item.stage,
+							item.stationtype,
+							item.line,
+							item.yieldtype,
+							item.open,
+							item.ongoing,
+							item.closed,
+							item.total,
+						];
+						tableData.push(rowData);
+					});
+					let ws = utils.aoa_to_sheet(tableData);
+					let wb = utils.book_new();
+					utils.book_append_sheet(wb, ws, excelName); // 工作簿名称
+					writeFile(wb, `${excelName}.xlsx`); // 保存的文件名
+				}
 			});
 		},
 
