@@ -1997,6 +1997,8 @@ export default {
   'db-account': ' DB账户信息',
   'SendAheadSystem': 'SendAheadSystem',
   'maverick-faca-new': '新版 Maverick FACA',
+  'maverick-to-box': 'MaverickToBox',
+  'maverick-trigger': 'MaverickTrigger',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
