@@ -17,18 +17,6 @@
 										<FormItem label="ID" prop="id">
 											<Input v-model.trim="req.id" clearabled />
 										</FormItem>
-										<!-- SN -->
-										<!-- <FormItem label="SN" prop="sn">
-											<Input v-model.trim="req.sn" clearabled />
-										</FormItem> -->
-										<!-- GUID -->
-										<!-- <FormItem label="GUID" prop="guid">
-											<Input v-model.trim="req.guid" clearabled />
-										</FormItem> -->
-										<!-- userId -->
-										<!-- <FormItem label="UserId" prop="userId">
-											<Input v-model.trim="req.userId" clearabled />
-										</FormItem> -->
 									</Form>
 									<div class="poptip-style-button">
 										<Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -52,9 +40,11 @@
 					@on-selection-change="currentClick"
 				>
 				</Table>
-				<div class="reply-maverick">
-					<div class="title">回复列表信息:</div>
-					<reply-maverick :selectArr="selectArr" ref="replymaverick" @pageLoad="pageLoad" />
+				<div style="background: #fff">
+					<div class="reply-maverick">
+						<div class="title">回复列表信息:</div>
+						<reply-maverick :selectArr="selectArr" ref="replymaverick" @pageLoad="pageLoad" />
+					</div>
 				</div>
 			</Card>
 		</div>
@@ -86,7 +76,7 @@ export default {
 			columns: [
 				{ type: "index", fixed: "left", width: 50, align: "center" },
 				{ type: "selection", width: 60, align: "center" },
-				{ title: "ID", key: "id", align: "center", width: 120, tooltip: true },
+				{ title: "ID", key: "pid", align: "center", minWidth: 50, tooltip: true },
 				{ title: "序列号", key: "serial_Number", align: "center", minWidth: 150, tooltip: true },
 				{ title: "机种", key: "product", align: "center", minWidth: 100, tooltip: true },
 				{ title: "ResultDate", key: "resultdate", align: "center", width: 150, tooltip: true, render: renderDate },
@@ -95,10 +85,10 @@ export default {
 				{ title: "线体", key: "line", align: "center", minWidth: 100, tooltip: true },
 				{ title: "TestStation", key: "teststationcode", align: "center", minWidth: 90, tooltip: true },
 				{ title: "FailSymptom", key: "failuresymptom", align: "center", minWidth: 120, tooltip: true },
-				{ title: "Category", key: "category", align: "center", minWidth: 50, tooltip: true },
-				{ title: "Location", key: "location", align: "center", minWidth: 50, tooltip: true },
-				{ title: "RootCause", key: "rootcause", align: "center", minWidth: 50, tooltip: true },
-				{ title: "NextDRI", key: "nextDRI", align: "center", minWidth: 50, tooltip: true },
+				{ title: "Category", key: "category", align: "center", minWidth: 100, tooltip: true },
+				{ title: "Location", key: "location", align: "center", minWidth: 80, tooltip: true },
+				{ title: "RootCause", key: "rootcause", align: "center", minWidth: 80, tooltip: true },
+				{ title: "NextDRI", key: "nextDRI", align: "center", minWidth: 80, tooltip: true },
 				{ title: "Status", key: "status", align: "center", minWidth: 50, tooltip: true },
 			], // 表格数据
 			selectArr: [], //表格选中数据
@@ -210,6 +200,8 @@ export default {
 		// 自动改变表格高度
 		autoSize() {
 			this.tableConfig.height = document.body.clientHeight - 120 - 60 - 430;
+			if (this.tableConfig.height < 200) this.tableConfig.height = 200;
+			console.log(this.tableConfig.height);
 		},
 		//获取url参数
 		getUrlParams() {
@@ -266,5 +258,8 @@ export default {
 			margin-bottom: -5px;
 		}
 	}
+}
+.main .content-wrapper-div {
+	height: auto !important;
 }
 </style>

@@ -1,7 +1,7 @@
-/* NXT SN补资料 */
+/*SN 打件资料 */
 <template>
 	<div class="page-style" style="height: 100%">
-		<Drawer v-model="modalFlag" title="NXT 打件资料信息补录" width="650" :mask-closable="false" :before-close="cancelClick">
+		<Drawer v-model="modalFlag" title="SN 打件资料信息补录" width="650" :mask-closable="false" :before-close="cancelClick">
 			<div style="height: calc(100% - 300px)">
 				<Input
 					v-model="submitData.unitId"
@@ -11,7 +11,7 @@
 					clearable
 				/>
 				<div style="margin: 0 auto; text-align: center; margin-top: 10px">
-					<Button style="margin-right: 8px" @click="cancelClick">Cancel</Button> <Button type="primary" @click="submitClick">Submit</Button>
+					<Button style="margin-right: 8px" @click="cancelClick">取消</Button> <Button type="primary" @click="submitClick">提交</Button>
 				</div>
 				<List header="信息展示列" border v-if="resultList.length > 0" class="info-list">
 					<ListItem v-for="(item, index) in resultList" :key="index" :style="{ color: item.state == 'NG' ? 'red' : '' }">{{ item.msg }}</ListItem>
@@ -86,6 +86,15 @@
 					:data="data"
 				>
 				</Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 	</div>
@@ -119,6 +128,9 @@ export default {
 					fixed: "left",
 					width: 50,
 					align: "center",
+					indexMethod: (row) => {
+						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
+					},
 				},
 				{ title: "操作账号", key: "createid", align: "center", minWidth: 180, tooltip: true },
 				{ title: "操作时间", key: "createdate", align: "center", minWidth: 100, tooltip: true, render: renderDate },
@@ -145,6 +157,7 @@ export default {
 	methods: {
 		// 点击搜索按钮触发
 		searchClick() {
+			this.req.pageIndex = 1;
 			this.pageLoad();
 		},
 		// 获取分页列表数据
@@ -154,16 +167,25 @@ export default {
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
 					this.tableConfig.loading = true;
+
 					const obj = {
-						startTime: formatDate(startTime),
-						endTime: formatDate(endTime),
-						unitId,
+						orderField: "createdate", // 排序字段
+						ascending: true, // 是否升序
+						pageSize: this.req.pageSize, // 分页大小
+						pageIndex: this.req.pageIndex, // 当前页码
+						data: {
+							startTime: formatDate(startTime),
+							endTime: formatDate(endTime),
+							unitId,
+						},
 					};
 					getlistReq(obj)
 						.then((res) => {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
-								this.data = res.result || [];
+								let { data, pageSize, pageIndex, total, totalPage } = res.result;
+								this.data = data || [];
+								this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 							}
 						})
 						.catch(() => (this.tableConfig.loading = false));
@@ -181,7 +203,7 @@ export default {
 				userId: window.sessionStorage.getItem("userName"),
 			};
 			addReq(obj).then((res) => {
-				if (res.resData.status == "OK") {
+				if (res.code === 200) {
 					this.$Message.success("提交成功");
 					this.searchClick();
 					this.cancelClick();
@@ -205,7 +227,19 @@ export default {
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 130;
+			this.tableConfig.height = document.body.clientHeight - 130 - 50;
+		},
+
+		// 选择第几页
+		pageChange(index) {
+			this.req.pageIndex = index;
+			this.pageLoad();
+		},
+		// 选择一页有条数据
+		pageSizeChange(index) {
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
 		},
 	},
 };

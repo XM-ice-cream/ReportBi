@@ -194,6 +194,7 @@ export default {
 			mailDepartArry: [],
 			isEdit: false,
 			req: {
+				ischeckPoint: false,
 				category: "",
 				location: "",
 				rootcause: "",
@@ -211,15 +212,15 @@ export default {
 			categoryList: [
 				{
 					label: "0:material issue",
-					value: 0,
+					value: "0:material issue",
 				},
 				{
 					label: "1:process issue",
-					value: 1,
+					value: "1:process issue",
 				},
 				{
 					label: "3:NTF",
-					value: 3,
+					value: "3:NTF",
 				},
 			],
 		};
@@ -240,7 +241,22 @@ export default {
 		submitClick(isClose = true, type = "") {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
-					const { category, location, rootcause, nextDRI, mailDepartArry, status, fA_MSG, fA_EMPNO, cA_MSG, cA_EMPNO, q_MSG, q_EMPNO } = this.req;
+					const {
+						ischeckPoint,
+						checkPoint,
+						category,
+						location,
+						rootcause,
+						nextDRI,
+						mailDepartArry,
+						status,
+						fA_MSG,
+						fA_EMPNO,
+						cA_MSG,
+						cA_EMPNO,
+						q_MSG,
+						q_EMPNO,
+					} = this.req;
 					let maverickDetailList = this.selectArr.map((item, index) => {
 						switch (status) {
 							case "FA":
@@ -260,10 +276,11 @@ export default {
 						maverickDetailList,
 						mailDepartArry,
 						status: this.req.status, //回复类型
-						checkPoint: this.ischeckPoint ? formatDate(this.req.checkPoint) : "",
+						checkPoint: ischeckPoint ? formatDate(checkPoint) : "",
 						userId: this.$store.state.account, //工号
 						opt_type: type,
 					};
+
 					sendCommentReq(obj).then((res) => {
 						if (res.code === 200) {
 							this.$Message.success(`回复信息${this.$t("success")}`);
@@ -320,6 +337,8 @@ export default {
 			this.drawerFlag = false;
 			//数据恢复初始化
 			Object.assign(this.$data, this.$options.data());
+			//重新获取群组
+			this.getMailDepart();
 		},
 	},
 	created() {},
