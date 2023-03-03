@@ -115,7 +115,9 @@ export default {
 
 			this.myChart.setOption(option, true);
 			window.addEventListener("resize", function () {
-				this.myChart.resize();
+				if (this.myChart) {
+					this.myChart.resize();
+				}
 			});
 		},
 	},

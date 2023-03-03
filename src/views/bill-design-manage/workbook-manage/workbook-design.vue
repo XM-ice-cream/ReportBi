@@ -277,6 +277,8 @@
 													</template>
 												</Dropdown>
 											</DropdownMenu>
+											<!-- 删除 -->
+											<DropdownItem name="column-delete">移除</DropdownItem>
 										</template>
 									</Dropdown>
 								</span>
@@ -312,6 +314,8 @@
 													</template>
 												</Dropdown>
 											</DropdownMenu>
+											<!-- 删除 -->
+											<DropdownItem name="row-delete">移除</DropdownItem>
 										</template>
 									</Dropdown>
 								</span>
@@ -325,7 +329,7 @@
 						<div class="title">{{ submitData.title }}</div>
 						<componentsTemp
 							v-if="modelFlag"
-							:type="markData[0].chartType"
+							:type="markData[0]?.chartType || 'bar'"
 							:visib="true"
 							:value="chartsData"
 							:row="rowData"
@@ -389,6 +393,7 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
+				console.log("编辑");
 				this.$nextTick(() => {
 					//编辑
 					if (!this.workbookIsAdd) {
@@ -475,11 +480,13 @@ export default {
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
 				if (res.code == 200) {
-					const { calcItems, filterItems, marks } = res.result;
-					this.markData = JSON.parse(marks) || [{ name: "全部", chartType: "bar", data: [] }]; //标记
+					const { calcItems, filterItems, markStyle } = res.result;
+
 					this.filterData = filterItems; //过滤器
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
 					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
+
+					this.markData = markStyle && markStyle !== "{}" ? JSON.parse(markStyle) : [{ name: "全部", chartType: "bar", data: [] }]; //标记
 					this.$nextTick(() => {
 						//加载图表数据
 						this.searchClick();
@@ -506,16 +513,18 @@ export default {
 			}
 			let markData = [];
 			this.markData.forEach((item) => {
+				item.data.markValue = "";
 				markData.push(item.data);
 			});
 			this.$Spin.show();
 			const obj = {
 				datasetId,
 				filterItems: this.filterData,
-				calcItems: this.rowData.concat(this.columnData).concat(markData.flat()),
-				markItems: this.markData,
+				calcItems: this.rowData.concat(this.columnData),
+				markItems: markData.flat().map((item) => {
+					return { ...item, markValue: "" };
+				}),
 			};
-			console.log(obj);
 			getChartsInfoReq(obj)
 				.then((res) => {
 					if (res.code == 200) {
@@ -561,12 +570,18 @@ export default {
 		rowColumnDropDownClick(name, index, type, item, markIndex) {
 			switch (type) {
 				case "row":
-					this.rowData[index].calculatorFunction = name;
-					// this.rowData = JSON.parse(JSON.stringify(this.rowData));
+					if (name == "row-delete") {
+						this.rowData.splice(index, 1);
+					} else {
+						this.rowData[index].calculatorFunction = name;
+					}
 					break;
 				case "column":
-					this.columnData[index].calculatorFunction = name;
-					// this.columnData = JSON.parse(JSON.stringify(this.columnData));
+					if (name == "column-delete") {
+						this.columnData.splice(index, 1);
+					} else {
+						this.columnData[index].calculatorFunction = name;
+					}
 					break;
 				case "mark":
 					if (!["markField-edit", "markField-delete"].includes(name)) this.markData[markIndex].data[index].calculatorFunction = name;
@@ -802,7 +817,7 @@ export default {
 				if (validate) {
 					let obj = {
 						...this.submitData,
-						marks: JSON.stringify(this.markData), //标记
+						markStyle: JSON.stringify(this.markData), //标记
 						filterItems: this.filterData, //过滤器
 						calcItems: this.rowData.concat(this.columnData), //行、列
 					};
@@ -823,7 +838,7 @@ export default {
 			this.filterData = []; //过滤值
 			this.columnData = []; //列值
 			this.rowData = []; //行值
-			this.markData = [{ name: "全部", chartType: "componentBar", data: [] }];
+			this.markData = [{ name: "全部", chartType: "bar", data: [] }];
 			this.selectObj = {};
 			this.chartsData = [];
 			this.$emit("update:modelFlag", false);
@@ -845,6 +860,8 @@ export default {
 			//如果标记中有指标数据多余，需要删除。判断依据：当前标记的markId是否存在于列的指标,不存在则删除
 			this.markData = this.markData.filter((item) => item.name == "全部" || dataId.includes(item.markId));
 
+			console.log("this.markData", this.markData);
+
 			data.forEach((item) => {
 				const { calculatorFunction, columnName, nodeId, axis, orderBy } = item;
 
@@ -859,6 +876,7 @@ export default {
 					this.markData[index].stack = `${axis}${orderBy}`;
 				}
 			});
+			// this.updateDragData(); //修改拖拽的行列标记
 		},
 		//计算属性对应中文
 		calculatorObj(name, columnName) {

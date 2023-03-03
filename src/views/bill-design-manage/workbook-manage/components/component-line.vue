@@ -55,13 +55,13 @@ export default {
 				grid: grid,
 				xAxis: xAxis,
 				yAxis: yAxis,
-				series: series.map((item) => {
-					return { ...item, type: "line" };
-				}),
+				series: series,
 			};
 			this.myChart.setOption(option, true);
 			window.addEventListener("resize", function () {
-				this.myChart.resize();
+				if (this.myChart) {
+					this.myChart.resize();
+				}
 			});
 		},
 	},

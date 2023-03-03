@@ -61,7 +61,9 @@ export default {
 			this.myChart.setOption(option, true);
 			console.log(option);
 			window.addEventListener("resize", function () {
-				this.myChart.resize();
+				if (this.myChart) {
+					this.myChart.resize();
+				}
 			});
 		},
 	},
