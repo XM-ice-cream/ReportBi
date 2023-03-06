@@ -345,7 +345,7 @@
 			<!-- 过滤字段属性设定 -->
 			<FilterFields ref="filterField" :selectObj="selectObj" :isAdd="isAdd" @updateFilter="updateFilter" />
 			<!-- 标记属性设定 -->
-			<MarkFields ref="markField" :selectObj="selectObj" :isAdd="isAdd" @updateMark="updateMark" />
+			<MarkFields ref="markField" :selectObj="selectObj" :filterData="filterData" :isAdd="isAdd" @updateMark="updateMark" />
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>

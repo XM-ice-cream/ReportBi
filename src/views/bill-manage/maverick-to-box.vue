@@ -137,14 +137,14 @@ export default {
 				{ title: "SigmaValue", key: "sigmavalue", align: "center", minWidth: 100, tooltip: true, dataType: "GoalSBL" },
 				{ title: "SBL Statistical", key: "sblstatistical", align: "center", minWidth: 100, tooltip: true, dataType: "GoalSBL" },
 
-				{ title: "line", key: "line", align: "center", minWidth: 100, tooltip: true, dataType: "SYL,SBL" },
-				{ title: "datecode", key: "datecode", minWidth: 100, align: "center", dataType: "SYL,SBL" },
-				{ title: "inputqty", key: "inputqty", minWidth: 100, align: "center", dataType: "SYL,SBL" },
-				{ title: "failqty", key: "failqty", minWidth: 100, align: "center", dataType: "SYL,SBL" },
-				{ title: "mavericklimit", key: "mavericklimit", minWidth: 100, align: "center", dataType: "SYL,SBL" },
-				{ title: "yield", key: "yield", minWidth: 100, align: "center", dataType: "SYL" },
-				{ title: "testitem", key: "testitem", minWidth: 100, align: "center", dataType: "SBL" },
-				{ title: "fr", key: "fr", minWidth: 100, align: "center", dataType: "SBL" },
+				{ title: "Line", key: "line", align: "center", minWidth: 100, tooltip: true, dataType: "SYL,SBL" },
+				{ title: "DateCode", key: "datecode", minWidth: 100, align: "center", dataType: "SYL,SBL" },
+				{ title: "InputQty", key: "inputqty", minWidth: 100, align: "center", dataType: "SYL,SBL" },
+				{ title: "FailQty", key: "failqty", minWidth: 100, align: "center", dataType: "SYL,SBL" },
+				{ title: "MverickLimit", key: "mavericklimit", minWidth: 100, align: "center", dataType: "SYL,SBL" },
+				{ title: "Yield", key: "yield", minWidth: 100, align: "center", dataType: "SYL" },
+				{ title: "TestItem", key: "testitem", minWidth: 100, align: "center", dataType: "SBL" },
+				{ title: "FR", key: "fr", minWidth: 100, align: "center", dataType: "SBL" },
 			], // 表格数据
 		};
 	},
@@ -165,7 +165,7 @@ export default {
 			this.req.pageIndex = 1;
 			this.pageLoad();
 			this.searchPoptipModal = false;
-			this.columns = this.originColumns.filter((item) => item.dataType.indexOf(this.req.type) > -1);
+			this.columns = this.originColumns.filter((item) => item.dataType.split(",").includes(this.req.type));
 		},
 		// 获取分页列表数据
 		pageLoad() {

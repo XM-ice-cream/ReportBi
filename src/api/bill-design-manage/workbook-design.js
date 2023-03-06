@@ -21,3 +21,12 @@ export const getEchoReq = data => {
     data
   })
 }
+//  根据字段获取标记所有值
+export const getMarksReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/bicalculator/getmarkvalue',
+    method: 'post',
+    data
+  })
+}

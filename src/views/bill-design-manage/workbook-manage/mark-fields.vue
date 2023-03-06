@@ -22,7 +22,7 @@
 	</Modal>
 </template>
 <script>
-import { getselectvalueReq } from "@/api/bill-design-manage/workbook-design.js";
+import { getMarksReq } from "@/api/bill-design-manage/workbook-design.js";
 import { formatDate } from "@/libs/tools";
 
 export default {
@@ -32,6 +32,10 @@ export default {
 		selectObj: {
 			type: Object,
 			default: () => {},
+		},
+		filterData: {
+			type: Array,
+			default: () => [],
 		},
 		isAdd: {
 			type: Boolean,
@@ -78,27 +82,15 @@ export default {
 		//获取字段对应的所有值
 		getAllValue() {
 			this.spinShow = true;
-			const { nodeId, datasetId, tableName, columnName, columnType, dataType, columnComment } = this.submitData;
+			const { dataType } = this.submitData;
 			const obj = {
-				orderField: "string",
-				ascending: true,
-				pageSize: 30, // 分页大小
-				pageIndex: 1, // 当前页码
-				total: 0,
-				data: {
-					nodeId,
-					datasetId,
-					tableName,
-					columnName,
-					columnType,
-					dataType,
-					columnComment,
-				},
+				filterFields: this.filterData,
+				markField: this.submitData,
 			};
-			getselectvalueReq(obj)
+			getMarksReq(obj)
 				.then((res) => {
 					if (res.code == 200) {
-						let { data } = res.result;
+						const data = res.result;
 						this.submitData.markValue =
 							data.map((item, index) => {
 								if (dataType === "DateTime") item = formatDate(item);
