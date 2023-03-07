@@ -839,6 +839,7 @@ export default {
 		},
 		//判断数据是否存在
 		markIndexOf(index, data) {
+			if (!data) return -1;
 			const { nodeId, innerText, columnName } = data;
 			return this.markData[index].data.findIndex((item) => item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName);
 		},
