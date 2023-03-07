@@ -155,7 +155,7 @@
 								{{ item.name }}
 
 								<template #content>
-									<Select v-model="markData[markIndex].chartType" clearable placeholder="请选择图表">
+									<Select v-model="markData[markIndex].chartType" clearable placeholder="请选择图表" @on-change="changeMarks(markIndex)">
 										<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 									</Select>
 									<div class="mark-box">
@@ -243,7 +243,7 @@
 						</Collapse>
 					</div>
 				</div>
-				<!-- 行列 -->
+				<!-- 行列 、工作区-->
 				<div class="right-box">
 					<!-- 行列拖拽 -->
 					<div class="row-column">
@@ -448,7 +448,7 @@ export default {
 			filterData: [], //过滤值
 			columnData: [], //列值
 			rowData: [], //行值
-			markData: [],
+			markData: [{ name: "全部", chartType: "bar", data: [] }],
 			chartList: [
 				{ label: "柱状图", value: "bar" },
 				{ label: "折线图", value: "line" },
@@ -645,7 +645,9 @@ export default {
 					this.$refs.markField.modelFlag = true;
 					break;
 				case "markField-delete":
+					this.changeMarks(markIndex, "delete", index);
 					this.markData[markIndex].data.splice(index, 1);
+
 					break;
 			}
 		},
@@ -696,7 +698,12 @@ export default {
 					break;
 				case "mark-box":
 					console.log("mark-box", this.markData);
-					id === "mark-box" && oldIndex === newIndex ? this.markData[markIndex].data.splice(oldIndex, 1) : "";
+
+					if (id === "mark-box" && oldIndex === newIndex) {
+						this.changeMarks(markIndex, "delete", newIndex); //联动删除标记字段
+
+						this.markData[markIndex].data.splice(oldIndex, 1);
+					}
 					break;
 				case "tree":
 					if (["color", "mark", "info", "labelWidth"].includes(id)) {
@@ -704,6 +711,9 @@ export default {
 						if (!this.markData[markIndex].data[newIndex]) newIndex = 0;
 
 						this.markData[markIndex].data[newIndex]["innerText"] = id;
+
+						this.changeMarks(markIndex, "add", newIndex); //联动添加标记字段
+
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
 					break;
@@ -767,6 +777,37 @@ export default {
 		updateFilter(newIndex, obj) {
 			this.filterData[newIndex] = { ...obj };
 			this.filterData = JSON.parse(JSON.stringify(this.filterData));
+		},
+		//修改第一个标记，联动其余标记
+		changeMarks(markIndex, type, newIndex) {
+			const chartType = this.markData[markIndex].chartType;
+			let chartFlag = true;
+			//除全部标记 以外的所有图表类型为相同时，修改全部的图表类型
+
+			for (let i = 1; i < this.markData.length; i++) {
+				//===修改图表类别
+				if (this.markData[i].chartType !== chartType) chartFlag = false;
+				//标记 联动 删除、新增
+				if (markIndex == 0 && (type == "delete" || type == "add")) {
+					const { nodeId, innerText, columnName } = this.markData[markIndex].data[newIndex];
+					//判断是否已存在
+					const markIndexOthers = this.markData[i].data.findIndex(
+						(item) => item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName
+					);
+
+					if (markIndexOthers > -1 && type == "delete") this.markData[i].data.splice(markIndexOthers, 1);
+					if (markIndexOthers == -1 && type == "add" && innerText !== "labelWidth")
+						this.markData[i].data.push(this.markData[markIndex].data[newIndex]);
+				}
+			}
+
+			if (markIndex == 0 || chartFlag) {
+				this.markData.map((item) => (item.chartType = chartType));
+			}
+			// this.$nextTick(() => {
+			// 	this.searchClick();
+			// });
+			console.log("修改第一个标记，联动其余标记", this.markData);
 		},
 		//更新标记数据
 		updateMark(newIndex, obj, markIndex) {

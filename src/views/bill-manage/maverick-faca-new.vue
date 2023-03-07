@@ -30,7 +30,7 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table
+				<!-- <Table
 					:border="tableConfig.border"
 					:highlight-row="tableConfig.highlightRow"
 					:height="tableConfig.height"
@@ -39,7 +39,36 @@
 					:data="data"
 					@on-selection-change="currentClick"
 				>
-				</Table>
+				</Table> -->
+				<vxe-table
+					ref="xTable1"
+					size="mini"
+					resizable
+					:border="tableConfig.border"
+					align="center"
+					:loading="tableConfig.loading"
+					:data="data"
+					:height="tableConfig.height"
+					@checkbox-change="currentClick"
+				>
+					<vxe-column type="seq" width="60"></vxe-column>
+					<vxe-column type="checkbox" show-overflow></vxe-column>
+					<vxe-column field="pid" title="ID" show-overflow></vxe-column>
+					<vxe-column field="serial_Number" title="序列号" show-overflow> </vxe-column>
+					<vxe-column field="product" title="机种" show-overflow></vxe-column>
+					<vxe-column field="resultdate" title="ResultDate" show-overflow></vxe-column>
+					<vxe-column field="stage" title="Stage" show-overflow></vxe-column>
+					<vxe-column field="station" title="工站" show-overflow></vxe-column>
+					<vxe-column field="line" title="线体" show-overflow></vxe-column>
+					<vxe-column field="teststationcode" title="TestStation" show-overflow></vxe-column>
+					<vxe-column field="failuresymptom" title="FailSymptom" show-overflow></vxe-column>
+					<vxe-column field="category" title="Category" show-overflow></vxe-column>
+					<vxe-column field="location" title="Location" show-overflow></vxe-column>
+					<vxe-column field="rootcause" title="RootCause" show-overflow></vxe-column>
+					<vxe-column field="nextDRI" title="NextDRI" show-overflow></vxe-column>
+					<vxe-column field="category" title="Category" show-overflow></vxe-column>
+					<vxe-column field="status" title="Status" show-overflow></vxe-column>
+				</vxe-table>
 				<div style="background: #fff">
 					<div class="reply-maverick">
 						<div class="title">回复列表信息:</div>
@@ -120,9 +149,10 @@ export default {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
 								this.data = res?.result || [];
+								console.log("res", res.code, this.tableConfig.loading, JSON.stringify(this.data));
 							}
 						})
-						.catch(() => (this.tableConfig.loading = false));
+						.finally(() => (this.tableConfig.loading = false));
 					this.searchPoptipModal = false;
 				}
 			});
@@ -132,7 +162,8 @@ export default {
 			this.$refs.searchReq.resetFields();
 		},
 		// 某一行高亮时触发
-		currentClick(selection) {
+		currentClick() {
+			const selection = this.$refs.xTable1.getCheckboxRecords();
 			const status = selection[0]?.status || "";
 			const isRight = selection.every((item) => item.status === status && status !== "Closed");
 			if (isRight) {

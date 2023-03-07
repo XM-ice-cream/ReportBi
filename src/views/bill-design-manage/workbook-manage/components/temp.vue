@@ -1,20 +1,17 @@
 <template>
 	<div style="height: calc(100% - 50px); padding: 5px; margin: 5px">
-		<component :is="type" :ispreview="true" :visib="visib" :chartData="chartData" />
+		<component :is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type" :ispreview="true" :visib="visib" :chartData="chartData" />
 	</div>
 </template>
 
 <script>
-import componentTable from "./component-table.vue";
-import bar from "./component-bar.vue"; //柱状图
-import componentLine from "./component-line.vue"; //折线图
+import barLineScatter from "./component-bar-line-scatter.vue"; //柱状图
 import componentPie from "./component-pie.vue"; //饼图
-import componentScatter from "./component-scatter.vue"; //散点图
 import componentBoxplot from "./component-boxplot.vue"; //箱线图
 
 export default {
 	name: "componentsTemp",
-	components: { componentTable, bar, componentLine, componentPie, componentScatter, componentBoxplot },
+	components: { barLineScatter, componentPie, componentBoxplot },
 	model: {
 		prop: "value",
 		event: "input",
@@ -265,7 +262,7 @@ export default {
 							// 图表文字显示
 							label: {
 								show: true,
-								position: "top",
+								position: yNumber.length ? "top" : "right",
 								formatter: function (val) {
 									let result = [];
 									markArray.forEach((item) => {

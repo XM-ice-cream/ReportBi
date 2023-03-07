@@ -22,6 +22,9 @@ import mixins from './libs/queryform'
 import '@/assets/iconfont/iconfont.css'
 import moment from "moment";
 import XEUtils from 'xe-utils';
+import VXETable from 'vxe-table'
+import 'vxe-table/lib/style.css'
+
 // 引入elementui 部分组件
 import {
   Input
@@ -30,6 +33,7 @@ Vue.use(Input)
 
 Vue.use(Avue);
 Vue.use(animate);
+Vue.use(VXETable);
 Vue.component('v-chart', ECharts)
 
 // 注册全局组件
