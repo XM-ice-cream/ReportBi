@@ -44,7 +44,7 @@
 					<div class="left-tree">
 						<ul class="tree">
 							<li v-for="(item, index) in data" :key="index" class="tree-father">
-								<div @click="item.isShow = !item.isShow">
+								<div @click="item.isShow = !item.isShow" class="textOverhidden">
 									<Icon type="ios-arrow-forward" :style="{ transform: item.isShow ? 'rotate(90deg)' : 'rotate(0deg)' }" />
 									<Icon type="md-apps" /> {{ item.labelName }}
 								</div>
@@ -150,7 +150,7 @@
 					<div class="mark">
 						<div class="title">标记</div>
 						<!-- 手风琴 -->
-						<Collapse accordion v-model="collapse">
+						<Collapse accordion v-model="collapse" style="max-height: calc(100% - 30px); overflow: hidden">
 							<Panel v-for="(item, markIndex) in markData" :key="markIndex" :name="markIndex.toString()" class="markPanel">
 								{{ item.name }}
 
@@ -511,6 +511,7 @@ export default {
 				this.$Message.error("请拖拽字段至列");
 				return;
 			}
+			this.updateDragData(); //更新row,column数据
 			let markData = [];
 			this.markData.forEach((item) => {
 				item.data.markValue = "";
@@ -585,6 +586,10 @@ export default {
 					break;
 				case "mark":
 					if (!["markField-edit", "markField-delete"].includes(name)) this.markData[markIndex].data[index].calculatorFunction = name;
+
+					const data = this.markData[markIndex].data[index];
+					this.changeMarks(markIndex, "update", data);
+
 					this.markData = JSON.parse(JSON.stringify(this.markData));
 					this.dropDownClick(name, item, index, markIndex); //标记下拉框属性
 					break;
@@ -645,9 +650,9 @@ export default {
 					this.$refs.markField.modelFlag = true;
 					break;
 				case "markField-delete":
-					this.changeMarks(markIndex, "delete", index);
+					const data = this.markData[markIndex].data[index];
 					this.markData[markIndex].data.splice(index, 1);
-
+					this.changeMarks(markIndex, "delete", data);
 					break;
 			}
 		},
@@ -700,9 +705,9 @@ export default {
 					console.log("mark-box", this.markData);
 
 					if (id === "mark-box" && oldIndex === newIndex) {
-						this.changeMarks(markIndex, "delete", newIndex); //联动删除标记字段
-
+						const data = this.markData[markIndex].data[newIndex];
 						this.markData[markIndex].data.splice(oldIndex, 1);
+						this.changeMarks(markIndex, "delete", data); //联动删除标记字段
 					}
 					break;
 				case "tree":
@@ -712,7 +717,7 @@ export default {
 
 						this.markData[markIndex].data[newIndex]["innerText"] = id;
 
-						this.changeMarks(markIndex, "add", newIndex); //联动添加标记字段
+						this.changeMarks(markIndex, "add", this.markData[markIndex].data[newIndex]); //联动添加标记字段
 
 						this.markData = JSON.parse(JSON.stringify(this.markData));
 					}
@@ -778,31 +783,48 @@ export default {
 			this.filterData[newIndex] = { ...obj };
 			this.filterData = JSON.parse(JSON.stringify(this.filterData));
 		},
-		//修改第一个标记，联动其余标记
-		changeMarks(markIndex, type, newIndex) {
+		//修改第0个标记，联动其余标记；其余标记均修改后，自动修改第0标记
+		changeMarks(markIndex, type, data) {
 			const chartType = this.markData[markIndex].chartType;
+
 			let chartFlag = true;
+			let deleteFlag = true;
+			let addFlag = true;
 			//除全部标记 以外的所有图表类型为相同时，修改全部的图表类型
 
 			for (let i = 1; i < this.markData.length; i++) {
-				//===修改图表类别
+				//修改图表类别
 				if (this.markData[i].chartType !== chartType) chartFlag = false;
-				//标记 联动 删除、新增
-				if (markIndex == 0 && (type == "delete" || type == "add")) {
-					const { nodeId, innerText, columnName } = this.markData[markIndex].data[newIndex];
-					//判断是否已存在
-					const markIndexOthers = this.markData[i].data.findIndex(
-						(item) => item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName
-					);
+				//判断是否已存在
+				const markIndexOthers = this.markIndexOf(i, data);
+				//不可删除0标记
+				if (markIndexOthers > -1 && type == "delete") deleteFlag = false;
+				//不可添加0标记
+				if (markIndexOthers === -1 && type == "add") addFlag = false;
 
+				console.log("标记", markIndexOthers);
+
+				//标记 联动 删除、新增、编辑
+				if (markIndex == 0 && (type == "delete" || type == "add" || type == "update")) {
 					if (markIndexOthers > -1 && type == "delete") this.markData[i].data.splice(markIndexOthers, 1);
-					if (markIndexOthers == -1 && type == "add" && innerText !== "labelWidth")
-						this.markData[i].data.push(this.markData[markIndex].data[newIndex]);
+					if (markIndexOthers == -1 && type == "add" && data.innerText !== "labelWidth") this.markData[i].data.push(data);
+					if (markIndexOthers > -1 && type == "update") this.markData[i].data[markIndexOthers] = { ...data };
 				}
 			}
-
+			//修改0标记图表类型 同步修改其余标记图表类型；其余图表类型改为相同，同步修改0标记图表类型
 			if (markIndex == 0 || chartFlag) {
 				this.markData.map((item) => (item.chartType = chartType));
+			}
+			//删除0标记
+			if (deleteFlag && type == "delete") {
+				const markIndexOthers = this.markIndexOf(0, data);
+				this.markData[0].data.splice(markIndexOthers, 1);
+			}
+			console.log(addFlag, type);
+			//添加0标记
+			if (addFlag && type == "add") {
+				const markIndexOthers = this.markIndexOf(0, data);
+				if (markIndexOthers == -1) this.markData[0].data.push(data);
 			}
 			// this.$nextTick(() => {
 			// 	this.searchClick();
@@ -811,10 +833,16 @@ export default {
 		},
 		//更新标记数据
 		updateMark(newIndex, obj, markIndex) {
-			this.markData[markIndex].data[newIndex] = { ...obj };
-			this.markData = JSON.parse(JSON.stringify(this.markData));
-			console.log("this.markData", this.markData);
+			const data = { ...obj };
+			this.markData[markIndex].data[newIndex] = { ...data };
+			this.changeMarks(markIndex, "update", data);
 		},
+		//判断数据是否存在
+		markIndexOf(index, data) {
+			const { nodeId, innerText, columnName } = data;
+			return this.markData[index].data.findIndex((item) => item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName);
+		},
+
 		//删除自定义字段
 		deleteFields(row) {
 			const { nodeId } = row;
@@ -1083,7 +1111,7 @@ export default {
 			}
 		}
 		.right-box {
-			flex: 1;
+			width: calc(100% - 500px);
 			margin-left: 10px;
 			.row-column {
 				.row,
@@ -1177,6 +1205,7 @@ export default {
 
 :deep(.ivu-modal-fullscreen .ivu-modal-body) {
 	bottom: 35px;
+	overflow-y: overlay;
 }
 :deep(.ivu-modal-header p, .ivu-modal-header-inner) {
 	color: #17233d;

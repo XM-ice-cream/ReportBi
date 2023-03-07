@@ -33,7 +33,6 @@ export default {
 			}
 			// 基于准备好的dom，初始化echarts实例
 			this.myChart = echarts.init(document.getElementById("barchart"));
-
 			const _this = this;
 
 			const { xAxis, yAxis, grid, series, groupByString, dataZoom } = this.chartData;

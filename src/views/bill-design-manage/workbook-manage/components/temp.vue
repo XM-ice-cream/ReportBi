@@ -158,7 +158,6 @@ export default {
 					//文本宽度
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
-							console.log(markItem, this.axisToField(`x${index}`)?.trim(), markItem.columnName);
 							return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnName;
 						})[0]?.markValue || 90;
 
