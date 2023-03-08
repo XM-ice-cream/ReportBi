@@ -36,7 +36,7 @@ export default {
 			const _this = this;
 			let seriesResult = [];
 
-			const { xAxis, yAxis, grid, series, groupByString, dataZoom } = this.chartData;
+			const { xAxis, yAxis, grid, series, groupByString, dataZoom, legend } = this.chartData;
 
 			//series 根据颜色类别 分类
 			series.forEach((item) => {
@@ -64,7 +64,7 @@ export default {
 					appendToBody: true,
 					confine: true,
 				},
-				legend: { width: "50%", itemWidth: 14 },
+				legend: { width: "50%", itemWidth: 14, data: legend },
 				dataZoom: dataZoom,
 				grid: grid,
 				xAxis: xAxis,

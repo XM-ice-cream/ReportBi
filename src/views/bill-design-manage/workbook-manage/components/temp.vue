@@ -84,7 +84,6 @@ export default {
 			});
 			const { string: xString, number: xNumber } = rcSummary.x;
 			const { string: yString, number: yNumber } = rcSummary.y;
-
 			// 列中有指标，对所有行维度进行分组
 			const groupByString = yNumber.length ? xString : yString;
 			const groupByNumber = yNumber.length ? yNumber : xNumber;
@@ -130,18 +129,18 @@ export default {
 			const objKeys = Object.keys(obj);
 
 			// 行、列
-			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, objKeys, axisConst, groupByString, markObj);
+			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj);
 			//series
-			const series = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj);
+			const { series, legend } = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj);
 
 			//dataZoom
 			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber);
 
-			return { xAxis, yAxis, grid, series: series.flat(), groupByString, groupByNumber, dataZoom };
+			return { xAxis, yAxis, grid, series: series.flat(), groupByString, groupByNumber, dataZoom, legend };
 		},
 
 		//获取x,y轴属性设定
-		getxAxisyAxis(yNumber, objKeys, axisConst, groupByString) {
+		getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString) {
 			let gridWidth = 0;
 			let yAxis = [];
 			let xAxis = [];
@@ -193,60 +192,71 @@ export default {
 				});
 				grid = [{ bottom: gridWidth + groupByString.length * 10 }];
 			} else {
-				//行中有指标，列均为维度
-				xAxis = this.axisNumber;
-				this.$XEUtils.lastEach(axisConst, (item, index) => {
-					axisLabelData[index] = [];
+				//行列均无指标
+				if (!xNumber.length && !yNumber.length) {
+					xAxis = this.axisString;
+				} else {
+					//行中有指标，列均为维度
+					xAxis = this.axisNumber;
+					this.$XEUtils.lastEach(axisConst, (item, index) => {
+						axisLabelData[index] = [];
 
-					// 文本宽度;
-					const labelWidth =
-						this.mark[0].data.filter((markItem) => {
-							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
-						})[0]?.markValue || 90;
+						// 文本宽度;
+						const labelWidth =
+							this.mark[0].data.filter((markItem) => {
+								return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
+							})[0]?.markValue || 90;
 
-					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+						gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+
+						yAxis.push({
+							...this.axisString[0],
+							name: this.axisToField(`y${index}`),
+							nameLocation: "start",
+							data: item,
+							axisLabel: {
+								show: true,
+								interval: 0,
+								rotate: 0,
+								width: labelWidth,
+								overflow: "truncate",
+								align: "right",
+								formatter: function (value, valueIndex, data) {
+									axisLabelData[index][valueIndex] = value;
+									if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+									if (value === axisLabelData[index][valueIndex - 1]) return "";
+									else return value;
+								},
+							},
+							inverse: true, //反向坐标
+							position: "left",
+							offset: gridWidth - labelWidth,
+						});
+					});
 
 					yAxis.push({
 						...this.axisString[0],
-						name: this.axisToField(`y${index}`),
-						nameLocation: "start",
-						data: item,
-						axisLabel: {
-							show: true,
-							interval: 0,
-							rotate: 0,
-							width: labelWidth,
-							overflow: "truncate",
-							align: "right",
-							formatter: function (value, valueIndex, data) {
-								axisLabelData[index][valueIndex] = value;
-								if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
-								if (value === axisLabelData[index][valueIndex - 1]) return "";
-								else return value;
-							},
-						},
+						data: objKeys,
+						show: false,
 						inverse: true, //反向坐标
-						position: "left",
-						offset: gridWidth - labelWidth,
 					});
-				});
-
-				yAxis.push({
-					...this.axisString[0],
-					data: objKeys,
-					show: false,
-					inverse: true, //反向坐标
-				});
-				grid = [{ left: gridWidth + groupByString.length * 10 }];
+					grid = [{ left: gridWidth + groupByString.length * 10 }];
+				}
 			}
 			return { xAxis, yAxis, grid };
 		},
 		//获取series
 		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj) {
 			let series = [];
+			let legend = [];
 			groupByNumber.forEach((item, index) => {
 				//颜色、标签
 				const { color: markObjColor, mark: markArray, type } = markObj[item];
+				Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
+					legend.push({ name: item, itemStyle: { color: Object.values(markObjColor)[0][item] } });
+				});
+				console.log(legend);
+
 				objKeys.forEach((key) => {
 					obj[key].forEach((itemValue, itemIndex) => {
 						let name = "";
@@ -297,7 +307,7 @@ export default {
 					});
 				});
 			});
-			return series;
+			return { series, legend };
 		},
 		//增减进度条
 		getDataZoom(xAxis, yAxis, groupByNumber) {
