@@ -34,8 +34,22 @@ export default {
 			// 基于准备好的dom，初始化echarts实例
 			this.myChart = echarts.init(document.getElementById("barchart"));
 			const _this = this;
+			let seriesResult = [];
 
 			const { xAxis, yAxis, grid, series, groupByString, dataZoom } = this.chartData;
+
+			//series 根据颜色类别 分类
+			series.forEach((item) => {
+				let temp = {};
+				item.data.forEach((data) => {
+					const { name } = data;
+					if (!temp[name]) temp[name] = [];
+					temp[name].push(data);
+				});
+				Object.keys(temp).forEach((tempKey) => {
+					seriesResult.push({ ...item, data: temp[tempKey], name: tempKey });
+				});
+			});
 
 			let option = {
 				// color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
@@ -50,12 +64,12 @@ export default {
 					appendToBody: true,
 					confine: true,
 				},
-				legend: {},
+				legend: { width: "50%", itemWidth: 14 },
 				dataZoom: dataZoom,
 				grid: grid,
 				xAxis: xAxis,
 				yAxis: yAxis,
-				series: series,
+				series: seriesResult,
 			};
 			this.myChart.setOption(option, true);
 			console.log(option);

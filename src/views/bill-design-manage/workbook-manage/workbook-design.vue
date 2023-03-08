@@ -642,7 +642,7 @@ export default {
 					break;
 				//删除筛选器
 				case "filterField-delete":
-					this.filterData.splice(newIndex, 1);
+					this.filterData.splice(index, 1);
 					break;
 				//编辑标记字段
 				case "markField-edit":

@@ -256,6 +256,7 @@ export default {
 
 						const value = yNumber.length ? [name, itemValue[item], { ...itemValue }, item] : [itemValue[item], name, { ...itemValue }, item];
 						let data = {
+							name: "",
 							value: value,
 							itemStyle: {},
 							// 图表文字显示
@@ -273,7 +274,10 @@ export default {
 						};
 						// 图表颜色
 						if (JSON.stringify(markObjColor) !== "{}") {
-							data.itemStyle.color = markObjColor[Object.keys(markObjColor)[0]][itemValue[Object.keys(markObjColor)[0]]];
+							const colorName = itemValue[Object.keys(markObjColor)[0]];
+							const color = markObjColor[Object.keys(markObjColor)[0]][colorName];
+							data.itemStyle.color = color;
+							data.name = colorName;
 						}
 						if (!series[index]) series[index] = [];
 						if (series[index][itemIndex]) {
