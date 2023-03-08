@@ -252,9 +252,12 @@ export default {
 			groupByNumber.forEach((item, index) => {
 				//颜色、标签
 				const { color: markObjColor, mark: markArray, type } = markObj[item];
-				Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
-					legend.push({ name: item, itemStyle: { color: Object.values(markObjColor)[0][item] } });
-				});
+				//legend 设定
+				if (JSON.stringify(markObjColor) !== "{}") {
+					Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
+						legend.push({ name: item, itemStyle: { color: Object.values(markObjColor)[0][item] } });
+					});
+				}
 				console.log(legend);
 
 				objKeys.forEach((key) => {
