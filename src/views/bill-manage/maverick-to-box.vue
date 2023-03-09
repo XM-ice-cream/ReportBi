@@ -175,7 +175,7 @@ export default {
 					this.tableConfig.loading = true;
 					const { type, startTime, endTime, line, model, ascending, pageSize, pageIndex } = this.req;
 					const obj = {
-						orderField: "line", // 排序字段
+						orderField: type == "GoalSBL" ? "line" : "workWeek", // 排序字段
 						ascending, // 是否升序
 						pageSize, // 分页大小
 						pageIndex, // 当前页码

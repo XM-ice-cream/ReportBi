@@ -52,22 +52,21 @@
 					@checkbox-change="currentClick"
 				>
 					<vxe-column type="seq" width="60"></vxe-column>
-					<vxe-column type="checkbox" show-overflow></vxe-column>
-					<vxe-column field="pid" title="ID" show-overflow></vxe-column>
-					<vxe-column field="serial_Number" title="序列号" show-overflow> </vxe-column>
-					<vxe-column field="product" title="机种" show-overflow></vxe-column>
-					<vxe-column field="resultdate" title="ResultDate" show-overflow></vxe-column>
-					<vxe-column field="stage" title="Stage" show-overflow></vxe-column>
-					<vxe-column field="station" title="工站" show-overflow></vxe-column>
-					<vxe-column field="line" title="线体" show-overflow></vxe-column>
-					<vxe-column field="teststationcode" title="TestStation" show-overflow></vxe-column>
-					<vxe-column field="failuresymptom" title="FailSymptom" show-overflow></vxe-column>
-					<vxe-column field="category" title="Category" show-overflow></vxe-column>
-					<vxe-column field="location" title="Location" show-overflow></vxe-column>
-					<vxe-column field="rootcause" title="RootCause" show-overflow></vxe-column>
-					<vxe-column field="nextDRI" title="NextDRI" show-overflow></vxe-column>
-					<vxe-column field="category" title="Category" show-overflow></vxe-column>
-					<vxe-column field="status" title="Status" show-overflow></vxe-column>
+					<vxe-column type="checkbox" width="60" show-overflow></vxe-column>
+					<vxe-column field="pid" title="ID" width="60" show-overflow></vxe-column>
+					<vxe-column field="serial_Number" title="序列号" min-width="140" show-overflow> </vxe-column>
+					<vxe-column field="product" title="机种" min-width="80" show-overflow></vxe-column>
+					<vxe-column field="resultdate" title="ResultDate" min-width="140" show-overflow></vxe-column>
+					<vxe-column field="stage" title="Stage" min-width="80" show-overflow></vxe-column>
+					<vxe-column field="station" title="工站" min-width="100" show-overflow></vxe-column>
+					<vxe-column field="line" title="线体" min-width="120" show-overflow></vxe-column>
+					<vxe-column field="teststationcode" min-width="100" title="TestStation" show-overflow></vxe-column>
+					<vxe-column field="failuresymptom" min-width="140" title="FailSymptom" show-overflow></vxe-column>
+					<vxe-column field="category" title="Category" min-width="120" show-overflow></vxe-column>
+					<vxe-column field="location" title="Location" min-width="80" show-overflow></vxe-column>
+					<vxe-column field="rootcause" title="RootCause" min-width="80" show-overflow></vxe-column>
+					<vxe-column field="nextDRI" title="NextDRI" min-width="80" show-overflow></vxe-column>
+					<vxe-column field="status" title="Status" min-width="100" show-overflow></vxe-column>
 				</vxe-table>
 				<div style="background: #fff">
 					<div class="reply-maverick">

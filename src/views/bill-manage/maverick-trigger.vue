@@ -96,7 +96,7 @@
 							</template>
 							<!-- ONGOING -->
 							<template slot-scope="{ row }" slot="ongoing">
-								<div @click="show(row, 2, 'ONGOGING')" style="color: blue; cursor: pointer">
+								<div @click="show(row, 2, 'ONGOING')" style="color: blue; cursor: pointer">
 									{{ row.ongoing }}
 								</div>
 							</template>
