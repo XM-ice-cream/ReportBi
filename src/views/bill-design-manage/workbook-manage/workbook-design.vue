@@ -151,7 +151,7 @@
 						<div class="title">标记</div>
 						<!-- 手风琴 -->
 						<Collapse accordion v-model="collapse" style="max-height: calc(100% - 30px); overflow: hidden">
-							<Panel v-for="(item, markIndex) in markData" :key="markIndex" :name="markIndex.toString()" class="markPanel">
+							<Panel v-for="(item, markIndex) in markData" :key="markIndex" :name="markIndex.toString()" class="markPanel" :title="item.name">
 								{{ item.name }}
 
 								<template #content>
@@ -202,7 +202,9 @@
 												<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
 												<!-- 字段显示 -->
 												<div :class="isNumberCell(item)">
-													<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction, item.columnName) }}</div>
+													<div class="textOverhidden" style="width: 80%" :title="calculatorObj(item.calculatorFunction, item.columnName)">
+														{{ calculatorObj(item.calculatorFunction, item.columnName) }}
+													</div>
 
 													<!-- 下拉框 -->
 													<Dropdown style="float: right" @on-click="(name) => rowColumnDropDownClick(name, index, 'mark', item, markIndex)">
@@ -728,6 +730,14 @@ export default {
 			//数据拖拽至筛选器
 			//过滤器
 			if (id === "filter" && type !== "filter") {
+				const { nodeId, columnName } = this.filterData[newIndex];
+				const filterIndex = this.filterData.findIndex((item) => item.nodeId == nodeId && item.columnName == columnName);
+				console.log(filterIndex, this.filterData[newIndex]);
+				if (filterIndex !== newIndex) {
+					this.$Message.warning("禁止拖拽重复字段");
+					this.filterData.splice(newIndex, 1);
+					return;
+				}
 				this.selectObj = { ...this.filterData[newIndex], newIndex, datasetId, showData: 0 };
 				this.$refs.filterField.modelFlag = true;
 			}
@@ -984,6 +994,13 @@ export default {
 .mark .ivu-collapse > .ivu-collapse-item > .ivu-collapse-header {
 	height: 25px;
 	line-height: 25px;
+}
+.mark .ivu-collapse-header {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+	text-align: left;
 }
 </style>
 <style scoped lang="less">

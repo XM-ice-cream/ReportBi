@@ -9,23 +9,45 @@
 				</Select>
 			</FormItem>
 		</Form>
-		<div class="add-box" @click="addData"><icon custom="iconfont icon-add" class="add-icon" /> 添加更多字段</div>
+		<div class="add-box" @click="addClick"><icon custom="iconfont icon-add" class="add-icon" /> 添加更多字段</div>
 		<div class="modal-content">
 			<Table :columns="columns" :data="data" :height="tableConfig.height" disabled-hover>
 				<!-- 源表 -->
 				<template #source="{ row, index }">
-					<Select v-model.trim="data[index].source" size="small" placehold="选择字段" transfer filterable @on-change="changeField(index)">
+					<Select
+						v-model.trim="data[index].sourceType"
+						size="small"
+						transfer
+						class="field-select"
+						style="width: 80px; display: inline-block"
+						placeholder=""
+					>
+						<Option value="String"> Str. </Option>
+						<Option value="Number"> Num. </Option>
+						<Option value="DateTime"> Date. </Option>
+					</Select>
+					<Select
+						v-model.trim="data[index].source"
+						size="small"
+						placehold="选择字段"
+						transfer
+						filterable
+						@on-click.stop
+						@on-change="changeField(index, 'source')"
+						style="display: inline-block; width: calc(100% - 80px)"
+					>
 						<template #prefix v-if="!row.source">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="(item, index) in sourceList" :value="item.columnName" :key="index" :label="item.columnName">
-							<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-shuzishurukuang" v-else-if="columnTypeList[1].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(item.columnType.toUpperCase())" />
+						<Option v-for="(item, sourceIndex) in sourceList" :value="item.columnName" :key="sourceIndex" :label="item.columnName">
+							<icon custom="iconfont icon-string" v-if="item.columnType == 'String'" />
+							<icon custom="iconfont icon-shuzishurukuang" v-else-if="item.columnType == 'Number'" />
+							<icon custom="iconfont icon-riqishijian" v-else-if="item.columnType == 'DateTime'" />
 							<icon custom="iconfont icon-wenhao" v-else />{{ item.columnName }}
 						</Option>
 					</Select>
 				</template>
+				<!-- 逻辑符号 -->
 				<template #symbol="{ row, index }">
 					<Select v-model="data[index].symbol" size="small" style="border: none" transfer>
 						<Option v-for="item in symbolList" :value="item" :key="item">{{ item }}</Option>
@@ -33,17 +55,43 @@
 				</template>
 				<!-- 目标表 -->
 				<template #target="{ row, index }">
-					<Select v-model.trim="data[index].target" size="small" placehold="选择字段" transfer filterable @on-change="changeField(index)">
+					<Select
+						v-model.trim="data[index].targetType"
+						size="small"
+						transfer
+						class="field-select"
+						style="width: 80px; display: inline-block"
+						placeholder=""
+					>
+						<Option value="String"> Str. </Option>
+						<Option value="Number"> Num. </Option>
+						<Option value="DateTime"> Date. </Option>
+					</Select>
+					<Select
+						v-model.trim="data[index].target"
+						size="small"
+						placehold="选择字段"
+						transfer
+						filterable
+						@on-click.stop
+						@on-change="changeField(index, 'target')"
+						style="display: inline-block; width: calc(100% - 80px)"
+					>
 						<template #prefix v-if="!row.target">
 							<icon custom="iconfont icon-search" />
 						</template>
-						<Option v-for="(item, index) in targetList" :value="item.columnName" :key="index" :label="item.columnName">
-							<icon custom="iconfont icon-string" v-if="columnTypeList[0].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-shuzishurukuang" v-else-if="columnTypeList[1].detailCode.includes(item.columnType.toUpperCase())" />
-							<icon custom="iconfont icon-riqishijian" v-else-if="columnTypeList[2].detailCode.includes(item.columnType.toUpperCase())" />
+						<Option v-for="(item, targetIndex) in targetList" :value="item.columnName" :key="targetIndex" :label="item.columnName">
+							<icon custom="iconfont icon-string" v-if="item.columnType == 'String'" />
+							<icon custom="iconfont icon-shuzishurukuang" v-else-if="item.columnType == 'Number'" />
+							<icon custom="iconfont icon-riqishijian" v-else-if="item.columnType == 'DateTime'" />
 							<icon custom="iconfont icon-wenhao" v-else />{{ item.columnName }}
 						</Option>
 					</Select>
+				</template>
+				<!-- 操作 -->
+				<template #operator="{ row, index }">
+					<Button type="error" ghost size="small" @click="deleteClick(index, data)" custom-icon="iconfont icon-delete"></Button>
+					<!-- <Button type="primary" size="small" shape="circle" icon="iconfont icon-delete" @click.native.prevent="deleteClick(index, data)"></Button> -->
 				</template>
 			</Table>
 		</div>
@@ -111,7 +159,9 @@ export default {
 		},
 		//提交
 		submitClick() {
-			if (this.isSameType.every((item) => item === true)) {
+			//判断数据类型是否都相同
+			const isSamType = this.data.every((item) => item.sourceType === item.targetType);
+			if (isSamType) {
 				this.$emit("updateEdge", { ...this.connectObj, relations: this.data });
 				this.closeDialog();
 			} else {
@@ -127,7 +177,16 @@ export default {
 			};
 			getColumnListReq(sourceObj).then((res) => {
 				if (res.code == 200) {
-					this.sourceList = res?.result || [];
+					this.sourceList =
+						res?.result.map((item) => {
+							const { columnType } = item;
+							this.columnTypeList.forEach((columnItem) => {
+								const { detailCode, detailName } = columnItem;
+								if (detailCode.includes(columnType.toUpperCase())) item.columnType = detailName;
+							});
+							return { ...item };
+						}) || [];
+					console.log(this.sourceList);
 				}
 			});
 		},
@@ -140,7 +199,15 @@ export default {
 			};
 			getColumnListReq(targetObj).then((res) => {
 				if (res.code == 200) {
-					this.targetList = res?.result || [];
+					this.targetList =
+						res?.result.map((item) => {
+							const { columnType } = item;
+							this.columnTypeList.forEach((columnItem) => {
+								const { detailCode, detailName } = columnItem;
+								if (detailCode.includes(columnType.toUpperCase())) item.columnType = detailName;
+							});
+							return { ...item };
+						}) || [];
 				}
 			});
 		},
@@ -160,34 +227,52 @@ export default {
 					title: target.split(":")[1],
 					slot: "target",
 				},
+				{
+					title: "#",
+					slot: "operator",
+					width: 60,
+					align: "center",
+				},
 			];
 		},
+
+		//修改按钮
+		changeRadioGroup(data, index, type) {
+			console.log(data, index, 1);
+			this.data[index][type] = data;
+		},
 		//添加字段
-		addData() {
+		addClick() {
 			this.data.push({ source: "", symbol: "=", target: "" });
 		},
+		//删除字段
+		deleteClick(index, rows) {
+			rows.splice(index, 1);
+		},
 		//修改关联字段
-		changeField(index) {
-			let obj = {};
+		async changeField(index, type) {
 			const { target, source } = this.data[index];
+			//目标值
+			if (type == "target") {
+				const targetCurType = this.targetList.filter((item) => item.columnName === target)[0].columnType;
+				this.data[index].targetType = targetCurType;
+				this.data[index].targetCurType = targetCurType;
+			}
+			//源值
+			if (type == "source") {
+				const sourceCurType = this.sourceList.filter((item) => item.columnName === source)[0].columnType;
+				this.data[index].sourceType = sourceCurType;
+				this.data[index].sourceCurType = sourceCurType;
+			}
+			//选中原值、目标值判断类型
 			if (target && source) {
-				const targetObj = this.targetList.filter((item) => item.columnName === target)[0];
-				const sourceObj = this.sourceList.filter((item) => item.columnName === source)[0];
-				this.columnTypeList.forEach((item, index) => {
-					if (item.detailCode.includes(targetObj.columnType.toUpperCase())) {
-						obj.target = index;
-					}
-					if (item.detailCode.includes(sourceObj.columnType.toUpperCase())) {
-						obj.source = index;
-					}
-				});
-				if (obj.target !== obj.source) {
+				const { sourceType, targetType } = this.data[index];
+				if (sourceType !== targetType) {
 					this.$Message.error("两个字段类型不一致,不可保存");
-					this.isSameType[index] = false;
 					return;
 				}
-				this.isSameType[index] = true;
 			}
+			this.data = JSON.parse(JSON.stringify(this.data));
 		},
 		// 获取数据字典数据
 		async getDataItemData() {
@@ -212,6 +297,21 @@ export default {
 	},
 };
 </script>
+<style>
+.field-select .ivu-select-arrow {
+	visibility: hidden;
+}
+.field-select .ivu-select-selected-value {
+	text-align: center;
+	background: #00374421;
+	margin-bottom: 6px;
+	border-radius: 3px;
+	color: #000;
+	padding-right: 12px !important;
+	/* width: 55px; */
+	border: 1px solid #3b2c2c1a;
+}
+</style>
 <style lang="less" scoped>
 .add-box {
 	color: #6f6f6f;

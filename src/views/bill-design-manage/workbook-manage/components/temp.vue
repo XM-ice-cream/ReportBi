@@ -393,6 +393,7 @@ export default {
 		},
 		//提示框
 		tooltipFormatter(params, groupByString) {
+			console.log(1);
 			let aa = [];
 			params.forEach((item, index) => {
 				aa.push("");
@@ -450,6 +451,7 @@ export default {
 				"": "",
 				null: "",
 			};
+			console.log(name, columnName, `${obj[name]} ${columnName}`);
 			return `${obj[name]} ${columnName}`;
 		},
 	},

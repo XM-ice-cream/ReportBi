@@ -100,7 +100,7 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				this.submitData = { ...this.selectObj };
+				this.submitData = { ...this.selectObj, showData: 0 };
 				this.autoSize();
 				window.addEventListener("resize", () => this.autoSize());
 			}

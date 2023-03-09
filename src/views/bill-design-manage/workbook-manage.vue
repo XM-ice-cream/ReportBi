@@ -42,6 +42,7 @@
 					:data="data"
 					@on-current-change="currentClick"
 					@on-selection-change="selectClick"
+					@on-row-dblclick="editClick"
 				>
 					<template slot="datasetId" slot-scope="{ row }">
 						<span>{{ dataSetIdName[row.datasetId] }}</span>
