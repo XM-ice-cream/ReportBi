@@ -194,7 +194,7 @@
 											:id="`angle,${markIndex}`"
 											ghost-class="ghost"
 											class="box-cell"
-											v-if="markIndex == 0 && markData[markIndex].chartType == 'pie'"
+											v-if="markIndex == 0 && markData[markIndex].chartType == 'componentPie'"
 										>
 											<div class="angle"><Icon custom="iconfont icon-jiaodu" />角度</div>
 										</draggable>
