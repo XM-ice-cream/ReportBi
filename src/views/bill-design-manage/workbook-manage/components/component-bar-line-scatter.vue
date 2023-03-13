@@ -9,17 +9,6 @@ export default {
 	props: {
 		chartData: Object,
 	},
-	watch: {
-		chartData: {
-			handler() {
-				this.$nextTick(() => {
-					this.pageLoad();
-				});
-			},
-			deep: true,
-			immediate: true,
-		},
-	},
 	data() {
 		return {
 			myChart: "",
@@ -28,6 +17,7 @@ export default {
 
 	methods: {
 		pageLoad() {
+			console.log("pageLoad");
 			if (this.myChart != null && this.myChart != "" && this.myChart != undefined) {
 				this.myChart.dispose();
 			}
@@ -59,12 +49,13 @@ export default {
 						type: "shadow",
 					},
 					formatter: function (params) {
-						return _this.$parent.tooltipFormatter([params], groupByString);
+						return _this.$parent.tooltipFormatter(params, groupByString);
 					},
 					appendToBody: true,
 					confine: true,
 				},
-				legend: { width: "50%", itemWidth: 14, data: legend },
+				// type: "scroll" 图例滚动的关键
+				legend: { type: "scroll", width: "50%", itemWidth: 14, data: legend },
 				dataZoom: dataZoom,
 				grid: grid,
 				xAxis: xAxis,
@@ -72,7 +63,6 @@ export default {
 				series: seriesResult,
 			};
 			this.myChart.setOption(option, true);
-			console.log(option);
 			window.addEventListener("resize", function () {
 				if (this.myChart) {
 					this.myChart.resize();

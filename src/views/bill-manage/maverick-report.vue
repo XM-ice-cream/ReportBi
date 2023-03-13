@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { getpagelistReq, getLineReq, getStationReq, getModelReq } from "@/api/bill-manage/maverick-report.js";
+import { getpagelistReq, getLineReq, getStationReq, getModelReq, getTypeReq } from "@/api/bill-manage/maverick-report.js";
 import { formatDate } from "@/libs/tools";
 import LineMaverick from "@/components/echarts/line-maverick.vue";
 export default {
@@ -162,6 +162,7 @@ export default {
 		},
 	},
 	mounted() {
+		this.getType();
 		this.getLine();
 		this.$nextTick(() => {
 			this.$refs.lineMaverick.initChart();
@@ -234,6 +235,14 @@ export default {
 			getModelReq({ line: this.req.line }).then((res) => {
 				if (res.code === 200) {
 					this.modelList = res.result || [];
+				}
+			});
+		},
+		//获取类别
+		getType() {
+			getTypeReq().then((res) => {
+				if (res.code == 200) {
+					console.log(res);
 				}
 			});
 		},

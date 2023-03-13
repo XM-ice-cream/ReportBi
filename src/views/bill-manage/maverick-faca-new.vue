@@ -148,7 +148,6 @@ export default {
 							this.tableConfig.loading = false;
 							if (res.code === 200) {
 								this.data = res?.result || [];
-								console.log("res", res.code, this.tableConfig.loading, JSON.stringify(this.data));
 							}
 						})
 						.finally(() => (this.tableConfig.loading = false));
@@ -231,7 +230,6 @@ export default {
 		autoSize() {
 			this.tableConfig.height = document.body.clientHeight - 120 - 60 - 430;
 			if (this.tableConfig.height < 200) this.tableConfig.height = 200;
-			console.log(this.tableConfig.height);
 		},
 		//获取url参数
 		getUrlParams() {

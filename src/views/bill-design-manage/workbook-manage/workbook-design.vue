@@ -180,11 +180,23 @@
 										>
 											<div class="labelWidth"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
 										</draggable>
+
 										<draggable group="site" v-model="markData[markIndex].data" :id="`mark,${markIndex}`" ghost-class="ghost" class="box-cell">
 											<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
 										</draggable>
 										<draggable group="site" v-model="markData[markIndex].data" :id="`info,${markIndex}`" ghost-class="ghost" class="box-cell">
 											<div class="detail-info"><Icon type="ios-more" />详细信息</div>
+										</draggable>
+										<!-- 角度只能在 全部且饼图 中设定-->
+										<draggable
+											group="site"
+											v-model="markData[markIndex].data"
+											:id="`angle,${markIndex}`"
+											ghost-class="ghost"
+											class="box-cell"
+											v-if="markIndex == 0 && markData[markIndex].chartType == 'pie'"
+										>
+											<div class="angle"><Icon custom="iconfont icon-jiaodu" />角度</div>
 										</draggable>
 										<draggable
 											group="site"
@@ -200,6 +212,7 @@
 												<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
 												<Icon type="ios-more" v-if="item.innerText === 'info'" />
 												<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
+												<Icon custom="iconfont icon-jiaodu" v-if="item.innerText === 'angle'" />
 												<!-- 字段显示 -->
 												<div :class="isNumberCell(item)">
 													<div class="textOverhidden" style="width: 80%" :title="calculatorObj(item.calculatorFunction, item.columnName)">
@@ -331,6 +344,7 @@
 						<div class="title">{{ submitData.title }}</div>
 						<componentsTemp
 							v-if="modelFlag"
+							ref="tempRef"
 							:type="markData[0]?.chartType || 'bar'"
 							:visib="true"
 							:value="chartsData"
@@ -395,7 +409,6 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				console.log("编辑");
 				this.$nextTick(() => {
 					//编辑
 					if (!this.workbookIsAdd) {
@@ -498,6 +511,7 @@ export default {
 		},
 		//查询
 		searchClick() {
+			console.log(1);
 			//数据集
 			const { datasetId } = this.submitData;
 
@@ -505,11 +519,12 @@ export default {
 				this.$Message.error("请拖拽字段至筛选器");
 				return;
 			}
-			if (!this.rowData.length) {
+			//饼图 并不需要拖拽行、列
+			if (!this.rowData.length && !(this.markData[0].chartType === "componentPie")) {
 				this.$Message.error("请拖拽字段至行");
 				return;
 			}
-			if (!this.columnData.length) {
+			if (!this.columnData.length && !(this.markData[0].chartType === "componentPie")) {
 				this.$Message.error("请拖拽字段至列");
 				return;
 			}
@@ -532,6 +547,9 @@ export default {
 				.then((res) => {
 					if (res.code == 200) {
 						this.chartsData = res?.result || [];
+						this.$nextTick(() => {
+							this.$refs.tempRef.pageLoad();
+						});
 					} else {
 						this.$Message.error(`查询失败，${res.message}`);
 					}
@@ -688,11 +706,11 @@ export default {
 		},
 		//拖拽结束
 		dragEnd(e, type) {
-			console.log(e, e.newIndex);
 			const { datasetId } = this.submitData;
 			let { oldIndex, newIndex, to } = e;
 			const id = to.id.split(",")[0];
 			const markIndex = to.id.split(",")[1];
+
 			switch (type) {
 				case "filter":
 					id === "filter" && oldIndex === newIndex ? this.filterData.splice(oldIndex, 1) : "";
@@ -704,8 +722,6 @@ export default {
 					id === "row" && oldIndex === newIndex ? this.rowData.splice(oldIndex, 1) : "";
 					break;
 				case "mark-box":
-					console.log("mark-box", this.markData);
-
 					if (id === "mark-box" && oldIndex === newIndex) {
 						const data = this.markData[markIndex].data[newIndex];
 						this.markData[markIndex].data.splice(oldIndex, 1);
@@ -713,7 +729,7 @@ export default {
 					}
 					break;
 				case "tree":
-					if (["color", "mark", "info", "labelWidth"].includes(id)) {
+					if (["color", "mark", "info", "labelWidth", "angle"].includes(id)) {
 						//保证标记的数据中颜色设定只有一个
 						if (!this.markData[markIndex].data[newIndex]) newIndex = 0;
 
@@ -725,14 +741,15 @@ export default {
 					}
 					break;
 			}
-			this.updateDragData(); //更新row,column数据
+
+			//更新row,column数据
+			this.updateDragData();
 
 			//数据拖拽至筛选器
 			//过滤器
 			if (id === "filter" && type !== "filter") {
 				const { nodeId, columnName } = this.filterData[newIndex];
 				const filterIndex = this.filterData.findIndex((item) => item.nodeId == nodeId && item.columnName == columnName);
-				console.log(filterIndex, this.filterData[newIndex]);
 				if (filterIndex !== newIndex) {
 					this.$Message.warning("禁止拖拽重复字段");
 					this.filterData.splice(newIndex, 1);
@@ -750,6 +767,12 @@ export default {
 			//数据拖拽至行
 			if (id === "row" && type !== "row") {
 				const { columnType, dataType } = this.rowData[newIndex];
+				//如果标记为饼图 无法拖拽至行列中
+				if (this.markData[0].chartType == "componentPie") {
+					this.rowData.splice(newIndex, 1);
+					this.$Message.warning("饼图无需拖拽字段到行中");
+					return;
+				}
 				//转换为维度
 				if (columnType === "1" && dataType === "String") this.rowData[newIndex].calculatorFunction = "toChar";
 				//转换为指标
@@ -759,14 +782,19 @@ export default {
 			//数据拖拽至列
 			if (id === "column" && type !== "column") {
 				const { columnType, dataType } = this.columnData[newIndex];
+
+				//如果标记为饼图 无法拖拽至行列中
+				if (this.markData[0].chartType == "componentPie") {
+					this.columnData.splice(newIndex, 1);
+					this.$Message.warning("饼图无需拖拽字段到列中");
+					return;
+				}
 				//转换为维度
 				if (columnType === "1" && dataType === "String") this.columnData[newIndex].calculatorFunction = "toChar";
 				//转换为指标
 				if (columnType === "1" && dataType === "Number") this.columnData[newIndex].calculatorFunction = "countDistinct";
 				this.columnData = JSON.parse(JSON.stringify(this.columnData));
 			}
-
-			console.log("this.markData", this.markData);
 		},
 		//修改拖拽的数据
 		updateDragData() {
@@ -785,7 +813,6 @@ export default {
 					this.markData[index].data[dataIndex] = { ...itemData, axis: "z", orderBy: `${index}${dataIndex}` };
 				});
 			});
-			console.log("标记", this.markData);
 		},
 
 		//更新过滤器数据
@@ -796,6 +823,19 @@ export default {
 		//修改第0个标记，联动其余标记；其余标记均修改后，自动修改第0标记
 		changeMarks(markIndex, type, data) {
 			const chartType = this.markData[markIndex].chartType;
+
+			if (!type && chartType == "componentPie" && (this.rowData.length || this.columnData.length)) {
+				this.$Modal.confirm({
+					title: "确认要选择饼图图表吗?",
+					content: "如果确认,我将删除已拖拽的行列字段信息",
+					onOk: () => {
+						this.rowData = [];
+						this.columnData = [];
+						this.markData[0].chartType = "componentPie";
+						this.collapse = "0";
+					},
+				});
+			}
 
 			let chartFlag = true;
 			let deleteFlag = true;
@@ -812,8 +852,6 @@ export default {
 				//不可添加0标记
 				if (markIndexOthers === -1 && type == "add") addFlag = false;
 
-				console.log("标记", markIndexOthers);
-
 				//标记 联动 删除、新增、编辑
 				if (markIndex == 0 && (type == "delete" || type == "add" || type == "update")) {
 					if (markIndexOthers > -1 && type == "delete") this.markData[i].data.splice(markIndexOthers, 1);
@@ -828,18 +866,15 @@ export default {
 			//删除0标记
 			if (deleteFlag && type == "delete") {
 				const markIndexOthers = this.markIndexOf(0, data);
-				this.markData[0].data.splice(markIndexOthers, 1);
+				if (markIndexOthers > -1) this.markData[0].data.splice(markIndexOthers, 1);
 			}
-			console.log(addFlag, type);
 			//添加0标记
 			if (addFlag && type == "add") {
 				const markIndexOthers = this.markIndexOf(0, data);
 				if (markIndexOthers == -1) this.markData[0].data.push(data);
 			}
-			// this.$nextTick(() => {
-			// 	this.searchClick();
-			// });
-			console.log("修改第一个标记，联动其余标记", this.markData);
+
+			//
 		},
 		//更新标记数据
 		updateMark(newIndex, obj, markIndex) {
@@ -939,8 +974,6 @@ export default {
 
 			//如果标记中有指标数据多余，需要删除。判断依据：当前标记的markId是否存在于列的指标,不存在则删除
 			this.markData = this.markData.filter((item) => item.name == "全部" || dataId.includes(item.markId));
-
-			console.log("this.markData", this.markData);
 
 			data.forEach((item) => {
 				const { calculatorFunction, columnName, nodeId, axis, orderBy } = item;

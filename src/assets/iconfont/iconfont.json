@@ -6,6 +6,20 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "18175386",
+      "name": "角度",
+      "font_class": "jiaodu",
+      "unicode": "e703",
+      "unicode_decimal": 59139
+    },
+    {
+      "icon_id": "3669589",
+      "name": "SOP",
+      "font_class": "sop",
+      "unicode": "e8cb",
+      "unicode_decimal": 59595
+    },
+    {
       "icon_id": "762874",
       "name": "宽度",
       "font_class": "kuandu",

@@ -309,7 +309,6 @@ export default {
 		},
 		//获取数据信息
 		getDataInfo() {
-			console.log(this.$store.state);
 			const { status, id } = this.selectArr[0];
 			const obj = {
 				guid: id,
@@ -319,7 +318,6 @@ export default {
 			detailModelReq(obj).then((res) => {
 				if (res.code == 200) {
 					this.isEdit = res.result.auth ? false : true;
-					console.log(this.isEdit);
 				}
 			});
 		},

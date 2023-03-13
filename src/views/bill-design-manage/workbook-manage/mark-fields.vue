@@ -45,7 +45,6 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				console.log(this.isAdd);
 				this.submitData = { ...this.selectObj };
 				const { innerText } = this.submitData;
 				if (innerText === "labelWidth" && this.isAdd) {
@@ -56,8 +55,6 @@ export default {
 					//获取对应字段的所有值
 					this.getAllValue();
 				}
-
-				console.log(this.submitData);
 			}
 		},
 	},
@@ -130,7 +127,6 @@ export default {
 							on: {
 								"on-change": (val) => {
 									data.color = val;
-									console.log(val);
 								},
 							},
 

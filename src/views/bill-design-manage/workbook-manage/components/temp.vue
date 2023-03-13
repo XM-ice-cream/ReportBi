@@ -1,6 +1,13 @@
 <template>
 	<div style="height: calc(100% - 50px); padding: 5px; margin: 5px">
-		<component :is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type" :ispreview="true" :visib="visib" :chartData="chartData" />
+		<component
+			ref="componentRef"
+			:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
+			:ispreview="true"
+			:visib="visib"
+			:chartData="chartData"
+			:mark="mark"
+		/>
 	</div>
 </template>
 
@@ -25,15 +32,6 @@ export default {
 		value: {
 			type: Array,
 			default: () => {},
-		},
-	},
-	watch: {
-		value: {
-			handler() {
-				this.chartData = this.dataLogic();
-			},
-			deep: true,
-			immediate: true,
 		},
 	},
 	data() {
@@ -67,12 +65,51 @@ export default {
 		};
 	},
 	methods: {
+		pageLoad() {
+			if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
+			else this.chartData = this.dataLogic();
+			this.$nextTick(() => {
+				this.$refs.componentRef.pageLoad();
+			});
+		},
+		//饼图
+		dataLogicByPie() {
+			let legend = {};
+			let series = { type: "pie", data: [] };
+			console.log("this.mark", this.mark);
+			console.log("this.value", this.value);
+			console.log(this.markDataLogic());
+			const { color, angle, mark } = this.markDataLogic().undefined;
+
+			this.value.forEach((item) => {
+				series.data.push({
+					name: item[Object.keys(color)[0]],
+					value: [item[angle[0]], item[Object.keys(color)[0]], item, "x0"],
+					itemStyle: {
+						color: Object.keys(color)[0] ? color[Object.keys(color)[0]][item[Object.keys(color)[0]]] : "#5470c6",
+					},
+					label: {
+						show: true,
+						position: "top",
+						formatter: function (val) {
+							const { percent } = val;
+							let result = [];
+							mark.forEach((item) => {
+								result.push(val.value[2][item]);
+							});
+							result.push(`占比:${percent}%`);
+							return result.join("\n");
+						},
+					},
+				});
+			});
+			return { series };
+		},
 		//数据逻辑处理
 		dataLogic() {
 			let obj = {}; //数据分组
 			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] } };
 			let axisConst = []; //维度常量
-			let markObj = {};
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
@@ -106,27 +143,11 @@ export default {
 					axisConst[index].push(obj[keyItem][0][rowItem]);
 				});
 			});
-			//标记
-			this.mark.forEach((item) => {
-				markObj[item.stack] = { color: {}, mark: [], type: item.chartType };
-				item.data.forEach((markItem) => {
-					const { innerText, markValue, axis, orderBy } = markItem;
-					//颜色
-					if (innerText === "color") {
-						markValue.forEach((data) => {
-							const { title, color } = data;
-							if (!markObj[item.stack].color[`${axis}${orderBy}`]) markObj[item.stack].color[`${axis}${orderBy}`] = {};
-							markObj[item.stack].color[`${axis}${orderBy}`][title] = color;
-						});
-					}
-					//标签
-					if (innerText === "mark") {
-						markObj[item.stack].mark.push(`${axis}${orderBy}`);
-					}
-				});
-			});
 
 			const objKeys = Object.keys(obj);
+
+			//标记
+			const markObj = this.markDataLogic();
 
 			// 行、列
 			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj);
@@ -258,7 +279,6 @@ export default {
 						legend.push({ name: item, itemStyle: { color: Object.values(markObjColor)[0][item] } });
 					});
 				}
-				console.log(legend);
 
 				objKeys.forEach((key) => {
 					obj[key].forEach((itemValue, itemIndex) => {
@@ -393,28 +413,54 @@ export default {
 		},
 		//提示框
 		tooltipFormatter(params, groupByString) {
-			console.log(1);
-			let aa = [];
-			params.forEach((item, index) => {
-				aa.push("");
-				const { data, marker } = item;
-				const { value } = data;
-				Object.keys(value[2]).forEach((dataitem) => {
-					if (groupByString.includes(dataitem) && index == 0) {
-						aa.splice(
-							groupByString.findIndex((item) => item === dataitem),
-							0,
-							this.axisToField(dataitem) + `:  ${value[2][dataitem]}`
-						);
-					}
+			let aa = [""];
+			const { data, marker, seriesType, percent } = params;
+			const { value } = data;
+			Object.keys(value[2]).forEach((dataitem) => {
+				if (groupByString.includes(dataitem)) {
+					aa.splice(
+						groupByString.findIndex((item) => item === dataitem),
+						0,
+						this.axisToField(dataitem) + `:  ${value[2][dataitem]}`
+					);
+				}
 
-					if (!groupByString.includes(dataitem) && (value[3] === dataitem || typeof value[2][dataitem] === "string" || dataitem.indexOf("z") > -1)) {
-						if (value[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
-						else aa.push(this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
+				if (!groupByString.includes(dataitem) && (value[3] === dataitem || typeof value[2][dataitem] === "string" || dataitem.indexOf("z") > -1)) {
+					if (value[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
+					else aa.push(this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
+				}
+			});
+			//饼图增加百分比
+			if (seriesType == "pie") aa.push(`占比:${percent}%`);
+			return Array.from(new Set([...aa])).join("<br>");
+		},
+		//标记
+		markDataLogic() {
+			let markObj = {};
+			//标记
+			this.mark.forEach((item) => {
+				markObj[item.stack] = { color: {}, mark: [], angle: [], type: item.chartType };
+				item.data.forEach((markItem) => {
+					const { innerText, markValue, axis, orderBy } = markItem;
+					//颜色
+					if (innerText === "color") {
+						markValue.forEach((data) => {
+							const { title, color } = data;
+							if (!markObj[item.stack].color[`${axis}${orderBy}`]) markObj[item.stack].color[`${axis}${orderBy}`] = {};
+							markObj[item.stack].color[`${axis}${orderBy}`][title] = color;
+						});
+					}
+					//标签
+					if (innerText === "mark") {
+						markObj[item.stack].mark.push(`${axis}${orderBy}`);
+					}
+					//角度
+					if (innerText === "angle") {
+						markObj[item.stack].angle.push(`${axis}${orderBy}`);
 					}
 				});
 			});
-			return Array.from(new Set([...aa])).join("<br>");
+			return markObj;
 		},
 		//数字类型
 		numberType(item) {
@@ -451,7 +497,6 @@ export default {
 				"": "",
 				null: "",
 			};
-			console.log(name, columnName, `${obj[name]} ${columnName}`);
 			return `${obj[name]} ${columnName}`;
 		},
 	},

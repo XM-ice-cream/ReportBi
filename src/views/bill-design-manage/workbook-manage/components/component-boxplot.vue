@@ -11,17 +11,6 @@ export default {
 	props: {
 		chartData: Object,
 	},
-	watch: {
-		chartData: {
-			handler() {
-				this.$nextTick(() => {
-					this.pageLoad();
-				});
-			},
-			deep: true,
-			immediate: true,
-		},
-	},
 	data() {
 		return {
 			myChart: "",

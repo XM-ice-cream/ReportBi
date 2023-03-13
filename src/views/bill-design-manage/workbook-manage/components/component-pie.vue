@@ -7,17 +7,7 @@ export default {
 	name: "componentPie",
 	props: {
 		chartData: Object,
-	},
-	watch: {
-		chartData: {
-			handler() {
-				this.$nextTick(() => {
-					this.pageLoad();
-				});
-			},
-			deep: true,
-			immediate: true,
-		},
+		mark: Array,
 	},
 	data() {
 		return {
@@ -33,28 +23,23 @@ export default {
 			this.myChart = echarts.init(document.getElementById("piechart"));
 			const _this = this;
 
-			const { xAxis, yAxis, grid, series, groupByString, dataZoom } = this.chartData;
+			const { series } = this.chartData;
 
 			let option = {
 				// color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 				tooltip: {
-					trigger: "axis",
-					axisPointer: {
-						type: "shadow",
-					},
+					trigger: "item",
 					formatter: function (params) {
-						return _this.$parent.tooltipFormatter(params, groupByString);
+						console.log(params);
+						return _this.$parent.tooltipFormatter(params, Object.keys(params.value[2]));
 					},
-					appendToBody: true,
-					confine: true,
 				},
 				legend: {},
-				series: series.map((item) => {
-					return { ...item, type: "pie", radius: "50%" };
-				}),
+				series: series,
 			};
 
 			this.myChart.setOption(option, true);
+			console.log("pie", option);
 			window.addEventListener("resize", function () {
 				if (this.myChart) {
 					this.myChart.resize();

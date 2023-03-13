@@ -186,7 +186,6 @@ export default {
 							});
 							return { ...item };
 						}) || [];
-					console.log(this.sourceList);
 				}
 			});
 		},
@@ -238,7 +237,6 @@ export default {
 
 		//修改按钮
 		changeRadioGroup(data, index, type) {
-			console.log(data, index, 1);
 			this.data[index][type] = data;
 		},
 		//添加字段
