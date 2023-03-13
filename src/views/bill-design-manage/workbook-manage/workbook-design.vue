@@ -59,7 +59,7 @@
 										dragClass="dragClass"
 										@end="(e) => dragEnd(e, 'tree')"
 									>
-										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
+										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex" @on-click.stop>
 											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
 											<template v-if="['2'].includes(subitem.columnType)">
 												<span style="color: #47a67f; margin-right: -5px; margin-top: -2px">=</span>
