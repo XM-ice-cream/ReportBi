@@ -316,7 +316,7 @@ export default {
 		getDataZoom(xAxis, yAxis, groupByNumber) {
 			const showData = 50 / groupByNumber.length;
 			const xAxisEnd = xAxis[0]?.data ? (showData / xAxis[0].data.length) * 100 : 100;
-			const yAxisEnd = yAxis[0].data ? (showData / yAxis[0].data.length) * 100 : 100;
+			const yAxisEnd = yAxis[0]?.data ? (showData / yAxis[0].data.length) * 100 : 100;
 			const xAxisIndex = xAxis.map((item, index) => index);
 			const yAxisIndex = yAxis.map((item, index) => index);
 			return [

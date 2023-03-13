@@ -146,7 +146,7 @@ export default {
 		pageLoad() {
 			this.tableConfig.loading = true;
 			this.data = [];
-			const { nodeId, datasetId, tableName, columnName, columnType, dataType, columnComment } = this.submitData;
+			const { nodeId, datasetId, labelName, columnName, columnType, dataType, columnComment } = this.submitData;
 			const obj = {
 				orderField: "string",
 				ascending: true,
@@ -156,7 +156,7 @@ export default {
 				data: {
 					nodeId,
 					datasetId,
-					tableName,
+					labelName,
 					columnName,
 					columnType,
 					dataType,
