@@ -42,6 +42,11 @@ export default {
 					width: "90%",
 					containLabel: true,
 				},
+				toolbox: {
+					feature: {
+						saveAsImage: {},
+					},
+				},
 				tooltip: {
 					trigger: "axis",
 					formatter: function (params) {
