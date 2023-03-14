@@ -26,13 +26,14 @@ export default {
 	},
 	methods: {
 		initChart() {
+			console.log(this.data);
 			this.isShow = true;
 			// 基于准备好的dom，初始化echarts实例
 			this.maverickLineChart = echarts.init(document.getElementById("maverickLineChart" + this.index));
 			let option = {
-				color: ["#76d9be", "#f9b90b", "#7aa8ff"],
+				color: ["#675bba", "#ff8000"],
 				title: {
-					text: `${this.data?.station} SYL Report`,
+					text: `${this.data?.station} ${this.data?.type} Report`,
 					left: "center",
 				},
 				grid: {
@@ -82,7 +83,9 @@ export default {
 			};
 			this.maverickLineChart.setOption(option, true);
 			window.addEventListener("resize", () => {
-				this.maverickLineChart.resize();
+				if (this.maverickLineChart) {
+					this.maverickLineChart.resize();
+				}
 			});
 		},
 	},

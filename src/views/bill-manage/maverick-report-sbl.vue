@@ -1,4 +1,4 @@
-/* Maverick SYL 图表*/
+/* Maverick SBL 图表*/
 <template>
 	<div class="page-style">
 		<!-- 页面表格 -->
@@ -66,20 +66,20 @@
 										</FormItem>
 										<!-- 线体 -->
 										<FormItem label="线体" prop="line">
-											<Select v-model.tirm="req.line" transfer :placeholder="$t('pleaseSelect') + '线体'" clearable @on-change="getStation">
+											<Select v-model.tirm="req.line" transfer :placeholder="$t('pleaseSelect') + '线体'" clearable @on-change="getModel">
 												<Option v-for="(item, index) in lineList" :key="index" :value="item">{{ item }}</Option>
-											</Select>
-										</FormItem>
-										<!-- 站点 -->
-										<FormItem label="站点" prop="station">
-											<Select v-model.tirm="req.station" transfer :placeholder="$t('pleaseSelect') + '站点'" clearable @on-change="getModel">
-												<Option v-for="(item, index) in stationList" :key="index" :value="item">{{ item }}</Option>
 											</Select>
 										</FormItem>
 										<!-- 机种 -->
 										<FormItem label="机种" prop="model">
-											<Select v-model.tirm="req.model" transfer :placeholder="$t('pleaseSelect') + '机种'" clearable>
+											<Select v-model.tirm="req.model" transfer :placeholder="$t('pleaseSelect') + '机种'" clearable @on-change="getLocation">
 												<Option v-for="(item, index) in modelList" :key="index" :value="item">{{ item }}</Option>
+											</Select>
+										</FormItem>
+										<!-- Location -->
+										<FormItem label="Location" prop="location">
+											<Select v-model.tirm="req.location" transfer :placeholder="$t('pleaseSelect') + 'Location'" clearable>
+												<Option v-for="(item, index) in locationList" :key="index" :value="item">{{ item }}</Option>
 											</Select>
 										</FormItem>
 									</Form>
@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { getpagelistReq, getLineReq, getStationReq, getModelReq, getTypeReq, exportReq } from "@/api/bill-manage/maverick-report.js";
+import { getpagelistReq, getLineReq, getStationReq, getModelReq, getTypeReq, getLocationReq, exportReq } from "@/api/bill-manage/maverick-report.js";
 import { formatDate, getButtonBoolean, exportFile } from "@/libs/tools";
 import LineMaverick from "@/components/echarts/line-maverick.vue";
 export default {
@@ -113,12 +113,12 @@ export default {
 			searchPoptipModal: false,
 			btnData: [],
 			timer: null,
-			yield_type: "SYL", //当前图表类型
+			yield_type: "SBL", //当前图表类型
 			typeList: [], //类别
-			stationList: [], //站点
+			locationList: [], //Loction
 			modelList: [], //机种
 			lineList: [], //线体
-			lineData: { station: "", type: "", xData: [], legendData: ["YR", "SYL Limit"], series: [] }, //线体值
+			lineData: { station: "", type: "", xData: [], legendData: ["YR", "SBL Limit"], series: [] }, //线体值
 			req: {
 				isRefresh: false, //自动刷新
 				refeshRate: 20, //刷新频率
@@ -152,10 +152,10 @@ export default {
 						trigger: "change",
 					},
 				],
-				station: [
+				location: [
 					{
 						required: true,
-						message: this.$t("pleaseEnter") + "站点",
+						message: this.$t("pleaseEnter") + "Location",
 						trigger: "change",
 					},
 				],
@@ -191,7 +191,7 @@ export default {
 			this.searchPoptipModal = false;
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
-					let { startTime, endTime, line, model, station, isRefresh, type } = this.req;
+					let { startTime, endTime, line, model, location, isRefresh, type } = this.req;
 					let obj = {
 						yieldtype: this.yield_type,
 						type,
@@ -199,12 +199,12 @@ export default {
 						endTime: isRefresh ? "" : formatDate(endTime),
 						line,
 						model,
-						station,
+						location,
 					};
 					getpagelistReq(obj).then((res) => {
 						if (res.code === 200) {
 							this.lineData.xData = res.result.map((item, index) => index);
-							this.lineData.station = station;
+							this.lineData.station = location;
 							this.lineData.type = this.yield_type;
 							this.lineData.series = [
 								{
@@ -255,7 +255,7 @@ export default {
 								},
 								{
 									type: "line",
-									name: "SYL Limit",
+									name: "SBL Limit",
 									data: res.result.map((item1) => item1.yielD_TARGET),
 									symbolSize: 0,
 									lineStyle: {
@@ -277,7 +277,7 @@ export default {
 		exportClick() {
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
-					let { startTime, endTime, line, model, station, type } = this.req;
+					let { startTime, endTime, line, model, location, type } = this.req;
 					let obj = {
 						yieldtype: this.yield_type,
 						type,
@@ -285,11 +285,11 @@ export default {
 						endTime: formatDate(endTime),
 						line,
 						model,
-						station,
+						location,
 					};
 					exportReq(obj).then((res) => {
 						let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-						const fileName = `${this.$t("maverick-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+						const fileName = `${this.$t("maverick-report-sbl")}${formatDate(new Date())}.xlsx`; // 自定义文件名
 						exportFile(blob, fileName);
 					});
 				}
@@ -332,6 +332,16 @@ export default {
 			getModelReq(obj).then((res) => {
 				if (res.code === 200) {
 					this.modelList = res.result || [];
+				}
+			});
+		},
+		//获取Location
+		getLocation() {
+			const { line, type } = this.req;
+			const obj = { yield_type: this.yield_type, line, type };
+			getLocationReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.locationList = res?.result || [];
 				}
 			});
 		},

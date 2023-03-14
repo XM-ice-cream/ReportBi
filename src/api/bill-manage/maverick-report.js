@@ -37,7 +37,6 @@ export const exportReq = data => {
 // 获取类型
 export const getTypeReq = data => {
   return requestCenter({
-    loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/maverickyieldinfo/gettype',
     method: 'get',
@@ -47,7 +46,6 @@ export const getTypeReq = data => {
 // 获取线体
 export const getLineReq = data => {
   return requestCenter({
-    loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/maverickyieldinfo/getline',
     method: 'get',
@@ -57,7 +55,6 @@ export const getLineReq = data => {
 // 获取站点
 export const getStationReq = data => {
   return requestCenter({
-    loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/maverickyieldinfo/getstation',
     method: 'get',
@@ -67,7 +64,6 @@ export const getStationReq = data => {
 // 获取机种
 export const getModelReq = data => {
   return requestCenter({
-    loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/maverickyieldinfo/getmodel',
     method: 'get',
@@ -78,7 +74,6 @@ export const getModelReq = data => {
 // 获取Location
 export const getLocationReq = data => {
   return requestCenter({
-    loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/maverickyieldinfo/getlocation',
     method: 'get',

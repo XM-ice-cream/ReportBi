@@ -1960,7 +1960,7 @@ export default {
   'insight-manage': 'insight管理',
   'productivity-report': '生产报表',
   'tooling-report': '磨具报表',
-  'maverick-report': 'Maverick报表',
+  'maverick-report': 'Maverick-SYL',
   'maverick-email-setting': 'Maverick预警邮箱设定',
   'test-yield-report': '测试良率报表',
   'epm-config': 'EPM上下限配置',
@@ -2001,6 +2001,7 @@ export default {
   'maverick-to-box': 'MaverickToBox',
   'maverick-trigger': 'MaverickTrigger',
   'maverick-cusdata': 'MaverickCusData',
+  'maverick-report-sbl': 'Maverick-SBL',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
