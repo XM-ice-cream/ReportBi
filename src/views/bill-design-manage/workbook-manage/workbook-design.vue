@@ -204,7 +204,7 @@
 											:id="`mark-box,${markIndex}`"
 											ghost-class="ghost"
 											@end="(e) => dragEnd(e, 'mark-box', markIndex)"
-											style="width: 100%; height: 100%; overflow: auto"
+											style="width: 100%; max-height: 200px; overflow: auto"
 										>
 											<div v-for="(item, index) in markData[markIndex].data" :key="index" style="display: flex; align-items: center">
 												<!-- 图标 -->
@@ -511,9 +511,9 @@ export default {
 		},
 		//查询
 		searchClick() {
-			console.log(1);
 			//数据集
 			const { datasetId } = this.submitData;
+			const angelData = this.markData[0].data.filter((item) => item.innerText == "angle");
 
 			if (!this.filterData.length) {
 				this.$Message.error("请拖拽字段至筛选器");
@@ -528,7 +528,13 @@ export default {
 				this.$Message.error("请拖拽字段至列");
 				return;
 			}
+			//判断角度是否为指标类型
+			if (angelData.length && !this.numberType(angelData[0])) {
+				this.$Message.error("角度为指标类型，请修改相关属性配置");
+				return;
+			}
 			this.updateDragData(); //更新row,column数据
+
 			let markData = [];
 			this.markData.forEach((item) => {
 				item.data.markValue = "";
@@ -730,10 +736,13 @@ export default {
 					break;
 				case "tree":
 					if (["color", "mark", "info", "labelWidth", "angle"].includes(id)) {
-						//保证标记的数据中颜色设定只有一个
+						//会有newIndex 为1 但其实应该是0 的情况
 						if (!this.markData[markIndex].data[newIndex]) newIndex = 0;
 
 						this.markData[markIndex].data[newIndex]["innerText"] = id;
+
+						//保证标记的数据中角度设定只有一个
+						if (id === "angle") return this.deleteColorAngle(id, markIndex, newIndex);
 
 						this.changeMarks(markIndex, "add", this.markData[markIndex].data[newIndex]); //联动添加标记字段
 
@@ -823,7 +832,7 @@ export default {
 		//修改第0个标记，联动其余标记；其余标记均修改后，自动修改第0标记
 		changeMarks(markIndex, type, data) {
 			const chartType = this.markData[markIndex].chartType;
-
+			//饼图 不需要行列信息
 			if (!type && chartType == "componentPie" && (this.rowData.length || this.columnData.length)) {
 				this.$Modal.confirm({
 					title: "确认要选择饼图图表吗?",
@@ -835,6 +844,12 @@ export default {
 						this.collapse = "0";
 					},
 				});
+			}
+			//饼图 切换为其他图表时 删除角度数据
+			if (!type && chartType !== "componentPie") {
+				const angleIndex = this.markData[0].data.findIndex((item) => item.innerText === "angle");
+				console.log("angleIndex", angleIndex);
+				if (angleIndex > -1) this.markData[0].data.splice(angleIndex, 1);
 			}
 
 			let chartFlag = true;
@@ -853,9 +868,12 @@ export default {
 				if (markIndexOthers === -1 && type == "add") addFlag = false;
 
 				//标记 联动 删除、新增、编辑
-				if (markIndex == 0 && (type == "delete" || type == "add" || type == "update")) {
+				if (markIndex == 0 && type) {
 					if (markIndexOthers > -1 && type == "delete") this.markData[i].data.splice(markIndexOthers, 1);
-					if (markIndexOthers == -1 && type == "add" && data.innerText !== "labelWidth") this.markData[i].data.push(data);
+					if (markIndexOthers == -1 && type == "add" && data.innerText !== "labelWidth") {
+						this.markData[i].data.push(data);
+						if (data.innerText == "color") this.deleteColorAngle("color", i, this.markData[i].data.length - 1);
+					}
 					if (markIndexOthers > -1 && type == "update") this.markData[i].data[markIndexOthers] = { ...data };
 				}
 			}
@@ -871,22 +889,37 @@ export default {
 			//添加0标记
 			if (addFlag && type == "add") {
 				const markIndexOthers = this.markIndexOf(0, data);
-				if (markIndexOthers == -1) this.markData[0].data.push(data);
+				if (markIndexOthers == -1) {
+					this.markData[0].data.push(data);
+					if (data.innerText == "color") this.deleteColorAngle("color", 0, this.markData[0].data.length - 1);
+				}
 			}
-
-			//
 		},
 		//更新标记数据
 		updateMark(newIndex, obj, markIndex) {
 			const data = { ...obj };
+			if (data.innerText == "color") newIndex = this.deleteColorAngle("color", markIndex, newIndex);
 			this.markData[markIndex].data[newIndex] = { ...data };
 			this.changeMarks(markIndex, "update", data);
 		},
 		//判断数据是否存在
 		markIndexOf(index, data) {
 			if (!data) return -1;
-			const { nodeId, innerText, columnName } = data;
-			return this.markData[index].data.findIndex((item) => item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName);
+			const { nodeId, innerText, columnName, calculatorFunction } = data;
+			return this.markData[index].data.findIndex(
+				(item) =>
+					item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName && item.calculatorFunction === calculatorFunction
+			);
+		},
+		//保证颜色、角度属性的唯一性
+		deleteColorAngle(type, markIndex, newIndex) {
+			const dataIndex = this.markData[markIndex].data.findIndex((item, index) => item.innerText === type && index !== newIndex);
+			if (dataIndex > -1) {
+				this.markData[markIndex].data[dataIndex] = { ...this.markData[markIndex].data[newIndex] }; //新颜色赋值给旧颜色
+				this.markData[markIndex].data.splice(newIndex, 1); //删除
+				newIndex = this.markData[markIndex].data.findIndex((item, index) => item.innerText === type); //索引重新赋值
+			}
+			return newIndex;
 		},
 
 		//删除自定义字段

@@ -65,6 +65,7 @@ export default {
 		};
 	},
 	methods: {
+		//加载图表
 		pageLoad() {
 			if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
 			else this.chartData = this.dataLogic();
@@ -74,17 +75,16 @@ export default {
 		},
 		//饼图
 		dataLogicByPie() {
-			let legend = {};
 			let series = { type: "pie", data: [] };
 			console.log("this.mark", this.mark);
 			console.log("this.value", this.value);
-			console.log(this.markDataLogic());
+
 			const { color, angle, mark } = this.markDataLogic().undefined;
 
 			this.value.forEach((item) => {
 				series.data.push({
 					name: item[Object.keys(color)[0]],
-					value: [item[angle[0]], item[Object.keys(color)[0]], item, "x0"],
+					value: [item[angle[0]] || 1, item[Object.keys(color)[0]], item, "x0"],
 					itemStyle: {
 						color: Object.keys(color)[0] ? color[Object.keys(color)[0]][item[Object.keys(color)[0]]] : "#5470c6",
 					},
@@ -103,6 +103,7 @@ export default {
 					},
 				});
 			});
+			console.log("series", series);
 			return { series };
 		},
 		//数据逻辑处理

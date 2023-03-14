@@ -30,16 +30,14 @@ export default {
 				tooltip: {
 					trigger: "item",
 					formatter: function (params) {
-						console.log(params);
 						return _this.$parent.tooltipFormatter(params, Object.keys(params.value[2]));
 					},
 				},
-				legend: {},
+				legend: { type: "scroll", width: "50%", itemWidth: 14 },
 				series: series,
 			};
 
 			this.myChart.setOption(option, true);
-			console.log("pie", option);
 			window.addEventListener("resize", function () {
 				if (this.myChart) {
 					this.myChart.resize();
