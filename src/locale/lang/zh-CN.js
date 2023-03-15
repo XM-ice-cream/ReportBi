@@ -2002,6 +2002,7 @@ export default {
   'maverick-trigger': 'MaverickTrigger',
   'maverick-cusdata': 'MaverickCusData',
   'maverick-report-sbl': 'Maverick-SBL',
+  'trace-picture': 'TracePicture',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
