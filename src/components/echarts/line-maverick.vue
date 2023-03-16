@@ -31,7 +31,7 @@ export default {
 			// 基于准备好的dom，初始化echarts实例
 			this.maverickLineChart = echarts.init(document.getElementById("maverickLineChart" + this.index));
 			let option = {
-				color: ["#675bba", "#ff8000"],
+				color: ["#000", "#648dc6", "#e51f0e"],
 				title: {
 					text: `${this.data?.station} ${this.data?.type} Report`,
 					left: "center",
@@ -82,6 +82,9 @@ export default {
 					},
 					axisLabel: {
 						formatter: "{value} %",
+					},
+					min: function (value) {
+						return Math.floor(value.min - 1);
 					},
 				},
 				series: this.data.series,

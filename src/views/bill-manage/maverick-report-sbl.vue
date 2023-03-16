@@ -118,7 +118,7 @@ export default {
 			locationList: [], //Loction
 			modelList: [], //机种
 			lineList: [], //线体
-			lineData: { station: "", type: "", xData: [], legendData: ["YR", "SBL Limit"], series: [] }, //线体值
+			lineData: { station: "", type: "", xData: [], legendData: ["YR", "YR Goal", "SBL Limit"], series: [] }, //线体值
 			req: {
 				isRefresh: false, //自动刷新
 				refeshRate: 20, //刷新频率
@@ -127,6 +127,7 @@ export default {
 				line: "",
 				model: "",
 				station: "",
+				location: "",
 				type: "",
 			}, //查询数据
 			// 验证实体
@@ -189,6 +190,7 @@ export default {
 		// 获取分页列表数据
 		pageLoad() {
 			this.searchPoptipModal = false;
+			console.log(this.req);
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
 					let { startTime, endTime, line, model, location, isRefresh, type } = this.req;
@@ -214,29 +216,6 @@ export default {
 										return { value: item1.yield, createtime: item1.datecode, station: item1.station, yielD_TARGET: item1.yielD_TARGET };
 									}),
 									symbolSize: 5,
-									markLine: {
-										data: [
-											{
-												name: "YR Goal",
-												yAxis: res.result[0]?.yielD_GOAL.toString() || 0,
-												lineStyle: {
-													color: "#d14a61",
-													width: 2,
-													type: "solid",
-												},
-											},
-										],
-
-										label: {
-											formatter: function (params) {
-												const { name, value } = params;
-												return `${name}\n${value}%`;
-											},
-										},
-										lineStyle: {
-											width: 2,
-										},
-									},
 									markPoint: {
 										data: [
 											{
@@ -249,6 +228,15 @@ export default {
 											},
 										],
 									},
+									lineStyle: {
+										width: 2,
+									},
+								},
+								{
+									type: "line",
+									name: "YR Goal",
+									data: res.result.map((item1) => item1.yielD_TARGET),
+									symbolSize: 0,
 									lineStyle: {
 										width: 2,
 									},
@@ -297,6 +285,7 @@ export default {
 		},
 		//获取类别
 		getType() {
+			this.req.type = "";
 			const obj = { yield_type: this.yield_type };
 			getTypeReq(obj).then((res) => {
 				if (res.code == 200) {
@@ -307,6 +296,7 @@ export default {
 		},
 		//获取线体
 		async getLine() {
+			this.req.line = "";
 			const obj = { yield_type: this.yield_type, type: this.req.type };
 			await getLineReq(obj).then((res) => {
 				if (res.code === 200) {
@@ -317,6 +307,7 @@ export default {
 
 		//获取站点
 		getStation() {
+			this.req.station = "";
 			const { type, line } = this.req;
 			const obj = { yield_type: this.yield_type, type, line };
 			getStationReq(obj).then((res) => {
@@ -327,6 +318,8 @@ export default {
 		},
 		//获取机种
 		getModel() {
+			this.req.model = "";
+
 			const { line } = this.req;
 			const obj = { yield_type: this.yield_type, line };
 			getModelReq(obj).then((res) => {
@@ -337,6 +330,7 @@ export default {
 		},
 		//获取Location
 		getLocation() {
+			this.req.location = "";
 			const { line, type } = this.req;
 			const obj = { yield_type: this.yield_type, line, type };
 			getLocationReq(obj).then((res) => {
