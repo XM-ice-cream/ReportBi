@@ -132,7 +132,7 @@ export default {
 		// 提交
 		submitClick(isClose = false) {
 			this.submitData.detailsList = this.tableData;
-			const desLength = this.tableData.every((item) => item.issuedescription.length <= 120);
+			const desLength = this.tableData.every((item) => !item?.issuedescription || item?.issuedescription?.length <= 120);
 			if (!desLength) {
 				this.$Message.error("Issue Description 内容长度超出120,请核验");
 				return;
@@ -140,7 +140,7 @@ export default {
 			let request = addReq(this.submitData);
 			request.then((res) => {
 				if (res.code === 200) {
-					this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+					this.$Message.success(`${res.message}`);
 					this.$emit("refreshPageLoad");
 					if (isClose) this.cancelClick();
 				} else {

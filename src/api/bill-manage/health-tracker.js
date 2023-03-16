@@ -37,6 +37,7 @@ export const modifyReq = data => {
 export const getInfoReq = data => {
   return requestCenter({
     timeout: 0,
+    loading: true,
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/HealthTrack/getHealthInfo',
     method: 'post',
