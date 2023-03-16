@@ -89,6 +89,7 @@ export const deleteCustomerFieldReq = data => {
 //查询工作簿图表
 export const getChartsInfoReq = data => {
   return requestCenter({
+    timeout: 20 * 60 * 1000, //最长等待20分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
     url: '/api/autoreportcenter/anonymous/v1/bicalculator/execute',
     method: 'post',
