@@ -45,21 +45,21 @@
 										</FormItem>
 										<!-- TrackTooling -->
 										<FormItem label="TrackTooling" prop="trackTooling">
-											<i-switch size="default" v-model="req.trackTooling" :true-value="Y" :false-value="N">
+											<i-switch size="default" v-model="req.trackTooling" true-value="Y" false-value="N">
 												<span slot="open">Y</span>
 												<span slot="close">N</span>
 											</i-switch>
 										</FormItem>
 										<!-- Customer -->
 										<FormItem label="辅耗材" prop="consumer">
-											<i-switch size="default" v-model="req.consumer" :true-value="Y" :false-value="N">
+											<i-switch size="default" v-model="req.consumer" true-value="Y" false-value="N">
 												<span slot="open">Y</span>
 												<span slot="close">N</span>
 											</i-switch>
 										</FormItem>
 										<!-- 打件资料 -->
 										<FormItem label="打件资料" prop="generate">
-											<i-switch size="default" v-model="req.generate" :true-value="Y" :false-value="N">
+											<i-switch size="default" v-model="req.generate" true-value="Y" false-value="N">
 												<span slot="open">Y</span>
 												<span slot="close">N</span>
 											</i-switch>
@@ -126,9 +126,9 @@ export default {
 				endTime: "",
 				unitId: "",
 				sation: "",
-				trackTooling: "",
-				consumer: "",
-				generate: "",
+				trackTooling: "N",
+				consumer: "N",
+				generate: "N",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -149,12 +149,12 @@ export default {
 				{ title: "Generate", key: "generate", minWidth: 160, tooltip: true, align: "center" },
 				{ title: "Consumer", key: "consumer", minWidth: 120, tooltip: true, align: "center" },
 				{ title: "创建时间", key: "createdate", minWidth: 120, render: renderDate, tooltip: true, align: "center" },
-				{ title: "operator", slot: "operator", width: 100, tooltip: true, align: "center" },
+				{ title: "操作", slot: "operator", width: 100, tooltip: true, align: "center" },
 			], // 表格数据
 		};
 	},
 	activated() {
-		this.searchClick();
+		this.tableConfig.loading = false;
 		this.autoSize();
 		window.addEventListener("resize", () => this.autoSize());
 		getButtonBoolean(this, this.btnData);
@@ -221,16 +221,7 @@ export default {
 				//   onCancel: () => this.clearGraphData(),
 			});
 		},
-		// 右侧弹窗打开
-		importClick() {
-			this.modalFlag = true;
-		},
-		uploadSuccess() {
-			this.searchClick(); //刷新
-			this.$Message.success(`${this.$t("import")}${this.$t("success")}`);
-			//关闭弹框
-			this.modalFlag = false;
-		},
+
 		// 按钮公共方法
 		buttonCustomClick(refName, title) {
 			this.$refs[refName].drawerTitle = this.$t(title);
@@ -254,11 +245,6 @@ export default {
 				}
 			});
 		},
-		// 左侧抽屉取消
-		cancelClick() {
-			this.modalFlag = false;
-		},
-
 		// 点击重置按钮触发
 		resetClick() {
 			this.$refs.searchReq.resetFields();
