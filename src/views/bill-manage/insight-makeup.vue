@@ -37,32 +37,23 @@
 										</FormItem>
 										<!-- UnitId -->
 										<FormItem label="UnitId" prop="unitId">
-											<Input v-model="req.unitId" :placeholder="$t('pleaseEnter') + 'UnitId' + $t('multiple,separated')" />
+											<Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + 'UnitId' + $t('multiple,separated')" />
 										</FormItem>
 										<!-- Station -->
 										<FormItem label="站点" prop="station">
-											<Input v-model="req.station" :placeholder="$t('pleaseEnter') + '站点'" />
+											<Input v-model.trim="req.station" :placeholder="$t('pleaseEnter') + '站点'" />
 										</FormItem>
 										<!-- TrackTooling -->
 										<FormItem label="TrackTooling" prop="trackTooling">
-											<i-switch size="default" v-model="req.trackTooling" true-value="Y" false-value="N">
-												<span slot="open">Y</span>
-												<span slot="close">N</span>
-											</i-switch>
+											<Input v-model.trim="req.trackTooling" :placeholder="$t('pleaseEnter') + 'TrackTooling'" />
 										</FormItem>
 										<!-- Customer -->
 										<FormItem label="辅耗材" prop="consumer">
-											<i-switch size="default" v-model="req.consumer" true-value="Y" false-value="N">
-												<span slot="open">Y</span>
-												<span slot="close">N</span>
-											</i-switch>
+											<Input v-model.trim="req.consumer" :placeholder="$t('pleaseEnter') + '辅耗材'" />
 										</FormItem>
 										<!-- 打件资料 -->
 										<FormItem label="打件资料" prop="generate">
-											<i-switch size="default" v-model="req.generate" true-value="Y" false-value="N">
-												<span slot="open">Y</span>
-												<span slot="close">N</span>
-											</i-switch>
+											<Input v-model.trim="req.generate" :placeholder="$t('pleaseEnter') + '打件资料'" />
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -107,7 +98,7 @@
 
 <script>
 import { getpagelistReq, updateStatusReq, uploadReq } from "@/api/bill-manage/insight-makeup";
-import { formatDate, getButtonBoolean, exportFile, commaSplitString, renderDate } from "@/libs/tools";
+import { formatDate, getButtonBoolean, commaSplitString, renderDate } from "@/libs/tools";
 import ImportFormData from "@/components/import-formData";
 
 export default {
@@ -126,9 +117,9 @@ export default {
 				endTime: "",
 				unitId: "",
 				sation: "",
-				trackTooling: "N",
-				consumer: "N",
-				generate: "N",
+				trackTooling: "",
+				consumer: "",
+				generate: "",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [

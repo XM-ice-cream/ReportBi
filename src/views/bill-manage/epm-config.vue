@@ -86,7 +86,12 @@
 						</i-col>
 						<!-- 按钮 -->
 						<i-col span="12">
-							<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick"></button-custom>
+							<button-custom
+								:btnData="btnData"
+								@on-add-click="addClick"
+								@on-edit-click="editClick"
+								@on-import-click="buttonCustomClick('ImportFormData', 'uploadAttachment')"
+							></button-custom>
 						</i-col>
 					</Row>
 				</div>
@@ -101,16 +106,21 @@
 					@on-current-change="currentClick"
 				></Table>
 			</Card>
+			<!-- 导入 -->
+			<ImportFormData @fileUpload="fileUpload" ref="ImportFormData" />
 		</div>
 	</div>
 </template>
 
 <script>
-import { getpagelistReq, addReq, modifyReq } from "@/api/bill-manage/epm-config";
+import { getpagelistReq, addReq, modifyReq, uploadReq } from "@/api/bill-manage/epm-config";
 import { getButtonBoolean, errorType, renderDate } from "@/libs/tools";
 import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item";
+import ImportFormData from "@/components/import-formData";
+
 export default {
 	name: "epm-config",
+	components: { ImportFormData },
 	data() {
 		return {
 			poptipModal: false,
@@ -138,10 +148,10 @@ export default {
 				{ title: "Line_Categy", key: "line_Categy", align: "center", minWidth: 100, tooltip: true },
 				{ title: "EQPID", key: "eqpid", align: "center", minWidth: 100, tooltip: true },
 				{ title: this.$t("remark"), key: "remark", align: "center", width: 150, tooltip: true },
-				{ title: this.$t("createUser"), key: "createusername", align: "center", width: 80 },
-				{ title: this.$t("createDate"), key: "createdate", align: "center", width: 125, render: renderDate },
-				{ title: this.$t("modifyUser"), key: "modifyusername", align: "center", width: 80 },
-				{ title: this.$t("modifyDate"), key: "modifydate", align: "center", width: 125, render: renderDate },
+				{ title: this.$t("createUser"), key: "createUserName", align: "center", width: 80 },
+				{ title: this.$t("createDate"), key: "createDate", align: "center", width: 125, render: renderDate },
+				{ title: this.$t("modifyUser"), key: "modifyUserName", align: "center", width: 80 },
+				{ title: this.$t("modifyDate"), key: "modifyDate", align: "center", width: 125, render: renderDate },
 			], // 表格数据
 			data: [], // 表格数据
 			selectObj: null, // 表格选中数据
@@ -176,7 +186,7 @@ export default {
 		};
 	},
 	activated() {
-		this.pageLoad();
+		this.tableConfig.loading = false;
 		this.autoSize();
 		window.addEventListener("resize", () => this.autoSize());
 		getButtonBoolean(this, this.btnData);
@@ -207,6 +217,29 @@ export default {
 			this.poptipModal = false;
 			this.req.pageIndex = 1;
 			this.pageLoad();
+		},
+		// 按钮公共方法
+		buttonCustomClick(refName, title) {
+			this.$refs[refName].drawerTitle = this.$t(title);
+			this.$refs[refName].drawerFlag = true;
+		},
+		//上传附件
+		fileUpload(file) {
+			let formData = new FormData();
+			formData.append("file", file);
+			uploadReq(formData).then((res) => {
+				if (res.code === 200) {
+					this.$Message.success(this.$t("uploadSuccess"));
+					this.pageLoad();
+					this.$refs.ImportFormData.drawerFlag = false;
+				} else {
+					let content = `${errorType(this, res)}<br> ${res.message}`;
+					this.$Modal.error({
+						title: this.$t("uploadAttachment") + this.$t("fail"),
+						content: content,
+					});
+				}
+			});
 		},
 		// 点击新增按钮触发
 		addClick() {
@@ -268,17 +301,6 @@ export default {
 		// 某一行高亮时触发
 		currentClick(currentRow) {
 			this.selectObj = currentRow;
-		},
-		// 选择第几页
-		pageChange(index) {
-			this.req.pageIndex = index;
-			this.pageLoad();
-		},
-		// 选择一页有条数据
-		pageSizeChange(index) {
-			this.req.pageIndex = 1;
-			this.req.pageSize = index;
-			this.pageLoad();
 		},
 	},
 };

@@ -2003,6 +2003,7 @@ export default {
   'maverick-cusdata': 'MaverickCusData',
   'maverick-report-sbl': 'Maverick-SBL',
   'trace-picture': 'TracePicture',
+  'insight-makeup': 'Insight状态',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',

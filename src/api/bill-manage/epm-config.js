@@ -1,4 +1,6 @@
-import {requestCenter} from '@/libs/request'
+import {
+  requestCenter
+} from '@/libs/request'
 /* EPM 上下限配置 接口 */
 
 // 新增
@@ -29,7 +31,15 @@ export const getpagelistReq = data => {
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/epmconfig/get',
     method: 'get',
-    params:data
+    params: data
   })
 }
-
+//批量导入
+export const uploadReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/reportcenter/anonymous/v1/epmconfig/upload',
+    method: 'post',
+    data,
+  })
+}
