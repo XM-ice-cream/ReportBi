@@ -86,6 +86,15 @@ export const deleteCustomerFieldReq = data => {
     data
   })
 }
+//校验自定义字段
+export const checkCustomerFieldReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/syntaxRules',
+    method: 'post',
+    data
+  })
+}
 //查询工作簿图表
 export const getChartsInfoReq = data => {
   return requestCenter({

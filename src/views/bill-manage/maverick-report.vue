@@ -233,7 +233,7 @@ export default {
 								{
 									type: "line",
 									name: "YR Goal",
-									data: res.result.map((item1) => item1.yielD_TARGET),
+									data: res.result.map((item1) => item1.yielD_GOAL),
 									symbolSize: 0,
 									lineStyle: {
 										width: 2,

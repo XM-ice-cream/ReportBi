@@ -106,7 +106,7 @@ import { getpagelistReq, getLineReq, getStationReq, getModelReq, getTypeReq, get
 import { formatDate, getButtonBoolean, exportFile } from "@/libs/tools";
 import LineMaverick from "@/components/echarts/line-maverick.vue";
 export default {
-	name: "maverick-report",
+	name: "maverick-report-sbl",
 	components: { LineMaverick },
 	data() {
 		return {
@@ -235,7 +235,7 @@ export default {
 								{
 									type: "line",
 									name: "YR Goal",
-									data: res.result.map((item1) => item1.yielD_TARGET),
+									data: res.result.map((item1) => item1.yielD_GOAL),
 									symbolSize: 0,
 									lineStyle: {
 										width: 2,

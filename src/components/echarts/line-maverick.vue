@@ -84,7 +84,7 @@ export default {
 						formatter: "{value} %",
 					},
 					min: function (value) {
-						return Math.floor(value.min - 1);
+						return Math.floor(value.min - 1) < 0 ? 0 : Math.floor(value.min - 1);
 					},
 				},
 				series: this.data.series,

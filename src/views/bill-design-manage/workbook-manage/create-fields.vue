@@ -10,7 +10,6 @@
 					v-model="submitData.fieldFunction"
 					type="textarea"
 					ref="fieldFunction"
-					draggable
 					:autosize="{ minRows: 20, maxRows: 20 }"
 					style="margin-top: 10px"
 				></Input>
@@ -47,13 +46,14 @@
 
 		<div slot="footer" class="dialog-footer">
 			<Button @click="outerVisible = false">取 消</Button>
+			<Button @click="checkRules">校验语法</Button>
 			<Button type="primary" @click="submitClick">确定 </Button>
 		</div>
 	</Modal>
 </template>
 <script>
 import { getlistReq as getDataItemReq, getlisttreeReq } from "@/api/system-manager/data-item";
-import { addCustomerFieldReq, getCustomerFieldReq, modifyCustomerFieldReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { addCustomerFieldReq, getCustomerFieldReq, modifyCustomerFieldReq, checkCustomerFieldReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { inputSelectContent } from "@/libs/tools";
 import draggable from "vuedraggable";
 
@@ -130,6 +130,20 @@ export default {
 			getCustomerFieldReq({ id: nodeId }).then((res) => {
 				if (res.code == 200) {
 					this.submitData = { ...this.submitData, ...res.result };
+				}
+			});
+		},
+		//校验语法
+		checkRules() {
+			checkCustomerFieldReq({ ...this.submitData }).then((res) => {
+				if (res.code == 200) {
+					this.$Message.success("语法检查通过，可保存！");
+				} else {
+					this.$Message.error({
+						content: res.message,
+						duration: 10,
+						closable: true,
+					});
 				}
 			});
 		},
@@ -252,5 +266,11 @@ export default {
 			}
 		}
 	}
+}
+.ivu-modal-footer .ivu-btn:nth-child(2) {
+	padding: 5px 16px;
+	color: #27ce88;
+	border: 1px solid #27ce88;
+	border-radius: 0;
 }
 </style>
