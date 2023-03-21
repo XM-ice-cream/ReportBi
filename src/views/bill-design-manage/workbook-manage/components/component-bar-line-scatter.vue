@@ -1,6 +1,6 @@
 <!-- 柱状图 -->
 <template>
-	<div id="barchart" class="charts"></div>
+	<div id="barchart" class="charts" ref="barchart"></div>
 </template>
 <script>
 import * as echarts from "echarts";
@@ -10,19 +10,13 @@ export default {
 		chartData: Object,
 	},
 	data() {
-		return {
-			myChart: "",
-		};
+		return {};
 	},
 
 	methods: {
 		pageLoad() {
-			console.log("pageLoad");
-			if (this.myChart != null && this.myChart != "" && this.myChart != undefined) {
-				this.myChart.dispose();
-			}
 			// 基于准备好的dom，初始化echarts实例
-			this.myChart = echarts.init(document.getElementById("barchart"));
+			let myChart = echarts.init(this.$el);
 			const _this = this;
 			let seriesResult = [];
 
@@ -62,10 +56,10 @@ export default {
 				yAxis: yAxis,
 				series: seriesResult,
 			};
-			this.myChart.setOption(option, true);
+			myChart.setOption(option, true);
 			window.addEventListener("resize", function () {
-				if (this.myChart) {
-					this.myChart.resize();
+				if (myChart) {
+					myChart.resize();
 				}
 			});
 		},

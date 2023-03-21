@@ -335,9 +335,12 @@ export default {
 		},
 		//增减进度条
 		getDataZoom(xAxis, yAxis, groupByNumber) {
-			const showData = 50 / groupByNumber.length;
-			const xAxisEnd = xAxis[0]?.data ? (showData / xAxis[0].data.length) * 100 : 100;
-			const yAxisEnd = yAxis[0]?.data ? (showData / yAxis[0].data.length) * 100 : 100;
+			// const showData = 50 / groupByNumber.length;
+			// const xAxisEnd = xAxis[0]?.data ? (showData / xAxis[0].data.length) * 100 : 100;
+			// const yAxisEnd = yAxis[0]?.data ? (showData / yAxis[0].data.length) * 100 : 100;
+			//滚动条设定  minValueSpan：最小显示的值数量
+			const xAxisEnd = xAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
+			const yAxisEnd = yAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
 			const xAxisIndex = xAxis.map((item, index) => index);
 			const yAxisIndex = yAxis.map((item, index) => index);
 			return [
@@ -358,7 +361,7 @@ export default {
 						"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
 					//手柄大小
 					handleSize: 18,
-					end: xAxisEnd,
+					...xAxisEnd,
 					//为手柄设置阴影效果
 					handleStyle: {
 						shadowBlur: 6,
@@ -392,7 +395,7 @@ export default {
 						"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
 					//手柄大小
 					handleSize: 18,
-					end: yAxisEnd,
+					...yAxisEnd,
 					//为手柄设置阴影效果
 					handleStyle: {
 						shadowBlur: 6,
