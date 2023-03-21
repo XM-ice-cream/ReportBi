@@ -229,15 +229,11 @@ export default {
 			formData.append("file", file);
 			uploadReq(formData).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success(this.$t("uploadSuccess"));
+					this.$Message.success(`${res.message}`);
 					this.pageLoad();
 					this.$refs.ImportFormData.drawerFlag = false;
 				} else {
-					let content = `${errorType(this, res)}<br> ${res.message}`;
-					this.$Modal.error({
-						title: this.$t("uploadAttachment") + this.$t("fail"),
-						content: content,
-					});
+					this.$Message.error(`${res.message}`);
 				}
 			});
 		},
