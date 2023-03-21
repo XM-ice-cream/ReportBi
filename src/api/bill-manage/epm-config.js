@@ -37,7 +37,7 @@ export const getpagelistReq = data => {
 //批量导入
 export const uploadReq = data => {
   return requestCenter({
-    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/anonymous/v1/epmconfig/upload',
     method: 'post',
     data,

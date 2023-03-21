@@ -27,7 +27,7 @@ export const updateStatusReq = data => {
 //批量导入
 export const uploadReq = data => {
   return requestCenter({
-    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/insight/v1/insightmakeup/chanagestatusbybatchasync',
     method: 'post',
     data,
