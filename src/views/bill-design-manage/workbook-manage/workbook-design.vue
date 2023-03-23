@@ -220,7 +220,7 @@
 													</div>
 
 													<!-- 下拉框 -->
-													<Dropdown style="float: right" @on-click="(name) => rowColumnDropDownClick(name, index, 'mark', item, markIndex)">
+													<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index, markIndex, 'mark')">
 														<Icon type="ios-arrow-down"></Icon>
 														<template #list>
 															<DropdownMenu>
@@ -244,6 +244,8 @@
 																		</DropdownMenu>
 																	</template>
 																</Dropdown>
+																<!-- 排序 -->
+																<DropdownItem name="markField-sortby">排序</DropdownItem>
 																<!-- 删除 -->
 																<DropdownItem name="markField-delete">移除</DropdownItem>
 															</DropdownMenu>
@@ -269,7 +271,7 @@
 								<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
 									{{ calculatorObj(item.calculatorFunction, item.columnName) }}
 									<!-- 下拉框 -->
-									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'column')">
+									<Dropdown @on-click="(name) => dropDownClick(name, item, index, '', 'column')">
 										<Icon type="ios-arrow-down"></Icon>
 										<template #list>
 											<DropdownItem name="">维度</DropdownItem>
@@ -292,6 +294,8 @@
 													</template>
 												</Dropdown>
 											</DropdownMenu>
+											<!-- 排序 -->
+											<DropdownItem name="column-sortby">排序</DropdownItem>
 											<!-- 删除 -->
 											<DropdownItem name="column-delete">移除</DropdownItem>
 										</template>
@@ -306,7 +310,7 @@
 								<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
 									{{ calculatorObj(item.calculatorFunction, item.columnName) }}
 									<!-- 下拉框 -->
-									<Dropdown @on-click="(name) => rowColumnDropDownClick(name, index, 'row')">
+									<Dropdown @on-click="(name) => dropDownClick(name, item, index, '', 'row')">
 										<Icon type="ios-arrow-down"></Icon>
 										<template #list>
 											<DropdownItem name="">维度</DropdownItem>
@@ -329,6 +333,8 @@
 													</template>
 												</Dropdown>
 											</DropdownMenu>
+											<!-- 排序 -->
+											<DropdownItem name="row-sortby">排序</DropdownItem>
 											<!-- 删除 -->
 											<DropdownItem name="row-delete">移除</DropdownItem>
 										</template>
@@ -362,6 +368,8 @@
 			<FilterFields ref="filterField" :selectObj="selectObj" :isAdd="isAdd" @updateFilter="updateFilter" />
 			<!-- 标记属性设定 -->
 			<MarkFields ref="markField" :selectObj="selectObj" :filterData="filterData" :isAdd="isAdd" @updateMark="updateMark" />
+			<!-- 排序属性设定 -->
+			<SortbyFields ref="sortbyField" :selectObj="selectObj" :filterData="filterData" @updateSort="updateSort" />
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
@@ -388,10 +396,11 @@ import MarkFields from "./mark-fields.vue";
 
 import { getlistReq } from "@/api/system-manager/data-item";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
+import SortbyFields from "./sortby-fields.vue";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields },
+	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields },
 	props: {
 		modelFlag: {
 			type: Boolean,
@@ -611,7 +620,8 @@ export default {
 					}
 					break;
 				case "mark":
-					if (!["markField-edit", "markField-delete"].includes(name)) this.markData[markIndex].data[index].calculatorFunction = name;
+					if (!["markField-edit", "markField-delete", "markField-sortby"].includes(name))
+						this.markData[markIndex].data[index].calculatorFunction = name;
 
 					const data = this.markData[markIndex].data[index];
 					this.changeMarks(markIndex, "update", data);
@@ -623,7 +633,8 @@ export default {
 			this.updateDragData(); //更新row,column数据
 		},
 		//标记 下拉
-		dropDownClick(name, row, index, markIndex) {
+		dropDownClick(name, row, index, markIndex, type) {
+			console.log("dropDownClick");
 			const { datasetId } = this.submitData;
 			this.selectObj = {
 				...row,
@@ -637,6 +648,14 @@ export default {
 			};
 
 			switch (name) {
+				//行
+				case "row-delete":
+					this.rowData.splice(index, 1);
+					break;
+				//列
+				case "column-delete":
+					this.columnData.splice(index, 1);
+					break;
 				// 删除自定义字段
 				case "deleteFields":
 					this.deleteFields(row);
@@ -680,7 +699,32 @@ export default {
 					this.markData[markIndex].data.splice(index, 1);
 					this.changeMarks(markIndex, "delete", data);
 					break;
+				//排序
+				case "markField-sortby":
+					this.selectObj.sortType = "mark";
+					this.$refs.sortbyField.modelFlag = true;
+					break;
+				case "row-sortby":
+					this.selectObj.sortType = "row";
+					this.$refs.sortbyField.modelFlag = true;
+					break;
+				case "column-sortby":
+					this.selectObj.sortType = "column";
+					this.$refs.sortbyField.modelFlag = true;
+					break;
+				// 函数执行
+				default:
+					console.log(type);
+					if (type == "row") this.rowData[index].calculatorFunction = name;
+					if (type === "column") this.columnData[index].calculatorFunction = name;
+					if (type === "mark") {
+						this.markData[markIndex].data[index].calculatorFunction = name;
+						const data = this.markData[markIndex].data[index];
+						this.changeMarks(markIndex, "update", data);
+					}
+					break;
 			}
+			this.updateDragData(); //更新row,column数据
 		},
 		//转换为指标 0 或 维度 1
 		changeToProperty(row, type) {
@@ -829,6 +873,23 @@ export default {
 			this.filterData[newIndex] = { ...obj };
 			this.filterData = JSON.parse(JSON.stringify(this.filterData));
 		},
+		//更新排序数据
+		updateSort(newIndex, data, markIndex) {
+			console.log("updateSort", newIndex, data, markIndex);
+			if (data.sortType === "mark") {
+				this.markData[markIndex].data[newIndex] = { ...data };
+				this.changeMarks(markIndex, "update", data);
+				this.markData = JSON.parse(JSON.stringify(this.markData));
+			}
+			if (data.sortType === "row") {
+				this.rowData[newIndex] = { ...data };
+				this.rowData = JSON.parse(JSON.stringify(this.rowData));
+			}
+			if (data.sortType === "column") {
+				this.columnData[newIndex] = { ...data };
+				this.columnData = JSON.parse(JSON.stringify(this.columnData));
+			}
+		},
 		//修改第0个标记，联动其余标记；其余标记均修改后，自动修改第0标记
 		changeMarks(markIndex, type, data) {
 			const chartType = this.markData[markIndex].chartType;
@@ -905,11 +966,9 @@ export default {
 		//判断数据是否存在
 		markIndexOf(index, data) {
 			if (!data) return -1;
-			const { nodeId, innerText, columnName, calculatorFunction } = data;
-			return this.markData[index].data.findIndex(
-				(item) =>
-					item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName && item.calculatorFunction === calculatorFunction
-			);
+			const { nodeId, innerText, columnName } = data;
+			// && item.calculatorFunction === calculatorFunction
+			return this.markData[index].data.findIndex((item) => item.nodeId == nodeId && item.innerText == innerText && item.columnName == columnName);
 		},
 		//保证颜色、角度属性的唯一性
 		deleteColorAngle(type, markIndex, newIndex) {

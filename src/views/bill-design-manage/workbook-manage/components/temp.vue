@@ -448,7 +448,7 @@ export default {
 					const { innerText, markValue, axis, orderBy } = markItem;
 					//颜色
 					if (innerText === "color") {
-						markValue.forEach((data) => {
+						markValue?.forEach((data) => {
 							const { title, color } = data;
 							if (!markObj[item.stack].color[`${axis}${orderBy}`]) markObj[item.stack].color[`${axis}${orderBy}`] = {};
 							markObj[item.stack].color[`${axis}${orderBy}`][title] = color;
