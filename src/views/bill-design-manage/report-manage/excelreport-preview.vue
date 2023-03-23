@@ -127,6 +127,11 @@
 											>模板设定导出</DropdownItem
 										>
 										<DropdownItem :name="4"
+											><Tooltip max-width="180" content="导出当超过1百万数量时,自动分多个sheet输出【越南推荐】" placement="left-start" transfer>
+												<Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip
+											>分sheet导出</DropdownItem
+										>
+										<DropdownItem :name="5"
 											><Tooltip max-width="180" content="导出当前页面显示内容" placement="left-start" transfer>
 												<Icon type="ios-help-circle-outline" style="margin-right: 5px; font-size: 14px" /> </Tooltip
 											>表格导出</DropdownItem
@@ -470,6 +475,9 @@ export default {
 					this.exportReqFun(obj, type, fileName, exportInfo);
 					break;
 				case 4:
+					this.exportReqFun(obj, type, fileName, exportInfo);
+					break;
+				case 5:
 					fileName = `${this.$route.query.reportName}` + "-" + `${formatDate(new Date())}.xls`;
 					// 前端自己导出表格
 					$("#exceltable").table2excel({
