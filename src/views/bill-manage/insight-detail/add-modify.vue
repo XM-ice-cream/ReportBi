@@ -47,7 +47,6 @@
 			</FormItem>
 			<!-- 卡关 -->
 			<FormItem label="卡关" prop="opT1">
-				<!-- <Input v-model.trim="submitData.refdes_Gategory" :placeholder="$t('pleaseEnter') + '生产地'"  /> -->
 				<Select v-model="submitData.opT1" clearable>
 					<Option v-for="item in opt1List" :value="item" :key="item">{{ item }}</Option>
 				</Select>
@@ -109,6 +108,7 @@ export default {
 				mateType: "",
 				origin: "",
 				actionFlag: "",
+				refdes_Gategory: "",
 				site: "",
 				opT1: "",
 				enabled: 1,
@@ -123,7 +123,8 @@ export default {
 		submitClick(isClose = false) {
 			this.$refs.submitData.validate((validate) => {
 				if (validate) {
-					const { modelName, lineName, eeCode, partName, infoCode, mateType, origin, actionFlag, site, id, opT1, enabled } = this.submitData;
+					const { modelName, lineName, eeCode, partName, infoCode, mateType, origin, actionFlag, site, id, opT1, enabled, refdes_Gategory } =
+						this.submitData;
 					const obj = {
 						modelName,
 						lineName,
@@ -137,6 +138,7 @@ export default {
 						id,
 						opT1,
 						enabled,
+						refdes_Gategory,
 					};
 					const requestApi = this.isAdd ? addReq : modifyReq;
 					requestApi(obj).then((res) => {
