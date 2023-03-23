@@ -216,18 +216,6 @@ export default {
 										return { value: item1.yield, createtime: item1.datecode, station: item1.station, yielD_TARGET: item1.yielD_TARGET };
 									}),
 									symbolSize: 5,
-									markPoint: {
-										data: [
-											{
-												type: "max",
-												name: "最大值",
-											},
-											{
-												type: "min",
-												name: "最小值",
-											},
-										],
-									},
 									lineStyle: {
 										width: 2,
 									},
@@ -235,10 +223,20 @@ export default {
 								{
 									type: "line",
 									name: "YR Goal",
-									data: res.result.map((item1) => item1.yielD_GOAL),
-									symbolSize: 0,
-									lineStyle: {
-										width: 2,
+									markLine: {
+										data: [
+											{
+												name: "YR Goal",
+												yAxis: res.result && res.result[0]?.yielD_GOAL,
+											},
+										],
+										lineStyle: {
+											type: "solid",
+											width: 2,
+										},
+										label: {
+											fontSize: 14,
+										},
 									},
 								},
 								{
@@ -248,6 +246,17 @@ export default {
 									symbolSize: 0,
 									lineStyle: {
 										width: 2,
+									},
+									label: {
+										show: true,
+										color: "#e51f0e",
+										fontSize: 14,
+										formatter: function (params) {
+											const { dataIndex, data } = params;
+											if (dataIndex == 0) return data;
+											if (res.result[dataIndex - 1].yielD_TARGET !== data) return data;
+											else return "";
+										},
 									},
 								},
 							];
