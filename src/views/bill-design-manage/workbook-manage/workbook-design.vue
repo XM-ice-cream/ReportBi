@@ -59,7 +59,7 @@
 										dragClass="dragClass"
 										@end="(e) => dragEnd(e, 'tree')"
 									>
-										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex" @on-click.stop>
+										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
 											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
 											<template v-if="['2'].includes(subitem.columnType)">
 												<span style="color: #47a67f; margin-right: -5px; margin-top: -2px">=</span>
@@ -74,7 +74,7 @@
 											<!-- 任意类型 -->
 											<icon custom="iconfont icon-huatifuhao" v-else />
 
-											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'">
+											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop="test">
 												{{ subitem.columnName }}
 												<!-- 下拉框 -->
 												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem)">
@@ -91,18 +91,8 @@
 															<DropdownItem name="dimension" v-if="subitem.columnType != '2' && subitem.dataType == 'Number'"
 																>转换为维度</DropdownItem
 															>
-															<!-- 创建 -->
-															<Dropdown placement="right-start">
-																<DropdownItem>
-																	创建
-																	<Icon type="ios-arrow-forward" style="float: right"></Icon>
-																</DropdownItem>
-																<template #list>
-																	<DropdownMenu>
-																		<DropdownItem name="createField-create">计算字段</DropdownItem>
-																	</DropdownMenu>
-																</template>
-															</Dropdown>
+															<!-- 创建计算字段 -->
+															<DropdownItem name="createField-create">创建计算字段</DropdownItem>
 															<!-- 删除 -->
 															<DropdownItem name="deleteFields" v-if="subitem.columnType == '2'">删除</DropdownItem>
 														</DropdownMenu>
@@ -216,6 +206,7 @@
 												<!-- 字段显示 -->
 												<div :class="isNumberCell(item)">
 													<div class="textOverhidden" style="width: 80%" :title="calculatorObj(item.calculatorFunction, item.columnName)">
+														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />
 														{{ calculatorObj(item.calculatorFunction, item.columnName) }}
 													</div>
 
@@ -269,7 +260,9 @@
 							<span class="title">列</span>
 							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
 								<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									{{ calculatorObj(item.calculatorFunction, item.columnName) }}
+									<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
+										calculatorObj(item.calculatorFunction, item.columnName)
+									}}
 									<!-- 下拉框 -->
 									<Dropdown @on-click="(name) => dropDownClick(name, item, index, '', 'column')">
 										<Icon type="ios-arrow-down"></Icon>
@@ -308,7 +301,9 @@
 							<span class="title">行</span>
 							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
 								<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									{{ calculatorObj(item.calculatorFunction, item.columnName) }}
+									<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
+										calculatorObj(item.calculatorFunction, item.columnName)
+									}}
 									<!-- 下拉框 -->
 									<Dropdown @on-click="(name) => dropDownClick(name, item, index, '', 'row')">
 										<Icon type="ios-arrow-down"></Icon>
@@ -500,6 +495,9 @@ export default {
 	},
 	activated() {},
 	methods: {
+		test() {
+			console.log("测试");
+		},
 		//加载信息
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
@@ -1292,17 +1290,18 @@ export default {
 
 	.drag-cell {
 		width: calc(100% - 23px);
-		padding: 2px 20px;
+		padding: 2px 20px 2px 10px;
 		text-align: center;
 		background: #4996b2;
 		color: #fff;
 		border-radius: 10px;
 		margin: 4px;
 		display: inline-block;
+		position: relative;
 	}
 	.drag-number {
 		width: calc(100% - 23px);
-		padding: 2px 20px;
+		padding: 2px 20px 2px 10px;
 		text-align: center;
 		background: #00b180;
 		color: #fff;
@@ -1352,5 +1351,14 @@ export default {
 }
 :deep(.ivu-modal-header p, .ivu-modal-header-inner) {
 	color: #17233d;
+}
+.desc {
+	transform: rotateZ(90deg);
+}
+.asc {
+	transform: rotateZ(270deg);
+}
+.manual {
+	transform: rotateZ(360deg);
 }
 </style>

@@ -45,7 +45,7 @@
 		</div>
 
 		<div slot="footer" class="dialog-footer">
-			<Button @click="outerVisible = false">取 消</Button>
+			<Button @click="modelFlag = false">取 消</Button>
 			<Button @click="checkRules">校验语法</Button>
 			<Button type="primary" @click="submitClick">确定 </Button>
 		</div>

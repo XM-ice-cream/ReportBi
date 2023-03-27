@@ -127,8 +127,8 @@ export default {
 			const groupByNumber = yNumber.length ? yNumber : xNumber;
 
 			//整理数据
-			//1.排序
-			const valueResult = this.$XEUtils.orderBy(this.value, groupByString);
+			//1.排序[取消排序，排序为后台]
+			const valueResult = this.value;
 			// 2.分组
 			valueResult.forEach((item) => {
 				let stringData = "";

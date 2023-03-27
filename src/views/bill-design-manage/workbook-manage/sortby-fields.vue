@@ -11,7 +11,30 @@
 					</Select>
 				</FormItem>
 			</Form>
-			<Table :columns="columns" :data="submitData.sortValue" draggable @on-drag-drop="changeOrder" v-if="submitData.sortBy === 'manual'"> </Table>
+			<!-- <vxe-table
+				ref="xTable1"
+				size="mini"
+				resizable
+				:border="tableConfig.border"
+				align="center"
+				:loading="tableConfig.loading"
+				:data="submitData.sortValue"
+				:height="tableConfig.height"
+				v-if="submitData.sortBy === 'manual'"
+			>
+				<vxe-column type="seq" width="60"></vxe-column>
+				<vxe-column field="value" title="value" min-width="120" show-overflow></vxe-column>
+			</vxe-table> -->
+			<Table
+				:columns="columns"
+				:data="submitData.sortValue"
+				:height="tableConfig.height"
+				draggable
+				@on-drag-drop="changeOrder"
+				:loading="tableConfig.loading"
+				v-if="submitData.sortBy === 'manual'"
+			>
+			</Table>
 		</div>
 		<div slot="footer" class="dialog-footer">
 			<Button @click="cancelClick">取 消</Button>
@@ -55,6 +78,7 @@ export default {
 			submitData: {},
 			modelFlag: false,
 			modalTitle: "字段排序",
+			tableConfig: { ...this.$config.tableConfig }, // table配置
 			sortByList: [
 				{ name: "数据源顺序", value: "0" },
 				{ name: "升序", value: "asc" },
@@ -97,20 +121,23 @@ export default {
 				filterFields: this.filterData,
 				markField: { ...this.submitData },
 			};
-			getMarksReq(obj).then((res) => {
-				if (res.code == 200) {
-					const data = res.result;
-					this.submitData.sortValue =
-						data.map((item, index) => {
-							if (dataType === "DateTime") item = formatDate(item);
-							return { value: item };
-						}) || [];
-				} else {
-					this.$message.error(`查询失败,${res.message}`);
-					this.submitData.sortValue = [];
-				}
-				this.submitData = JSON.parse(JSON.stringify(this.submitData));
-			});
+			this.tableConfig.loading = true;
+			getMarksReq(obj)
+				.then((res) => {
+					if (res.code == 200) {
+						const data = res.result;
+						this.submitData.sortValue =
+							data.map((item, index) => {
+								if (dataType === "DateTime") item = formatDate(item);
+								return { value: item };
+							}) || [];
+					} else {
+						this.$message.error(`查询失败,${res.message}`);
+						this.submitData.sortValue = [];
+					}
+					this.submitData = JSON.parse(JSON.stringify(this.submitData));
+				})
+				.finally(() => (this.tableConfig.loading = false));
 		},
 		//排序
 		changeOrder(oldIndex, newIndex) {
