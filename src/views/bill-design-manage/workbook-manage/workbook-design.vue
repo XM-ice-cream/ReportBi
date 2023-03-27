@@ -1297,7 +1297,6 @@ export default {
 		border-radius: 10px;
 		margin: 4px;
 		display: inline-block;
-		position: relative;
 	}
 	.drag-number {
 		width: calc(100% - 23px);
