@@ -256,7 +256,7 @@
 					<!-- 行列拖拽 -->
 					<div class="row-column">
 						<!-- 行 -->
-						<div class="row">
+						<div class="row" :class="isDisabledCell()">
 							<span class="title">列</span>
 							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
 								<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
@@ -297,7 +297,7 @@
 							</draggable>
 						</div>
 						<!-- 列 -->
-						<div class="column">
+						<div class="column" :class="isDisabledCell()">
 							<span class="title">行</span>
 							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
 								<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
@@ -1081,6 +1081,10 @@ export default {
 			});
 			// this.updateDragData(); //修改拖拽的行列标记
 		},
+		//当饼图时，行、列不可拖拽样式
+		isDisabledCell() {
+			return this.markData[0].chartType == "componentPie" ? "disabled-cell" : "";
+		},
 		//计算属性对应中文
 		calculatorObj(name, columnName) {
 			const obj = {
@@ -1127,6 +1131,10 @@ export default {
 }
 </style>
 <style scoped lang="less">
+.disabled-cell {
+	background: #eaeaea70;
+	cursor: no-drop;
+}
 .workbook-container {
 	height: calc(100% - 20px);
 	.top-container {
