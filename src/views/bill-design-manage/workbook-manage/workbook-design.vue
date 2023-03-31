@@ -77,12 +77,12 @@
 											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop="test">
 												{{ subitem.columnName }}
 												<!-- 下拉框 -->
-												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem)">
+												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem, 0, 0, 'create-fileds')">
 													<Icon type="ios-arrow-down"></Icon>
 													<template #list>
 														<DropdownMenu>
 															<!-- 编辑 -->
-															<DropdownItem name="createField-edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
+															<DropdownItem name="edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
 															<!-- 维度转指标 传0【自定义字段不可转】 -->
 															<DropdownItem name="indicators" v-if="subitem.columnType != '2' && subitem.dataType !== 'Number'"
 																>转换为指标</DropdownItem
@@ -92,9 +92,9 @@
 																>转换为维度</DropdownItem
 															>
 															<!-- 创建计算字段 -->
-															<DropdownItem name="createField-create">创建计算字段</DropdownItem>
+															<DropdownItem name="create">创建计算字段</DropdownItem>
 															<!-- 删除 -->
-															<DropdownItem name="deleteFields" v-if="subitem.columnType == '2'">删除</DropdownItem>
+															<DropdownItem name="delete" v-if="subitem.columnType == '2'">删除</DropdownItem>
 														</DropdownMenu>
 													</template>
 												</Dropdown>
@@ -122,14 +122,14 @@
 							<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
 								<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction, item.columnName) }}</div>
 								<!-- 下拉框 -->
-								<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index)">
+								<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
 									<Icon type="ios-arrow-down"></Icon>
 									<template #list>
 										<DropdownMenu>
 											<!-- 编辑 -->
-											<DropdownItem name="filterField-edit">编辑筛选器</DropdownItem>
+											<DropdownItem name="edit">编辑筛选器</DropdownItem>
 											<!-- 删除 -->
-											<DropdownItem name="filterField-delete">删除筛选器</DropdownItem>
+											<DropdownItem name="delete">删除筛选器</DropdownItem>
 										</DropdownMenu>
 									</template>
 								</Dropdown>
@@ -209,39 +209,8 @@
 														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />
 														{{ calculatorObj(item.calculatorFunction, item.columnName) }}
 													</div>
-
-													<!-- 下拉框 -->
-													<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index, markIndex, 'mark')">
-														<Icon type="ios-arrow-down"></Icon>
-														<template #list>
-															<DropdownMenu>
-																<!-- 编辑 -->
-																<DropdownItem name="markField-edit">编辑</DropdownItem>
-																<DropdownItem name="">维度</DropdownItem>
-																<Dropdown placement="right-start">
-																	<DropdownItem>
-																		指标
-																		<Icon type="ios-arrow-forward"></Icon>
-																	</DropdownItem>
-																	<template #list>
-																		<DropdownMenu>
-																			<DropdownItem name="sum">总和</DropdownItem>
-																			<DropdownItem name="avg">平均值</DropdownItem>
-																			<DropdownItem name="count">计数</DropdownItem>
-																			<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
-																			<DropdownItem name="max">最大值</DropdownItem>
-																			<DropdownItem name="min">最小值</DropdownItem>
-																			<DropdownItem name="stdev">标准差</DropdownItem>
-																		</DropdownMenu>
-																	</template>
-																</Dropdown>
-																<!-- 排序 -->
-																<DropdownItem name="markField-sortby">排序</DropdownItem>
-																<!-- 删除 -->
-																<DropdownItem name="markField-delete">移除</DropdownItem>
-															</DropdownMenu>
-														</template>
-													</Dropdown>
+													<!-- 下拉选 -->
+													<DropdownFields type="mark" :data="item" :index="index" :markIndex="markIndex" @dropDownClick="dropDownClick" />
 												</div>
 											</div>
 										</draggable>
@@ -263,36 +232,8 @@
 									<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
 										calculatorObj(item.calculatorFunction, item.columnName)
 									}}
-									<!-- 下拉框 -->
-									<Dropdown @on-click="(name) => dropDownClick(name, item, index, '', 'column')">
-										<Icon type="ios-arrow-down"></Icon>
-										<template #list>
-											<DropdownItem name="">维度</DropdownItem>
-											<DropdownMenu>
-												<Dropdown placement="right-start">
-													<DropdownItem>
-														指标
-														<Icon type="ios-arrow-forward"></Icon>
-													</DropdownItem>
-													<template #list>
-														<DropdownMenu>
-															<DropdownItem name="sum">总和</DropdownItem>
-															<DropdownItem name="avg">平均值</DropdownItem>
-															<DropdownItem name="count">计数</DropdownItem>
-															<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
-															<DropdownItem name="max">最大值</DropdownItem>
-															<DropdownItem name="min">最小值</DropdownItem>
-															<DropdownItem name="stdev">标准差</DropdownItem>
-														</DropdownMenu>
-													</template>
-												</Dropdown>
-											</DropdownMenu>
-											<!-- 排序 -->
-											<DropdownItem name="column-sortby">排序</DropdownItem>
-											<!-- 删除 -->
-											<DropdownItem name="column-delete">移除</DropdownItem>
-										</template>
-									</Dropdown>
+									<!-- 下拉选 -->
+									<DropdownFields type="column" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
 								</span>
 							</draggable>
 						</div>
@@ -304,36 +245,8 @@
 									<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
 										calculatorObj(item.calculatorFunction, item.columnName)
 									}}
-									<!-- 下拉框 -->
-									<Dropdown @on-click="(name) => dropDownClick(name, item, index, '', 'row')">
-										<Icon type="ios-arrow-down"></Icon>
-										<template #list>
-											<DropdownItem name="">维度</DropdownItem>
-											<DropdownMenu>
-												<Dropdown placement="right-start">
-													<DropdownItem>
-														指标
-														<Icon type="ios-arrow-forward"></Icon>
-													</DropdownItem>
-													<template #list>
-														<DropdownMenu>
-															<DropdownItem name="sum">总和</DropdownItem>
-															<DropdownItem name="avg">平均值</DropdownItem>
-															<DropdownItem name="count">计数</DropdownItem>
-															<DropdownItem name="countDistinct">计数(不同)</DropdownItem>
-															<DropdownItem name="max">最大值</DropdownItem>
-															<DropdownItem name="min">最小值</DropdownItem>
-															<DropdownItem name="stdev">标准差</DropdownItem>
-														</DropdownMenu>
-													</template>
-												</Dropdown>
-											</DropdownMenu>
-											<!-- 排序 -->
-											<DropdownItem name="row-sortby">排序</DropdownItem>
-											<!-- 删除 -->
-											<DropdownItem name="row-delete">移除</DropdownItem>
-										</template>
-									</Dropdown>
+									<!-- 下拉选 -->
+									<DropdownFields type="row" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
 								</span>
 							</draggable>
 						</div>
@@ -392,10 +305,11 @@ import MarkFields from "./mark-fields.vue";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import SortbyFields from "./sortby-fields.vue";
+import DropdownFields from "./dropdown-fields.vue";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields },
+	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields, DropdownFields },
 	props: {
 		modelFlag: {
 			type: Boolean,
@@ -618,8 +532,7 @@ export default {
 					}
 					break;
 				case "mark":
-					if (!["markField-edit", "markField-delete", "markField-sortby"].includes(name))
-						this.markData[markIndex].data[index].calculatorFunction = name;
+					if (!["edit", "delete", "sortby"].includes(name)) this.markData[markIndex].data[index].calculatorFunction = name;
 
 					const data = this.markData[markIndex].data[index];
 					this.changeMarks(markIndex, "update", data);
@@ -646,31 +559,46 @@ export default {
 			};
 
 			switch (name) {
-				//行
-				case "row-delete":
-					this.rowData.splice(index, 1);
+				case "create":
+					if (type == "create-fileds") {
+						this.isAdd = true;
+						//新增 默认值为字段名
+						const { columnName, labelName } = this.selectObj;
+						this.selectObj.fieldFunction = `[${columnName}(${labelName})]`;
+						this.$refs.createField.modelFlag = true;
+					}
 					break;
-				//列
-				case "column-delete":
-					this.columnData.splice(index, 1);
+				case "delete":
+					if (type == "row") this.rowData.splice(index, 1);
+					if (type == "column") this.columnData.splice(index, 1);
+					if (type == "filter") this.filterData.splice(index, 1);
+					if (type == "create-fileds") this.deleteFields(row);
+					if (type == "mark") {
+						const data = this.markData[markIndex].data[index];
+						this.markData[markIndex].data.splice(index, 1);
+						this.changeMarks(markIndex, "delete", data);
+					}
 					break;
-				// 删除自定义字段
-				case "deleteFields":
-					this.deleteFields(row);
+				case "sortby":
+					if (type == "row") this.selectObj.sortType = "row";
+					if (type == "column") this.selectObj.sortType = "column";
+					if (type == "mark") {
+						this.selectObj.sortType = "mark";
+						this.$refs.sortbyField.modelFlag = true;
+					}
 					break;
-				// 创建自定义字段
-				case "createField-create":
-					this.isAdd = true;
-					//新增 默认值为字段名
-					const { columnName, labelName } = this.selectObj;
-					this.selectObj.fieldFunction = `[${columnName}(${labelName})]`;
-					this.$refs.createField.modelFlag = true;
+				case "edit":
+					if (type == "filter") this.$refs.filterField.modelFlag = true;
+					if (type == "create-fileds") {
+						this.isAdd = false;
+						this.$refs.createField.modelFlag = true;
+					}
+					if (type == "mark") {
+						this.isAdd = false;
+						this.$refs.markField.modelFlag = true;
+					}
 					break;
-				//编辑自定义字段
-				case "createField-edit":
-					this.isAdd = false;
-					this.$refs.createField.modelFlag = true;
-					break;
+
 				//转换为指标
 				case "indicators":
 					this.changeToProperty(this.selectObj, 0);
@@ -679,37 +607,7 @@ export default {
 				case "dimension":
 					this.changeToProperty(this.selectObj, 1);
 					break;
-				//编辑筛选器
-				case "filterField-edit":
-					this.$refs.filterField.modelFlag = true;
-					break;
-				//删除筛选器
-				case "filterField-delete":
-					this.filterData.splice(index, 1);
-					break;
-				//编辑标记字段
-				case "markField-edit":
-					this.isAdd = false;
-					this.$refs.markField.modelFlag = true;
-					break;
-				case "markField-delete":
-					const data = this.markData[markIndex].data[index];
-					this.markData[markIndex].data.splice(index, 1);
-					this.changeMarks(markIndex, "delete", data);
-					break;
-				//排序
-				case "markField-sortby":
-					this.selectObj.sortType = "mark";
-					this.$refs.sortbyField.modelFlag = true;
-					break;
-				case "row-sortby":
-					this.selectObj.sortType = "row";
-					this.$refs.sortbyField.modelFlag = true;
-					break;
-				case "column-sortby":
-					this.selectObj.sortType = "column";
-					this.$refs.sortbyField.modelFlag = true;
-					break;
+
 				// 函数执行
 				default:
 					console.log(type);
