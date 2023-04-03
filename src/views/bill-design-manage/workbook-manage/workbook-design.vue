@@ -993,6 +993,12 @@ export default {
 				max: "最大值",
 				min: "最小值",
 				stdev: "标准差",
+				YYYY: "年",
+				MM: "月",
+				DD: "日",
+				HH: "时",
+				Q: "季",
+				WK: "周",
 				undefined: "",
 				toChar: "",
 				"": "",
@@ -1002,15 +1008,20 @@ export default {
 		},
 		//cell 样式 数字/字符串
 		isNumberCell(item) {
-			return item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar") ? "drag-number" : "drag-cell";
+			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
+			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction))
+				? "drag-number"
+				: "drag-cell";
 		},
 		//数字类型
 		numberType(item) {
-			return item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar");
+			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
+			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction));
 		},
 		//字符串类型
 		stringType(item) {
-			return item.dataType !== "Number" || !item.calculatorFunction || item.calculatorFunction === "toChar";
+			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
+			return item.dataType !== "Number" || !item.calculatorFunction || stringFunction.includes(item.calculatorFunction);
 		},
 	},
 };

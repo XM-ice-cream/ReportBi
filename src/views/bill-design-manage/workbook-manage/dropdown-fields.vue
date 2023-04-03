@@ -24,6 +24,14 @@
 						</DropdownMenu>
 					</template>
 				</Dropdown>
+				<template v-if="data.dataType === 'DateTime'">
+					<DropdownItem name="YYYY">年</DropdownItem>
+					<DropdownItem name="MM">月</DropdownItem>
+					<DropdownItem name="DD">日</DropdownItem>
+					<DropdownItem name="HH">时</DropdownItem>
+					<DropdownItem name="Q">季</DropdownItem>
+					<DropdownItem name="WK">周</DropdownItem>
+				</template>
 				<!-- 排序 -->
 				<DropdownItem name="sortby">排序</DropdownItem>
 				<!-- 删除 -->

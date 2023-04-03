@@ -468,11 +468,13 @@ export default {
 		},
 		//数字类型
 		numberType(item) {
-			return item.dataType === "Number" || (item.calculatorFunction && item.calculatorFunction !== "toChar");
+			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
+			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction));
 		},
 		//字符串类型
 		stringType(item) {
-			return item.dataType !== "Number" || !item.calculatorFunction || item.calculatorFunction === "toChar";
+			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
+			return item.dataType !== "Number" || !item.calculatorFunction || stringFunction.includes(item.calculatorFunction);
 		},
 
 		//轴名 对应 字段名称
@@ -496,6 +498,12 @@ export default {
 				max: "最大值",
 				min: "最小值",
 				stdev: "标准差",
+				YYYY: "年",
+				MM: "月",
+				DD: "日",
+				HH: "时",
+				Q: "季",
+				WK: "周",
 				undefined: "",
 				toChar: "",
 				"": "",
