@@ -47,7 +47,7 @@ export default {
 	props: {
 		data: Object,
 		index: Number,
-		markIndex: Number,
+		markIndex: [Number, String],
 		type: String,
 	},
 	data() {

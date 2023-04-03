@@ -582,10 +582,8 @@ export default {
 				case "sortby":
 					if (type == "row") this.selectObj.sortType = "row";
 					if (type == "column") this.selectObj.sortType = "column";
-					if (type == "mark") {
-						this.selectObj.sortType = "mark";
-						this.$refs.sortbyField.modelFlag = true;
-					}
+					if (type == "mark") this.selectObj.sortType = "mark";
+					this.$refs.sortbyField.modelFlag = true;
 					break;
 				case "edit":
 					if (type == "filter") this.$refs.filterField.modelFlag = true;
