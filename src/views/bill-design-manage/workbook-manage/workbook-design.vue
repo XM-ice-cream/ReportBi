@@ -603,11 +603,10 @@ export default {
 
 				// 函数执行
 				default:
-					console.log(type);
-					if (type == "row") this.rowData[index].calculatorFunction = name;
-					if (type === "column") this.columnData[index].calculatorFunction = name;
+					if (type == "row") this.rowData[index] = { ...this.rowData[index], calculatorFunction: name, sortValue: [] };
+					if (type === "column") this.columnData[index] = { ...this.columnData[index], calculatorFunction: name, sortValue: [] };
 					if (type === "mark") {
-						this.markData[markIndex].data[index].calculatorFunction = name;
+						this.markData[markIndex].data[index] = { ...this.markData[markIndex].data[index], calculatorFunction: name, sortValue: [] };
 						const data = this.markData[markIndex].data[index];
 						this.changeMarks(markIndex, "update", data);
 					}

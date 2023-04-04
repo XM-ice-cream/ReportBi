@@ -69,6 +69,9 @@ export default {
 					} else {
 						this.submitData = { ...this.selectObj, sortBy: "0", sortValue: [] };
 					}
+					if (this.submitData.sortBy === "manual") {
+						this.changeSortBy();
+					}
 				});
 			}
 		},
@@ -107,8 +110,7 @@ export default {
 			this.cancelClick(); //关闭弹框
 		},
 		//排序
-		changeSortBy(data) {
-			console.log(data);
+		changeSortBy() {
 			if (this.submitData.sortBy === "manual" && (!this.submitData.sortValue || this.submitData?.sortValue?.length == 0)) {
 				this.getAllValue();
 			}
