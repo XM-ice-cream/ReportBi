@@ -25,6 +25,7 @@ export const getEchoReq = data => {
 export const getMarksReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
+    timeout: 10 * 60 * 1000, //最长等待10分钟
     url: '/api/autoreportcenter/anonymous/v1/bicalculator/getmarkvalue',
     method: 'post',
     data
