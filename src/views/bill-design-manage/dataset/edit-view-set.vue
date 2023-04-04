@@ -60,7 +60,7 @@
 							<Tabs v-model.trim="tabsActiveName" type="card" @on-click="handleClickTabs">
 								<TabPane label="查询参数" name="first">
 									<Button type="primary" v-if="tableData.length == 0" size="small" @click="addRow(-1)">添加 </Button>
-									<Table :data="tableData" border :columns="columns" :max-height="350" style="width: 100%">
+									<Table :data="tableData" border :columns="columns" :max-height="350" style="width: 100%" draggable @on-drag-drop="changeOrder">
 										<!-- 参数名 -->
 										<template slot-scope="{ index }" slot="paramName">
 											<Input v-model.trim="tableData[index].paramName" clearable />
@@ -97,16 +97,40 @@
 											>
 											</v-selectpage>
 											<!-- 时间 限制长度 -->
-											<InputNumber v-model.trim="tableData[index].paramAstrict" v-if="tableData[index].paramType == 'DateTime'" placeholder="请输入最长的时间差（天）" clearable />
+											<InputNumber
+												v-model.trim="tableData[index].paramAstrict"
+												v-if="tableData[index].paramType == 'DateTime'"
+												placeholder="请输入最长的时间差（天）"
+												clearable
+											/>
 											<!-- 数组 限制长度 -->
-											<InputNumber v-model.trim="tableData[index].paramAstrict" v-if="tableData[index].paramType == 'Array'" placeholder="请输入数组的最大长度" clearable />
+											<InputNumber
+												v-model.trim="tableData[index].paramAstrict"
+												v-if="tableData[index].paramType == 'Array'"
+												placeholder="请输入数组的最大长度"
+												clearable
+											/>
 										</template>
 										<!-- 示例值 -->
 										<template slot-scope="{ index }" slot="sampleItem">
 											<!-- 时间 -->
-											<DatePicker v-if="tableData[index].paramType == 'DateTime'" v-model.trim="tableData[index].sampleItem" transfer type="datetime" clearable format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions"></DatePicker>
+											<DatePicker
+												v-if="tableData[index].paramType == 'DateTime'"
+												v-model.trim="tableData[index].sampleItem"
+												transfer
+												type="datetime"
+												clearable
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+											></DatePicker>
 											<!-- 数组为文本框 -->
-											<Input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-else-if="tableData[index].paramType == 'Array'" v-model.trim="tableData[index].sampleItem" clearable></Input>
+											<Input
+												type="textarea"
+												:autosize="{ minRows: 2, maxRows: 5 }"
+												v-else-if="tableData[index].paramType == 'Array'"
+												v-model.trim="tableData[index].sampleItem"
+												clearable
+											></Input>
 											<!-- 数据类型为 下拉框 -->
 											<v-selectpage
 												class="select-page-style"
@@ -171,14 +195,22 @@
 	</div>
 </template>
 <script>
-import { getAllDatasourceReq, testTransformSet, insertDatacollectReq, modifyDatacollectReq, getDeatilByIdReq, setCodePageListUrl, getValueBySetcodePageListUrl } from "@/api/bill-design-manage/data-set.js";
+import {
+	getAllDatasourceReq,
+	testTransformSet,
+	insertDatacollectReq,
+	modifyDatacollectReq,
+	getDeatilByIdReq,
+	setCodePageListUrl,
+	getValueBySetcodePageListUrl,
+} from "@/api/bill-design-manage/data-set.js";
 import MonacoEditor from "@/components/monaco-editor/monaco-editor.vue";
 import vueJsonEditor from "vue-json-editor";
 import { validateEngOrNum } from "@/libs/validate";
 import { formatDate } from "@/libs/tools";
 export default {
 	name: "Support",
-	components: {  vueJsonEditor, MonacoEditor },
+	components: { vueJsonEditor, MonacoEditor },
 	props: {
 		visib: {
 			required: true,
@@ -320,6 +352,14 @@ export default {
 			this.tabsActiveName = "first";
 			this.testMassageCode = null;
 			!isAdd ? this.refeshEdit(row) : this.refeshAdd();
+		},
+		//排序
+		changeOrder(oldIndex, newIndex) {
+			oldIndex = parseInt(oldIndex);
+			newIndex = parseInt(newIndex);
+			let oldData = this.tableData[oldIndex];
+			this.tableData.splice(oldIndex, 1, this.tableData[newIndex]);
+			this.tableData.splice(newIndex, 1, oldData);
 		},
 		//编辑
 		refeshEdit(row) {
