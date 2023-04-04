@@ -74,7 +74,7 @@
 											<!-- 任意类型 -->
 											<icon custom="iconfont icon-huatifuhao" v-else />
 
-											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop="test">
+											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop>
 												{{ subitem.columnName }}
 												<!-- 下拉框 -->
 												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem, 0, 0, 'create-fileds')">
@@ -255,10 +255,10 @@
 					</div>
 					<!-- 工作区 -->
 					<div class="right-content">
-						<div class="title">{{ submitData.title }}</div>
 						<componentsTemp
 							v-if="modelFlag"
 							ref="tempRef"
+							:title="submitData.workBookName"
 							:type="markData[0]?.chartType || 'bar'"
 							:visib="true"
 							:value="chartsData"
@@ -281,6 +281,7 @@
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
+			<Button @click="previewClick" class="preview-btn">预览</Button>
 			<Button type="primary" @click="submitClick">{{ $t("submit") }}</Button>
 		</div>
 	</Modal>
@@ -301,8 +302,6 @@ import { getEchoReq } from "@/api/bill-design-manage/workbook-design";
 import CreateFields from "./create-fields.vue";
 import FilterFields from "./filter-fields.vue";
 import MarkFields from "./mark-fields.vue";
-
-import { getlistReq } from "@/api/system-manager/data-item";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import SortbyFields from "./sortby-fields.vue";
 import DropdownFields from "./dropdown-fields.vue";
@@ -334,7 +333,6 @@ export default {
 						this.pageLoad(); //查询信息
 					}
 					this.getDataSetList();
-					this.getDataItemData(); //数据字典 获取类型
 					this.getColumnList(); //获取左侧列
 				});
 			}
@@ -372,7 +370,6 @@ export default {
 				enabled: 1, //是否有效
 				columnName: "",
 				chartType: "bar",
-				title: "工作表",
 			},
 			columnList: [],
 			columnTypeList: [],
@@ -409,9 +406,6 @@ export default {
 	},
 	activated() {},
 	methods: {
-		test() {
-			console.log("测试");
-		},
 		//加载信息
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
@@ -488,6 +482,7 @@ export default {
 
 		//获取左侧数据集对应表及字段
 		getColumnList() {
+			console.log("getColumnList");
 			const { datasetId, columnName } = this.submitData;
 			const obj = { datasetId, enabled: 1, columnName };
 			getTabelColumnReq(obj).then((res) => {
@@ -887,17 +882,6 @@ export default {
 				}
 			});
 		},
-		// 获取数据字典数据
-		async getDataItemData() {
-			this.columnTypeList = await this.getDataItemDetailList("columnType");
-		},
-		async getDataItemDetailList(itemCode) {
-			let arr = [];
-			await getlistReq({ itemCode, enabled: 1 }).then((res) => {
-				if (res.code === 200) arr = res.result || [];
-			});
-			return arr;
-		},
 
 		//获取所有数据集
 		getDataSetList() {
@@ -932,6 +916,23 @@ export default {
 					});
 				}
 			});
+		},
+		//预览
+		previewClick() {
+			const { id } = this.submitData;
+			const href = this.skipUrl("workbookPreview", id);
+			window.open(href, "_blank");
+		},
+		skipUrl(key, id) {
+			const obj = {
+				workbookPreview: "/bill-design-manage/workbook-preview",
+				workbookDesign: "/bill-design-manage/workbook-design",
+			};
+			const { href } = this.$router.resolve({
+				path: obj[key],
+				query: { id },
+			});
+			return href;
 		},
 		//取消
 		cancelClick() {
@@ -1274,5 +1275,11 @@ export default {
 }
 .manual {
 	transform: rotateZ(360deg);
+}
+.preview-btn {
+	padding: 5px 16px;
+	color: #27ce88;
+	border: 1px solid #27ce88;
+	border-radius: 0;
 }
 </style>

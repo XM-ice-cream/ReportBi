@@ -99,12 +99,7 @@ export default {
 			], // 表格数据
 		};
 	},
-	activated() {
-		this.autoSize();
-		this.tableConfig.loading = false;
-		window.addEventListener("resize", () => this.autoSize);
-		getButtonBoolean(this, this.btnData);
-	},
+
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
 		this.searchPoptipModal = false;
@@ -192,7 +187,9 @@ export default {
 	mounted() {
 		this.searchClick();
 		this.autoSize();
-		window.addEventListener("resize", () => this.autoSize());
+		this.tableConfig.loading = false;
+		window.addEventListener("resize", () => this.autoSize);
+		getButtonBoolean(this, this.btnData);
 	},
 };
 </script>

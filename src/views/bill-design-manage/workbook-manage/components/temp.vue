@@ -1,5 +1,6 @@
 <template>
-	<div style="height: calc(100% - 50px); padding: 5px; margin: 5px">
+	<div class="workbook-temp">
+		<div class="title">{{ title }}</div>
 		<component
 			ref="componentRef"
 			:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
@@ -29,6 +30,7 @@ export default {
 		row: Array, //行
 		column: Array, //列
 		mark: Array, //标记
+		title: String,
 		value: {
 			type: Array,
 			default: () => {},
@@ -515,4 +517,15 @@ export default {
 };
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.workbook-temp {
+	height: calc(100% - 50px);
+	padding: 5px;
+	margin: 5px;
+	.title {
+		text-align: center;
+		font-size: 16px;
+		font-weight: bold;
+	}
+}
+</style>

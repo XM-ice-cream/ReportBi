@@ -48,6 +48,15 @@ const otherRouter = [{
       notCache: true
     },
     component: () => import( /* webpackChunkName: "paperless-preview" */ '@/views/bill-design-manage/paperless/paperless-preview.vue')
+  }, {
+    path: '/bill-design-manage/workbook-preview',
+    name: 'workbook-preview',
+    meta: {
+      title: '工作簿 - 预览',
+      hideInMenu: true,
+      notCache: true
+    },
+    component: () => import( /* webpackChunkName: "workbook-preview" */ '@/views/bill-design-manage/workbook-manage/workbook-preview.vue')
   },
   {
     path: '/',

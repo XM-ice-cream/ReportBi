@@ -48,7 +48,6 @@
 						<span>{{ dataSetIdName[row.datasetId] }}</span>
 					</template>
 					<template slot="operator" slot-scope="{ row }">
-						<Button class="tableBtn" type="text" @click="design(row)">设计</Button>&nbsp;
 						<Button class="tableBtn" type="text" @click="preview(row)">预览</Button>
 					</template>
 				</Table>
@@ -127,6 +126,7 @@ export default {
 					tooltip: true,
 				},
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
+				{ title: "操作", slot: "operator", align: "center", width: 80 },
 			], // 表格数据
 		};
 	},
@@ -242,8 +242,8 @@ export default {
 		// 预览
 		preview(data) {
 			this.selectObj = { ...data };
-			const { workBookName, workBookCode, datasetId } = data;
-			const href = this.skipUrl("workbookPreview", workBookCode, workBookName, datasetId);
+			const { id } = data;
+			const href = this.skipUrl("workbookPreview", id);
 			window.open(href, "_blank");
 		},
 
@@ -257,14 +257,14 @@ export default {
 			});
 			return arr;
 		},
-		skipUrl(key, workBookCode, workBookName, datasetId) {
+		skipUrl(key, id) {
 			const obj = {
 				workbookPreview: "/bill-design-manage/workbook-preview",
 				workbookDesign: "/bill-design-manage/workbook-design",
 			};
 			const { href } = this.$router.resolve({
 				path: obj[key],
-				query: { workBookCode, workBookName, datasetId },
+				query: { id },
 			});
 			return href;
 		},
