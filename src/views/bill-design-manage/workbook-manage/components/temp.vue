@@ -140,6 +140,7 @@ export default {
 				if (!obj[stringData]) obj[stringData] = [];
 				obj[stringData].push(item);
 			});
+			console.log("valueResult", valueResult, "obj", obj);
 			groupByString.forEach((rowItem, index) => {
 				Object.keys(obj).map((keyItem, keyIndex) => {
 					if (!axisConst[index]) axisConst[index] = [];
@@ -163,7 +164,7 @@ export default {
 			return { xAxis, yAxis, grid, series: series.flat(), groupByString, groupByNumber, dataZoom, legend };
 		},
 
-		//获取x,y轴属性设定
+		//获取x,y轴 grid属性设定
 		getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString) {
 			let gridWidth = 0;
 			let yAxis = [];
@@ -269,13 +270,14 @@ export default {
 			}
 			return { xAxis, yAxis, grid };
 		},
-		//获取series
+		//获取series /legend
 		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj) {
 			let series = [];
 			let legend = [];
 			groupByNumber.forEach((item, index) => {
 				//颜色、标签
 				const { color: markObjColor, mark: markArray, type } = markObj[item];
+
 				//legend 设定
 				if (JSON.stringify(markObjColor) !== "{}") {
 					Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
@@ -319,7 +321,7 @@ export default {
 						if (series[index][itemIndex]) {
 							series[index][itemIndex].data.push(data);
 						} else {
-							series[index].push({
+							let seriesObj = {
 								type,
 								stack: item,
 								xAxisIndex: yNumber.length ? groupByString.length : 0,
@@ -328,7 +330,8 @@ export default {
 								labelLayout: {
 									hideOverlap: true,
 								},
-							});
+							};
+							series[index].push(seriesObj);
 						}
 					});
 				});
@@ -352,7 +355,7 @@ export default {
 					//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
 					filterMode: "none",
 					showDataShadow: false,
-					bottom: 10,
+					bottom: 22,
 					height: 10,
 					//区域缩放组件边框颜色
 					borderColor: "transparent",
@@ -372,6 +375,7 @@ export default {
 						shadowColor: "#e1eaf3",
 					},
 					labelFormatter: "",
+					moveHandleSize: 12,
 					xAxisIndex: xAxisIndex,
 				},
 				{
@@ -387,6 +391,7 @@ export default {
 					//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
 					filterMode: "none",
 					showDataShadow: false,
+					right: 22,
 					width: 10,
 					//区域缩放组件边框颜色
 					borderColor: "transparent",
@@ -407,6 +412,7 @@ export default {
 					},
 					labelFormatter: "",
 					yAxisIndex: yAxisIndex,
+					moveHandleSize: 12,
 				},
 				{
 					//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中

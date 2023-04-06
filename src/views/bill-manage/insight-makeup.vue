@@ -116,7 +116,7 @@ export default {
 				startTime: "",
 				endTime: "",
 				unitId: "",
-				sation: "",
+				station: "",
 				trackTooling: "",
 				consumer: "",
 				generate: "",
@@ -165,7 +165,7 @@ export default {
 		// 获取分页列表数据
 		pageLoad() {
 			this.tableConfig.loading = false;
-			let { startTime, endTime, unitId, sation, trackTooling, consumer, generate } = this.req;
+			let { startTime, endTime, unitId, station, trackTooling, consumer, generate } = this.req;
 			this.tableConfig.loading = true;
 			let obj = {
 				orderField: "unitid", // 排序字段
@@ -175,7 +175,7 @@ export default {
 				data: {
 					startTime: formatDate(startTime),
 					endTime: formatDate(endTime),
-					sation,
+					station,
 					trackTooling,
 					consumer,
 					generate,
