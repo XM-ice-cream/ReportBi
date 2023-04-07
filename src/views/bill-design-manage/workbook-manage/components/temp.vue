@@ -161,7 +161,7 @@ export default {
 			//dataZoom
 			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber);
 
-			return { xAxis, yAxis, grid, series: series.flat(), groupByString, groupByNumber, dataZoom, legend };
+			return { xAxis, yAxis, grid, series: series.flat(), groupByString, groupByNumber, dataZoom, legend, resultKeys: Object.keys(obj) };
 		},
 
 		//获取x,y轴 grid属性设定

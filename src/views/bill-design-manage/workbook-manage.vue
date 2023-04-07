@@ -30,7 +30,13 @@
 							</Poptip>
 						</i-col>
 						<i-col span="18">
-							<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
+							<button-custom
+								:btnData="btnData"
+								@on-add-click="addClick"
+								@on-edit-click="editClick"
+								@on-delete-click="deleteClick"
+								@on-copy-click="copyClick"
+							></button-custom>
 						</i-col>
 					</Row>
 				</div>
@@ -187,6 +193,13 @@ export default {
 				this.isAdd = false;
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
+		//复制
+		copyClick() {
+			if (this.selectObj) {
+				this.modelFlag = true;
+				this.isAdd = "copy";
+			} else this.$Msg.warning(this.$t("oneData"));
+		},
 
 		//删除
 		deleteClick() {
@@ -206,6 +219,7 @@ export default {
 				});
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
+
 		//获取所有数据集
 		getDataSetList() {
 			this.dataSetIdName = {};

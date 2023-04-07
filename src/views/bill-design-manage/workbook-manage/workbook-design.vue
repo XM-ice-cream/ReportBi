@@ -281,8 +281,8 @@
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
-			<Button @click="previewClick" class="preview-btn">预览</Button>
-			<Button type="primary" @click="submitClick">{{ $t("submit") }}</Button>
+			<Button @click="submitClick(true)" class="preview-btn">提交并预览</Button>
+			<Button type="primary" @click="submitClick(false)">{{ $t("submit") }}</Button>
 		</div>
 	</Modal>
 </template>
@@ -327,9 +327,14 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.$nextTick(() => {
-					//编辑
-					if (!this.workbookIsAdd) {
+					//编辑 或 复制
+					if (this.workbookIsAdd !== true) {
 						this.submitData = { ...this.submitData, ...this.workbookSelectObj };
+						//对 工作簿名称、编码 重命名
+						if (this.workbookIsAdd === "copy") {
+							this.submitData.workBookCode = `${this.submitData.workBookCode}_copy`;
+							this.submitData.workBookName = `${this.submitData.workBookName}_copy`;
+						}
 						this.pageLoad(); //查询信息
 					}
 					this.getDataSetList();
@@ -509,35 +514,6 @@ export default {
 			});
 		},
 
-		//行列下拉框
-		rowColumnDropDownClick(name, index, type, item, markIndex) {
-			switch (type) {
-				case "row":
-					if (name == "row-delete") {
-						this.rowData.splice(index, 1);
-					} else {
-						this.rowData[index].calculatorFunction = name;
-					}
-					break;
-				case "column":
-					if (name == "column-delete") {
-						this.columnData.splice(index, 1);
-					} else {
-						this.columnData[index].calculatorFunction = name;
-					}
-					break;
-				case "mark":
-					if (!["edit", "delete", "sortby"].includes(name)) this.markData[markIndex].data[index].calculatorFunction = name;
-
-					const data = this.markData[markIndex].data[index];
-					this.changeMarks(markIndex, "update", data);
-
-					this.markData = JSON.parse(JSON.stringify(this.markData));
-					this.dropDownClick(name, item, index, markIndex); //标记下拉框属性
-					break;
-			}
-			this.updateDragData(); //更新row,column数据
-		},
 		//标记 下拉
 		dropDownClick(name, row, index, markIndex, type) {
 			console.log("dropDownClick");
@@ -896,7 +872,7 @@ export default {
 			});
 		},
 		//提交
-		submitClick() {
+		submitClick(flag = false) {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
 					let obj = {
@@ -905,18 +881,20 @@ export default {
 						filterItems: this.filterData, //过滤器
 						calcItems: this.rowData.concat(this.columnData), //行、列
 					};
-					let request = this.workbookIsAdd ? addReq(obj) : modifyReq(obj);
+					let request = [true, "copy"].includes(this.workbookIsAdd) ? addReq(obj) : modifyReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
 							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.$parent.pageLoad(); //刷新表格
+							console.log(flag);
+							if (flag) this.previewClick(); //跳转至预览界面
 							this.cancelClick(); //关闭弹框
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
 					});
 				}
 			});
 		},
-		//预览
+		//预览界面跳转
 		previewClick() {
 			const { id } = this.submitData;
 			const href = this.skipUrl("workbookPreview", id);

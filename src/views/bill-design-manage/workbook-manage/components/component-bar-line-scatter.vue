@@ -20,23 +20,32 @@ export default {
 			const _this = this;
 			let seriesResult = [];
 
-			const { xAxis, yAxis, grid, series, groupByString, dataZoom, legend } = this.chartData;
+			const { xAxis, yAxis, grid, series, groupByString, dataZoom, legend, resultKeys } = this.chartData;
 
 			//series 根据颜色类别 分类
+			let temp = {};
 			series.forEach((item) => {
-				let temp = {};
-				item.data.forEach((data) => {
-					const { name } = data;
-					if (!temp[name]) temp[name] = [];
-					temp[name].push(data);
-				});
-				Object.keys(temp).forEach((tempKey) => {
-					console.log(temp[tempKey]);
-					const { color } = temp[tempKey][0]?.itemStyle;
-					seriesResult.push({ ...item, data: temp[tempKey], name: tempKey, lineStyle: { color } });
-				});
+				const { stack } = item;
+				//name存在 说明有分类
+				if (item.data[0].name) {
+					item.data.forEach((data) => {
+						const { name, value } = data;
+						const { color } = data.itemStyle;
+						//获取维度 所处索引 为了保持数据顺序一致
+						const index = resultKeys.findIndex((item) => item === value[1]);
+						let stackName = `${stack}${name}`;
+						if (!temp[stackName]) temp[stackName] = { ...item, data: [], lineStyle: { color }, name };
+						temp[stackName].data.splice(index, 0, data); //指定位置填充数据
+					});
+				} else {
+					seriesResult.push({ ...item });
+				}
 			});
-			console.log("seriesResult", seriesResult, series);
+			//添加分类了的数据
+			Object.keys(temp).forEach((tempKey) => {
+				seriesResult.push({ ...temp[tempKey] });
+			});
+			// console.log("seriesResult", seriesResult, series, "legend", legend, "groupByString", groupByString);
 
 			let option = {
 				// color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
