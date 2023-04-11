@@ -2004,6 +2004,7 @@ export default {
   'maverick-report-sbl': 'Maverick-SBL',
   'trace-picture': 'TracePicture',
   'insight-makeup': 'Insight状态',
+  'virtual-sn': "虚拟SN",
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',
