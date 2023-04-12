@@ -38,7 +38,7 @@
 							</FormItem>
 							<!-- 架构 -->
 							<FormItem label="架构" prop="user">
-								<Select v-model.trim="submitData.user" size="small" placeholder="请选择用户" @on-change="getTableList" clearable>
+								<Select v-model.trim="submitData.user" filterable size="small" placeholder="请选择用户" @on-change="getTableList" clearable>
 									<Option v-for="item in userList" :key="item" :label="item" :value="item" />
 								</Select>
 							</FormItem>
@@ -72,6 +72,7 @@
 			</div>
 		</Modal>
 		<DataSetConfigConnecttable ref="datasetconfigconnecttable" :modalFlag.sync="connectModalFlag" :connectObj="connectObj" @updateEdge="updateEdge" />
+		<TableFilter ref="tablefilter" :modalFlag.sync="filterModalFlag" :selectObj="filterObj" @updateFilter="updateFilter" />
 	</div>
 </template>
 <script>
@@ -80,10 +81,11 @@ import { addReq, modifyReq, getTableListReq, getUsersReq } from "@/api/bill-desi
 
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
 import G6 from "@antv/g6";
+import TableFilter from "./table-filter.vue";
 
 export default {
 	name: "DataSetConfigAddEdit",
-	components: { DataSetConfigConnecttable },
+	components: { DataSetConfigConnecttable, TableFilter },
 	props: {
 		modalFlag: {
 			required: true,
@@ -110,7 +112,9 @@ export default {
 		return {
 			modalTitle: "数据集配置",
 			connectModalFlag: false,
+			filterModalFlag: false,
 			connectObj: {}, //关联表
+			filterObj: {}, //过滤表
 			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "", user: "" },
 			filterList: [], //过滤后的值
 			userList: [], //数据源对应所有用户
@@ -441,8 +445,8 @@ export default {
 		updateEdge(val) {
 			val.style.lineDash = [];
 			val.style.stroke = "#cacaca";
-			const isEdgeId = this.data.edges.map((item) => item.id).includes(val.id);
-			if (isEdgeId) {
+			const isNodesId = this.data.edges.map((item) => item.id).includes(val.id);
+			if (isNodesId) {
 				this.data.edges.forEach((item, index) => {
 					if (item.id === val.id) {
 						this.data.edges[index] = JSON.parse(JSON.stringify({ ...val }));
@@ -453,6 +457,12 @@ export default {
 			}
 			this.graph.changeData(this.data);
 		},
+		//更新节点
+		updateFilter(val) {
+			const index = this.data.nodes.findIndex((item) => item.id === val.id);
+			this.data.nodes[index].condition = [...val.condition];
+			this.graph.changeData(this.data);
+		},
 		// 右键--节点的删除
 		getContextMenu() {
 			const menu = new G6.Menu({
@@ -461,15 +471,23 @@ export default {
 					outDiv.style.minWidth = "100px";
 					outDiv.style.zIndex = 999;
 					let htmlVal = ``;
-					htmlVal += `<p data-name='delete' style="padding: 3px 0;cursor: pointer;"
-              onmouseenter="this.style.backgroundColor = '#ccc'"
-              onmouseleave="this.style.backgroundColor = '#fff'">删除</p>`;
+					// 对于表的筛选
+					htmlVal += `<p data-name='filter' style="padding: 3px 10px;cursor: pointer;"
+              onmouseenter="this.style.backgroundColor = '#27ce88';this.style.color = '#fff';"
+              onmouseleave="this.style.backgroundColor = '#fff';this.style.color = '#515a6e'">筛选</p>`;
+
+					// 删除
+					htmlVal += `<p data-name='delete' style="padding: 3px 10px;cursor: pointer;"
+              onmouseenter="this.style.backgroundColor = '#e95050';this.style.color = '#fff';"
+              onmouseleave="this.style.backgroundColor = '#fff';this.style.color = '#515a6e'">删除</p>`;
+
 					outDiv.innerHTML = htmlVal;
 					return outDiv;
 				},
 				handleMenuClick: (target, item) => {
 					const name = target.getAttribute("data-name");
 					if (name === "delete") this.delNodes(item.getModel().id);
+					if (name === "filter") this.filterNodes(item.getModel());
 				},
 				offsetX: 16 + 10,
 				offsetY: 0,
@@ -497,6 +515,13 @@ export default {
 					this.graph.changeData(this.data);
 				},
 			});
+		},
+		//节点 过滤器筛选
+		filterNodes(model) {
+			const { id, condition, label } = model;
+			let obj = { id, condition, label };
+			this.filterModalFlag = true;
+			this.filterObj = { ...obj };
 		},
 
 		//获取数据源下拉框
