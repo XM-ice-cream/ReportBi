@@ -182,7 +182,7 @@ export default {
 			};
 			exportReq(obj).then((res) => {
 				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
-				const fileName = `${this.$t("virtaul-sn")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+				const fileName = `${this.$t("virtual-sn")}${formatDate(new Date())}.xlsx`; // 自定义文件名
 				exportFile(blob, fileName);
 			});
 		},

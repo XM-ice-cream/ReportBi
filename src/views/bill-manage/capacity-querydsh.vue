@@ -13,12 +13,28 @@
 									<Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
-											<DatePicker style="width: 50%" transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
+											<DatePicker
+												style="width: 50%"
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('startTime')"
+												format="yyyy-MM-dd"
+												:options="$config.datetimeOptions"
+												v-model="req.startTime"
+											></DatePicker>
 											<TimePicker transfer type="time" confirm placeholder="Select time" style="width: 50%" v-model="req.startTime1"></TimePicker>
 										</FormItem>
 										<!-- 结束时间 -->
 										<FormItem :label="$t('endTime')" prop="endTime">
-											<DatePicker transfer style="width: 50%" type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
+											<DatePicker
+												transfer
+												style="width: 50%"
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('endTime')"
+												format="yyyy-MM-dd"
+												:options="$config.datetimeOptions"
+												v-model="req.endTime"
+											></DatePicker>
 											<TimePicker transfer type="time" confirm placeholder="Select time" style="width: 50%" v-model="req.endTime1"></TimePicker>
 										</FormItem>
 										<!-- 工单 -->
@@ -64,12 +80,41 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+				></Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 
 				<Modal draggable v-model="modalFlag" width="1500" title="工单明细" :styles="{ top: '20px' }">
-					<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loadingModal" :columns="columnsModal" :data="dataModal"></Table>
-					<page-custom :total="modalReq.total" :totalPage="modalReq.totalPage" :pageIndex="modalReq.pageIndex" :page-size="modalReq.pageSize" @on-change="pageChangeModal" @on-page-size-change="pageSizeChangeModal" />
+					<Table
+						:border="tableConfig.border"
+						:highlight-row="tableConfig.highlightRow"
+						:height="tableConfig.height"
+						:loading="tableConfig.loadingModal"
+						:columns="columnsModal"
+						:data="dataModal"
+					></Table>
+					<page-custom
+						:total="modalReq.total"
+						:totalPage="modalReq.totalPage"
+						:pageIndex="modalReq.pageIndex"
+						:page-size="modalReq.pageSize"
+						@on-change="pageChangeModal"
+						@on-page-size-change="pageSizeChangeModal"
+					/>
 				</Modal>
 			</Card>
 		</div>
@@ -346,7 +391,7 @@ export default {
 					tooltip: true,
 				},
 				{
-					title: "维修前良率",
+					title: "复判前良率",
 					key: "firstyielD_RATE",
 					width: 80,
 					align: "center",
@@ -354,7 +399,7 @@ export default {
 					tooltip: true,
 				},
 				{
-					title: "维修后良率",
+					title: "最终良率",
 					key: "yield_Rate",
 					width: 80,
 					align: "center",
