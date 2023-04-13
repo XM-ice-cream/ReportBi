@@ -33,47 +33,9 @@
 										@keyup.native.enter="searchClick"
 										:rules="ruleValidate"
 									>
-										<!-- 起始时间 -->
-										<FormItem :label="$t('startTime')" prop="startTime">
-											<DatePicker
-												transfer
-												type="datetime"
-												:placeholder="$t('pleaseSelect') + $t('startTime')"
-												format="yyyy-MM-dd HH:mm:ss"
-												:options="$config.datetimeOptions"
-												v-model="req.startTime"
-											></DatePicker>
-										</FormItem>
-										<!-- 结束时间 -->
-										<FormItem :label="$t('endTime')" prop="endTime">
-											<DatePicker
-												transfer
-												type="datetime"
-												:placeholder="$t('pleaseSelect') + $t('endTime')"
-												format="yyyy-MM-dd HH:mm:ss"
-												:options="$config.datetimeOptions"
-												v-model="req.endTime"
-											></DatePicker>
-										</FormItem>
 										<!-- 工单 -->
-										<FormItem label="工单">
+										<FormItem label="工单" prop="workorder">
 											<Input v-model.trim="req.workorder" :placeholder="$t('pleaseEnter') + '工单'" clearable></Input>
-										</FormItem>
-										<!-- 机种 -->
-										<FormItem label="机种">
-											<Input v-model.trim="req.modelName" :placeholder="$t('pleaseEnter') + '机种'" clearable></Input>
-										</FormItem>
-										<!-- 线体 -->
-										<FormItem label="线体">
-											<Input v-model.trim="req.lineName" :placeholder="$t('pleaseEnter') + '线体'" clearable></Input>
-										</FormItem>
-										<!-- 制程 -->
-										<FormItem label="制程">
-											<Input v-model.trim="req.processName" :placeholder="$t('pleaseEnter') + '制程'" clearable></Input>
-										</FormItem>
-										<!-- SN -->
-										<FormItem label="UnitId">
-											<Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + 'UnitId'" clearable></Input>
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -127,12 +89,6 @@ export default {
 			btnData: [],
 			req: {
 				workorder: "",
-				startTime: "",
-				endTime: "",
-				modelName: "",
-				lineName: "",
-				processName: "",
-				unitId: "",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -157,20 +113,11 @@ export default {
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
-				startTime: [
+				workorder: [
 					{
 						required: true,
-						message: `${this.$t("pleaseEnter")}${this.$t("startTime")}`,
+						message: `${this.$t("pleaseEnter")}工单`,
 						trigger: "change",
-						type: "date",
-					},
-				],
-				endTime: [
-					{
-						required: true,
-						message: `${this.$t("pleaseEnter")}${this.$t("endTime")}`,
-						trigger: "change",
-						type: "date",
 					},
 				],
 			},
@@ -200,7 +147,7 @@ export default {
 		pageLoad() {
 			this.data = [];
 			this.tableConfig.loading = false;
-			let { workorder, startTime, endTime, modelName, lineName, processName, unitId } = this.req;
+			let { workorder } = this.req;
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
 					this.tableConfig.loading = true;
@@ -210,13 +157,7 @@ export default {
 						pageSize: this.req.pageSize, // 分页大小
 						pageIndex: this.req.pageIndex, // 当前页码
 						data: {
-							startTime: formatDate(startTime),
-							endTime: formatDate(endTime),
 							workorder,
-							modelName,
-							lineName,
-							processName,
-							unitId,
 						},
 					};
 					getpagelistReq(obj)
@@ -235,15 +176,9 @@ export default {
 		},
 		// 导出
 		exportClick() {
-			let { workorder, startTime, endTime, modelName, lineName, processName, unitId } = this.req;
+			let { workorder } = this.req;
 			let obj = {
-				startTime: formatDate(startTime),
-				endTime: formatDate(endTime),
 				workorder,
-				modelName,
-				lineName,
-				processName,
-				unitId,
 			};
 			exportReq(obj).then((res) => {
 				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
@@ -267,6 +202,9 @@ export default {
 					if (res.code === 200) {
 						this.$Message.success("提交成功");
 						this.cancelClick(); //关闭弹框
+					} else {
+						this.$Message.error(res.message);
+						this.modalFlag = true;
 					}
 				});
 			} else {

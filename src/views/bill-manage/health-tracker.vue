@@ -181,6 +181,7 @@ export default {
 				},
 				{ title: "Report Time", key: "reportdate", align: "center", minWidth: 130, tooltip: true, render: renderDate, inputType: "datetime" },
 				{ title: "Status", key: "status", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
+				{ title: "RouteName", key: "opT2", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 				{ title: "Remark", key: "remark", align: "center", minWidth: 120, tooltip: true, inputType: "input" },
 			], // 表格数据
 			rulesValidate: {

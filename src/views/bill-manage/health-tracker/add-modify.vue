@@ -137,6 +137,7 @@ export default {
 				this.$Message.error("Issue Description 内容长度超出120,请核验");
 				return;
 			}
+
 			let request = addReq(this.submitData);
 			request.then((res) => {
 				if (res.code === 200) {
