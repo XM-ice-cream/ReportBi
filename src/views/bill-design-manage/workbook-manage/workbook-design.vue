@@ -32,6 +32,10 @@
 								<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
 							</Select>
 						</FormItem>
+						<!-- 最大数据量 -->
+						<FormItem label="最大数据量" prop="maxNumber">
+							<Input v-model.trim="submitData.maxNumber" :placeholder="$t('pleaseEnter') + '最大数据量【推荐2000笔】'" cleabler />
+						</FormItem>
 						<!-- 是否有效 -->
 						<FormItem :label="$t('enabled')" prop="enabled">
 							<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
@@ -375,6 +379,7 @@ export default {
 				enabled: 1, //是否有效
 				columnName: "",
 				chartType: "bar",
+				maxNumber: 2000,
 			},
 			columnList: [],
 			columnTypeList: [],
@@ -432,7 +437,7 @@ export default {
 		//查询
 		searchClick() {
 			//数据集
-			const { datasetId } = this.submitData;
+			const { datasetId, maxNumber } = this.submitData;
 			const angelData = this.markData[0].data.filter((item) => item.innerText == "angle");
 
 			if (!this.filterData.length) {
@@ -462,6 +467,7 @@ export default {
 			});
 			this.$Spin.show();
 			const obj = {
+				maxNumber,
 				datasetId,
 				filterItems: this.filterData,
 				calcItems: this.rowData.concat(this.columnData),
@@ -471,7 +477,8 @@ export default {
 			};
 			getChartsInfoReq(obj)
 				.then((res) => {
-					if (res.code == 200) {
+					if (res.code == 200 || res.result.length > 0) {
+						if (res.code == -1) this.$Msg.warning(`${res.message}`);
 						this.chartsData = res?.result || [];
 						this.$nextTick(() => {
 							this.$refs.tempRef.pageLoad();

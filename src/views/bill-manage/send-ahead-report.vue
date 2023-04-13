@@ -365,7 +365,7 @@ export default {
 					};
 					lclinkwoReq(obj).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.pageLoad();
 							if (isClose) this.cancelClick();
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")},${errorType(this, res)}`);
@@ -379,11 +379,11 @@ export default {
 			});
 			groupReq(data).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success("提交成功");
+					this.$Msg.success("提交成功");
 					this.pageLoad();
 					this.groupModalFlag = false;
 				} else {
-					this.$Message.error(`提交失败, ${res.message}`);
+					this.$Msg.error(`提交失败, ${res.message}`);
 				}
 			});
 		},
@@ -411,11 +411,11 @@ export default {
 			});
 			holdReq(data).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success("提交成功");
+					this.$Msg.success("提交成功");
 					this.pageLoad();
 					this.modalFlag = false;
 				} else {
-					this.$Message.error(`提交失败, ${res.message}`);
+					this.$Msg.error(`提交失败, ${res.message}`);
 				}
 			});
 		},

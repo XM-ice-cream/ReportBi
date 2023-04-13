@@ -355,10 +355,10 @@ export default {
 			this.reportExcelDto.id = this.reportId || null;
 			const { code, message } = await requestReq(this.reportExcelDto);
 			if (code != 200) {
-				this.$Message.error(message);
+				this.$Msg.error(message);
 				return;
 			}
-			this.$Message.success("保存成功");
+			this.$Msg.success("保存成功");
 		},
 		//设定传参
 		setReportExcelDto() {
@@ -533,7 +533,7 @@ export default {
 					for (let i = 0; i < this.dataSet.length; i++) {
 						if (this.dataSet[i].setCode === val.setCode) {
 							this.dataSet.splice(i, 1);
-							this.$Message.success("删除成功");
+							this.$Msg.success("删除成功");
 							break;
 						}
 					}

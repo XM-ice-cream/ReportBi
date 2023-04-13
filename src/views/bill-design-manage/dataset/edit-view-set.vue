@@ -432,7 +432,7 @@ export default {
 						});
 						const { code, message } = await testTransformSet(params);
 						if (code != 200) {
-							this.$Message.error(message);
+							this.$Msg.error(message);
 							return;
 						}
 						this.cols = JSON.parse(message);
@@ -464,12 +464,12 @@ export default {
 			//   const { code, message, data } = await verificationSet(this.isRowData);
 			//   if (code == "200") {
 			//     if (data) {
-			//       this.$message.success("返回结果：" + data);
+			//       this.$Msg.success("返回结果：" + data);
 			//     } else {
-			//       this.$message.warning("当前示例值校验不通过");
+			//       this.$Msg.warning("当前示例值校验不通过");
 			//     }
 			//   } else {
-			//     this.$message.error(message);
+			//     this.$Msg.error(message);
 			//   }
 		},
 		// 删除
@@ -515,17 +515,17 @@ export default {
 						const requestApi = this.isAdd ? insertDatacollectReq : modifyDatacollectReq;
 						const { code, message } = await requestApi(this.formData);
 						if (code != 200) {
-							this.$Message.error(message);
+							this.$Msg.error(message);
 							return;
 						}
-						this.$Message.success("提交成功！");
+						this.$Msg.success("提交成功！");
 						if (isSkip) {
 							this.$router.push({ name: "design-report-manage", query: { setCode: this.formData.setCode } });
 						}
 						this.$emit("refreshList");
 						this.closeDialog();
 					} else {
-						this.$Message.error("请先测试预览，操作成功后便可保存！");
+						this.$Msg.error("请先测试预览，操作成功后便可保存！");
 						return;
 					}
 				}

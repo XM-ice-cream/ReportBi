@@ -62,9 +62,9 @@ export default {
 					};
 					modifyReq(obj).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success("解Hold成功！");
+							this.$Msg.success("解Hold成功！");
 						} else {
-							this.$Message.error(`解Hold失败！,${res.message}`);
+							this.$Msg.error(`解Hold失败！,${res.message}`);
 						}
 					});
 				}

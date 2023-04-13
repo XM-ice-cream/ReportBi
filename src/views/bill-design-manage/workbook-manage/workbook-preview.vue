@@ -119,7 +119,7 @@ export default {
 		searchClick() {
 			const { flag, filterItems } = this.searchCondition(); //查询条件处理
 			if (!flag) {
-				this.$Message.error("操作失败，至少要有一个查询条件！");
+				this.$Msg.error("操作失败，至少要有一个查询条件！");
 				return;
 			}
 			//数据集
@@ -138,7 +138,7 @@ export default {
 							this.$refs.tempRef.pageLoad();
 						});
 					} else {
-						this.$Message.error(`查询失败，${res.message}`);
+						this.$Msg.error(`查询失败，${res.message}`);
 					}
 				})
 				.finally(() => {

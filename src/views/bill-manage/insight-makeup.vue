@@ -201,11 +201,11 @@ export default {
 				onOk: () => {
 					updateStatusReq({ id: row.id }).then((res) => {
 						if (res.code == 200) {
-							this.$Message.success("更新状态成功！");
+							this.$Msg.success("更新状态成功！");
 							this.pageLoad(); //刷新当前页面
 							return;
 						} else {
-							this.$Message.error(`${res.message}`);
+							this.$Msg.error(`${res.message}`);
 						}
 					});
 				},
@@ -224,7 +224,7 @@ export default {
 			formData.append("file", file);
 			uploadReq(formData).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success(this.$t("uploadSuccess"));
+					this.$Msg.success(this.$t("uploadSuccess"));
 					this.pageLoad();
 					this.$refs.ImportFormData.drawerFlag = false;
 				} else {

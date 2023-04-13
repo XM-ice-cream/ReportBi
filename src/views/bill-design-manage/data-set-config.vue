@@ -43,6 +43,7 @@
 					:data="data"
 					@on-current-change="currentClick"
 					@on-selection-change="selectClick"
+					@on-row-dblclick="editClick"
 				>
 				</Table>
 				<page-custom
@@ -185,7 +186,7 @@ export default {
 						const obj = { ...this.selectObj };
 						deleteReq(obj).then((res) => {
 							if (res.code === 200) {
-								this.$Message.success("删除成功");
+								this.$Msg.success("删除成功");
 								this.pageLoad();
 							}
 						});

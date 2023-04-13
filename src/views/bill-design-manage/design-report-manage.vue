@@ -115,7 +115,15 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick" @on-selection-change="selectClick">
+				<Table
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+					@on-selection-change="selectClick"
+				>
 					<template slot-scope="{ row }" slot="reportType">
 						<Tag v-if="row.reportType === 'excel'" color="blue">Excel报表</Tag>
 						<Tag v-else-if="row.reportType === 'largescreen'" color="green">大屏报表</Tag>
@@ -125,7 +133,15 @@
 						<Button class="tableBtn" type="text" @click="preview(row)">预览</Button>
 					</template>
 				</Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 		<!-- Excel 的设计与预览 -->
@@ -139,13 +155,13 @@
 </template>
 
 <script>
-import { getpagelistReq, insertReportReq, deleteReportReq, modifyReportReq } from "@/api/bill-design-manage/report-manage.js"
-import { getButtonBoolean, renderIsEnabled } from "@/libs/tools"
-import excelreportDesign from "./report-manage/excelreport-design.vue"
-import ExcelreportPreview from "./report-manage/excelreport-preview.vue"
-import ScreenreportDesign from "./report-manage/screenreport-design.vue"
-import ScreenreportPreview from "./report-manage/screenreport-preview.vue"
-import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item"
+import { getpagelistReq, insertReportReq, deleteReportReq, modifyReportReq } from "@/api/bill-design-manage/report-manage.js";
+import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
+import excelreportDesign from "./report-manage/excelreport-design.vue";
+import ExcelreportPreview from "./report-manage/excelreport-preview.vue";
+import ScreenreportDesign from "./report-manage/screenreport-design.vue";
+import ScreenreportPreview from "./report-manage/screenreport-preview.vue";
+import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item";
 
 export default {
 	components: { excelreportDesign, ExcelreportPreview, ScreenreportDesign, ScreenreportPreview },
@@ -198,7 +214,7 @@ export default {
 					width: 50,
 					align: "center",
 					indexMethod: (row) => {
-						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1
+						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
 				{ title: this.$t("reportName"), key: "reportName", align: "center", tooltip: true },
@@ -236,35 +252,35 @@ export default {
 			previewVisib: false,
 			screenVisib: false,
 			previewScreenVisib: false,
-		}
+		};
 	},
 	activated() {
 		if (this.$route.query.setCode) {
-			this.req.setCode = this.$route.query.setCode
+			this.req.setCode = this.$route.query.setCode;
 		}
-		this.pageLoad()
-		this.getDataItemData()
-		this.autoSize()
-		window.addEventListener("resize", () => this.autoSize())
-		getButtonBoolean(this, this.btnData)
+		this.pageLoad();
+		this.getDataItemData();
+		this.autoSize();
+		window.addEventListener("resize", () => this.autoSize());
+		getButtonBoolean(this, this.btnData);
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
-		this.searchPoptipModal = false
-		next()
+		this.searchPoptipModal = false;
+		next();
 	},
 	methods: {
 		// 点击搜索按钮触发
 		searchClick() {
-			this.req.pageIndex = 1
-			this.req.setCode = ""
-			this.pageLoad()
+			this.req.pageIndex = 1;
+			this.req.setCode = "";
+			this.pageLoad();
 		},
 		// 获取分页列表数据
 		pageLoad() {
-			this.data = []
-			this.tableConfig.loading = true
-			const { reportType, reportName, reportAuthor, reportCode, setCode, remark } = this.req
+			this.data = [];
+			this.tableConfig.loading = true;
+			const { reportType, reportName, reportAuthor, reportCode, setCode, remark } = this.req;
 			let obj = {
 				orderField: "reportType", // 排序字段
 				ascending: true, // 是否升序
@@ -278,116 +294,116 @@ export default {
 					setCode,
 					remark,
 				},
-			}
+			};
 			getpagelistReq(obj)
 				.then((res) => {
-					this.tableConfig.loading = false
+					this.tableConfig.loading = false;
 					if (res.code === 200) {
-						let { data, pageSize, pageIndex, total, totalPage } = res.result
-						this.data = data || []
-						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds }
+						let { data, pageSize, pageIndex, total, totalPage } = res.result;
+						this.data = data || [];
+						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 					}
 				})
-				.catch(() => (this.tableConfig.loading = false))
-			this.searchPoptipModal = false
+				.catch(() => (this.tableConfig.loading = false));
+			this.searchPoptipModal = false;
 		},
 		// 点击新增按钮触发
 		addClick() {
-			this.drawerFlag = true
-			this.isAdd = true
-			this.drawerTitle = this.$t("add")
+			this.drawerFlag = true;
+			this.isAdd = true;
+			this.drawerTitle = this.$t("add");
 		},
 		// 点击编辑按钮触发
 		editClick() {
 			if (this.selectObj) {
-				let { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled, remark } = this.selectObj
-				this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled, remark }
-				this.drawerFlag = true
-				this.isAdd = false
-				this.drawerTitle = this.$t("edit")
-			} else this.$Msg.warning(this.$t("oneData"))
+				let { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled, remark } = this.selectObj;
+				this.submitData = { reportType, sourceConnect, reportCode, reportName, reportAuthor, reportDesc, enabled, remark };
+				this.drawerFlag = true;
+				this.isAdd = false;
+				this.drawerTitle = this.$t("edit");
+			} else this.$Msg.warning(this.$t("oneData"));
 		},
 		//提交
 		submitClick() {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
-					let obj = { ...this.submitData }
-					let request = this.isAdd ? insertReportReq(obj) : modifyReportReq(obj)
+					let obj = { ...this.submitData };
+					let request = this.isAdd ? insertReportReq(obj) : modifyReportReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`)
-							this.pageLoad() //刷新表格
-							this.cancelClick()
-						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + "报表编码不可重复!")
-					})
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.pageLoad(); //刷新表格
+							this.cancelClick();
+						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + "报表编码不可重复!");
+					});
 				}
-			})
+			});
 		},
 		cancelClick() {
-			this.drawerFlag = false
-			this.$refs.submitReq.resetFields() //清除表单红色提示
+			this.drawerFlag = false;
+			this.$refs.submitReq.resetFields(); //清除表单红色提示
 		},
 		//删除
 		deleteClick() {
-			const deleteData = this.selectArr.length > 0 ? this.selectArr : this.selectObj ? [{ ...this.selectObj }] : []
+			const deleteData = this.selectArr.length > 0 ? this.selectArr : this.selectObj ? [{ ...this.selectObj }] : [];
 			if (deleteData.length == 0) {
-				this.$Message.error("无选中删除数据")
-				return
+				this.$Msg.error("无选中删除数据");
+				return;
 			}
 			this.$Modal.confirm({
 				title: "确认要删除该数据吗?",
 				onOk: () => {
-					const deleteArr = deleteData.map((o) => o.reportCode)
+					const deleteArr = deleteData.map((o) => o.reportCode);
 					deleteReportReq(deleteArr).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success("删除成功")
-							this.pageLoad()
+							this.$Msg.success("删除成功");
+							this.pageLoad();
 						}
-					})
+					});
 				},
 				//   onCancel: () => this.clearGraphData(),
-			})
+			});
 		},
 
 		// 某一行高亮时触发
 		currentClick(currentRow) {
-			this.selectObj = currentRow
+			this.selectObj = currentRow;
 		},
 		//删除选择的数据
 		selectClick(selection) {
-			this.selectArr = selection
+			this.selectArr = selection;
 		},
 		// 点击重置按钮触发
 		resetClick() {
-			this.$refs.searchReq.resetFields()
+			this.$refs.searchReq.resetFields();
 		},
 		//设计
 		design(data) {
-			this.selectObj = { ...data }
-			const { reportCode, reportName } = data
-			const href = this.skipUrl(data.reportType + "Design", reportCode, reportName)
-			window.open(href, "_blank")
+			this.selectObj = { ...data };
+			const { reportCode, reportName } = data;
+			const href = this.skipUrl(data.reportType + "Design", reportCode, reportName);
+			window.open(href, "_blank");
 		},
 		// 预览
 		preview(data) {
-			this.selectObj = { ...data }
-			const { reportCode, reportName } = data
-			const href = this.skipUrl(data.reportType + "Preview", reportCode, reportName)
-			window.open(href, "_blank")
+			this.selectObj = { ...data };
+			const { reportCode, reportName } = data;
+			const href = this.skipUrl(data.reportType + "Preview", reportCode, reportName);
+			window.open(href, "_blank");
 		},
 		// 获取业务数据
 		async getDataItemData() {
-			this.remarkList = await this.getDataItemDetailList("reportDesignType") // 获取站点数据
+			this.remarkList = await this.getDataItemDetailList("reportDesignType"); // 获取站点数据
 		},
 		// 获取数据字典数据
 		async getDataItemDetailList(itemCode) {
-			let arr = []
+			let arr = [];
 			await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
 				if (res.code === 200) {
-					arr = res.result || []
+					arr = res.result || [];
 				}
-			})
-			return arr
+			});
+			return arr;
 		},
 		skipUrl(key, reportCode, reportName) {
 			const obj = {
@@ -395,30 +411,30 @@ export default {
 				largescreenPreview: "/bill-design-manage/screenreport-preview",
 				excelDesign: "/bill-design-manage/excelreport-design",
 				largescreenDesign: "/bill-design-manage/screenreport-design",
-			}
+			};
 			const { href } = this.$router.resolve({
 				path: obj[key],
 				query: { reportCode, reportName },
-			})
-			return href
+			});
+			return href;
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 120 - 60
+			this.tableConfig.height = document.body.clientHeight - 120 - 60;
 		},
 		// 选择第几页
 		pageChange(index) {
-			this.req.pageIndex = index
-			this.pageLoad()
+			this.req.pageIndex = index;
+			this.pageLoad();
 		},
 		// 选择一页有条数据
 		pageSizeChange(index) {
-			this.req.pageIndex = 1
-			this.req.pageSize = index
-			this.pageLoad()
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
 		},
 	},
-}
+};
 </script>
 
 <style scoped lang="less">

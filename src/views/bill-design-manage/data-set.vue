@@ -241,7 +241,7 @@ export default {
 			//   request.then((res) => {
 			//     if (res.code === 200) {
 			//       this.selectObj = null;
-			//       this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+			//       this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 			//       this.getLeftMenu();
 			//       if (isClose) {
 			//         this.treeCancel();
@@ -265,7 +265,7 @@ export default {
 		deleteClick() {
 			const deleteData = this.selectArr.length > 0 ? this.selectArr : this.selectObj ? [{ ...this.selectObj }] : [];
 			if (deleteData.length == 0) {
-				this.$Message.error("无选中删除数据");
+				this.$Msg.error("无选中删除数据");
 				return;
 			}
 			this.$Modal.confirm({
@@ -274,7 +274,7 @@ export default {
 					const deleteArr = deleteData.map((o) => o.setCode);
 					deleteDatacollectReq({ setCode: deleteArr }).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success("删除成功");
+							this.$Msg.success("删除成功");
 							this.pageLoad();
 						}
 					});

@@ -167,7 +167,7 @@ export default {
 			if (isRight) {
 				this.selectArr = selection;
 			} else {
-				this.$Message.error("选择状态必须一致,并且状态不可为Closed,请核对~");
+				this.$Msg.error("选择状态必须一致,并且状态不可为Closed,请核对~");
 			}
 		},
 		exportClick() {

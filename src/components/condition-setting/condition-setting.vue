@@ -207,7 +207,7 @@ export default {
 			// 是否存在值
 			const isExit = await this.getValue(this.data, curContent);
 			if (isExit) {
-				this.$Message.error("数据已存在！！");
+				this.$Msg.error("数据已存在！！");
 				return;
 			}
 
@@ -390,7 +390,7 @@ export default {
 			data.some((item, index) => {
 				if (item.nodeKey === nodeKey) {
 					if (item.disableCheckbox) {
-						this.$Message.error("请去除括号后，再删除！");
+						this.$Msg.error("请去除括号后，再删除！");
 					} else {
 						data.splice(index, 1);
 					}

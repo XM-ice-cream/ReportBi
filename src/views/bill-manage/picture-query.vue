@@ -197,7 +197,7 @@ export default {
 				let imgUrl = this.req.AOIRreviewFile + "/download?filefullname=" + fileFullName;
 				window.open(imgUrl, "_blank");
 			} else {
-				this.$Message.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
+				this.$Msg.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
 			}
 		},
 		downloadImage(fileFullName, id) {
@@ -218,7 +218,7 @@ export default {
 						Spin.hide();
 					});
 			} else {
-				this.$Message.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
+				this.$Msg.warning(this.$t("pleaseSelect") + this.$t("previewServer") + "图片预览地址");
 			}
 		},
 		// 获取数据字典数据

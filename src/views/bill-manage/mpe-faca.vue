@@ -30,18 +30,47 @@
 									{{ $t("selectQuery") }}
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" :rules="ruleValidate" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form
+										ref="searchReq"
+										:model="req"
+										:label-width="80"
+										:label-colon="true"
+										:rules="ruleValidate"
+										@submit.native.prevent
+										@keyup.native.enter="searchClick"
+									>
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('startTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.startTime"
+											></DatePicker>
 										</FormItem>
 										<!-- 结束时间 -->
 										<FormItem :label="$t('endTime')" prop="endTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('endTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.endTime"
+											></DatePicker>
 										</FormItem>
 										<!-- 创建时间 -->
 										<FormItem :label="$t('createTime')" prop="createdate">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('createTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.createdate"></DatePicker>
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('createTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.createdate"
+											></DatePicker>
 										</FormItem>
 										<!-- UnitId -->
 										<FormItem label="UnitId" prop="unitId">
@@ -64,8 +93,25 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data" @on-current-change="currentClick"> </Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+					@on-current-change="currentClick"
+				>
+				</Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 	</div>
@@ -199,7 +245,7 @@ export default {
 					modifyReq(obj).then((res) => {
 						if (res.code === 200) {
 							this.selectObj = null;
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.pageLoad();
 							if (isClose) this.cancelClick();
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")},${errorType(this, res)}`);

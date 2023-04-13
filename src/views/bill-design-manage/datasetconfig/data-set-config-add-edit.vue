@@ -173,7 +173,7 @@ export default {
 						this.submitData.user = "";
 						this.filterData(); //过滤值
 					} else {
-						this.$Message.error(`获取用户失败, ${res.message}`);
+						this.$Msg.error(`获取用户失败, ${res.message}`);
 					}
 				});
 			}
@@ -192,7 +192,7 @@ export default {
 						this.submitData.filterTable = ""; //清空搜索栏数据
 						this.filterData(); //过滤值
 					} else {
-						this.$Message.error(`获取表失败, ${res.message}`);
+						this.$Msg.error(`获取表失败, ${res.message}`);
 					}
 				});
 			}
@@ -204,7 +204,7 @@ export default {
 			await this.getLevel(); //节点层级
 			const depth0 = this.data.nodes.filter((item) => item.depth === 0);
 			if (depth0.length > 1) {
-				this.$Message.error("根节点有且只有一个，请确认！");
+				this.$Msg.error("根节点有且只有一个，请确认！");
 				return;
 			}
 			const { id, datasetName, datasetCode, enabled, user } = this.submitData;
@@ -217,7 +217,7 @@ export default {
 				return { id, type, relations, source, target, startPoint, style, incidenceRelation };
 			});
 			if (connectEdge) {
-				this.$Message.error("请关联每个数据集之间的关系，谢谢！");
+				this.$Msg.error("请关联每个数据集之间的关系，谢谢！");
 				return;
 			}
 			const obj = {
@@ -235,11 +235,11 @@ export default {
 					const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 					requestApi.then((res) => {
 						if (res.code === 200) {
-							this.$Message.success("提交成功！");
+							this.$Msg.success("提交成功！");
 							this.$parent.pageLoad(); //刷新数据
 							this.closeDialog(); //关闭弹框
 						} else {
-							this.$Message.error(`提交异常, ${res.message}`);
+							this.$Msg.error(`提交异常, ${res.message}`);
 						}
 					});
 				}
@@ -316,7 +316,7 @@ export default {
 										return item.target === id;
 									});
 									if (targetEdges.length >= 1) {
-										this.$Message.error("禁止多对一连接！");
+										this.$Msg.error("禁止多对一连接！");
 										return false;
 									}
 								}

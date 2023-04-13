@@ -204,11 +204,11 @@ export default {
 			};
 			addReq(obj).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success("提交成功");
+					this.$Msg.success("提交成功");
 					this.searchClick();
 					this.cancelClick();
 				} else {
-					this.$Message.error(`提交失败,${res.msg}`);
+					this.$Msg.error(`提交失败,${res.msg}`);
 					this.modalFlag = true;
 				}
 				this.resultList = res?.result || [];

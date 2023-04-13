@@ -179,9 +179,9 @@ export default {
 							this.loading[flag] = false;
 							if (res.code === 200) {
 								this.reqList.push({ ...this.req, type: flag });
-								this.$Message.success("提交成功！");
+								this.$Msg.success("提交成功！");
 							} else {
-								this.$Message.error(res.message);
+								this.$Msg.error(res.message);
 							}
 						})
 						.catch(() => {

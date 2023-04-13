@@ -177,7 +177,7 @@ export default {
 				onOk: () => {
 					deleteReq({ id: this.selectObj.id }).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success("删除成功");
+							this.$Msg.success("删除成功");
 							this.pageLoad();
 						}
 					});
@@ -193,7 +193,7 @@ export default {
 			let { panel, unitId, workOrder } = this.req;
 			if (panel || unitId || workOrder) {
 				if (limitStrLength(panel) || limitStrLength(unitId) || limitStrLength(workOrder)) {
-					this.$Message.error("查询条件超出最大长度2000!");
+					this.$Msg.error("查询条件超出最大长度2000!");
 					return;
 				}
 				const obj = {
@@ -208,7 +208,7 @@ export default {
 					exportFile(blob, fileName);
 				});
 			} else {
-				this.$Message.warning(this.$t("pleaseEnter") + this.$t("selectQuery"));
+				this.$Msg.warning(this.$t("pleaseEnter") + this.$t("selectQuery"));
 			}
 		},
 		// 点击重置按钮触发

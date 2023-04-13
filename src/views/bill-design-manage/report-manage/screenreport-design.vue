@@ -445,7 +445,7 @@ export default {
 		// 保存数据
 		async save(flag) {
 			if (!this.widgets || this.widgets.length == 0) {
-				this.$Message.error("请添加组件");
+				this.$Msg.error("请添加组件");
 				return;
 			}
 			const screenData = {
@@ -461,7 +461,7 @@ export default {
 			};
 			const { code, data } = await addScreenReq(screenData);
 			if (code == 200) {
-				this.$Message.success("保存成功！");
+				this.$Msg.success("保存成功！");
 			}
 		},
 		// 预览--跳转至新窗口

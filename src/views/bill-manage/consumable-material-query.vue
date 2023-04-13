@@ -19,7 +19,11 @@
 										</FormItem>
 										<!-- 小板序号 -->
 										<FormItem :label="$t('smallBoardCode')">
-											<Input type="text" v-model="req.unitId" :placeholder="$t('pleaseEnter') + $t('smallBoardCode') + $t('multiple,separated')"></Input>
+											<Input
+												type="text"
+												v-model="req.unitId"
+												:placeholder="$t('pleaseEnter') + $t('smallBoardCode') + $t('multiple,separated')"
+											></Input>
 										</FormItem>
 										<!-- 站点 -->
 										<FormItem :label="$t('stepName')">
@@ -41,7 +45,7 @@
 														return {
 															totalRow: res.total,
 															list: res.data || [],
-														}
+														};
 													}
 												"
 											>
@@ -72,17 +76,32 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data"></Table>
-				<page-custom :elapsedMilliseconds="req.elapsedMilliseconds" :total="req.total" :totalPage="req.totalPage" :pageIndex="req.pageIndex" :page-size="req.pageSize" @on-change="pageChange" @on-page-size-change="pageSizeChange" />
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+				></Table>
+				<page-custom
+					:elapsedMilliseconds="req.elapsedMilliseconds"
+					:total="req.total"
+					:totalPage="req.totalPage"
+					:pageIndex="req.pageIndex"
+					:page-size="req.pageSize"
+					@on-change="pageChange"
+					@on-page-size-change="pageSizeChange"
+				/>
 			</Card>
 		</div>
 	</div>
 </template>
 
 <script>
-import { getpagelistReq, exportReq } from "@/api/bill-manage/consumable-material-query"
-import { workerPageListUrl } from "@/api/material-manager/order-info"
-import { getButtonBoolean, commaSplitString, formatDate, exportFile, limitStrLength, renderDate } from "@/libs/tools"
+import { getpagelistReq, exportReq } from "@/api/bill-manage/consumable-material-query";
+import { workerPageListUrl } from "@/api/material-manager/order-info";
+import { getButtonBoolean, commaSplitString, formatDate, exportFile, limitStrLength, renderDate } from "@/libs/tools";
 
 export default {
 	name: "consumable-material-query",
@@ -115,7 +134,7 @@ export default {
 					width: 50,
 					align: "center",
 					indexMethod: (row) => {
-						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1
+						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
 				{ title: this.$t("panel"), key: "panel", width: 120, align: "center" },
@@ -133,36 +152,36 @@ export default {
 				{ title: "RID", key: "rid", width: 100, align: "center" },
 				{ title: "UnitID", key: "unitid", width: 100, align: "center" },
 			],
-		}
+		};
 	},
 	mounted() {
-		this.tableConfig.loading = false
-		this.pageLoad()
+		this.tableConfig.loading = false;
+		this.pageLoad();
 	},
 	activated() {
-		this.autoSize()
-		window.addEventListener("resize", () => this.autoSize())
-		getButtonBoolean(this, this.btnData)
+		this.autoSize();
+		window.addEventListener("resize", () => this.autoSize());
+		getButtonBoolean(this, this.btnData);
 	},
 	deactivated() {
-		this.searchPoptipModal = false
+		this.searchPoptipModal = false;
 	},
 	methods: {
 		// 获取分页列表数据
 		pageLoad() {
-			let { pageSize, pageIndex, panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req
-			if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error("请输入查询条件")
+			let { pageSize, pageIndex, panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req;
+			if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error("请输入查询条件");
 			if (limitStrLength(panel) || limitStrLength(unitId) || limitStrLength(lotCode) || limitStrLength(tfencode)) {
-				this.$Message.error("查询条件超出最大长度2000!")
-				this.searchPoptipModal = true
-				return
+				this.$Msg.error("查询条件超出最大长度2000!");
+				this.searchPoptipModal = true;
+				return;
 			}
 			if (limitStrLength(rid, 3)) {
-				this.$Message.error("RID查询条件超出最大长度3!")
-				this.searchPoptipModal = true
-				return
+				this.$Msg.error("RID查询条件超出最大长度3!");
+				this.searchPoptipModal = true;
+				return;
 			}
-			this.tableConfig.loading = true
+			this.tableConfig.loading = true;
 			const obj = {
 				orderField: "panel", // 排序字段
 				ascending: true, // 是否升序
@@ -177,48 +196,48 @@ export default {
 					lotCode,
 					tfencode,
 				},
-			}
+			};
 
 			getpagelistReq(obj)
 				.then((res) => {
-					this.tableConfig.loading = false
+					this.tableConfig.loading = false;
 					if (res.code === 200) {
-						let data = res.result
-						this.data = data.data ? data.data : []
-						this.req.pageSize = data.pageSize
-						this.req.pageIndex = data.pageIndex
-						this.req.total = data.total
-						this.req.totalPage = data.totalPage
+						let data = res.result;
+						this.data = data.data ? data.data : [];
+						this.req.pageSize = data.pageSize;
+						this.req.pageIndex = data.pageIndex;
+						this.req.total = data.total;
+						this.req.totalPage = data.totalPage;
 					}
 				})
-				.catch(() => (this.tableConfig.loading = false))
-			this.searchPoptipModal = false
+				.catch(() => (this.tableConfig.loading = false));
+			this.searchPoptipModal = false;
 		},
 		searchClick() {
-			this.req.pageIndex = 1
-			this.pageLoad()
-			this.searchPoptipModal = false
+			this.req.pageIndex = 1;
+			this.pageLoad();
+			this.searchPoptipModal = false;
 		},
 		// 点击重置按钮触发
 		resetClick() {
-			this.req.panel = ""
-			this.req.unitId = ""
-			this.$refs.workOrder.remove()
-			this.req.rid = ""
-			this.req.lotCode = ""
-			this.req.tfencode = ""
+			this.req.panel = "";
+			this.req.unitId = "";
+			this.$refs.workOrder.remove();
+			this.req.rid = "";
+			this.req.lotCode = "";
+			this.req.tfencode = "";
 		},
 		// 导出
 		exportClick() {
-			let { panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req
-			if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error("请输入查询条件")
+			let { panel, unitId, stepName, workOrder, rid, lotCode, tfencode } = this.req;
+			if (!panel && !unitId && !stepName && !workOrder && !rid && !lotCode && !tfencode) return this.$Msg.error("请输入查询条件");
 			if (limitStrLength(panel) || limitStrLength(unitId) || limitStrLength(lotCode) || limitStrLength(tfencode)) {
-				this.$Message.error("查询条件超出最大长度2000!")
-				return
+				this.$Msg.error("查询条件超出最大长度2000!");
+				return;
 			}
 			if (limitStrLength(rid, 3)) {
-				this.$Message.error("RID查询条件超出最大长度3!")
-				return
+				this.$Msg.error("RID查询条件超出最大长度3!");
+				return;
 			}
 			const obj = {
 				panel: commaSplitString(panel).join(),
@@ -228,28 +247,28 @@ export default {
 				rid,
 				lotCode,
 				tfencode,
-			}
+			};
 			exportReq(obj).then((res) => {
-				let blob = new Blob([res], { type: "application/vnd.ms-excel" })
-				const fileName = `${this.$t("consumable-material-query")}${formatDate(new Date())}.xlsx` // 自定义文件名
-				exportFile(blob, fileName)
-			})
+				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+				const fileName = `${this.$t("consumable-material-query")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+				exportFile(blob, fileName);
+			});
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 180
+			this.tableConfig.height = document.body.clientHeight - 180;
 		},
 		// 选择第几页
 		pageChange(index) {
-			this.req.pageIndex = index
-			this.pageLoad()
+			this.req.pageIndex = index;
+			this.pageLoad();
 		},
 		// 选择一页有条数据
 		pageSizeChange(index) {
-			this.req.pageIndex = 1
-			this.req.pageSize = index
-			this.pageLoad()
+			this.req.pageIndex = 1;
+			this.req.pageSize = index;
+			this.pageLoad();
 		},
 	},
-}
+};
 </script>

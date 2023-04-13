@@ -132,7 +132,7 @@ export default {
 			};
 			modifyReq(obj).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+					this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 					this.$emit("refreshPageLoad");
 					if (isClose) this.cancelClick();
 				} else {

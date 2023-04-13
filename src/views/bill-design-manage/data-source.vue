@@ -319,7 +319,7 @@ export default {
 		submitClick(isSkip = false) {
 			//测试连接失败
 			if (!this.isConnectSuccess) {
-				this.$Message.error("未测试或测试连接失败,请确认！");
+				this.$Msg.error("未测试或测试连接失败,请确认！");
 				return;
 			}
 			this.$refs.submitReq.validate((validate) => {
@@ -328,7 +328,7 @@ export default {
 					let request = this.isAdd ? insertDataSourceReq(obj) : modifyDataSourceReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							//跳转至数据集
 							if (isSkip) {
 								this.$router.push({ name: "dataset", query: { sourceCode: this.submitData.sourceCode } });
@@ -348,7 +348,7 @@ export default {
 		deleteClick() {
 			const deleteData = this.selectArr.length > 0 ? this.selectArr : this.selectObj ? [{ ...this.selectObj }] : [];
 			if (deleteData.length == 0) {
-				this.$Message.error("无选中删除数据");
+				this.$Msg.error("无选中删除数据");
 				return;
 			}
 			this.$Modal.confirm({
@@ -357,7 +357,7 @@ export default {
 					const deleteArr = deleteData.map((o) => o.sourceCode);
 					deleteDataSourceReq({ sourceCode: deleteArr }).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success("删除成功");
+							this.$Msg.success("删除成功");
 							this.pageLoad();
 						}
 					});
@@ -371,11 +371,11 @@ export default {
 			const obj = { ...this.submitData };
 			testConnection(obj).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success("连接成功");
+					this.$Msg.success("连接成功");
 					this.isConnectSuccess = true;
 					return;
 				}
-				this.$Message.error("数据源连接失败");
+				this.$Msg.error("数据源连接失败");
 				this.isConnectSuccess = false;
 			});
 		},

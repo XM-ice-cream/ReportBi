@@ -306,7 +306,7 @@ export default {
 			}
 			if (this.cellType.type == "checkbox") this.cellType.default = [...this.cellType.default];
 			this.$emit("autoChangeFunc", "cellType", { ...this.cellType });
-			if (flag) this.$Message.success("提交成功");
+			if (flag) this.$Msg.success("提交成功");
 		},
 		//重置
 		resetType() {

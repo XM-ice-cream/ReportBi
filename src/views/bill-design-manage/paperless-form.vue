@@ -231,11 +231,11 @@ export default {
 			const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 			requestApi.then((res) => {
 				if (res.code === 200) {
-					this.$Message.success("提交成功！");
+					this.$Msg.success("提交成功！");
 					this.cancelClick();
 					this.pageLoad();
 				} else {
-					this.$Message.error(`提交失败,${res.message}`);
+					this.$Msg.error(`提交失败,${res.message}`);
 				}
 			});
 		},

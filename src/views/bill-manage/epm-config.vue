@@ -229,11 +229,11 @@ export default {
 			formData.append("file", file);
 			uploadReq(formData).then((res) => {
 				if (res.code === 200) {
-					this.$Message.success(`${res.message}`);
+					this.$Msg.success(`${res.message}`);
 					this.pageLoad();
 					this.$refs.ImportFormData.drawerFlag = false;
 				} else {
-					this.$Message.error(`${res.message}`);
+					this.$Msg.error(`${res.message}`);
 				}
 			});
 		},
@@ -261,7 +261,7 @@ export default {
 					request.then((res) => {
 						if (res.code === 200) {
 							this.selectObj = null;
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.pageLoad();
 							if (isClose) this.cancelClick();
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")},${errorType(this, res)}`);

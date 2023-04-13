@@ -165,7 +165,7 @@ export default {
 				this.$emit("updateEdge", { ...this.connectObj, relations: this.data });
 				this.closeDialog();
 			} else {
-				this.$Message.error("关联字段类型不一致，请核验~");
+				this.$Msg.error("关联字段类型不一致，请核验~");
 			}
 		},
 		//获取字段 源表
@@ -266,7 +266,7 @@ export default {
 			if (target && source) {
 				const { sourceType, targetType } = this.data[index];
 				if (sourceType !== targetType) {
-					this.$Message.error("两个字段类型不一致,不可保存");
+					this.$Msg.error("两个字段类型不一致,不可保存");
 					return;
 				}
 			}

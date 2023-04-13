@@ -214,7 +214,7 @@ export default {
 				this.$refs.searchReq.validate((validate) => {
 					if (validate) {
 						if (limitStrLength(panelNo) || limitStrLength(unitId) || limitStrLength(unitId56)) {
-							this.$Message.error("查询条件超出最大长度2000!");
+							this.$Msg.error("查询条件超出最大长度2000!");
 							this.searchPoptipModal = true;
 							return;
 						}
@@ -255,7 +255,7 @@ export default {
 					}
 				});
 			} else {
-				this.$Message.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
+				this.$Msg.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
 			}
 		},
 		// 导出
@@ -276,7 +276,7 @@ export default {
 				currentstatus
 			) {
 				if (limitStrLength(panelNo) || limitStrLength(unitId) || limitStrLength(unitId56)) {
-					this.$Message.error("查询条件超出最大长度2000!");
+					this.$Msg.error("查询条件超出最大长度2000!");
 					return;
 				}
 				let obj = {
@@ -300,7 +300,7 @@ export default {
 					exportFile(blob, fileName);
 				});
 			} else {
-				this.$Message.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
+				this.$Msg.warning(this.$t("pleaseSelect") + this.$t("timeHorizon"));
 			}
 		},
 		// 点击重置按钮触发

@@ -200,15 +200,15 @@ export default {
 			if (workorder) {
 				addReq({ workorder }).then((res) => {
 					if (res.code === 200) {
-						this.$Message.success("提交成功");
+						this.$Msg.success("提交成功");
 						this.cancelClick(); //关闭弹框
 					} else {
-						this.$Message.error(res.message);
+						this.$Msg.error(res.message);
 						this.modalFlag = true;
 					}
 				});
 			} else {
-				this.$Message.error("请输入工单");
+				this.$Msg.error("请输入工单");
 			}
 		},
 		//获取工单投入数及目标数
@@ -221,7 +221,7 @@ export default {
 					}
 				});
 			} else {
-				this.$Message.error("请输入工单");
+				this.$Msg.error("请输入工单");
 			}
 		},
 		//关闭弹框

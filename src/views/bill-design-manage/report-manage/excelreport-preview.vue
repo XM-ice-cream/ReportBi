@@ -252,7 +252,7 @@ export default {
 			// 校验查询参数
 			const { message } = this.tableDataFormate();
 			if (message) {
-				this.$Message.error(message);
+				this.$Msg.error(message);
 				return;
 			}
 			//左侧查询参数 --必要参数接收[所有查询条件的值为空时，返回false,不可查询]
@@ -281,7 +281,7 @@ export default {
 						// 渲染表格
 						this.getTable(this.jsonStr);
 					} else {
-						this.$Message.error({
+						this.$Msg.error({
 							content: res.message,
 							duration: 3,
 						});
@@ -297,7 +297,7 @@ export default {
 		//初始化表格
 		getTable(data) {
 			if (!data[0].celldata.length) {
-				this.$Message.warning("查询结果为空");
+				this.$Msg.warning("查询结果为空");
 				return;
 			}
 			//   this.htm = "<table class='table tableScroll' id='exceltable'>";
@@ -448,7 +448,7 @@ export default {
 			// 校验查询参数
 			const { message } = this.tableDataFormate();
 			if (message) {
-				this.$Message.error(message);
+				this.$Msg.error(message);
 				return;
 			}
 			//左侧查询参数 --必要参数接收[所有查询条件的值为空时，返回false,不可查询]

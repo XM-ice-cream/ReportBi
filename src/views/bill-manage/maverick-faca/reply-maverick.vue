@@ -123,7 +123,7 @@ export default {
 						//提交状态+1
 						if (type === "submit") {
 							if (item.status === "Closed" && index === 0) {
-								this.$Message.error("状态为Closed,不可提交！");
+								this.$Msg.error("状态为Closed,不可提交！");
 								warningType = true;
 							}
 							if (!warningType) {
@@ -134,7 +134,7 @@ export default {
 						//驳回状态-1
 						if (type === "back") {
 							if (item.status === "FA" && index === 0) {
-								this.$Message.error("状态为FA,不可驳回！");
+								this.$Msg.error("状态为FA,不可驳回！");
 								warningType = true;
 							}
 							if (!warningType) {
@@ -151,7 +151,7 @@ export default {
 					if (!warningType) {
 						modifyReq(obj).then((res) => {
 							if (res.code === 200) {
-								this.$Message.success(`回复信息${this.$t("success")}`);
+								this.$Msg.success(`回复信息${this.$t("success")}`);
 								if (isClose) this.cancelClick();
 								this.$parent.pageLoad();
 							} else {

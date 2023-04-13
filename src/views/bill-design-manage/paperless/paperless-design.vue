@@ -166,13 +166,13 @@ export default {
 				const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 				requestApi.then((res) => {
 					if (res.code === 200) {
-						this.$Message.success("提交成功!");
+						this.$Msg.success("提交成功!");
 						this.$parent.pageLoad(); //刷新数据
 						this.modalCancel(); //关闭弹框
 					}
 				});
 			} else {
-				this.$Message.error("数据为空，不可提交!");
+				this.$Msg.error("数据为空，不可提交!");
 			}
 		},
 		modalCancel() {

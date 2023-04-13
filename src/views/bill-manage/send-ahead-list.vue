@@ -379,11 +379,11 @@ export default {
 			const requestApi = this.isAdd ? addReq(obj) : modifyReq(obj);
 			requestApi.then((res) => {
 				if (res.code === 200) {
-					this.$Message.success("提交成功");
+					this.$Msg.success("提交成功");
 					this.pageLoad();
 					this.cancelClick();
 				} else {
-					this.$Message.error(`提交失败, ${res.message}`);
+					this.$Msg.error(`提交失败, ${res.message}`);
 				}
 			});
 		},
@@ -400,7 +400,7 @@ export default {
 						const obj = { ...this.selectObj };
 						deleteReq(obj).then((res) => {
 							if (res.code === 200) {
-								this.$Message.success("删除成功");
+								this.$Msg.success("删除成功");
 								this.pageLoad();
 							}
 						});
@@ -422,7 +422,7 @@ export default {
 		modalSubmitClick() {
 			setupStepReq(this.setupData).then((res) => {
 				if (res.code == 200) {
-					this.$Message.success("提交成功");
+					this.$Msg.success("提交成功");
 					this.modalFlag = false;
 				}
 			});

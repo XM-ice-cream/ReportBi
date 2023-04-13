@@ -143,7 +143,7 @@ export default {
 					// 都走更新接口 【新增接口 不会删除原有数据】
 					modifyReq(obj).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.$emit("pageLoad");
 							if (isClose) this.cancelClick();
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")},${res.message}`);

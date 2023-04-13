@@ -67,7 +67,7 @@ export default {
 					this.cancelClick();
 				}
 			} else {
-				this.$Message.warning("请检查语法后再保存提交");
+				this.$Msg.warning("请检查语法后再保存提交");
 			}
 		},
 		// 校验函数信息

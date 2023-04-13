@@ -283,7 +283,7 @@ export default {
 
 					sendCommentReq(obj).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success(`回复信息${this.$t("success")}`);
+							this.$Msg.success(`回复信息${this.$t("success")}`);
 							if (isClose) this.cancelClick();
 							this.$emit("pageLoad"); //刷新表格数据
 						} else {

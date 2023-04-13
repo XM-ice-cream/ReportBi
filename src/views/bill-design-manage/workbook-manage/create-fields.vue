@@ -137,9 +137,9 @@ export default {
 		checkRules() {
 			checkCustomerFieldReq({ ...this.submitData }).then((res) => {
 				if (res.code == 200) {
-					this.$Message.success("语法检查通过，可保存！");
+					this.$Msg.success("语法检查通过，可保存！");
 				} else {
-					this.$Message.error({
+					this.$Msg.error({
 						content: res.message,
 						duration: 10,
 						closable: true,
@@ -182,11 +182,11 @@ export default {
 			const requestApi = this.isAdd ? addCustomerFieldReq(obj) : modifyCustomerFieldReq(obj);
 			requestApi.then((res) => {
 				if (res.code === 200) {
-					this.$Message.success("提交成功！");
+					this.$Msg.success("提交成功！");
 					this.modelFlag = false;
 					this.$emit("getColumnList");
 				} else {
-					this.$Message.error(`提交失败！,${res.message}`);
+					this.$Msg.error(`提交失败！,${res.message}`);
 				}
 			});
 		},

@@ -134,7 +134,7 @@ export default {
 								return { value: item };
 							}) || [];
 					} else {
-						this.$message.error(`查询失败,${res.message}`);
+						this.$Msg.error(`查询失败,${res.message}`);
 						this.submitData.sortValue = [];
 					}
 					this.submitData = JSON.parse(JSON.stringify(this.submitData));

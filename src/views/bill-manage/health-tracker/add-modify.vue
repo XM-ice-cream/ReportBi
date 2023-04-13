@@ -120,12 +120,12 @@ export default {
 							this.tableData[index] = { ...this.tableData[index], ...result };
 							this.tableData = JSON.parse(JSON.stringify(this.tableData));
 						} else {
-							this.$Message.warning("无法找到对应信息！");
+							this.$Msg.warning("无法找到对应信息！");
 							this.tableData[index][fileKey] = "";
 						}
 					});
 				} else {
-					this.$Message.warning("请填写SN和Location,谢谢！");
+					this.$Msg.warning("请填写SN和Location,谢谢！");
 				}
 			}
 		},
@@ -134,14 +134,14 @@ export default {
 			this.submitData.detailsList = this.tableData;
 			const desLength = this.tableData.every((item) => !item?.issuedescription || item?.issuedescription?.length <= 120);
 			if (!desLength) {
-				this.$Message.error("Issue Description 内容长度超出120,请核验");
+				this.$Msg.error("Issue Description 内容长度超出120,请核验");
 				return;
 			}
 
 			let request = addReq(this.submitData);
 			request.then((res) => {
 				if (res.code === 200) {
-					this.$Message.success(`${res.message}`);
+					this.$Msg.success(`${res.message}`);
 					this.$emit("refreshPageLoad");
 					if (isClose) this.cancelClick();
 				} else {

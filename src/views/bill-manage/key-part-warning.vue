@@ -242,7 +242,7 @@ export default {
 					const requestApi = this.isAdd ? addReq : modifyReq;
 					requestApi(obj).then((res) => {
 						if (res.code === 200) {
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.pageLoad();
 							if (isClose) this.cancelClick();
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")},${errorType(this, res)}`);
@@ -281,7 +281,7 @@ export default {
 					onOk: () => {
 						deleteReq({ id: this.selectObj.id }).then((res) => {
 							if (res.code === 200) {
-								this.$Message.success("删除成功");
+								this.$Msg.success("删除成功");
 								this.pageLoad();
 							}
 						});

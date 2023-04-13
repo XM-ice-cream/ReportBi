@@ -252,7 +252,7 @@ export default {
 
 		uploadSuccess() {
 			this.searchClick(); //刷新
-			this.$Message.success(`${this.$t("import")}${this.$t("success")}`);
+			this.$Msg.success(`${this.$t("import")}${this.$t("success")}`);
 			//关闭弹框
 			this.modalFlag = false;
 		},
