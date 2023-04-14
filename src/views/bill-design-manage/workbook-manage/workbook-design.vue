@@ -285,8 +285,8 @@
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
-			<Button @click="submitClick(true)" class="preview-btn">提交并预览</Button>
-			<Button type="primary" @click="submitClick(false)">{{ $t("submit") }}</Button>
+			<Button @click="submitClick(true)" class="preview-btn" :disabled="!btnDistabled">提交并预览</Button>
+			<Button type="primary" @click="submitClick(false)" :disabled="!btnDistabled">{{ $t("submit") }}</Button>
 		</div>
 	</Modal>
 </template>
@@ -360,6 +360,7 @@ export default {
 
 	data() {
 		return {
+			btnDistabled: true,
 			isAdd: true,
 			tabValue: "data",
 			drawerTitle: this.$t("add"),
@@ -420,7 +421,8 @@ export default {
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
 				if (res.code == 200) {
-					const { calcItems, filterItems, markStyle } = res.result;
+					const { calcItems, filterItems, markStyle, maxNumber } = res.result;
+					this.submitData = { ...this.submitData, maxNumber };
 
 					this.filterData = filterItems; //过滤器
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
@@ -441,21 +443,21 @@ export default {
 			const angelData = this.markData[0].data.filter((item) => item.innerText == "angle");
 
 			if (!this.filterData.length) {
-				this.$Message.error("请拖拽字段至筛选器");
+				this.$Msg.error("请拖拽字段至筛选器");
 				return;
 			}
 			//饼图 并不需要拖拽行、列
 			if (!this.rowData.length && !(this.markData[0].chartType === "componentPie")) {
-				this.$Message.error("请拖拽字段至行");
+				this.$Msg.error("请拖拽字段至行");
 				return;
 			}
 			if (!this.columnData.length && !(this.markData[0].chartType === "componentPie")) {
-				this.$Message.error("请拖拽字段至列");
+				this.$Msg.error("请拖拽字段至列");
 				return;
 			}
 			//判断角度是否为指标类型
 			if (angelData.length && !this.numberType(angelData[0])) {
-				this.$Message.error("角度为指标类型，请修改相关属性配置");
+				this.$Msg.error("角度为指标类型，请修改相关属性配置");
 				return;
 			}
 			this.updateDragData(); //更新row,column数据
@@ -467,7 +469,7 @@ export default {
 			});
 			this.$Spin.show();
 			const obj = {
-				maxNumber,
+				maxNumber: parseInt(maxNumber),
 				datasetId,
 				filterItems: this.filterData,
 				calcItems: this.rowData.concat(this.columnData),
@@ -475,16 +477,19 @@ export default {
 					return { ...item, markValue: "" };
 				}),
 			};
+
 			getChartsInfoReq(obj)
 				.then((res) => {
+					//存在有数据返回 但code=-1(数据超过最大范围)
 					if (res.code == 200 || res.result.length > 0) {
 						if (res.code == -1) this.$Msg.warning(`${res.message}`);
+
 						this.chartsData = res?.result || [];
 						this.$nextTick(() => {
 							this.$refs.tempRef.pageLoad();
 						});
 					} else {
-						this.$Message.error(`查询失败，${res.message}`);
+						this.$Msg.error(`查询失败，${res.message}`);
 					}
 				})
 				.finally(() => {
@@ -621,7 +626,7 @@ export default {
 				if (res.code === 200) {
 					this.getColumnList(); //重新刷新左侧数据
 				} else {
-					this.$Message.error(`操作失败！${res.message}`);
+					this.$Msg.error(`操作失败！${res.message}`);
 				}
 			});
 		},
@@ -675,7 +680,7 @@ export default {
 				const { nodeId, columnName } = this.filterData[newIndex];
 				const filterIndex = this.filterData.findIndex((item) => item.nodeId == nodeId && item.columnName == columnName);
 				if (filterIndex !== newIndex) {
-					this.$Message.warning("禁止拖拽重复字段");
+					this.$Msg.warning("禁止拖拽重复字段");
 					this.filterData.splice(newIndex, 1);
 					return;
 				}
@@ -694,7 +699,7 @@ export default {
 				//如果标记为饼图 无法拖拽至行列中
 				if (this.markData[0].chartType == "componentPie") {
 					this.rowData.splice(newIndex, 1);
-					this.$Message.warning("饼图无需拖拽字段到行中");
+					this.$Msg.warning("饼图无需拖拽字段到行中");
 					return;
 				}
 				//转换为维度
@@ -710,7 +715,7 @@ export default {
 				//如果标记为饼图 无法拖拽至行列中
 				if (this.markData[0].chartType == "componentPie") {
 					this.columnData.splice(newIndex, 1);
-					this.$Message.warning("饼图无需拖拽字段到列中");
+					this.$Msg.warning("饼图无需拖拽字段到列中");
 					return;
 				}
 				//转换为维度
@@ -858,9 +863,9 @@ export default {
 			deleteCustomerFieldReq({ id: nodeId }).then((res) => {
 				if (res.code === 200) {
 					this.getColumnList(); //重新获取左侧数据
-					this.$Message.success("删除成功！");
+					this.$Msg.success("删除成功！");
 				} else {
-					this.$Message.error(`删除失败, ${res.message}`);
+					this.$Msg.error(`删除失败, ${res.message}`);
 				}
 			});
 		},
@@ -882,8 +887,10 @@ export default {
 		submitClick(flag = false) {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
+					this.btnDistabled = false; //提交按钮不可编辑
 					let obj = {
 						...this.submitData,
+						maxNumber: parseInt(this.submitData.maxNumber),
 						markStyle: JSON.stringify(this.markData), //标记
 						filterItems: this.filterData, //过滤器
 						calcItems: this.rowData.concat(this.columnData), //行、列
@@ -891,9 +898,14 @@ export default {
 					let request = [true, "copy"].includes(this.workbookIsAdd) ? addReq(obj) : modifyReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
-							this.$Message.success(`${this.drawerTitle}${this.$t("success")}`);
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.$parent.pageLoad(); //刷新表格
 							console.log(flag);
+
+							//提交按钮10s后才允许点击
+							setTimeout(() => {
+								this.btnDistabled = true;
+							}, 1000 * 10);
 							if (flag) this.previewClick(); //跳转至预览界面
 							this.cancelClick(); //关闭弹框
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
@@ -927,6 +939,7 @@ export default {
 			this.markData = [{ name: "全部", chartType: "bar", data: [] }];
 			this.selectObj = {};
 			this.chartsData = [];
+			this.btnDistabled = true;
 			this.$emit("update:modelFlag", false);
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
 		},

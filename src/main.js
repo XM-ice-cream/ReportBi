@@ -75,6 +75,13 @@ Vue.prototype.$Msg = {
       closable: true,
     });
   },
+  success: (content) => {
+    Vue.prototype.$Message.success({
+      content: content,
+      duration: config.tipTime,
+      closable: true,
+    });
+  },
 }
 
 /**

@@ -19,7 +19,7 @@
 													<Input
 														v-if="getFieldsType('STRING', item.columnType)"
 														type="textarea"
-														:autosize="{ minRows: 2, maxRows: 5 }"
+														:autosize="{ minRows: 5, maxRows: 10 }"
 														v-model.trim="item.filterValue"
 														clearable
 													/>
@@ -99,8 +99,8 @@ export default {
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
 				if (res.code == 200) {
-					const { calcItems, filterItems, markStyle, datasetId, workBookName, workBookCode } = res.result;
-					this.submitData = { ...this.submitData, datasetId, workBookName, workBookCode };
+					const { calcItems, filterItems, markStyle, datasetId, workBookName, workBookCode, maxNumber } = res.result;
+					this.submitData = { ...this.submitData, datasetId, workBookName, workBookCode, maxNumber };
 
 					this.filterData = filterItems.map((item) => {
 						let filterValue = item.filterValue;
@@ -112,6 +112,9 @@ export default {
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
 					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
 					this.markData = markStyle && markStyle !== "{}" ? JSON.parse(markStyle) : [{ name: "全部", chartType: "bar", data: [] }]; //标记
+					this.$nextTick(() => {
+						this.searchClick();
+					});
 				}
 			});
 		},
@@ -123,16 +126,20 @@ export default {
 				return;
 			}
 			//数据集
-			const { datasetId } = this.submitData;
+			const { datasetId, maxNumber } = this.submitData;
 			const obj = {
 				datasetId,
 				filterItems,
+				maxNumber,
 				calcItems: this.rowData.concat(this.columnData),
 				markItems: this.markData.map((item) => item.data).flat(),
 			};
 			getChartsInfoReq(obj)
 				.then((res) => {
-					if (res.code == 200) {
+					//存在有数据返回 但code=-1(数据超过最大范围)
+					if (res.code == 200 || res.result.length > 0) {
+						if (res.code == -1) this.$Msg.warning(`${res.message}`);
+
 						this.chartsData = res?.result || [];
 						this.$nextTick(() => {
 							this.$refs.tempRef.pageLoad();
