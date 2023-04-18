@@ -49,7 +49,6 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				console.log("this.selectObj", this.selectObj);
 				this.$nextTick(() => {
 					if (this.selectObj.sortBy) {
 						this.submitData = { ...this.selectObj };
@@ -91,7 +90,6 @@ export default {
 		//提交
 		submitClick() {
 			const { newIndex, markIndex } = this.submitData;
-			console.log("this.submitData", this.submitData);
 			this.$emit("updateSort", newIndex, this.submitData, markIndex); //取消后 删除拖拽的cell
 			this.$refs.submitReq.resetFields();
 			this.cancelClick(); //关闭弹框

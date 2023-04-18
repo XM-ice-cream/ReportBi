@@ -13,6 +13,11 @@
 					:autosize="{ minRows: 20, maxRows: 20 }"
 					style="margin-top: 10px"
 				></Input>
+				<!-- 校验信息 -->
+				<Alert :type="tipObj.code == 200 ? 'success' : 'error'" show-icon style="margin-top: 10px" v-if="tipObj.code">
+					数据类型:{{ tipObj.result }}
+					<template #desc>{{ tipObj.message }}</template>
+				</Alert>
 				<!-- </draggable> -->
 			</div>
 			<div class="right-box">
@@ -45,7 +50,7 @@
 		</div>
 
 		<div slot="footer" class="dialog-footer">
-			<Button @click="modelFlag = false">取 消</Button>
+			<Button @click="cancelClick">取 消</Button>
 			<Button @click="checkRules">校验语法</Button>
 			<Button type="primary" @click="submitClick">确定 </Button>
 		</div>
@@ -87,6 +92,7 @@ export default {
 	data() {
 		return {
 			submitData: {},
+			tipObj: { code: "", message: "", result: "" },
 			modelFlag: false,
 			dataItemList: { all: [] },
 			blurIndex: 0,
@@ -136,17 +142,11 @@ export default {
 		//校验语法
 		checkRules() {
 			checkCustomerFieldReq({ ...this.submitData }).then((res) => {
-				if (res.code == 200) {
-					this.$Msg.success("语法检查通过，可保存！");
-				} else {
-					this.$Msg.error({
-						content: res.message,
-						duration: 10,
-						closable: true,
-					});
-				}
+				const { code, message, result } = res;
+				this.tipObj = { code, message, result };
 			});
 		},
+
 		//li 标签选中事件
 		liClick(row) {
 			this.liObj = { ...row, remark: row.remark.split("\n\n") };
@@ -183,12 +183,17 @@ export default {
 			requestApi.then((res) => {
 				if (res.code === 200) {
 					this.$Msg.success("提交成功！");
-					this.modelFlag = false;
+					this.cancelClick(); //关闭弹框
 					this.$emit("getColumnList");
 				} else {
 					this.$Msg.error(`提交失败！,${res.message}`);
 				}
 			});
+		},
+		//关闭弹框
+		cancelClick() {
+			this.modelFlag = false;
+			this.tipObj = { code: "", message: "", result: "" };
 		},
 
 		// 获取业务数据
@@ -226,7 +231,12 @@ export default {
 	},
 };
 </script>
+
 <style lang="less" scoped>
+/deep/textarea.ivu-input {
+	background: #000;
+	color: #fff;
+}
 .create-field {
 	display: flex;
 	height: 500px;

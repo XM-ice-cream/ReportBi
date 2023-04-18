@@ -535,7 +535,6 @@ export default {
 
 		//获取左侧数据集对应表及字段
 		getColumnList() {
-			console.log("getColumnList");
 			const { datasetId, columnName } = this.submitData;
 			const obj = { datasetId, enabled: 1, columnName };
 			getTabelColumnReq(obj).then((res) => {
@@ -564,7 +563,6 @@ export default {
 
 		//标记 下拉
 		dropDownClick(name, row, index, markIndex, type) {
-			console.log("dropDownClick");
 			const { datasetId } = this.submitData;
 			this.selectObj = {
 				...row,
@@ -786,7 +784,6 @@ export default {
 		},
 		//更新排序数据
 		updateSort(newIndex, data, markIndex) {
-			console.log("updateSort", newIndex, data, markIndex);
 			if (data.sortType === "mark") {
 				this.markData[markIndex].data[newIndex] = { ...data };
 				this.changeMarks(markIndex, "update", data);
@@ -820,7 +817,6 @@ export default {
 			//饼图 切换为其他图表时 删除角度数据
 			if (!type && chartType !== "componentPie") {
 				const angleIndex = this.markData[0].data.findIndex((item) => item.innerText === "angle");
-				console.log("angleIndex", angleIndex);
 				if (angleIndex > -1) this.markData[0].data.splice(angleIndex, 1);
 			}
 
@@ -940,8 +936,6 @@ export default {
 						if (res.code === 200) {
 							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
 							this.$parent.pageLoad(); //刷新表格
-							console.log(flag);
-
 							//提交按钮10s后才允许点击
 							setTimeout(() => {
 								this.btnDistabled = true;

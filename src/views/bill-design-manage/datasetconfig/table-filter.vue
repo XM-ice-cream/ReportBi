@@ -139,7 +139,6 @@ export default {
 							});
 							return { ...item };
 						}) || [];
-					console.log("this.columnList", this.columnList);
 				}
 			});
 		},

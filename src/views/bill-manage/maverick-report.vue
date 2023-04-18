@@ -297,7 +297,6 @@ export default {
 			getTypeReq(obj).then((res) => {
 				if (res.code == 200) {
 					this.typeList = res?.result || [];
-					console.log(this.typeList);
 				}
 			});
 		},

@@ -45,8 +45,6 @@ export default {
 			Object.keys(temp).forEach((tempKey) => {
 				seriesResult.push({ ...temp[tempKey] });
 			});
-			// console.log("seriesResult", seriesResult, series, "legend", legend, "groupByString", groupByString);
-
 			let option = {
 				// color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 				tooltip: {

@@ -186,7 +186,6 @@ export default {
 		// 获取数据字典数据
 		async getDataItemData() {
 			this.columnTypeList = await this.getDataItemDetailList("columnType");
-			console.log(this.columnTypeList);
 		},
 		async getDataItemDetailList(itemCode) {
 			let arr = [];

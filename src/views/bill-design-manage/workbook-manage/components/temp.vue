@@ -78,8 +78,6 @@ export default {
 		//饼图
 		dataLogicByPie() {
 			let series = { type: "pie", data: [] };
-			console.log("this.mark", this.mark);
-			console.log("this.value", this.value);
 
 			const { color, angle, mark } = this.markDataLogic().undefined;
 
@@ -105,7 +103,6 @@ export default {
 					},
 				});
 			});
-			console.log("series", series);
 			return { series };
 		},
 		//数据逻辑处理
@@ -140,7 +137,6 @@ export default {
 				if (!obj[stringData]) obj[stringData] = [];
 				obj[stringData].push(item);
 			});
-			console.log("valueResult", valueResult, "obj", obj);
 			groupByString.forEach((rowItem, index) => {
 				Object.keys(obj).map((keyItem, keyIndex) => {
 					if (!axisConst[index]) axisConst[index] = [];

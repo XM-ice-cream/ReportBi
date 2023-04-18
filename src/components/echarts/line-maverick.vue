@@ -26,7 +26,6 @@ export default {
 	},
 	methods: {
 		initChart() {
-			console.log(this.data);
 			this.isShow = true;
 			const _this = this;
 			// 基于准备好的dom，初始化echarts实例
@@ -51,7 +50,6 @@ export default {
 				tooltip: {
 					trigger: "axis",
 					formatter: function (params) {
-						console.log(_this.data.type, params[0].data);
 						let aa = [
 							"日期：" + params[0].data.createtime,
 							"站点：" + `${_this.data.type === "SYL" ? params[0].data.station : null}`,

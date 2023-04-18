@@ -190,7 +190,6 @@ export default {
 		// 获取分页列表数据
 		pageLoad() {
 			this.searchPoptipModal = false;
-			console.log(this.req);
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
 					let { startTime, endTime, line, model, location, isRefresh, type } = this.req;
@@ -299,7 +298,6 @@ export default {
 			getTypeReq(obj).then((res) => {
 				if (res.code == 200) {
 					this.typeList = res?.result || [];
-					console.log(this.typeList);
 				}
 			});
 		},
