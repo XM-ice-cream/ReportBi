@@ -6,7 +6,7 @@
 			<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
 				<!-- 回复群组 -->
 				<FormItem label="回复群组" prop="mailDepartArry">
-					<CheckboxGroup v-model="req.mailDepartArry" clearable>
+					<CheckboxGroup v-model="req.mailDepartArry" clearable @on-change="changeChekBox">
 						<Checkbox :label="item" v-for="(item, index) in mailDepartArry" :key="index"></Checkbox>
 					</CheckboxGroup>
 				</FormItem>
@@ -40,7 +40,8 @@
 						</FormItem>
 						<!-- nexDRI-->
 						<FormItem label="nexDRI" prop="nextDRI">
-							<Input v-model="req.nextDRI" />
+							<!-- <Input v-model="req.nextDRI" /> -->
+							<Label>{{ req.nextDRI }}</Label>
 						</FormItem>
 					</template>
 					<!-- FA 文本框 -->
@@ -64,7 +65,7 @@
 					</template>
 					<!-- 回复人员-->
 					<FormItem label="回复人员" prop="fA_EMPNO">
-						<Input v-model="req.fA_EMPNO" />
+						<Label>{{ req.fA_EMPNO }}</Label>
 					</FormItem>
 				</Form>
 				<!-- CA-->
@@ -94,7 +95,7 @@
 						</FormItem>
 						<!-- nexDRI-->
 						<FormItem label="nexDRI" prop="nextDRI">
-							<Input v-model="req.nextDRI" />
+							<Label>{{ req.nextDRI }}</Label>
 						</FormItem>
 					</template>
 					<!-- CA 文本框 -->
@@ -118,7 +119,8 @@
 					</template>
 					<!-- 回复人员-->
 					<FormItem label="回复人员" prop="cA_EMPNO">
-						<Input v-model="req.cA_EMPNO" />
+						<!-- <Input v-model="req.cA_EMPNO" /> -->
+						<Label>{{ req.cA_EMPNO }}</Label>
 					</FormItem>
 				</Form>
 				<!-- Q-->
@@ -148,12 +150,14 @@
 						</FormItem>
 						<!-- nexDRI-->
 						<FormItem label="nexDRI" prop="nextDRI">
-							<Input v-model="req.nextDRI" />
+							<!-- <Input v-model="req.nextDRI" /> -->
+							<Label>{{ req.nextDRI }}</Label>
 						</FormItem>
 					</template>
 					<!-- 回复人员-->
 					<FormItem label="回复人员" prop="q_EMPNO">
-						<Input v-model="req.q_EMPNO" />
+						<!-- <Input v-model="req.q_EMPNO" /> -->
+						<Label>{{ req.q_EMPNO }}</Label>
 					</FormItem>
 				</Form>
 			</div>
@@ -228,9 +232,12 @@ export default {
 	watch: {
 		selectArr() {
 			if (this.selectArr.length > 0) {
-				const { location, category, rootcause, nextDRI } = this.selectArr[0];
+				const { location, category, rootcause, nextDRI, status } = this.selectArr[0];
 				this.replyInfo = { location, category, rootcause, nextDRI };
 				this.req = { ...this.selectArr[0], category: "", location: "", rootcause: "", nextDRI: "" };
+				if (status == "FA") this.req.fA_EMPNO = this.$store.state.account;
+				if (status == "CA") this.req.cA_EMPNO = this.$store.state.account;
+				if (status == "Q" || status == "Closed") this.req.q_EMPNO = this.$store.state.account;
 				// 获取数据是否有回复权限
 				this.getDataInfo();
 			}
@@ -306,6 +313,10 @@ export default {
 				3: "Closed",
 			};
 			return status[type];
+		},
+		//回复群组的值 对应修改nexDRI 字符串
+		changeChekBox() {
+			this.req.nextDRI = this.req.mailDepartArry.toString();
 		},
 		//获取数据信息
 		getDataInfo() {

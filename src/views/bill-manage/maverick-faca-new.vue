@@ -30,16 +30,7 @@
 						</i-col>
 					</Row>
 				</div>
-				<!-- <Table
-					:border="tableConfig.border"
-					:highlight-row="tableConfig.highlightRow"
-					:height="tableConfig.height"
-					:loading="tableConfig.loading"
-					:columns="columns"
-					:data="data"
-					@on-selection-change="currentClick"
-				>
-				</Table> -->
+
 				<vxe-table
 					ref="xTable1"
 					size="mini"
