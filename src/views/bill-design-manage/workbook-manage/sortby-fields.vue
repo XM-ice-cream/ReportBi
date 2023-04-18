@@ -11,24 +11,11 @@
 					</Select>
 				</FormItem>
 			</Form>
-			<!-- <vxe-table
-				ref="xTable1"
-				size="mini"
-				resizable
-				:border="tableConfig.border"
-				align="center"
-				:loading="tableConfig.loading"
-				:data="submitData.sortValue"
-				:height="tableConfig.height"
-				v-if="submitData.sortBy === 'manual'"
-			>
-				<vxe-column type="seq" width="60"></vxe-column>
-				<vxe-column field="value" title="value" min-width="120" show-overflow></vxe-column>
-			</vxe-table> -->
+
 			<Table
 				:columns="columns"
 				:data="submitData.sortValue"
-				:height="tableConfig.height"
+				:height="400"
 				draggable
 				@on-drag-drop="changeOrder"
 				:loading="tableConfig.loading"

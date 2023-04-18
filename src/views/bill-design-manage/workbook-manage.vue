@@ -160,7 +160,7 @@ export default {
 			this.tableConfig.loading = true;
 			const { workBookName, workBookCode } = this.req;
 			let obj = {
-				orderField: "id", // 排序字段
+				orderField: "createDate", // 排序字段
 				ascending: true, // 是否升序
 				pageSize: this.req.pageSize, // 分页大小
 				pageIndex: this.req.pageIndex, // 当前页码

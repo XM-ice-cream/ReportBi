@@ -124,7 +124,10 @@
 							@end="(e) => dragEnd(e, 'filter')"
 						>
 							<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
-								<div class="textOverhidden" style="width: 80%">{{ calculatorObj(item.calculatorFunction, item.columnName) }}</div>
+								<div class="textOverhidden" style="width: 80%" @dblclick="item.isEdit = true" v-if="!item.isEdit">
+									{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
+								</div>
+								<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
 								<!-- 下拉框 -->
 								<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
 									<Icon type="ios-arrow-down"></Icon>
@@ -145,7 +148,14 @@
 						<div class="title">标记</div>
 						<!-- 手风琴 -->
 						<Collapse accordion v-model="collapse" style="max-height: calc(100% - 30px); overflow: hidden">
-							<Panel v-for="(item, markIndex) in markData" :key="markIndex" :name="markIndex.toString()" class="markPanel" :title="item.name">
+							<Panel
+								v-for="(item, markIndex) in markData"
+								:key="markIndex"
+								:name="markIndex.toString()"
+								class="markPanel"
+								:title="item.name"
+								@dblclick.stop
+							>
 								{{ item.name }}
 
 								<template #content>
@@ -209,10 +219,23 @@
 												<Icon custom="iconfont icon-jiaodu" v-if="item.innerText === 'angle'" />
 												<!-- 字段显示 -->
 												<div :class="isNumberCell(item)">
-													<div class="textOverhidden" style="width: 80%" :title="calculatorObj(item.calculatorFunction, item.columnName)">
+													<div
+														class="textOverhidden"
+														style="width: 80%"
+														:title="calculatorObj(item.calculatorFunction, item.columnRename)"
+														@dblclick="changeMarkIsEdit(markIndex, index)"
+														v-if="!markData[markIndex].data[index].isEdit"
+													>
 														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />
-														{{ calculatorObj(item.calculatorFunction, item.columnName) }}
+														{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
 													</div>
+													<Input
+														type="text"
+														v-model="markData[markIndex].data[index].columnRename"
+														v-if="markData[markIndex].data[index].isEdit"
+														@on-blur="markData[markIndex].data[index].isEdit = false"
+														class="rename-input"
+													/>
 													<!-- 下拉选 -->
 													<DropdownFields type="mark" :data="item" :index="index" :markIndex="markIndex" @dropDownClick="dropDownClick" />
 												</div>
@@ -233,9 +256,12 @@
 							<span class="title">列</span>
 							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
 								<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
-										calculatorObj(item.calculatorFunction, item.columnName)
-									}}
+									<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
+										<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
+											calculatorObj(item.calculatorFunction, item.columnRename)
+										}}
+									</span>
+									<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
 									<!-- 下拉选 -->
 									<DropdownFields type="column" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
 								</span>
@@ -246,9 +272,12 @@
 							<span class="title">行</span>
 							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
 								<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
-										calculatorObj(item.calculatorFunction, item.columnName)
-									}}
+									<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
+										<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
+											calculatorObj(item.calculatorFunction, item.columnRename)
+										}}
+									</span>
+									<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
 									<!-- 下拉选 -->
 									<DropdownFields type="row" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
 								</span>
@@ -421,8 +450,15 @@ export default {
 		pageLoad() {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
 				if (res.code == 200) {
-					const { calcItems, filterItems, markStyle, maxNumber } = res.result;
+					let { calcItems, filterItems, markStyle, maxNumber } = res.result;
 					this.submitData = { ...this.submitData, maxNumber };
+					//相关可重命名的模块，均加isEdit参数
+					calcItems = calcItems.map((item) => {
+						return { ...item, isEdit: false };
+					});
+					filterItems = filterItems.map((item) => {
+						return { ...item, isEdit: false };
+					});
 
 					this.filterData = filterItems; //过滤器
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
@@ -518,7 +554,7 @@ export default {
 									item.columnType == "2" ? (index = 2) : (index = 1);
 									break;
 							}
-							return { ...item, index };
+							return { ...item, index, columnRename: item.columnName, isEdit: false };
 						});
 						return { labelName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
 					});
@@ -636,7 +672,6 @@ export default {
 			let { oldIndex, newIndex, to } = e;
 			const id = to.id.split(",")[0];
 			const markIndex = to.id.split(",")[1];
-
 			switch (type) {
 				case "filter":
 					id === "filter" && oldIndex === newIndex ? this.filterData.splice(oldIndex, 1) : "";
@@ -839,6 +874,11 @@ export default {
 			this.markData[markIndex].data[newIndex] = { ...data };
 			this.changeMarks(markIndex, "update", data);
 		},
+		//标记  重命名
+		changeMarkIsEdit(markIndex, index) {
+			this.markData[markIndex].data[index].isEdit = true;
+			this.markData = JSON.parse(JSON.stringify(this.markData));
+		},
 		//判断数据是否存在
 		markIndexOf(index, data) {
 			if (!data) return -1;
@@ -1034,6 +1074,9 @@ export default {
 	display: inline-block;
 	text-align: left;
 }
+.rename-input {
+	width: calc(100% - 18px) !important;
+}
 </style>
 <style scoped lang="less">
 .disabled-cell {
@@ -1058,7 +1101,7 @@ export default {
 				margin-bottom: 10px;
 			}
 			.left-tree {
-				height: calc(100% - 200px);
+				height: calc(100% - 250px);
 				margin-top: 5px;
 				.tree {
 					height: 100%;

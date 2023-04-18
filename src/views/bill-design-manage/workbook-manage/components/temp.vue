@@ -182,7 +182,7 @@ export default {
 					//文本宽度
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
-							return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnName;
+							return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnRename;
 						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
@@ -229,7 +229,7 @@ export default {
 						// 文本宽度;
 						const labelWidth =
 							this.mark[0].data.filter((markItem) => {
-								return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnName;
+								return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnRename;
 							})[0]?.markValue || 90;
 
 						gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
@@ -488,12 +488,11 @@ export default {
 		//轴名 对应 字段名称
 		axisToField(name) {
 			let obj = {};
-			this.row.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnName)));
-			this.column.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnName)));
+			this.row.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnRename)));
+			this.column.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnRename)));
 			this.mark.forEach((markItem) => {
-				markItem.data.forEach((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnName)));
+				markItem.data.forEach((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnRename)));
 			});
-
 			return obj[name];
 		},
 		//计算属性对应中文
