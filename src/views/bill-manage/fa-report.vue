@@ -265,42 +265,6 @@
 					<template slot-scope="{ row }" slot="faImage">
 						<img class="img_item" @click="imgClick(item)" :src="item" v-for="(item, index) in row.faImage && row.faImage.split(',')" :key="index" />
 					</template>
-					<template slot-scope="{ row }" slot="op20Image">
-						<img
-							class="img_item"
-							@click="imgClick('data:image/bmp;base64,' + item)"
-							:src="'data:image/bmp;base64,' + item"
-							v-for="(item, index) in row.op20Image && row.op20Image.split(',')"
-							:key="index"
-						/>
-					</template>
-					<template slot-scope="{ row }" slot="op25Image">
-						<img
-							class="img_item"
-							@click="imgClick('data:image/bmp;base64,' + item)"
-							:src="'data:image/bmp;base64,' + item"
-							v-for="(item, index) in row.op25Image && row.op25Image.split(',')"
-							:key="index"
-						/>
-					</template>
-					<template slot-scope="{ row }" slot="op30Image">
-						<img
-							class="img_item"
-							@click="imgClick('data:image/bmp;base64,' + item)"
-							:src="'data:image/bmp;base64,' + item"
-							v-for="(item, index) in row.op30Image && row.op30Image.split(',')"
-							:key="index"
-						/>
-					</template>
-					<template slot-scope="{ row }" slot="op40Image">
-						<img
-							class="img_item"
-							@click="imgClick('data:image/bmp;base64,' + item)"
-							:src="'data:image/bmp;base64,' + item"
-							v-for="(item, index) in row.op40Image && row.op40Image.split(',')"
-							:key="index"
-						/>
-					</template>
 				</Table>
 				<page-custom
 					:elapsedMilliseconds="req.elapsedMilliseconds"
@@ -333,7 +297,7 @@ export default {
 	data() {
 		return {
 			poptipModal: false,
-			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
+			noRepeatdRefresh: true, //刷新数据的时候不重复刷新pageLoad
 			tableConfig: { ...this.$config.tableConfig }, // table配置
 			data: [], // 表格数据
 			btnData: [],
@@ -383,7 +347,6 @@ export default {
 				{ title: this.$t("panelNo"), key: "panelNo", align: "center", width: 150, tooltip: true },
 				{ title: "UnitId", key: "unitId", align: "center", width: 140, tooltip: true },
 				{ title: "CarrierNo", key: "carrierNo", align: "center", width: 140, tooltip: true },
-				{ title: "TapId", key: "tapId", align: "center", width: 140, tooltip: true },
 				{
 					title: "不良站别",
 					key: "failureStationName",
@@ -391,7 +354,6 @@ export default {
 					width: 150,
 					tooltip: true,
 				},
-				{ title: "KNSEqp", key: "knsEqp", align: "center", width: 150, tooltip: true },
 				{
 					title: "PCB wash record",
 					key: "pcbWashRecord",
@@ -406,7 +368,6 @@ export default {
 					width: 150,
 					tooltip: true,
 				},
-				{ title: "Failure Mode", key: "failureMode", align: "center", width: 150, tooltip: true },
 				{
 					title: "Failure Reason",
 					key: "failureReason",
@@ -422,10 +383,6 @@ export default {
 					tooltip: true,
 				},
 				{ title: "FA Image", slot: "faImage", align: "center", width: 150, tooltip: true },
-				{ title: "Op20Image", key: "op20Image", slot: "op20Image", align: "center", width: 150, tooltip: true },
-				{ title: "Op25Image", key: "op25Image", slot: "op25Image", align: "center", width: 150, tooltip: true },
-				{ title: "Op30Image", key: "op30Image", slot: "op30Image", align: "center", width: 150, tooltip: true },
-				{ title: "Op40Image", key: "op40Image", slot: "op40Image", align: "center", width: 150, tooltip: true },
 				{ title: "EQPNAME", key: "eqpName", align: "center", width: 150, tooltip: true },
 				{
 					title: "Retest Sympton",
@@ -442,7 +399,8 @@ export default {
 					width: 150,
 					tooltip: true,
 				},
-				{ title: "Repair mothed", key: "repairMothed", align: "center", width: 150, tooltip: true },
+				{ title: "FA mothed", key: "repairMothed", align: "center", width: 150, tooltip: true },
+				{ title: "x-Ray Result", key: "xRay", align: "center", width: 150, tooltip: true },
 				{
 					title: "Rework machine ID",
 					key: "reworkMachineId",
@@ -450,13 +408,11 @@ export default {
 					width: 150,
 					tooltip: true,
 				},
-				{ title: "PCB BIN Code", key: "pcbBinCode", align: "center", width: 150, tooltip: true },
-				{ title: "LED BIN Code", key: "ledBinCode", align: "center", width: 150, tooltip: true },
 				{ title: "Scrap", key: "scrap", align: "center", width: 150, tooltip: true },
 				{ title: "Scrap reason", key: "scrapReason", align: "center", width: 150, tooltip: true },
-				// { title: "FA Employee", key: "faEmployee", align: "center", width: 150, tooltip: true },
+				{ title: "Scrap Duty Department", key: "scrapDuty", align: "center", width: 150, tooltip: true },
 				{
-					title: "Repair Employee",
+					title: "FA Employee",
 					key: "repairEmployee",
 					align: "center",
 					width: 150,
