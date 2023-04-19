@@ -154,11 +154,12 @@ export default {
 		currentClick() {
 			const selection = this.$refs.xTable1.getCheckboxRecords();
 			const status = selection[0]?.status || "";
-			const isRight = selection.every((item) => item.status === status && status !== "Closed");
+			const station = selection[0]?.station || "";
+			const isRight = selection.every((item) => item.status === status && status !== "Closed" && item.station === station);
 			if (isRight) {
 				this.selectArr = selection;
 			} else {
-				this.$Msg.error("选择状态必须一致,并且状态不可为Closed,请核对~");
+				this.$Msg.error("选择 状态 和 站点 必须一致,并且状态不可为Closed,请核对~");
 			}
 		},
 		exportClick() {

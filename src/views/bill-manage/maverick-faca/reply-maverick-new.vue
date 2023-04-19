@@ -172,8 +172,8 @@
 				</FormItem>
 			</Form>
 			<div class="drawer-button">
-				<Button ghost @click="submitClick(true, 'REJECT')" :disabled="isEdit">驳回</Button>
-				<Button ghost @click="submitClick(true, 'REBACK')" :disabled="isEdit">退回上一步</Button>
+				<!-- <Button ghost @click="submitClick(true, 'REJECT')" :disabled="isEdit">驳回</Button> -->
+				<Button ghost @click="submitClick(true, 'REBACK')" :disabled="isEdit">驳回上一步</Button>
 				<Button type="primary" @click="submitClick(true, 'OK')" :disabled="isEdit">回复</Button>
 			</div>
 		</div>
@@ -290,7 +290,8 @@ export default {
 
 					sendCommentReq(obj).then((res) => {
 						if (res.code === 200) {
-							this.$Msg.success(`回复信息${this.$t("success")}`);
+							if (type == "OK") this.$Msg.success(`回复信息${this.$t("success")}`);
+							if (type == "REBACK") this.$Msg.success("驳回上一步成功!");
 							if (isClose) this.cancelClick();
 							this.$emit("pageLoad"); //刷新表格数据
 						} else {
