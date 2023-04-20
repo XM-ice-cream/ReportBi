@@ -47,7 +47,7 @@ export default {
 					},
 				},
 				yAxis: {
-					name: "Pa",
+					name: "kg",
 					nameTextStyle: {
 						color: "#484848",
 					},

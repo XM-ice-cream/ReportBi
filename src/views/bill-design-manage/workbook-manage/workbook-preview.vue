@@ -14,7 +14,7 @@
 									<div class="submitForm">
 										<Form ref="submitReq" :label-width="80" :label-colon="true">
 											<template v-for="item in filterData">
-												<FormItem :label="item.columnName">
+												<FormItem :label="item.columnRename">
 													<!-- 数组 -->
 													<Input
 														v-if="getFieldsType('STRING', item.columnType)"

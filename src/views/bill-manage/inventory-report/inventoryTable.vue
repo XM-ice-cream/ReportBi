@@ -58,27 +58,4 @@ export default {
 };
 </script>
 
-<style scoped lang="less">
-.drawer-button {
-	button {
-		margin-right: 5px;
-		&:first-child {
-			padding: 5px 16px;
-			color: #27ce88;
-			border: 1px solid #27ce88;
-			border-radius: 0;
-		}
-		&:nth-child(2),
-		&:last-child {
-			padding: 5px 16px;
-			color: #fff;
-			border: 1px solid #27ce88;
-			background-color: #27ce88;
-			border-radius: 0;
-		}
-		&:last-child {
-			margin-right: 0;
-		}
-	}
-}
-</style>
+<style scoped lang="less"></style>
