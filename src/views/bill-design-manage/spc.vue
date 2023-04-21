@@ -244,10 +244,6 @@ export default {
 </script>
 <style lang="less" scope></style>
 <style>
-.ivu-btn > .ivu-icon {
-	font-size: 12px;
-	line-height: 0.5;
-}
 .ace-jsoneditor.ace_editor {
 	min-height: 21rem;
 }

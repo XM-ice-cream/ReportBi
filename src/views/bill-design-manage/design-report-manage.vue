@@ -1,6 +1,6 @@
 /* 报表管理 */
 <template>
-	<div class="page-style">
+	<div class="page-style design-report-manage">
 		<!-- 左侧抽屉 -->
 		<Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true" :before-close="cancelClick">
 			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
@@ -438,19 +438,21 @@ export default {
 </script>
 
 <style scoped lang="less">
-.tableBtn {
-	display: inline-block;
-	padding: 0.2rem;
-	color: #1890ff;
-	background: #f5f5f5;
+.design-report-manage {
+	.tableBtn {
+		display: inline-block;
+		padding: 0.2rem;
+		color: #1890ff;
+		background: #f5f5f5;
 
-	border-radius: 0.2rem;
-	box-shadow: 0px 2px 3px #ccc;
-	cursor: pointer;
-	&:active {
-		background: #40e49f;
-		color: #fff;
-		box-shadow: none;
+		border-radius: 0.2rem;
+		box-shadow: 0px 2px 3px #ccc;
+		cursor: pointer;
+		&:active {
+			background: #40e49f;
+			color: #fff;
+			box-shadow: none;
+		}
 	}
 }
 </style>

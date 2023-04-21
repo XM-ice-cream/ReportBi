@@ -122,7 +122,7 @@ export default {
   ],
   // 全局表格配置
   tableConfig: {
-    border: true, //全局表格边框是否展示
+    border: false, //全局表格边框是否展示
     highlightRow: true, //全局表格高亮是否开启
     loading: true, //全局表格加载是否开启
     height: 200, //全局表格初始高度

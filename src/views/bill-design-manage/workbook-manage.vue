@@ -1,6 +1,6 @@
 /* 工作簿管理 */
 <template>
-	<div class="page-style">
+	<div class="page-style workbook-manage">
 		<!-- 页面表格 -->
 		<div class="comment">
 			<Card :bordered="false" dis-hover class="card-style">
@@ -302,19 +302,25 @@ export default {
 </script>
 
 <style scoped lang="less">
-.tableBtn {
-	display: inline-block;
-	padding: 0.2rem;
-	color: #1890ff;
-	background: #f5f5f5;
+.workbook-manage {
+	.tableBtn {
+		display: inline-block;
+		padding: 2px 10px;
+		color: #1890ff;
+		background: #eff7ff;
+		cursor: pointer;
+		border: 1px solid #1890ff;
 
-	border-radius: 0.2rem;
-	box-shadow: 0px 2px 3px #ccc;
-	cursor: pointer;
-	&:active {
-		background: #40e49f;
-		color: #fff;
-		box-shadow: none;
+		&:active {
+			background: #40e49f;
+			color: #fff;
+			box-shadow: none;
+		}
+		&:hover {
+			transform: scale(1.1);
+			background: #fff;
+			color: #1890ff;
+		}
 	}
 }
 </style>

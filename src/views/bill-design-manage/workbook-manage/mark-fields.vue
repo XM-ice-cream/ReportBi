@@ -46,6 +46,7 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.submitData = { ...this.selectObj };
+				console.log("标记", this.submitData);
 				const { innerText } = this.submitData;
 				if (innerText === "labelWidth" && this.isAdd) {
 					this.submitData.markValue = 90;
@@ -72,9 +73,11 @@ export default {
 		//提交
 		submitClick() {
 			const { newIndex, markIndex } = this.submitData;
-			this.$emit("updateMark", newIndex, this.submitData, markIndex); //取消后 删除拖拽的cell
-			this.$refs.submitReq.resetFields();
 			this.cancelClick(); //关闭弹框
+			this.$nextTick(() => {
+				this.$emit("updateMark", newIndex, this.submitData, markIndex); //取消后 删除拖拽的cell
+				this.$refs.submitReq.resetFields();
+			});
 		},
 		//获取字段对应的所有值
 		getAllValue() {

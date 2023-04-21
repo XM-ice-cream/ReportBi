@@ -314,6 +314,7 @@
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
+			<Button @click="previewClick" class="preview-btn" :disabled="!btnDistabled">预览</Button>
 			<Button @click="submitClick(true)" class="preview-btn" :disabled="!btnDistabled">提交并预览</Button>
 			<Button type="primary" @click="submitClick(false)" :disabled="!btnDistabled">{{ $t("submit") }}</Button>
 		</div>
@@ -800,6 +801,7 @@ export default {
 		},
 		//修改第0个标记，联动其余标记；其余标记均修改后，自动修改第0标记
 		changeMarks(markIndex, type, data) {
+			console.log(markIndex, type, data);
 			const chartType = this.markData[markIndex].chartType;
 			//饼图 不需要行列信息
 			if (!type && chartType == "componentPie" && (this.rowData.length || this.columnData.length)) {
@@ -869,6 +871,7 @@ export default {
 			if (data.innerText == "color") newIndex = this.deleteColorAngle("color", markIndex, newIndex);
 			this.markData[markIndex].data[newIndex] = { ...data };
 			this.changeMarks(markIndex, "update", data);
+			this.markData = JSON.parse(JSON.stringify(this.markData));
 		},
 		//标记  重命名
 		changeMarkIsEdit(markIndex, index) {
@@ -1291,7 +1294,8 @@ export default {
 .search-btn {
 	border-radius: 0px;
 	float: right;
-	padding: 0 10px;
+	padding: 0 15px;
+	margin-right: 40px;
 }
 
 :deep(.ivu-modal-fullscreen .ivu-modal-body) {

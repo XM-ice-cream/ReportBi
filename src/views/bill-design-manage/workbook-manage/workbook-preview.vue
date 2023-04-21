@@ -137,7 +137,7 @@ export default {
 			getChartsInfoReq(obj)
 				.then((res) => {
 					//存在有数据返回 但code=-1(数据超过最大范围)
-					if (res.code == 200 || res.result.length > 0) {
+					if (res.code == 200 || res.result?.length > 0) {
 						if (res.code == -1) this.$Msg.warning(`${res.message}`);
 
 						this.chartsData = res?.result || [];
@@ -145,7 +145,7 @@ export default {
 							this.$refs.tempRef.pageLoad();
 						});
 					} else {
-						this.$Msg.error(`查询失败，${res.message}`);
+						this.$Msg.error(`${res.message}`);
 					}
 				})
 				.finally(() => {

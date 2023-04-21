@@ -1,7 +1,16 @@
 /**创建计算字段 */
 <template>
 	<!-- 函数管理 -->
-	<Modal :title="isAdd ? '新建计算字段' : '编辑计算字段'" v-model="modelFlag" width="1500" draggable :mask-closable="false" :mask="true">
+	<Modal
+		:title="isAdd ? '新建计算字段' : '编辑计算字段'"
+		v-model="modelFlag"
+		width="1500"
+		draggable
+		:mask-closable="false"
+		:mask="true"
+		:closable="true"
+		:before-close="cancelClick"
+	>
 		<div class="create-field">
 			<div class="left-box">
 				<Input type="text" v-model="submitData.columnName" clearabled />

@@ -1,6 +1,6 @@
 /* 数据集 */
 <template>
-	<div class="page-style">
+	<div class="page-style data-set">
 		<!-- 页面表格 -->
 		<div class="comment">
 			<Card :bordered="false" dis-hover class="card-style">
@@ -37,7 +37,7 @@
 						</i-col>
 						<i-col span="18" style="text-align: right">
 							<Dropdown size="small" @on-click="addClick">
-								<Button type="primary" custom-icon="iconfont icon-add"
+								<Button type="primary" custom-icon="iconfont icon-add" style="height: 30px; padding: 0 8px"
 									>新增
 									<Icon type="ios-arrow-down"></Icon>
 								</Button>
@@ -313,19 +313,21 @@ export default {
 };
 </script>
 <style lang="less" scope>
-.tableBtn {
-	display: inline-block;
-	padding: 0.4rem;
-	color: #181da1;
-	background: #f5f5f5;
+.data-set {
+	.tableBtn {
+		display: inline-block;
+		padding: 0.4rem;
+		color: #181da1;
+		background: #f5f5f5;
 
-	border-radius: 0.2rem;
-	box-shadow: 0px 2px 3px #ccc;
-	cursor: pointer;
-	&:active {
-		background: #40e49f;
-		color: #fff;
-		box-shadow: none;
+		border-radius: 0.2rem;
+		box-shadow: 0px 2px 3px #ccc;
+		cursor: pointer;
+		&:active {
+			background: #40e49f;
+			color: #fff;
+			box-shadow: none;
+		}
 	}
 }
 </style>

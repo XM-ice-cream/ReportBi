@@ -1,7 +1,7 @@
 /* 抽检标准 */
 <template>
 	<div>
-		<Table :border="true" :max-height="250" :columns="columns" :data="data">
+		<Table :max-height="250" :columns="columns" :data="data">
 			<!-- 类型 -->
 			<template slot-scope="{ index }" slot="type">
 				<Select

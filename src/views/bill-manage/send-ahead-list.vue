@@ -1,6 +1,6 @@
 /* Sendahead List */
 <template>
-	<div class="page-style">
+	<div class="page-style send-ahead-report">
 		<Drawer v-model="drawerFlag" :title="`Sendahead List${isAdd ? '新增' : '编辑'}`" width="650" :mask-closable="false" :before-close="cancelClick">
 			<Form ref="submitReq" :model="submitData" :label-width="80" :label-colon="true" @submit.native.prevent>
 				<!-- 机种 -->
@@ -480,19 +480,21 @@ export default {
 };
 </script>
 <style scoped lang="less">
-.tableBtn {
-	display: inline-block;
-	padding: 0.2rem;
-	color: #1890ff;
-	background: #f5f5f5;
+.send-ahead-report {
+	.tableBtn {
+		display: inline-block;
+		padding: 0.2rem;
+		color: #1890ff;
+		background: #f5f5f5;
 
-	border-radius: 0.2rem;
-	box-shadow: 0px 2px 3px #ccc;
-	cursor: pointer;
-	&:active {
-		background: #40e49f;
-		color: #fff;
-		box-shadow: none;
+		border-radius: 0.2rem;
+		box-shadow: 0px 2px 3px #ccc;
+		cursor: pointer;
+		&:active {
+			background: #40e49f;
+			color: #fff;
+			box-shadow: none;
+		}
 	}
 }
 </style>

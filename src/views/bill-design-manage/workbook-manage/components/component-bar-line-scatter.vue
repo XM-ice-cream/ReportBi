@@ -66,8 +66,9 @@ export default {
 				yAxis: yAxis,
 				series: seriesResult,
 			};
-			myChart.setOption(option, true);
 			console.log(option);
+			myChart.setOption(option, true);
+
 			window.addEventListener("resize", function () {
 				if (myChart) {
 					myChart.resize();
