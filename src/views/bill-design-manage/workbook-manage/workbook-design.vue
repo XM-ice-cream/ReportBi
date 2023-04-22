@@ -421,11 +421,13 @@ export default {
 			rowData: [], //行值
 			markData: [{ name: "全部", chartType: "bar", data: [] }],
 			chartList: [
+				{ label: "文本", value: "componentText" },
 				{ label: "柱状图", value: "bar" },
 				{ label: "折线图", value: "line" },
 				{ label: "散点图", value: "scatter" },
 				{ label: "盒须图", value: "componentBoxplot" },
 				{ label: "饼图", value: "componentPie" },
+				{ label: "热力图", value: "componentHeatMap" },
 			],
 
 			// 验证实体

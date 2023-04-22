@@ -16,10 +16,11 @@
 import barLineScatter from "./component-bar-line-scatter.vue"; //柱状图
 import componentPie from "./component-pie.vue"; //饼图
 import componentBoxplot from "./component-boxplot.vue"; //箱线图
-
+import componentHeatMap from "./component-heatmap.vue"; //热力图
+import componentText from "./component-text.vue"; //热力图
 export default {
 	name: "componentsTemp",
-	components: { barLineScatter, componentPie, componentBoxplot },
+	components: { barLineScatter, componentPie, componentBoxplot, componentHeatMap, componentText },
 	model: {
 		prop: "value",
 		event: "input",
@@ -64,6 +65,17 @@ export default {
 					},
 				},
 			],
+			visualMap: {
+				min: 0,
+				max: 10,
+				calculable: true,
+				orient: "vertical",
+				right: 50,
+				bottom: "0",
+				inRange: {
+					color: ["transparent"],
+				},
+			},
 		};
 	},
 	methods: {
@@ -107,20 +119,40 @@ export default {
 		},
 		//数据逻辑处理
 		dataLogic() {
-			let obj = {}; //数据分组
 			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] } };
-			let axisConst = []; //维度常量
+			let result = {}; //结果集
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
+				console.log(item);
 				const { axis, orderBy } = item;
 				//指标
 				if (this.numberType(item)) rcSummary[axis].number.push(`${axis}${orderBy}`);
-				//维度
-				if (this.stringType(item)) rcSummary[axis].string.push(`${axis}${orderBy}`);
+				else rcSummary[axis].string.push(`${axis}${orderBy}`);
 			});
-			const { string: xString, number: xNumber } = rcSummary.x;
-			const { string: yString, number: yNumber } = rcSummary.y;
+			console.log(rcSummary);
+
+			//有指标
+			result = this.numberFunction(rcSummary);
+
+			return { ...result };
+		},
+
+		// ====================================行.列中有指标===============================================
+		// 行 列中有指标
+		numberFunction(rcSummary) {
+			let axisConst = []; //维度常量
+			let obj = {}; //数据分组
+			let { string: xString, number: xNumber } = rcSummary.x;
+			let { string: yString, number: yNumber } = rcSummary.y;
+			//说明行列均为指标
+			console.log(rcSummary, xString.length, !xString.length && !yString.length);
+			if (!xString.length && !yString.length) {
+				xString = xNumber;
+				yString = yNumber;
+				yNumber = [];
+				xNumber = [];
+			}
 			// 列中有指标，对所有行维度进行分组
 			const groupByString = yNumber.length ? xString : yString;
 			const groupByNumber = yNumber.length ? yNumber : xNumber;
@@ -143,30 +175,65 @@ export default {
 					axisConst[index].push(obj[keyItem][0][rowItem]);
 				});
 			});
-
+			console.log(obj);
+			//如果 行列均为维度 获取x的所有常量
+			let axisConstX = [];
+			let stringObj = {};
+			if (!xNumber.length && !yNumber.length) {
+				valueResult.forEach((item) => {
+					let stringData = "";
+					xString.forEach((rowItem) => {
+						stringData += item[rowItem];
+					});
+					if (!stringObj[stringData]) stringObj[stringData] = [];
+					stringObj[stringData].push(item);
+				});
+				xString.forEach((item, index) => {
+					Object.values(obj)
+						.flat()
+						.forEach((value) => {
+							if (!axisConstX[index]) axisConstX[index] = [];
+							axisConstX[index].push(value[item]);
+						});
+				});
+			}
+			console.log("行列数据与", stringObj, axisConstX);
 			const objKeys = Object.keys(obj);
 
 			//标记
 			const markObj = this.markDataLogic();
 
 			// 行、列
-			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj);
+			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj);
 			//series
-			const { series, legend } = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj);
+			const { series, legend } = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString);
 
 			//dataZoom
 			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber);
 
-			return { xAxis, yAxis, grid, series: series.flat(), groupByString, groupByNumber, dataZoom, legend, resultKeys: Object.keys(obj) };
+			return {
+				xAxis,
+				yAxis,
+				grid,
+				series: series.flat(),
+				groupByString,
+				groupByNumber,
+				dataZoom,
+				legend,
+				resultKeys: Object.keys(obj),
+				visualMap: this.visualMap,
+			};
 		},
-
 		//获取x,y轴 grid属性设定
-		getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString) {
+		getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj) {
 			let gridWidth = 0;
+			let bottomWidth = 0;
 			let yAxis = [];
 			let xAxis = [];
 			let axisLabelData = [];
 			let grid = [];
+			let isAllNumber = !xNumber.length && !yNumber.length; //均为维度
+			console.log(isAllNumber, axisConstX);
 			//列中有指标
 			if (yNumber.length) {
 				yAxis = this.axisNumber;
@@ -213,66 +280,152 @@ export default {
 				});
 				grid = [{ bottom: gridWidth + groupByString.length * 10 }];
 			} else {
-				//行列均无指标
-				if (!xNumber.length && !yNumber.length) {
-					xAxis = this.axisString;
-				} else {
-					//行中有指标，列均为维度
-					xAxis = this.axisNumber;
-					this.$XEUtils.lastEach(axisConst, (item, index) => {
-						axisLabelData[index] = [];
+				//行中有指标，列均为维度
+				xAxis = isAllNumber ? [] : this.axisNumber;
+				this.$XEUtils.lastEach(axisConst, (item, index) => {
+					console.log("item", item, axisConst);
+					axisLabelData[index] = [];
 
-						// 文本宽度;
-						const labelWidth =
-							this.mark[0].data.filter((markItem) => {
-								return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnRename;
-							})[0]?.markValue || 90;
+					// 文本宽度;
+					const labelWidth =
+						this.mark[0].data.filter((markItem) => {
+							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnRename;
+						})[0]?.markValue || 90;
 
-						gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
-
-						yAxis.push({
-							...this.axisString[0],
-							name: this.axisToField(`y${index}`),
-							nameLocation: "start",
-							data: item,
-							axisLabel: {
-								show: true,
-								interval: 0,
-								rotate: 0,
-								width: labelWidth,
-								overflow: "truncate",
-								align: "right",
-								formatter: function (value, valueIndex, data) {
-									axisLabelData[index][valueIndex] = value;
-									if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
-									if (value === axisLabelData[index][valueIndex - 1]) return "";
-									else return value;
-								},
-							},
-							inverse: true, //反向坐标
-							position: "left",
-							offset: gridWidth - labelWidth,
-						});
-					});
+					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
 
 					yAxis.push({
 						...this.axisString[0],
-						data: objKeys,
-						show: false,
+						name: this.axisToField(`y${index}`),
+						nameLocation: "start",
+						data: item,
+						axisLabel: {
+							show: true,
+							interval: 0,
+							rotate: 0,
+							width: labelWidth,
+							overflow: "truncate",
+							align: "right",
+							formatter: function (value, valueIndex, data) {
+								axisLabelData[index][valueIndex] = value;
+								if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+								if (value === axisLabelData[index][valueIndex - 1]) return "";
+								else return value;
+							},
+						},
+						splitArea: {
+							show: isAllNumber,
+						},
 						inverse: true, //反向坐标
+						position: "left",
+						offset: gridWidth - labelWidth,
 					});
-					grid = [{ left: gridWidth + groupByString.length * 10 }];
+				});
+				//均为维度的逻辑
+				if (isAllNumber) {
+					axisConstX.forEach((item, index) => {
+						console.log(item);
+						// 文本宽度;
+						const labelWidth =
+							this.mark[0].data.filter((markItem) => {
+								return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnRename;
+							})[0]?.markValue || 90;
+
+						bottomWidth += bottomWidth == 0 ? labelWidth : labelWidth + 10;
+
+						xAxis.push({
+							...this.axisString[0],
+							data: item,
+							show: true,
+							position: "bottom",
+							axisLabel: {
+								show: true,
+								interval: 0,
+								rotate: 90,
+								width: 90,
+								overflow: "truncate",
+								align: "bottom",
+							},
+							splitArea: {
+								show: isAllNumber,
+							},
+							offset: bottomWidth - labelWidth,
+						});
+					});
+					xAxis.push({
+						...this.axisString[0],
+						data: Object.keys(stringObj),
+						show: false,
+						position: "bottom",
+						splitArea: {
+							show: isAllNumber,
+						},
+					});
 				}
+
+				yAxis.push({
+					...this.axisString[0],
+					data: objKeys,
+					show: false,
+					inverse: true, //反向坐标
+					splitArea: {
+						show: isAllNumber,
+					},
+				});
+				grid = [{ left: gridWidth + groupByString.length * 10, bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90 }];
 			}
 			return { xAxis, yAxis, grid };
 		},
 		//获取series /legend
-		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj) {
+		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString) {
 			let series = [];
 			let legend = [];
+			let stringData = []; //维度汇总数据
+			console.log(obj, markObj, xString, groupByString);
+			//说明均为维度
+			if (axisConstX.length) {
+				const { mark: markArray, type, color } = markObj[undefined];
+				console.log(markObj);
+				objKeys.forEach((key) => {
+					obj[key].forEach((item) => {
+						let name = "";
+						let labels = [];
+						let value = [item[Object.keys(color)]] || labels;
+						console.log(Object.keys(color));
+
+						xString.forEach((xkey) => {
+							name += item[xkey];
+						});
+						markArray.forEach((mkey) => {
+							labels.push(item[mkey]);
+						});
+						stringData.push([name, key, value.toString(), labels.toString()]);
+					});
+				});
+				series = [
+					[
+						{
+							type: type,
+							data: stringData,
+							yAxisIndex: groupByString.length,
+							xAxisIndex: xString.length,
+							label: {
+								show: true,
+								color: "#000",
+								formatter: function (val) {
+									console.log(val);
+									return val.data[3].replace(",", "\n");
+								},
+							},
+						},
+					],
+				];
+				return { series, legend };
+			}
 			groupByNumber.forEach((item, index) => {
+				const markValue = markObj[item] ? markObj[item] : markObj[undefined];
 				//颜色、标签
-				const { color: markObjColor, mark: markArray, type } = markObj[item];
+				const { color: markObjColor, mark: markArray, type } = markValue;
 
 				//legend 设定
 				if (JSON.stringify(markObjColor) !== "{}") {
@@ -332,6 +485,7 @@ export default {
 					});
 				});
 			});
+
 			return { series, legend };
 		},
 		//增减进度条
@@ -478,6 +632,7 @@ export default {
 		//字符串类型
 		stringType(item) {
 			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
+			console.log(item.dataType, item.calculatorFunction, !item.calculatorFunction);
 			return item.dataType !== "Number" || !item.calculatorFunction || stringFunction.includes(item.calculatorFunction);
 		},
 
