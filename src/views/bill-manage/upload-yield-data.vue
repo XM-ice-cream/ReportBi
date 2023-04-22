@@ -48,6 +48,7 @@ export default {
 			file: null,
 			uploadFormat: ["xlsx"],
 			maxSize: 2048,
+			drawerTitle: "上传文件",
 		};
 	},
 	activated() {},
@@ -75,10 +76,9 @@ export default {
 				if (res.code === 200) {
 					this.$Message.success(this.drawerTitle + this.$t("success"));
 				} else {
-					let content = `${errorType(this, res)}<br> ${res.message}`;
 					this.$Modal.error({
 						title: this.drawerTitle + this.$t("fail"),
-						content: content,
+						content: `${res.message}`,
 					});
 				}
 			});
@@ -90,6 +90,8 @@ export default {
 			let ext = file.name.split(".").pop().toLowerCase();
 			if (!this.isAssetTypeAnImage(ext)) {
 				this.$Msg.warning(`${file.name}。${this.$t("uploadFormError")}.${this.uploadFormat.join(",.")}`);
+			} else {
+				this.importData();
 			}
 			//终止上传改为自定义
 			return false;

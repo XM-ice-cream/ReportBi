@@ -21,7 +21,6 @@ export const importReq = data => {
     baseUrl: window.localStorage.getItem("reportip"),
     url: '/api/reportcenter/virtualreport/v1/virtualyieldmgr/importyielddata',
     method: 'post',
-    responseType: 'arraybuffer',
     data
   })
 }
