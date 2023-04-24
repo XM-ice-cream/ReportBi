@@ -1,96 +1,111 @@
 /* Maverick SYL 图表*/
 <template>
-	<div class="page-style">
+	<div class="page-style maverick-report">
 		<!-- 页面表格 -->
 		<div class="comment">
 			<Card :bordered="false" dis-hover class="card-style">
 				<div slot="title">
 					<Row>
-						<i-col span="12">
-							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-								<Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
-									{{ $t("selectQuery") }}
-								</Button>
-								<div class="poptip-style-content" slot="content">
-									<Form
-										ref="searchReq"
-										:model="req"
-										:label-width="80"
-										:label-colon="true"
-										:rules="ruleValidate"
-										@submit.native.prevent
-										@keyup.native.enter="searchClick"
+						<i-col span="22">
+							<Form
+								ref="searchReq"
+								:model="req"
+								inline
+								:label-width="80"
+								:label-colon="true"
+								:rules="ruleValidate"
+								@submit.native.prevent
+								@keyup.native.enter="searchClick"
+							>
+								<!-- 是否刷新 -->
+								<!-- <FormItem label="自动刷新" prop="isRefresh">
+									<i-switch v-model="req.isRefresh" style="width: 50px">
+										<template #open>
+											<span>On</span>
+										</template>
+										<template #close>
+											<span>Off</span>
+										</template>
+									</i-switch>
+								</FormItem> -->
+								<!-- 刷新频率 -->
+								<!-- <FormItem label="刷新频率(/mins)" prop="refeshRate" v-if="req.isRefresh" :label-width="120">
+									<InputNumber v-model="req.refeshRate" controls-outside />
+								</FormItem> -->
+								<!-- 起始时间 -->
+								<FormItem :label="$t('startTime')" prop="startTime" v-if="!req.isRefresh">
+									<DatePicker
+										transfer
+										type="datetime"
+										:placeholder="$t('pleaseSelect') + $t('startTime')"
+										format="yyyy-MM-dd HH:mm:ss"
+										:options="$config.datetimeOptions"
+										v-model="req.startTime"
+									></DatePicker>
+								</FormItem>
+								<!-- 结束时间 -->
+								<FormItem :label="$t('endTime')" prop="endTime" v-if="!req.isRefresh">
+									<DatePicker
+										transfer
+										type="datetime"
+										:placeholder="$t('pleaseSelect') + $t('endTime')"
+										format="yyyy-MM-dd HH:mm:ss"
+										:options="$config.datetimeOptions"
+										v-model="req.endTime"
+									></DatePicker>
+								</FormItem>
+								<!-- 类型 -->
+								<FormItem label="类型" prop="type">
+									<Select
+										v-model.tirm="req.type"
+										transfer
+										:placeholder="$t('pleaseSelect') + '类型'"
+										clearable
+										@on-change="getLine"
+										style="width: 200px"
 									>
-										<!-- 是否刷新 -->
-										<FormItem label="自动刷新" prop="isRefresh">
-											<i-switch v-model="req.isRefresh" style="width: 50px">
-												<template #open>
-													<span>On</span>
-												</template>
-												<template #close>
-													<span>Off</span>
-												</template>
-											</i-switch>
-										</FormItem>
-										<!-- 刷新频率 -->
-										<FormItem label="刷新频率(/mins)" prop="refeshRate" v-if="req.isRefresh" :label-width="120">
-											<InputNumber v-model="req.refeshRate" controls-outside />
-										</FormItem>
-										<!-- 起始时间 -->
-										<FormItem :label="$t('startTime')" prop="startTime" v-if="!req.isRefresh">
-											<DatePicker
-												transfer
-												type="datetime"
-												:placeholder="$t('pleaseSelect') + $t('startTime')"
-												format="yyyy-MM-dd HH:mm:ss"
-												:options="$config.datetimeOptions"
-												v-model="req.startTime"
-											></DatePicker>
-										</FormItem>
-										<!-- 结束时间 -->
-										<FormItem :label="$t('endTime')" prop="endTime" v-if="!req.isRefresh">
-											<DatePicker
-												transfer
-												type="datetime"
-												:placeholder="$t('pleaseSelect') + $t('endTime')"
-												format="yyyy-MM-dd HH:mm:ss"
-												:options="$config.datetimeOptions"
-												v-model="req.endTime"
-											></DatePicker>
-										</FormItem>
-										<!-- 类型 -->
-										<FormItem label="类型" prop="type">
-											<Select v-model.tirm="req.type" transfer :placeholder="$t('pleaseSelect') + '类型'" clearable @on-change="getLine">
-												<Option v-for="(item, index) in typeList" :key="index" :value="item">{{ item }}</Option>
-											</Select>
-										</FormItem>
-										<!-- 线体 -->
-										<FormItem label="线体" prop="line">
-											<Select v-model.tirm="req.line" transfer :placeholder="$t('pleaseSelect') + '线体'" clearable @on-change="getStation">
-												<Option v-for="(item, index) in lineList" :key="index" :value="item">{{ item }}</Option>
-											</Select>
-										</FormItem>
-										<!-- 站点 -->
-										<FormItem label="站点" prop="station">
-											<Select v-model.tirm="req.station" transfer :placeholder="$t('pleaseSelect') + '站点'" clearable @on-change="getModel">
-												<Option v-for="(item, index) in stationList" :key="index" :value="item">{{ item }}</Option>
-											</Select>
-										</FormItem>
-										<!-- 机种 -->
-										<FormItem label="机种" prop="model">
-											<Select v-model.tirm="req.model" transfer :placeholder="$t('pleaseSelect') + '机种'" clearable>
-												<Option v-for="(item, index) in modelList" :key="index" :value="item">{{ item }}</Option>
-											</Select>
-										</FormItem>
-									</Form>
-									<div class="poptip-style-button">
-										<Button @click="resetClick()">{{ $t("reset") }}</Button>
-										<Button type="primary" @click="pageLoad()">{{ $t("query") }}</Button>
-									</div>
-								</div>
-							</Poptip>
+										<Option v-for="(item, index) in typeList" :key="index" :value="item">{{ item }}</Option>
+									</Select>
+								</FormItem>
+								<!-- 线体 -->
+								<FormItem label="线体" prop="line">
+									<Select
+										v-model.tirm="req.line"
+										transfer
+										:placeholder="$t('pleaseSelect') + '线体'"
+										clearable
+										@on-change="getStation"
+										style="width: 200px"
+									>
+										<Option v-for="(item, index) in lineList" :key="index" :value="item">{{ item }}</Option>
+									</Select>
+								</FormItem>
+								<!-- 站点 -->
+								<FormItem label="站点" prop="station">
+									<Select
+										v-model.tirm="req.station"
+										transfer
+										:placeholder="$t('pleaseSelect') + '站点'"
+										clearable
+										@on-change="getModel"
+										style="width: 200px"
+									>
+										<Option v-for="(item, index) in stationList" :key="index" :value="item">{{ item }}</Option>
+									</Select>
+								</FormItem>
+								<!-- 机种 -->
+								<FormItem label="机种" prop="model">
+									<Select v-model.tirm="req.model" transfer :placeholder="$t('pleaseSelect') + '机种'" clearable style="width: 200px">
+										<Option v-for="(item, index) in modelList" :key="index" :value="item">{{ item }}</Option>
+									</Select>
+								</FormItem>
+								<FormItem>
+									<Button @click="resetClick()">{{ $t("reset") }}</Button>
+									<Button type="primary" @click="pageLoad()">{{ $t("query") }}</Button>
+								</FormItem>
+							</Form>
 						</i-col>
-						<i-col span="12">
+						<i-col span="2">
 							<button-custom :btnData="btnData" @on-export-click="exportClick"></button-custom>
 						</i-col>
 					</Row>
@@ -341,6 +356,11 @@ export default {
 	},
 };
 </script>
+<style>
+.maverick-report .card-style .ivu-card-body {
+	height: calc(100% - 100px) !important;
+}
+</style>
 <style lang="less" scoped>
 :deep(.ivu-switch-small.ivu-switch-checked:after) {
 	left: 34px;

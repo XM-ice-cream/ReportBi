@@ -51,6 +51,14 @@
 				<FormItem label="预警值" prop="dppmLimit">
 					<Input v-model="submitData.dppmLimit" :placeholder="$t('pleaseEnter') + '预警值'" />
 				</FormItem>
+				<!-- Check Qty -->
+				<FormItem label="Check Qty" prop="checkqty">
+					<Input v-model="submitData.checkqty" :placeholder="$t('pleaseEnter') + 'Check QTY'" />
+				</FormItem>
+				<!-- SAP MRP Area -->
+				<FormItem label="SAP MRP Area" prop="mararea">
+					<Input v-model="submitData.mararea" :placeholder="$t('pleaseEnter') + 'SAP MRP Area'" />
+				</FormItem>
 				<!-- 备注 -->
 				<FormItem label="备注" prop="remark">
 					<Input v-model="submitData.remark" :placeholder="$t('pleaseEnter') + '备注'" />
@@ -223,6 +231,8 @@ export default {
 				apn: "",
 				dppmLimit: 0,
 				remark: "",
+				checkqty: "",
+				mararea: "",
 			},
 			req: {
 				startTime: "",
@@ -257,6 +267,8 @@ export default {
 				{ title: "创建人", key: "createUserID", align: "center", tooltip: true, minWidth: 100 },
 				{ title: "创建时间", key: "createDate", align: "center", tooltip: true, minWidth: 150, render: renderDate },
 				{ title: "推送时间", key: "interDate", align: "center", tooltip: true, minWidth: 150, render: renderDate },
+				{ title: "Check Qty", key: "checkqty", align: "center", tooltip: true, minWidth: 100 },
+				{ title: "SAP MRP Area", key: "mararea", align: "center", tooltip: true, minWidth: 100 },
 				{ title: this.$t("operator"), slot: "operator", minWidth: 125, align: "center", tooltip: true },
 			], // 表格数据
 			data: [], // 表格数据

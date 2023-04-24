@@ -194,7 +194,7 @@ export default {
 						//导出内容的字段
 						rowData = [
 							index + 1,
-							item.id,
+							item.pid,
 							item.serial_Number,
 							item.product,
 							item.resultdate,
