@@ -9,8 +9,20 @@
 					<InputNumber v-model="submitData.markValue" controls-outside :step="10" />
 				</FormItem>
 				<!-- 颜色设定 -->
-				<FormItem label="颜色设定" prop="markValue" v-if="submitData.innerText === 'color'">
+				<FormItem label="颜色设定" prop="markValue" v-if="submitData.innerText === 'color' && !this.numberType(this.submitData)">
 					<Tree :data="submitData.markValue" :render="renderContent"></Tree>
+				</FormItem>
+				<!-- 数字类型颜色设定 -->
+				<FormItem label="颜色设定" v-if="submitData.innerText === 'color' && this.numberType(this.submitData)">
+					<ColorPicker v-model="submitData.markValue.startRange" recommend />
+					<div
+						class="color-bg"
+						:style="{
+							'--start': submitData.markValue.startRange,
+							'--end': submitData.markValue.endRange,
+						}"
+					></div>
+					<ColorPicker v-model="submitData.markValue.endRange" recommend />
 				</FormItem>
 			</Form>
 		</div>
@@ -51,10 +63,13 @@ export default {
 				if (innerText === "labelWidth" && this.isAdd) {
 					this.submitData.markValue = 90;
 				}
-				//新增的时候 需要获取字段对应的所有值
-				if (innerText === "color" && this.isAdd) {
-					//获取对应字段的所有值
-					this.getAllValue();
+				//新增的时候 需要获取字段对应的所有值 新增 或者 类型为数字类型，重新获取字段值
+				if (innerText === "color") {
+					//字符串类型 并且没有标记值
+					if (!this.numberType(this.submitData) && (!this.submitData.markValue || this.submitData.markValue.length === 0)) {
+						//获取对应字段的所有值
+						this.getAllValue();
+					}
 				}
 			}
 		},
@@ -83,6 +98,7 @@ export default {
 		getAllValue() {
 			this.spinShow = true;
 			const { dataType } = this.submitData;
+			console.log("this.submitData", this.submitData);
 			const obj = {
 				filterFields: this.filterData,
 				markField: this.submitData,
@@ -146,6 +162,11 @@ export default {
 				]
 			);
 		},
+		//数字类型
+		numberType(item) {
+			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
+			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction));
+		},
 
 		//关闭弹框
 		cancelClick() {
@@ -161,5 +182,10 @@ export default {
 .mark-fields {
 	height: 500px;
 	overflow: auto;
+}
+.color-bg {
+	height: 24px;
+	margin: 10px 0;
+	background: linear-gradient(to right, var(--start), var(--end));
 }
 </style>

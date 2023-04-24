@@ -420,6 +420,7 @@ export default {
 			columnData: [], //列值
 			rowData: [], //行值
 			markData: [{ name: "全部", chartType: "bar", data: [] }],
+			defaultMarkValue: { startRange: "red", endRange: "green" },
 			chartList: [
 				{ label: "文本", value: "componentText" },
 				{ label: "柱状图", value: "bar" },
@@ -628,10 +629,24 @@ export default {
 
 				// 函数执行
 				default:
-					if (type == "row") this.rowData[index] = { ...this.rowData[index], calculatorFunction: name, sortValue: [] };
-					if (type === "column") this.columnData[index] = { ...this.columnData[index], calculatorFunction: name, sortValue: [] };
+					if (type == "row") {
+						this.rowData[index] = {
+							...this.rowData[index],
+							calculatorFunction: name,
+							sortValue: [],
+						};
+					}
+
+					if (type === "column") {
+						this.columnData[index] = { ...this.columnData[index], calculatorFunction: name, sortValue: [], markValue: this.defaultMarkValue };
+					}
 					if (type === "mark") {
-						this.markData[markIndex].data[index] = { ...this.markData[markIndex].data[index], calculatorFunction: name, sortValue: [] };
+						this.markData[markIndex].data[index] = {
+							...this.markData[markIndex].data[index],
+							calculatorFunction: name,
+							sortValue: [],
+						};
+						this.markData[markIndex].data[index].markValue = this.numberType(this.markData[markIndex].data[index]) ? this.defaultMarkValue : [];
 						const data = this.markData[markIndex].data[index];
 						this.changeMarks(markIndex, "update", data);
 					}
@@ -724,7 +739,7 @@ export default {
 				this.$refs.filterField.modelFlag = true;
 			}
 			//标记(颜色、文本宽度开启弹框)
-			if (["color", "labelWidth"].includes(id) && type !== "mark-box") {
+			if (["labelWidth"].includes(id) && type !== "mark-box") {
 				this.selectObj = { ...this.markData[markIndex].data[newIndex], newIndex, datasetId, markIndex };
 				this.isAdd = true; //新增
 				this.$refs.markField.modelFlag = true;
@@ -947,7 +962,10 @@ export default {
 							}, 1000 * 10);
 							if (flag) this.previewClick(); //跳转至预览界面
 							this.cancelClick(); //关闭弹框
-						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
+						} else {
+							this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}${res.message}`);
+							this.btnDistabled = true;
+						}
 					});
 				}
 			});

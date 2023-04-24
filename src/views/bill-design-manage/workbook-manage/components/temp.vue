@@ -124,13 +124,11 @@ export default {
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
-				console.log(item);
 				const { axis, orderBy } = item;
 				//指标
 				if (this.numberType(item)) rcSummary[axis].number.push(`${axis}${orderBy}`);
 				else rcSummary[axis].string.push(`${axis}${orderBy}`);
 			});
-			console.log(rcSummary);
 
 			//有指标
 			result = this.numberFunction(rcSummary);
@@ -146,7 +144,6 @@ export default {
 			let { string: xString, number: xNumber } = rcSummary.x;
 			let { string: yString, number: yNumber } = rcSummary.y;
 			//说明行列均为指标
-			console.log(rcSummary, xString.length, !xString.length && !yString.length);
 			if (!xString.length && !yString.length) {
 				xString = xNumber;
 				yString = yNumber;
@@ -175,7 +172,6 @@ export default {
 					axisConst[index].push(obj[keyItem][0][rowItem]);
 				});
 			});
-			console.log(obj);
 			//如果 行列均为维度 获取x的所有常量
 			let axisConstX = [];
 			let stringObj = {};
@@ -189,15 +185,29 @@ export default {
 					stringObj[stringData].push(item);
 				});
 				xString.forEach((item, index) => {
-					Object.values(obj)
-						.flat()
-						.forEach((value) => {
-							if (!axisConstX[index]) axisConstX[index] = [];
-							axisConstX[index].push(value[item]);
-						});
+					Object.keys(stringObj).forEach((value) => {
+						if (!axisConstX[index]) axisConstX[index] = [];
+						console.log(value[item]);
+						axisConstX[index].push(stringObj[value][0][item]);
+					});
 				});
+				//如果都是指标 ，要补缺少的值，成为虚假的连续值
+				if (!rcSummary.x.string.length && !rcSummary.y.string.length) {
+					axisConstX.forEach((item, index) => {
+						const min = Math.min.apply(null, item);
+						const max = Math.max.apply(null, item);
+						let resultObj = {};
+						let resultArray = [];
+						for (let i = min; i <= max; i++) {
+							resultArray.push(i);
+							resultObj[i] = axisConstX[index][i];
+						}
+						axisConstX.splice(index, 1, resultArray);
+						stringObj = resultObj;
+					});
+				}
 			}
-			console.log("行列数据与", stringObj, axisConstX);
+			console.log("行列数据与", obj, stringObj, axisConstX, axisConst);
 			const objKeys = Object.keys(obj);
 
 			//标记
@@ -233,7 +243,6 @@ export default {
 			let axisLabelData = [];
 			let grid = [];
 			let isAllNumber = !xNumber.length && !yNumber.length; //均为维度
-			console.log(isAllNumber, axisConstX);
 			//列中有指标
 			if (yNumber.length) {
 				yAxis = this.axisNumber;
@@ -283,7 +292,6 @@ export default {
 				//行中有指标，列均为维度
 				xAxis = isAllNumber ? [] : this.axisNumber;
 				this.$XEUtils.lastEach(axisConst, (item, index) => {
-					console.log("item", item, axisConst);
 					axisLabelData[index] = [];
 
 					// 文本宽度;
@@ -324,12 +332,18 @@ export default {
 				//均为维度的逻辑
 				if (isAllNumber) {
 					axisConstX.forEach((item, index) => {
-						console.log(item);
 						// 文本宽度;
 						const labelWidth =
 							this.mark[0].data.filter((markItem) => {
 								return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnRename;
 							})[0]?.markValue || 90;
+						//颜色
+						console.log(markObj);
+						if (JSON.stringify(markObj[undefined].color) !== "{}") {
+							const { color } = markObj[undefined];
+							const { startRange, endRange } = Object.values(color)[0];
+							this.visualMap = { ...this.visualMap, inRange: { color: [startRange, endRange] } };
+						}
 
 						bottomWidth += bottomWidth == 0 ? labelWidth : labelWidth + 10;
 
@@ -344,7 +358,6 @@ export default {
 								rotate: 90,
 								width: 90,
 								overflow: "truncate",
-								align: "bottom",
 							},
 							splitArea: {
 								show: isAllNumber,
@@ -381,17 +394,14 @@ export default {
 			let series = [];
 			let legend = [];
 			let stringData = []; //维度汇总数据
-			console.log(obj, markObj, xString, groupByString);
 			//说明均为维度
 			if (axisConstX.length) {
 				const { mark: markArray, type, color } = markObj[undefined];
-				console.log(markObj);
 				objKeys.forEach((key) => {
 					obj[key].forEach((item) => {
 						let name = "";
 						let labels = [];
 						let value = [item[Object.keys(color)]] || labels;
-						console.log(Object.keys(color));
 
 						xString.forEach((xkey) => {
 							name += item[xkey];
@@ -402,6 +412,18 @@ export default {
 						stringData.push([name, key, value.toString(), labels.toString()]);
 					});
 				});
+				this.visualMap = {
+					...this.visualMap,
+					min: Math.min.apply(
+						null,
+						stringData.map((item) => item[2] * 1)
+					),
+					max: Math.max.apply(
+						null,
+						stringData.map((item) => item[2] * 1)
+					),
+				};
+
 				series = [
 					[
 						{
@@ -413,7 +435,6 @@ export default {
 								show: true,
 								color: "#000",
 								formatter: function (val) {
-									console.log(val);
 									return val.data[3].replace(",", "\n");
 								},
 							},
@@ -490,12 +511,12 @@ export default {
 		},
 		//增减进度条
 		getDataZoom(xAxis, yAxis, groupByNumber) {
-			// const showData = 50 / groupByNumber.length;
-			// const xAxisEnd = xAxis[0]?.data ? (showData / xAxis[0].data.length) * 100 : 100;
-			// const yAxisEnd = yAxis[0]?.data ? (showData / yAxis[0].data.length) * 100 : 100;
+			const showData = 15 / groupByNumber.length;
+			const xAxisEnd = { end: xAxis[0]?.data ? (showData / xAxis[0].data.length) * 100 : 100 };
+			const yAxisEnd = { end: yAxis[0]?.data ? (showData / yAxis[0].data.length) * 100 : 100 };
 			//滚动条设定  minValueSpan：最小显示的值数量
-			const xAxisEnd = xAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
-			const yAxisEnd = yAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
+			// const xAxisEnd = xAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
+			// const yAxisEnd = yAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
 			const xAxisIndex = xAxis.map((item, index) => index);
 			const yAxisIndex = yAxis.map((item, index) => index);
 			return [
@@ -606,11 +627,16 @@ export default {
 					const { innerText, markValue, axis, orderBy } = markItem;
 					//颜色
 					if (innerText === "color") {
-						markValue?.forEach((data) => {
-							const { title, color } = data;
-							if (!markObj[item.stack].color[`${axis}${orderBy}`]) markObj[item.stack].color[`${axis}${orderBy}`] = {};
-							markObj[item.stack].color[`${axis}${orderBy}`][title] = color;
-						});
+						//数组类型
+						if (Array.isArray(markValue)) {
+							markValue?.forEach((data) => {
+								const { title, color } = data;
+								if (!markObj[item.stack].color[`${axis}${orderBy}`]) markObj[item.stack].color[`${axis}${orderBy}`] = {};
+								markObj[item.stack].color[`${axis}${orderBy}`][title] = color;
+							});
+						} else {
+							markObj[item.stack].color[`${axis}${orderBy}`] = markValue;
+						}
 					}
 					//标签
 					if (innerText === "mark") {
@@ -632,7 +658,6 @@ export default {
 		//字符串类型
 		stringType(item) {
 			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
-			console.log(item.dataType, item.calculatorFunction, !item.calculatorFunction);
 			return item.dataType !== "Number" || !item.calculatorFunction || stringFunction.includes(item.calculatorFunction);
 		},
 
