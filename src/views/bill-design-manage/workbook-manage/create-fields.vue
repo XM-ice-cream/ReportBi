@@ -5,6 +5,7 @@
 		:title="isAdd ? '新建计算字段' : '编辑计算字段'"
 		v-model="modelFlag"
 		width="1500"
+		height="800"
 		draggable
 		:mask-closable="false"
 		:mask="true"
@@ -245,10 +246,11 @@ export default {
 /deep/textarea.ivu-input {
 	background: #000;
 	color: #fff;
+	font-size: 20px;
 }
 .create-field {
 	display: flex;
-	height: 500px;
+	height: 100%;
 	.left-box {
 		width: 1000px;
 		padding: 10px;

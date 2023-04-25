@@ -20,7 +20,7 @@ export default {
 			const _this = this;
 			let seriesResult = [];
 
-			const { xAxis, yAxis, grid, series, groupByString, dataZoom, legend, resultKeys } = this.chartData;
+			const { xAxis, yAxis, grid, series, groupByString, dataZoom, legend, resultKeys, visualMap } = this.chartData;
 
 			//series 根据颜色类别 分类
 			let temp = {};
@@ -67,6 +67,7 @@ export default {
 				series: seriesResult,
 			};
 			console.log(option);
+			option = visualMap ? { ...option, visualMap } : option;
 			myChart.setOption(option, true);
 
 			window.addEventListener("resize", function () {

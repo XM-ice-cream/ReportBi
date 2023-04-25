@@ -76,6 +76,8 @@ export default {
 					color: ["transparent"],
 				},
 			},
+			//颜色的汇总值
+			colorResultSummary: [],
 		};
 	},
 	methods: {
@@ -221,6 +223,9 @@ export default {
 			//dataZoom
 			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber);
 
+			//visualMap
+			const visualMap = this.getVisualMap(markObj);
+
 			return {
 				xAxis,
 				yAxis,
@@ -231,7 +236,7 @@ export default {
 				dataZoom,
 				legend,
 				resultKeys: Object.keys(obj),
-				visualMap: this.visualMap,
+				visualMap,
 			};
 		},
 		//获取x,y轴 grid属性设定
@@ -337,13 +342,6 @@ export default {
 							this.mark[0].data.filter((markItem) => {
 								return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnRename;
 							})[0]?.markValue || 90;
-						//颜色
-						console.log(markObj);
-						if (JSON.stringify(markObj[undefined].color) !== "{}") {
-							const { color } = markObj[undefined];
-							const { startRange, endRange } = Object.values(color)[0];
-							this.visualMap = { ...this.visualMap, inRange: { color: [startRange, endRange] } };
-						}
 
 						bottomWidth += bottomWidth == 0 ? labelWidth : labelWidth + 10;
 
@@ -394,6 +392,7 @@ export default {
 			let series = [];
 			let legend = [];
 			let stringData = []; //维度汇总数据
+			this.colorResultSummary = []; //颜色
 			//说明均为维度
 			if (axisConstX.length) {
 				const { mark: markArray, type, color } = markObj[undefined];
@@ -412,17 +411,7 @@ export default {
 						stringData.push([name, key, value.toString(), labels.toString()]);
 					});
 				});
-				this.visualMap = {
-					...this.visualMap,
-					min: Math.min.apply(
-						null,
-						stringData.map((item) => item[2] * 1)
-					),
-					max: Math.max.apply(
-						null,
-						stringData.map((item) => item[2] * 1)
-					),
-				};
+				this.colorResultSummary = stringData.map((item) => item[2] * 1);
 
 				series = [
 					[
@@ -447,7 +436,7 @@ export default {
 				const markValue = markObj[item] ? markObj[item] : markObj[undefined];
 				//颜色、标签
 				const { color: markObjColor, mark: markArray, type } = markValue;
-
+				console.log("markObjColor", markValue);
 				//legend 设定
 				if (JSON.stringify(markObjColor) !== "{}") {
 					Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
@@ -456,7 +445,11 @@ export default {
 				}
 
 				objKeys.forEach((key) => {
+					console.log(obj[key]);
 					obj[key].forEach((itemValue, itemIndex) => {
+						//visualMap 汇总值 为获取最小值与最大值 [若有颜色设定]
+						if (JSON.stringify(markObjColor) !== "{}") this.colorResultSummary.push(itemValue[Object.keys(markObjColor)[0]]);
+
 						let name = "";
 						groupByString.forEach((rowItem) => {
 							name += itemValue[rowItem];
@@ -480,8 +473,8 @@ export default {
 								},
 							},
 						};
-						// 图表颜色
-						if (JSON.stringify(markObjColor) !== "{}") {
+						// 图表颜色 字符串类型
+						if (JSON.stringify(markObjColor) !== "{}" && !Object.values(markObjColor)[0].startRange) {
 							const colorName = itemValue[Object.keys(markObjColor)[0]];
 							const color = markObjColor[Object.keys(markObjColor)[0]][colorName];
 							data.itemStyle.color = color;
@@ -594,23 +587,45 @@ export default {
 				},
 			];
 		},
+		//获取颜色
+		getVisualMap(markObj) {
+			let result = false;
+			const { color } = markObj[undefined];
+			//说明字段为数字类型
+			if (JSON.stringify(color) !== "{}" && Object.values(color)[0]?.startRange) {
+				const { color } = markObj[undefined];
+				const { startRange, endRange } = Object.values(color)[0];
+				result = {
+					...this.visualMap,
+					inRange: { color: [startRange, endRange] },
+					min: Math.min.apply(null, this.colorResultSummary),
+					max: Math.max.apply(null, this.colorResultSummary),
+				};
+			}
+			return result;
+		},
 		//提示框
 		tooltipFormatter(params, groupByString) {
+			console.log(groupByString, params);
 			let aa = [""];
-			const { data, marker, seriesType, percent } = params;
-			const { value } = data;
-			Object.keys(value[2]).forEach((dataitem) => {
+			const { value, marker, seriesType, percent } = params;
+			const tooltipValue = value[4] ? value[4] : value[2];
+			console.log(tooltipValue);
+			Object.keys(tooltipValue).forEach((dataitem) => {
 				if (groupByString.includes(dataitem)) {
 					aa.splice(
 						groupByString.findIndex((item) => item === dataitem),
 						0,
-						this.axisToField(dataitem) + `:  ${value[2][dataitem]}`
+						this.axisToField(dataitem) + `:  ${tooltipValue[dataitem]}`
 					);
 				}
 
-				if (!groupByString.includes(dataitem) && (value[3] === dataitem || typeof value[2][dataitem] === "string" || dataitem.indexOf("z") > -1)) {
-					if (value[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
-					else aa.push(this.axisToField(dataitem) + `:  ${value[2][dataitem]}`);
+				if (
+					!groupByString.includes(dataitem) &&
+					(value[3] === dataitem || typeof tooltipValue[dataitem] === "string" || dataitem.indexOf("z") > -1)
+				) {
+					if (value[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${tooltipValue[dataitem]}`);
+					else aa.push(this.axisToField(dataitem) + `:  ${tooltipValue[dataitem]}`);
 				}
 			});
 			//饼图增加百分比
