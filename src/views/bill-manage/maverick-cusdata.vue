@@ -48,8 +48,8 @@
 											<Input v-model.trim="req.line" :placeholder="$t('pleaseEnter') + $t('line')" />
 										</FormItem>
 										<!-- 机种 -->
-										<FormItem :label="$t('model')" prop="prop">
-											<Input v-model.trim="req.prop" :placeholder="$t('pleaseEnter') + $t('model')" />
+										<FormItem :label="$t('model')" prop="prod">
+											<Input v-model.trim="req.prod" :placeholder="$t('pleaseEnter') + $t('model')" />
 										</FormItem>
 										<!-- 站点类型 -->
 										<FormItem :label="$t('station')" prop="sttype">
@@ -117,7 +117,7 @@ export default {
 				startTime: "",
 				endTime: "",
 				line: "",
-				prop: "",
+				prod: "",
 				sttype: "",
 				tritype: "SYL",
 				...this.$config.pageConfig,
@@ -221,13 +221,13 @@ export default {
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
 					this.tableConfig.loading = true;
-					const { startTime, endTime, line, sttype, tritype, pageSize, pageIndex, ascending } = this.req;
+					const { startTime, endTime, line, sttype, tritype, pageSize, pageIndex, ascending, prod } = this.req;
 					const obj = {
 						orderField: "line", // 排序字段
 						ascending, // 是否升序
 						pageSize, // 分页大小
 						pageIndex, // 当前页码
-						data: { startTime: formatDate(startTime), endTime: formatDate(endTime), prod: "", line, sttype, tritype },
+						data: { startTime: formatDate(startTime), endTime: formatDate(endTime), prod, line, sttype, tritype },
 					};
 					getpagelistReq(obj)
 						.then((res) => {
