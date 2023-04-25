@@ -21,9 +21,9 @@
 
 <script>
 import { renderDate, formatDate, exportFile } from "@/libs/tools";
-import { getInventoryReq, downloadInventoryReq } from "@/api/bill-manage/inventory-report";
+import { getFailQtyReq, downloadFailQtyReq } from "@/api/bill-manage/inventory-report";
 export default {
-	name: "InventoryTable",
+	name: "BorrowTable",
 	components: {},
 	props: {},
 	data() {
@@ -49,32 +49,32 @@ export default {
 					align: "center",
 				},
 				{
-					title: "连板号",
-					key: "panelno",
+					title: "当前状态",
+					key: "currentstatus",
 					ellipsis: true,
 					tooltip: true,
 					minWidth: 100,
 					align: "center",
 				},
 				{
-					title: "当前站",
-					key: "nextprocessname",
+					title: "NG站点",
+					key: "curprocessname",
 					ellipsis: true,
 					tooltip: true,
 					minWidth: 100,
 					align: "center",
 				},
 				{
-					title: "箱号",
-					key: "cartonno",
+					title: "不良代码",
+					key: "defectcode",
 					ellipsis: true,
 					tooltip: true,
 					minWidth: 100,
 					align: "center",
 				},
 				{
-					title: "入库时间",
-					key: "createdate",
+					title: "进LAB时间",
+					key: "trackintime",
 					ellipsis: true,
 					tooltip: true,
 					minWidth: 100,
@@ -82,12 +82,13 @@ export default {
 					render: renderDate,
 				},
 				{
-					title: "备注",
-					key: "remark",
+					title: "出LAB时间",
+					key: "trackouttime",
 					ellipsis: true,
 					tooltip: true,
 					minWidth: 100,
 					align: "center",
+					render: renderDate,
 				},
 			],
 			title: "",
@@ -108,7 +109,7 @@ export default {
 			this.req = { ...obj };
 			this.title = obj.type;
 			this.tableConfig.loading = true;
-			getInventoryReq(obj)
+			getFailQtyReq(obj)
 				.then((res) => {
 					if (res.code === 200) {
 						this.data = res.result;
@@ -118,7 +119,7 @@ export default {
 		},
 		//导出
 		exportClick() {
-			downloadInventoryReq({ ...this.req }).then((res) => {
+			downloadFailQtyReq({ ...this.req }).then((res) => {
 				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
 				const fileName = `${this.req.type}${formatDate(new Date())}.xlsx`; // 自定义文件名
 				exportFile(blob, fileName);

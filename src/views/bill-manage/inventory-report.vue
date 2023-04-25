@@ -35,7 +35,7 @@
 					</Row>
 				</div>
 				<Table
-					:border="tableConfig.border"
+					:border="true"
 					:highlight-row="tableConfig.highlightRow"
 					:height="tableConfig.height"
 					:loading="tableConfig.loading"
@@ -43,93 +43,100 @@
 					:data="data"
 				>
 					<template slot-scope="{ row }" slot="smT1_Inventory">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
+						<div @click="show(row, 'smT1_Inventory')" style="color: blue; cursor: pointer">
 							{{ row.smT1_Inventory }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="smT1_Borrow">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'smT1_Borrow')" style="color: blue; cursor: pointer">
+							{{ row.smT1_Borrow }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="smT1_FailQty">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'smT1_FailQty')" style="color: blue; cursor: pointer">
+							{{ row.smT1_FailQty }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="bE_Inventory">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'bE_Inventory')" style="color: blue; cursor: pointer">
+							{{ row.bE_Inventory }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="bE_Borrow">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'bE_Borrow')" style="color: blue; cursor: pointer">
+							{{ row.bE_Borrow }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="bE_FailQty">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'bE_FailQty')" style="color: blue; cursor: pointer">
+							{{ row.bE_FailQty }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="smT2_Inventory">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'smT2_Inventory')" style="color: blue; cursor: pointer">
+							{{ row.smT2_Inventory }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="smT2_Borrow">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'smT2_Borrow')" style="color: blue; cursor: pointer">
+							{{ row.smT2_Borrow }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="smT2_FailQty">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'smT2_FailQty')" style="color: blue; cursor: pointer">
+							{{ row.smT2_FailQty }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="test_Inventory">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'test_Inventory')" style="color: blue; cursor: pointer">
+							{{ row.test_Inventory }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="test_Borrow">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'test_Borrow')" style="color: blue; cursor: pointer">
+							{{ row.test_Borrow }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="test_FailQty">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'test_FailQty')" style="color: blue; cursor: pointer">
+							{{ row.test_FailQty }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="fvI_Inventory">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'fvI_Inventory')" style="color: blue; cursor: pointer">
+							{{ row.fvI_Inventory }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="fvI_Borrow">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'fvI_Borrow')" style="color: blue; cursor: pointer">
+							{{ row.fvI_Borrow }}
 						</div>
 					</template>
 					<template slot-scope="{ row }" slot="fvI_FailQty">
-						<div @click="show(row, item)" style="color: blue; cursor: pointer">
-							{{ row.smT1_Inventory }}
+						<div @click="show(row, 'fvI_FailQty')" style="color: blue; cursor: pointer">
+							{{ row.fvI_FailQty }}
 						</div>
 					</template>
 				</Table>
 			</Card>
+
+			<InventoryTable ref="Inventory" />
+			<BorrowTable ref="Borrow" />
+			<FailqtyTable ref="FailQty" />
 		</div>
 	</div>
 </template>
 
 <script>
-import { getListReq } from "@/api/bill-manage/inventory-report";
-import { formatDate, getButtonBoolean } from "@/libs/tools";
+import { getListReq, downloadReq } from "@/api/bill-manage/inventory-report";
+import { formatDate, getButtonBoolean, renderDate, exportFile } from "@/libs/tools";
+import InventoryTable from "./inventory-report/inventoryTable.vue";
+import BorrowTable from "./inventory-report/borrowTable.vue";
+import FailqtyTable from "./inventory-report/failqtyTable.vue";
 
 export default {
 	name: "inventory-report",
-	components: {},
+	components: { InventoryTable, BorrowTable, FailqtyTable },
 	data() {
 		return {
 			searchPoptipModal: false,
@@ -149,9 +156,6 @@ export default {
 					fixed: "left",
 					width: 50,
 					align: "center",
-					indexMethod: (row) => {
-						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
-					},
 				},
 				{
 					title: "Maintain Function",
@@ -328,8 +332,9 @@ export default {
 							key: "f1_TO_F2TIME",
 							ellipsis: true,
 							tooltip: true,
-							minWidth: 100,
+							minWidth: 150,
 							align: "center",
+							render: renderDate,
 						},
 						{
 							title: "1楼转2楼 Qty",
@@ -445,6 +450,10 @@ export default {
 		searchClick() {
 			this.pageLoad();
 		},
+		// 点击重置按钮触发
+		resetClick() {
+			this.$refs.searchReq.resetFields();
+		},
 		// 获取分页列表数据
 		pageLoad() {
 			this.tableConfig.loading = false;
@@ -471,71 +480,31 @@ export default {
 				}
 			});
 		},
-		handleTabRemove(name) {
-			this[name] = false;
-		},
 		// 表格单元格点击事件
-		show(row, cellIndex, type) {
-			const { startTime, endTime, station, yielD_TYPE } = this.req;
-			const count = type == "OPEN" ? row.open : type == "ONGOING" ? row.ongoing : row.closed;
+		show(row, type) {
+			const { workorder } = row;
+			const refsName = type.split("_")[1];
 			let obj = {
-				...row,
-				triggerstatus: type,
-				triggerstatuscount: count,
-				startTime: formatDate(startTime),
-				endTime: formatDate(endTime),
-				station,
-				yielD_TYPE,
+				workorder,
+				type: type.toUpperCase(),
 			};
-			let index = cellIndex + 1;
-			this.tabName = "tab" + index;
-			this["tab" + index] = true;
 			this.$nextTick(() => {
-				this.$refs["tab" + index].req.pageIndex = 1;
-				this.$refs["tab" + index].queryObj = obj;
-				this.$refs["tab" + index].pageLoad(obj);
+				this.$refs[refsName].modalFlag = true;
+				this.$refs[refsName].pageLoad(obj);
 			});
 		},
 		// 导出
 		exportClick() {
-			const { triggerid, model, station, line, yielD_TYPE, type, startTime, endTime } = this.req;
-			let obj = { triggerid, model, station, line, yielD_TYPE, type, startTime: formatDate(startTime), endTime: formatDate(endTime) };
-
-			const excelName = `MaverickTrigger`;
-			getPageListReq(obj).then((res) => {
-				if (res.code === 200) {
-					let data = res.result || [];
-					let titleList = ["序号", "机种", "区段", "制程", "线体", "Yield Type", "Open", "Ongoing", "Close", "Total"]; // 表格表头
-					let tableData = [titleList];
-					tableData[0][0] = "序号";
-					data.map((item, index) => {
-						let rowData = [];
-						//导出内容的字段
-						rowData = [
-							index + 1,
-							item.model,
-							item.stage,
-							item.stationtype,
-							item.line,
-							item.yieldtype,
-							item.open,
-							item.ongoing,
-							item.closed,
-							item.total,
-						];
-						tableData.push(rowData);
-					});
-					let ws = utils.aoa_to_sheet(tableData);
-					let wb = utils.book_new();
-					utils.book_append_sheet(wb, ws, excelName); // 工作簿名称
-					writeFile(wb, `${excelName}.xlsx`); // 保存的文件名
-				}
+			downloadReq({ ...this.req }).then((res) => {
+				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+				const fileName = `${this.$t("inventory-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
+				exportFile(blob, fileName);
 			});
 		},
 
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 230;
+			this.tableConfig.height = document.body.clientHeight - 180;
 		},
 		// 选择第几页
 		pageChange(index) {
