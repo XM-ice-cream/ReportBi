@@ -408,10 +408,11 @@ export default {
 						markArray.forEach((mkey) => {
 							labels.push(item[mkey]);
 						});
-						stringData.push([name, key, value.toString(), labels.toString()]);
+						//数组 最后一个是数值
+						stringData.push([name, key, "", labels.toString(), item, value.toString()]);
 					});
 				});
-				this.colorResultSummary = stringData.map((item) => item[2] * 1);
+				this.colorResultSummary = stringData.map((item) => item[5] * 1);
 
 				series = [
 					[
@@ -422,7 +423,6 @@ export default {
 							xAxisIndex: xString.length,
 							label: {
 								show: true,
-								color: "#000",
 								formatter: function (val) {
 									return val.data[3].replace(",", "\n");
 								},
@@ -438,14 +438,13 @@ export default {
 				const { color: markObjColor, mark: markArray, type } = markValue;
 				console.log("markObjColor", markValue);
 				//legend 设定
-				if (JSON.stringify(markObjColor) !== "{}") {
+				if (JSON.stringify(markObjColor) !== "{}" && !Object.values(markObjColor)[0].startRange) {
 					Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
 						legend.push({ name: item, itemStyle: { color: Object.values(markObjColor)[0][item] } });
 					});
 				}
 
 				objKeys.forEach((key) => {
-					console.log(obj[key]);
 					obj[key].forEach((itemValue, itemIndex) => {
 						//visualMap 汇总值 为获取最小值与最大值 [若有颜色设定]
 						if (JSON.stringify(markObjColor) !== "{}") this.colorResultSummary.push(itemValue[Object.keys(markObjColor)[0]]);
@@ -460,25 +459,20 @@ export default {
 							name: "",
 							value: value,
 							itemStyle: {},
-							// 图表文字显示
-							label: {
-								show: true,
-								position: yNumber.length ? "top" : "right",
-								formatter: function (val) {
-									let result = [];
-									markArray.forEach((item) => {
-										result.push(val.value[2][item]);
-									});
-									return result.join("\n");
-								},
-							},
 						};
 						// 图表颜色 字符串类型
-						if (JSON.stringify(markObjColor) !== "{}" && !Object.values(markObjColor)[0].startRange) {
-							const colorName = itemValue[Object.keys(markObjColor)[0]];
-							const color = markObjColor[Object.keys(markObjColor)[0]][colorName];
-							data.itemStyle.color = color;
-							data.name = colorName;
+						if (JSON.stringify(markObjColor) !== "{}") {
+							//数字
+							if (Object.values(markObjColor)[0].startRange) {
+								//X轴、Y轴、...、数值 最后一个是热力图的对应的值
+								data = [value[0], value[1], { ...itemValue }, typeof value[0] === "number" ? value[0] : value[1]]; //取前两个
+							} else {
+								//字符串
+								const colorName = itemValue[Object.keys(markObjColor)[0]];
+								const color = markObjColor[Object.keys(markObjColor)[0]][colorName];
+								data.itemStyle.color = color;
+								data.name = colorName;
+							}
 						}
 						if (!series[index]) series[index] = [];
 						if (series[index][itemIndex]) {
@@ -492,6 +486,18 @@ export default {
 								data: [data],
 								labelLayout: {
 									hideOverlap: true,
+								},
+								// 图表文字显示
+								label: {
+									show: true,
+									position: yNumber.length ? "top" : "right",
+									formatter: function (val) {
+										let result = [];
+										markArray.forEach((item) => {
+											result.push(val.value[2][item]);
+										});
+										return result.join("\n");
+									},
 								},
 							};
 							series[index].push(seriesObj);
@@ -606,11 +612,10 @@ export default {
 		},
 		//提示框
 		tooltipFormatter(params, groupByString) {
-			console.log(groupByString, params);
+			//	console.log(groupByString, params);
 			let aa = [""];
 			const { value, marker, seriesType, percent } = params;
 			const tooltipValue = value[4] ? value[4] : value[2];
-			console.log(tooltipValue);
 			Object.keys(tooltipValue).forEach((dataitem) => {
 				if (groupByString.includes(dataitem)) {
 					aa.splice(

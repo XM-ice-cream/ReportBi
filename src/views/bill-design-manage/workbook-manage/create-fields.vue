@@ -163,7 +163,7 @@ export default {
 		},
 		//li 标签 双击
 		dbliClick(row) {
-			this.insertAtCursor(`${row.detailName}()`);
+			this.insertAtCursor(`${row.detailCode}`);
 		},
 		//插入数据至光标处
 		async insertAtCursor(myValue) {
@@ -172,7 +172,7 @@ export default {
 			if (myField.selectionStart || myField.selectionStart === 0) {
 				let startPos = myField.selectionStart; //开始位置
 				let endPos = myField.selectionEnd; //结束位置
-				let selectionPos = endPos + myValue.length - 1; //光标选中位置
+				let selectionPos = endPos + myValue.length; //光标选中位置
 
 				const fieldFunction = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
 				this.submitData = { ...this.submitData, fieldFunction };
