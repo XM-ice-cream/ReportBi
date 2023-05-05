@@ -55,3 +55,14 @@ export const lclinkwoReq = data => {
     data
   })
 }
+
+// SN LOG
+export const getListReq = data => {
+  return requestCenter({
+    timeout: 0,
+    baseUrl: window.localStorage.getItem("reportip"),
+    url: '/api/reportcenter/sendahead/v1/sendaheadreport/getsnloglist',
+    method: 'post',
+    data
+  })
+}

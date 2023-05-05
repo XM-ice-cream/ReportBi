@@ -133,8 +133,11 @@
 					<!-- 操作 -->
 					<template slot-scope="{ row }" slot="operator">
 						<div class="tableBtn" @click="lcwo(row)">LC-WO</div>
-					</template></Table
-				>
+					</template>
+					<template slot-scope="{ row }" slot="inputQty">
+						<span style="color: blue; cursor: pointer" @click="inputClick(row)">{{ row.inputQty }}</span>
+					</template>
+				</Table>
 				<page-custom
 					:elapsedMilliseconds="req.elapsedMilliseconds"
 					:total="req.total"
@@ -163,6 +166,8 @@
 				<Button @click="groupSubmitClick">提交</Button>
 			</template>
 		</Modal>
+
+		<InputQtyTable ref="inputQty" />
 	</div>
 </template>
 
@@ -171,10 +176,11 @@ import { getpagelistReq, holdReq, groupReq, lclinkwoReq, exportReq } from "@/api
 import { getButtonBoolean, formatDate, exportFile } from "@/libs/tools";
 import { errorType } from "@/libs/tools";
 import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item";
+import InputQtyTable from "./send-ahead-report/inputQtyTable.vue";
 
 export default {
-	name: "send-ahead-report",
-	components: {},
+	name: "sendahead-report",
+	components: { InputQtyTable },
 	data() {
 		return {
 			searchPoptipModal: false,
@@ -235,7 +241,7 @@ export default {
 				{ title: "ReelID", key: "reel", align: "center", minWidth: 200, tooltip: true },
 				{ title: "预警值", key: "dppmLimit", align: "center", minWidth: 200, tooltip: true },
 				{ title: "Fail数量", key: "failQty", align: "center", minWidth: 200, tooltip: true },
-				{ title: "投入数量", key: "inputQty", align: "center", minWidth: 200, tooltip: true },
+				{ title: "投入数量", slot: "inputQty", align: "center", minWidth: 200, tooltip: true },
 				{ title: "产出数量", key: "outputQty", align: "center", minWidth: 200, tooltip: true },
 				{ title: "MP_DPPM", key: "mP_DPPM", align: "center", minWidth: 200, tooltip: true },
 				{ title: "udfInspection", key: "udfInspection", align: "center", minWidth: 200, tooltip: true },
@@ -343,6 +349,13 @@ export default {
 				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
 				const fileName = `${this.$t("send-ahead-report")}${formatDate(new Date())}.xlsx`; // 自定义文件名
 				exportFile(blob, fileName);
+			});
+		},
+		//投入数量明细查看
+		inputClick(data) {
+			this.$refs.inputQty.modalFlag = true;
+			this.$nextTick(() => {
+				this.$refs.inputQty.pageLoad({ fromId: data.id });
 			});
 		},
 		//删除选择的数据
@@ -489,13 +502,11 @@ export default {
 <style scoped lang="less">
 .tableBtn {
 	display: inline-block;
-	padding: 0.2rem;
+	padding: 7px 10px;
 	color: #1890ff;
-	background: #f5f5f5;
-
-	border-radius: 0.2rem;
-	box-shadow: 0px 2px 3px #ccc;
+	background: #eff7ff;
 	cursor: pointer;
+	border: 1px solid;
 	&:active {
 		background: #40e49f;
 		color: #fff;
