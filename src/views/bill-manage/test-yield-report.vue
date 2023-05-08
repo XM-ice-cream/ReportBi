@@ -45,10 +45,6 @@
 												@on-change="changeSelectPage('modelName')"
 											></DatePicker>
 										</FormItem>
-										<!-- 工单 -->
-										<FormItem :label="$t('workOrder')" prop="workOrder">
-											<Input v-model="req.workOrder" :placeholder="$t('pleaseEnter') + $t('workOrder')" clearable />
-										</FormItem>
 										<!-- 机种名称 -->
 										<FormItem :label="$t('modelName')" prop="modelName">
 											<v-selectpage
@@ -155,6 +151,38 @@
 														};
 													}
 												"
+												@values="changeSelectPage('workOrder')"
+											>
+											</v-selectpage>
+										</FormItem>
+										<!-- WorkOrder -->
+										<FormItem :label="$t('workOrder')" prop="workOrder">
+											<v-selectpage
+												class="select-page-style"
+												key-field="name"
+												show-field="name"
+												v-model="req.workOrder"
+												ref="workOrder"
+												multiple
+												v-if="isWorkOrder && searchPoptipModal"
+												:data="workorderPageListUrl"
+												:placeholder="$t('pleaseEnter') + $t('workOrder')"
+												:params="{
+													startTime: formatDate(req.startTime),
+													endTime: formatDate(req.endTime),
+													modelName: req.modelName,
+													projectVersion: req.projectVersion,
+													buildType: req.buildType,
+													config: req.buildConfig,
+												}"
+												:result-format="
+													(res) => {
+														return {
+															totalRow: res.total,
+															list: res.data || [],
+														};
+													}
+												"
 												@values="changeSelectPage('processName')"
 											>
 											</v-selectpage>
@@ -234,6 +262,7 @@ import {
 	processPageListUrl,
 	projectVersionPageListUrl,
 	buildTypePageListUrl,
+	workorderPageListUrl,
 } from "@/api/bill-manage/test-yield-report";
 import { getButtonBoolean, formatDate, exportFile } from "@/libs/tools";
 
@@ -247,6 +276,7 @@ export default {
 			isProcessName: true,
 			isProjectVersion: true,
 			isBuildType: true,
+			isWorkOrder: true,
 			formatDate: formatDate,
 			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
 			tableConfig: { ...this.$config.tableConfig }, // table配置
@@ -255,6 +285,7 @@ export default {
 			processPageListUrl: processPageListUrl(),
 			projectVersionPageListUrl: projectVersionPageListUrl(),
 			buildTypePageListUrl: buildTypePageListUrl(),
+			workorderPageListUrl: workorderPageListUrl(),
 			data: [], // 表格数据
 			btnData: [],
 			categoryList: [], // 类别下拉框
@@ -409,6 +440,9 @@ export default {
 				case "buildType":
 					this.isBuildType = false;
 					break;
+				case "workOrder":
+					this.isWorkOrder = false;
+					break;
 				default:
 					break;
 			}
@@ -419,6 +453,7 @@ export default {
 				this.isProcessName = true;
 				this.isProjectVersion = true;
 				this.isBuildType = true;
+				this.isWorkOrder = true;
 			});
 		},
 		// 点击重置按钮触发
