@@ -72,7 +72,7 @@ import componentsTemp from "./components/temp.vue";
 import { getChartsInfoReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { getEchoReq } from "@/api/bill-design-manage/workbook-design";
 import { getlistReq } from "@/api/system-manager/data-item";
-import { formatDate } from "@/libs/tools";
+import { formatDate, commaSplitString } from "@/libs/tools";
 
 export default {
 	name: "workbook-preview",
@@ -171,6 +171,8 @@ export default {
 				if (this.getFieldsType("DATE", columnType)) {
 					//数组
 					filterValue = Array.isArray(filterValue) ? [formatDate(filterValue[0]), formatDate(filterValue[1])].toString() : filterValue.toString();
+				} else {
+					filterValue = filterValue ? commaSplitString(filterValue).join() : "";
 				}
 				if (filterValue && filterValue !== ",") flag = true;
 				filterItems.push({ ...item, filterValue });
