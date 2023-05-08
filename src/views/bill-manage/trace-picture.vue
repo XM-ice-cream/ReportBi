@@ -13,6 +13,36 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+										<!-- 起始时间 -->
+										<FormItem :label="$t('startTime')" prop="startTime">
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('startTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.startTime"
+											></DatePicker>
+										</FormItem>
+										<!-- 结束时间 -->
+										<FormItem :label="$t('endTime')" prop="endTime">
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('endTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.endTime"
+											></DatePicker>
+										</FormItem>
+										<!-- PanelNo -->
+										<FormItem label="PanelNo" prop="panelno">
+											<Input v-model="req.panelno" :placeholder="$t('pleaseEnter') + 'PanelNo'" clearabled />
+										</FormItem>
+										<!-- 工单 -->
+										<FormItem label="工单" prop="workorder">
+											<Input v-model="req.workorder" :placeholder="$t('pleaseEnter') + '工单'" clearabled />
+										</FormItem>
 										<!-- UnitId -->
 										<FormItem label="UnitId" prop="unitid">
 											<Input v-model.trim="req.unitid" placeholder="请输入unitid" />
@@ -73,7 +103,11 @@ export default {
 			lineList: [], //线体
 			modelList: [], //机种
 			req: {
+				startTime: "",
+				endTime: "",
 				unitid: "",
+				panelno: "",
+				workorder: "",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -118,13 +152,13 @@ export default {
 			this.$refs.searchReq.validate((validate) => {
 				if (validate) {
 					this.tableConfig.loading = true;
-					const { unitid, ascending, pageSize, pageIndex } = this.req;
+					const { unitid, ascending, pageSize, pageIndex, startTime, endTime, workorder, panelno } = this.req;
 					const obj = {
 						orderField: "unitid", // 排序字段
 						ascending, // 是否升序
 						pageSize, // 分页大小
 						pageIndex, // 当前页码
-						data: { unitid },
+						data: { unitid, startTime: formatDate(startTime), endTime: formatDate(endTime), workorder, panelno },
 					};
 
 					getpagelistReq(obj)
@@ -143,9 +177,13 @@ export default {
 		},
 		// 导出文件
 		exportClick() {
-			const { unitid } = this.req;
+			const { unitid, startTime, endTime, workorder, panelno } = this.req;
 			const obj = {
 				unitid,
+				startTime: formatDate(startTime),
+				endTime: formatDate(endTime),
+				workorder,
+				panelno,
 			};
 			exportReq(obj).then((res) => {
 				let blob = new Blob([res], { type: "application/vnd.ms-excel" });
