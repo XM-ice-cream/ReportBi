@@ -60,6 +60,10 @@
 					@on-current-change="currentClick"
 					@on-selection-change="selectClick"
 				>
+					<template slot="setType" slot-scope="{ row }"
+						><Tag v-if="row.setType === 'http'" color="#00346c" type="dot" size="small">HTTP</Tag>
+						<Tag v-else-if="row.setType === 'sql'" color="#08b9c6" type="dot" size="small">SQL</Tag>
+					</template>
 					<template slot="operation" slot-scope="{ row }">
 						<div class="operator">
 							<p @click="dataview(row)">数据预览</p>
@@ -129,13 +133,13 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
+				{ title: this.$t("sourceType"), slot: "setType", align: "center", tooltip: true },
 				{ title: this.$t("setCode"), key: "setCode", align: "center", tooltip: true },
 				{ title: this.$t("setName"), key: "setName", align: "center", tooltip: true },
-				{ title: this.$t("dataSetDesc"), key: "setDesc", align: "center", tooltip: true },
 				{ title: this.$t("dataSource"), key: "sourceName", align: "center", tooltip: true },
-				{ title: this.$t("sourceType"), key: "setType", align: "center", tooltip: true },
+				{ title: this.$t("dataSetDesc"), key: "setDesc", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled },
-				{ title: "操作", slot: "operation", align: "center", width: "80" },
+				{ title: "操作", slot: "operation", align: "center", width: 80 },
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {

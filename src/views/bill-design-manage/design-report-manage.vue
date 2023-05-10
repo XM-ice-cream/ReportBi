@@ -220,14 +220,14 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: this.$t("reportName"), key: "reportName", align: "center", tooltip: true },
-				{ title: this.$t("reportCode"), key: "reportCode", align: "center", tooltip: true },
-				{ title: this.$t("reportType"), key: "reportType", align: "center", slot: "reportType", width: 120 },
+				{ title: this.$t("reportType"), key: "reportType", align: "center", slot: "reportType", minWidth: 80 },
+				{ title: "报表分类", key: "remark", align: "center", tooltip: true, minWidth: 80 },
+				{ title: this.$t("reportCode"), key: "reportCode", align: "center", tooltip: true, minWidth: 80 },
+				{ title: this.$t("reportName"), key: "reportName", align: "center", tooltip: true, minWidth: 80 },
 				{ title: this.$t("reportAuthor"), key: "reportAuthor", align: "center", tooltip: true },
-				{ title: "报表分类", key: "remark", align: "center", tooltip: true },
-				{ title: this.$t("dataSetDesc"), key: "reportDesc", align: "center", tooltip: true },
-				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
-				{ title: this.$t("operator"), slot: "operator", align: "right", width: "100" },
+				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, minWidth: 80 },
+				{ title: this.$t("dataSetDesc"), key: "reportDesc", align: "center", tooltip: true, minWidth: 80 },
+				{ title: this.$t("operator"), slot: "operator", align: "center", width: 100 },
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
@@ -440,16 +440,4 @@ export default {
 };
 </script>
 
-<style scoped lang="less">
-/deep/.ivu-tag-dot-inner {
-	width: 8px;
-	height: 8px;
-	margin-right: 4px;
-}
-/deep/.ivu-tag-dot {
-	height: 100%;
-	border: none !important;
-	background: transparent !important;
-	line-height: 20px;
-}
-</style>
+<style scoped lang="less"></style>

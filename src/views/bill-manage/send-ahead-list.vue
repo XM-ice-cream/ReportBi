@@ -171,7 +171,7 @@
 					<!-- 操作 -->
 					<template slot-scope="{ row }" slot="operator">
 						<div class="operator">
-							<p @click="getStepList(row)">setup</p>
+							<p @click="getStepList(row)">SetUp</p>
 						</div>
 					</template>
 				</Table>

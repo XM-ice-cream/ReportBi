@@ -223,8 +223,8 @@ export default {
 				},
 				{ title: this.$t("dataSourceCode"), key: "sourceCode", align: "center", tooltip: true },
 				{ title: this.$t("dataSourceName"), key: "sourceName", align: "center", tooltip: true },
-				{ title: this.$t("dataSourceDesc"), key: "sourceDesc", align: "center", tooltip: true },
 				{ title: this.$t("dataSourceType"), key: "sourceType", align: "center", tooltip: true },
+				{ title: this.$t("dataSourceDesc"), key: "sourceDesc", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled },
 			], // 表格数据
 			// 验证实体
