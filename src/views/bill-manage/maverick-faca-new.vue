@@ -220,7 +220,7 @@ export default {
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 120 - 60 - 430;
+			this.tableConfig.height = document.body.clientHeight - 170 - 60 - 430;
 			if (this.tableConfig.height < 200) this.tableConfig.height = 200;
 		},
 		//获取url参数

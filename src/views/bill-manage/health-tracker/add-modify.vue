@@ -24,7 +24,7 @@
 							<Button type="error" ghost class="row-button" custom-icon="iconfont icon-delete" @click="deleteClick(index)"></Button>
 						</template>
 					</Table>
-					<Alert type="warning">输入SN和Location后，回车带出相关信息！</Alert>
+					<Alert type="warning" style="margin-top: 10px">输入SN和Location后，回车带出相关信息！</Alert>
 				</div>
 				<drawer-button @on-cancel="cancelClick" @on-ok="submitClick" @on-okAndClose="submitClick(true)"></drawer-button>
 			</div>

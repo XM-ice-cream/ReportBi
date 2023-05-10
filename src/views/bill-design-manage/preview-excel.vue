@@ -260,12 +260,13 @@ export default {
 </script>
 <style>
 .preview-excel .card-style .ivu-card-body {
-	height: calc(100% - 50px);
+	height: calc(100% - 60px);
+	background: #f5f7f9;
 }
 </style>
 <style scoped lang="less">
 .previewCard {
-	height: calc(100% - 40px);
+	height: calc(100% - 55px);
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: flex-start;
@@ -275,7 +276,7 @@ export default {
 	background-color: #f5f7f9;
 	padding-bottom: 1rem;
 	.cardCell {
-		width: 320px;
+		width: 315px;
 		/* background: #ccc; */
 		border: 2px solid #fafcff;
 		box-shadow: 3px 5px 7px #d0dbf194;

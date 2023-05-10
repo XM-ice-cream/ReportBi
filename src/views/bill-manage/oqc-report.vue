@@ -285,7 +285,7 @@ export default {
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 120 - 60;
+			this.tableConfig.height = document.body.clientHeight - 170 - 60;
 		},
 		// 选择第几页
 		pageChange(index) {
@@ -301,7 +301,7 @@ export default {
 	},
 	mounted() {
 		// window.addEventListener('resize', () => {
-		//   this.tableConfig.height = document.body.clientHeight - 120 - 60;
+		//   this.tableConfig.height = document.body.clientHeight - 170 - 60;
 		// });
 	},
 };

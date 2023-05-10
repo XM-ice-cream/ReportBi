@@ -2,7 +2,7 @@
 <template>
 	<div class="page-style">
 		<Drawer v-model="modalFlag" title="PANEL 打件资料信息补录" width="650" :mask-closable="false" :before-close="cancelClick">
-			<div style="height: calc(100% - 300px)">
+			<div style="height: 100%">
 				<Form
 					ref="submitReq"
 					:model="submitData"
@@ -52,17 +52,17 @@
 							</div>
 						</Alert>
 					</div>
-				</div>
-				<div class="declare">
-					<Alert type="warning">
-						<p>
-							说明：<br />
-							1.一次最多补录10个panelNo【必须是工单相同】;<br />
-							2.用做模板panelNo,可自动抓取或者手动输入【必须工单相同】;<br />
-							3.补录时超过RID剩余量不可操作;<br />
-							4.Watch补B面、Audio补T/B面。
-						</p>
-					</Alert>
+					<div class="declare">
+						<Alert type="warning">
+							<p>
+								说明：<br />
+								1.一次最多补录10个panelNo【必须是工单相同】;<br />
+								2.用做模板panelNo,可自动抓取或者手动输入【必须工单相同】;<br />
+								3.补录时超过RID剩余量不可操作;<br />
+								4.Watch补B面、Audio补T/B面。
+							</p>
+						</Alert>
+					</div>
 				</div>
 			</div>
 		</Drawer>
@@ -270,7 +270,7 @@ export default {
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 130 - 50;
+			this.tableConfig.height = document.body.clientHeight - 170 - 60;
 		},
 
 		// 选择第几页
@@ -320,8 +320,8 @@ export default {
 	}
 }
 .form-content {
-	width: 50%;
-	height: 50%;
+	width: 100%;
+	height: 30%;
 	float: left;
 	position: relative;
 	.declare {
@@ -332,7 +332,7 @@ export default {
 }
 .log-box {
 	width: 100%;
-	height: 300px;
+	height: 70%;
 	background: #f7feff;
 	border: 1px solid #27ce88;
 	padding: 10px;
@@ -346,7 +346,7 @@ export default {
 		color: #484848;
 	}
 	.log-content {
-		height: calc(100% - 45px);
+		height: calc(100% - 145px);
 		padding: 10px;
 		overflow-x: hidden;
 		overflow-y: auto;

@@ -49,9 +49,10 @@
 
 	// content部分修改
 	.content-wrapper {
-		padding: 5px;
-		height: calc(@baseSize - 80px);
+		padding: 20px;
+		height: calc(@baseSize - 96px);
 		overflow: auto;
+		box-shadow: 1px 1px 5px #e0e4e9 inset;
 
 		&-div {
 			height: @baseSize; // 自定义背景颜色
@@ -66,5 +67,9 @@
 
 	.main-content-con {
 		height: calc(@baseSize - 60px);
+	}
+	.comment .ivu-card-body {
+		padding: 0;
+		height: calc(100% - 41px);
 	}
 }

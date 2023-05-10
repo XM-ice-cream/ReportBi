@@ -64,8 +64,9 @@
 					<Input v-model="submitData.remark" :placeholder="$t('pleaseEnter') + '备注'" />
 				</FormItem>
 			</Form>
-			<div style="margin: 0 auto; text-align: center; margin-top: 10px">
-				<Button style="margin-right: 8px" @click="cancelClick">Cancel</Button> <Button type="primary" @click="submitClick">Submit</Button>
+			<div class="drawer-footer">
+				<Button style="margin-right: 8px" @click="cancelClick">{{ $t("cancel") }}</Button>
+				<Button type="primary" @click="submitClick">{{ $t("ok") }}</Button>
 			</div>
 		</Drawer>
 		<!-- 页面表格 -->
@@ -195,10 +196,14 @@
 					<Checkbox v-model="setupData[index].checkState" :true-value="1" :false-value="0"></Checkbox>
 				</template>
 			</Table>
-			<template #footer>
+			<div slot="footer" style="text-align: right">
+				<Button @click="modalFlag = false">{{ $t("cancel") }}</Button>
+				<Button type="primary" @click="modalSubmitClick">{{ $t("ok") }}</Button>
+			</div>
+			<!-- <template #footer>
 				<Button @click="modalFlag = false">关闭</Button>
 				<Button @click="modalSubmitClick">提交</Button>
-			</template>
+			</template> -->
 		</Modal>
 	</div>
 </template>
@@ -477,7 +482,7 @@ export default {
 		},
 		// 自动改变表格高度
 		autoSize() {
-			this.tableConfig.height = document.body.clientHeight - 120 - 60;
+			this.tableConfig.height = document.body.clientHeight - 170 - 60;
 		},
 		// 选择第几页
 		pageChange(index) {

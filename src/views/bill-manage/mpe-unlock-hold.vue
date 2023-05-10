@@ -33,7 +33,7 @@ import { modifyReq } from "@/api/bill-manage/mpe-unlock-hold";
 import { commaSplitString } from "@/libs/tools";
 
 export default {
-	name: "MpeUnlockHold",
+	name: "mpe-unlock-hold",
 	data() {
 		return {
 			req: {
@@ -80,8 +80,8 @@ export default {
 <style lang="less" scoped>
 #serinRowData {
 	.ivu-row {
-		margin-left: 15%;
-		margin-top: 8%;
+		padding-left: 15%;
+		padding-top: 8%;
 		text-align: center;
 	}
 	/deep/.ivu-form .ivu-form-item-label {

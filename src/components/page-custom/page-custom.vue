@@ -1,7 +1,22 @@
 <template>
 	<div class="pageStyle">
 		<div class="pageStyle_left">
-			<Page class-name="custom-page" :total="total" :page-size="pageSize" :current="pageIndex" :page-size-opts="pageSizeList" :prev-text="prevText" :next-text="nextText" size="small" show-total show-sizer show-elevator simple @on-change="pageChange" @on-page-size-change="pageSizeChange">
+			<Page
+				class-name="custom-page"
+				:total="total"
+				:page-size="pageSize"
+				:current="pageIndex"
+				:page-size-opts="pageSizeList"
+				:prev-text="prevText"
+				:next-text="nextText"
+				size="small"
+				show-total
+				show-sizer
+				show-elevator
+				simple
+				@on-change="pageChange"
+				@on-page-size-change="pageSizeChange"
+			>
 				<slot>{{ pageShowTips }}</slot>
 			</Page>
 			<Select v-model="pageSize" size="small" class="custom-page" style="width: 90px" @on-change="pageSizeChange">
@@ -39,7 +54,11 @@ export default {
 	computed: {
 		// 提示信息
 		pageShowTips() {
-			return this.total === 0 ? "" : `${this.$t("pageTips1")}${this.total}, ${this.$t("pageTips2")}${this.totalPage}${this.elapsedMilliseconds ? `, 耗时：${this.elapsedMilliseconds}ms` : ""}`;
+			return this.total === 0
+				? ""
+				: `${this.$t("pageTips1")}${this.total}, ${this.$t("pageTips2")}${this.totalPage}${
+						this.elapsedMilliseconds ? `, 耗时：${this.elapsedMilliseconds}ms` : ""
+				  }`;
 		},
 	},
 	methods: {
@@ -65,6 +84,7 @@ export default {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 5px;
 	.pageStyle_left {
 		display: flex;
 		align-items: center;
