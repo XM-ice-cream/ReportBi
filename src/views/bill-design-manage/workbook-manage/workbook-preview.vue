@@ -1,5 +1,5 @@
 <template>
-	<div class="page-style workbook-preview-content">
+	<div class="main page-style workbook-preview-content">
 		<div class="comment">
 			<Card :bordered="false" dis-hover class="card-style">
 				<div slot="title">
@@ -100,6 +100,9 @@ export default {
 			getEchoReq({ id: this.submitData.id }).then((res) => {
 				if (res.code == 200) {
 					const { calcItems, filterItems, markStyle, datasetId, workBookName, workBookCode, maxNumber } = res.result;
+					//修改浏览器titile
+					document.title = workBookName;
+
 					this.submitData = { ...this.submitData, datasetId, workBookName, workBookCode, maxNumber };
 
 					this.filterData = filterItems.map((item) => {

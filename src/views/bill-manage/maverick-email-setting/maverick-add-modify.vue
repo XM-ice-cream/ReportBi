@@ -92,7 +92,7 @@ export default {
 	},
 	data() {
 		return {
-			groupTypeList: ["FACA", "EarlyWarning", "MaverickSYLWarning"], //群组类型
+			groupTypeList: ["FACA", "EarlyWarning", "MaverickSYLWarning", "MaverickSBLWarning"], //群组类型
 			submitData: {
 				grouP_TYPE: "",
 				grouP_NAME: "",

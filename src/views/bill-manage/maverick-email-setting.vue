@@ -79,7 +79,7 @@ export default {
 			tableConfig: { ...this.$config.tableConfig }, // table配置
 			data: [], // 表格数据
 			btnData: [],
-			groupTypeList: ["FACA", "EarlyWarning", "MaverickSYLWarning"], //群组类型
+			groupTypeList: ["FACA", "EarlyWarning", "MaverickSYLWarning", "MaverickSBLWarning"], //群组类型
 			req: {
 				grouP_TYPE: "",
 				grouP_NAME: "",
