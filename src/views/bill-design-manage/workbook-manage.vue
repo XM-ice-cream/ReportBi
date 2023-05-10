@@ -54,7 +54,9 @@
 						<span>{{ dataSetIdName[row.datasetId] }}</span>
 					</template>
 					<template slot="operator" slot-scope="{ row }">
-						<Button class="tableBtn" type="text" @click="preview(row)">预览</Button>
+						<div class="operator">
+							<p @click="preview(row)">预览</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom
@@ -301,26 +303,4 @@ export default {
 };
 </script>
 
-<style scoped lang="less">
-.workbook-manage {
-	.tableBtn {
-		display: inline-block;
-		padding: 2px 10px;
-		color: #1890ff;
-		background: #eff7ff;
-		cursor: pointer;
-		border: 1px solid #1890ff;
-
-		&:active {
-			background: #40e49f;
-			color: #fff;
-			box-shadow: none;
-		}
-		&:hover {
-			transform: scale(1.1);
-			background: #fff;
-			color: #1890ff;
-		}
-	}
-}
-</style>
+<style scoped lang="less"></style>

@@ -132,7 +132,9 @@
 				>
 					<!-- 操作 -->
 					<template slot-scope="{ row }" slot="operator">
-						<div class="tableBtn" @click="lcwo(row)">LC-WO</div>
+						<div class="operator">
+							<p @click="lcwo(row)">LC-WO</p>
+						</div>
 					</template>
 					<template slot-scope="{ row }" slot="inputQty">
 						<span style="color: blue; cursor: pointer" @click="inputClick(row)">{{ row.inputQty }}</span>
@@ -226,7 +228,7 @@ export default {
 					},
 					fixed: "left",
 				},
-				{ title: "Operator", slot: "operator", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
+				{ title: "Operator", slot: "operator", align: "center", minWidth: 100, tooltip: true, fixed: "right" },
 				{ title: "status", key: "status", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
 				{ title: "机种", key: "project", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
 				{ title: "脚位", key: "location", align: "center", minWidth: 100, tooltip: true, fixed: "left" },
@@ -499,18 +501,4 @@ export default {
 	},
 };
 </script>
-<style scoped lang="less">
-.tableBtn {
-	display: inline-block;
-	padding: 7px 10px;
-	color: #1890ff;
-	background: #eff7ff;
-	cursor: pointer;
-	border: 1px solid;
-	&:active {
-		background: #40e49f;
-		color: #fff;
-		box-shadow: none;
-	}
-}
-</style>
+<style scoped lang="less"></style>

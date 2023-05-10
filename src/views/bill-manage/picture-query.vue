@@ -97,7 +97,7 @@
 					<template slot-scope="{ row }" slot="image">
 						<!-- <Button style="height:16px" v-if="row.fileFullName" type="primary" size="small" @click="previewImage(row.fileFullName)">{{ $t("preview") }}</Button> -->
 						<Button
-							style="height: 16px; margin-left: 5px"
+							style="height: 24px; margin-left: 5px; padding: 5px 10px"
 							v-if="row.fileFullName"
 							type="primary"
 							size="small"

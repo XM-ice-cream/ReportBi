@@ -195,6 +195,7 @@ export default {
 				});
 				//如果都是指标 ，要补缺少的值，成为虚假的连续值
 				if (!rcSummary.x.string.length && !rcSummary.y.string.length) {
+					//行
 					axisConstX.forEach((item, index) => {
 						const min = Math.min.apply(null, item);
 						const max = Math.max.apply(null, item);
@@ -206,6 +207,19 @@ export default {
 						}
 						axisConstX.splice(index, 1, resultArray);
 						stringObj = resultObj;
+					});
+					//列
+					axisConst.forEach((item, index) => {
+						const min = Math.min.apply(null, item);
+						const max = Math.max.apply(null, item);
+						let resultObj = {};
+						let resultArray = [];
+						for (let i = min; i <= max; i++) {
+							resultArray.push(i);
+							resultObj[i] = obj[i] || [];
+						}
+						axisConst.splice(index, 1, resultArray);
+						obj = resultObj;
 					});
 				}
 			}
@@ -612,7 +626,7 @@ export default {
 		},
 		//提示框
 		tooltipFormatter(params, groupByString) {
-			//	console.log(groupByString, params);
+			// console.log(groupByString, params);
 			let aa = [""];
 			const { value, marker, seriesType, percent } = params;
 			const tooltipValue = value[4] ? value[4] : value[2];
@@ -672,13 +686,13 @@ export default {
 		},
 		//数字类型
 		numberType(item) {
-			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
-			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction));
+			const numberFunction = ["count", "countDistinct"];
+			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
 		},
 		//字符串类型
 		stringType(item) {
-			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
-			return item.dataType !== "Number" || !item.calculatorFunction || stringFunction.includes(item.calculatorFunction);
+			const numberFunction = ["count", "countDistinct"];
+			return item.dataType !== "Number" || !item.calculatorFunction || !numberFunction.includes(item.calculatorFunction);
 		},
 
 		//轴名 对应 字段名称

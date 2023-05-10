@@ -170,7 +170,9 @@
 				>
 					<!-- 操作 -->
 					<template slot-scope="{ row }" slot="operator">
-						<div class="tableBtn" @click="getStepList(row)">setup</div>
+						<div class="operator">
+							<p @click="getStepList(row)">setup</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom
@@ -491,22 +493,4 @@ export default {
 	},
 };
 </script>
-<style scoped lang="less">
-.send-ahead-report {
-	.tableBtn {
-		display: inline-block;
-		padding: 0.2rem;
-		color: #1890ff;
-		background: #f5f5f5;
-
-		border-radius: 0.2rem;
-		box-shadow: 0px 2px 3px #ccc;
-		cursor: pointer;
-		&:active {
-			background: #40e49f;
-			color: #fff;
-			box-shadow: none;
-		}
-	}
-}
-</style>
+<style scoped lang="less"></style>

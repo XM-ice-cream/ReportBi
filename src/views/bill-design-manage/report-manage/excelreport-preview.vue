@@ -271,6 +271,7 @@ export default {
 								totalPage: this.jsonStr[this.jsonIndex].pageCount === -1 ? 0 : this.jsonStr[this.jsonIndex].pageCount,
 								elapsedMilliseconds: res.elapsedMilliseconds,
 							};
+							console.log(this.req, "this.req");
 							if (this.jsonStr[this.jsonIndex].total !== -1) this.isLoading = false;
 						} else {
 							this.req = {

@@ -61,7 +61,9 @@
 					@on-selection-change="selectClick"
 				>
 					<template slot="operation" slot-scope="{ row }">
-						<span @click="dataview(row)" class="tableBtn">数据预览</span>
+						<div class="operator">
+							<p @click="dataview(row)">数据预览</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom
@@ -312,25 +314,7 @@ export default {
 	},
 };
 </script>
-<style lang="less" scope>
-.data-set {
-	.tableBtn {
-		display: inline-block;
-		padding: 0.4rem;
-		color: #181da1;
-		background: #f5f5f5;
-
-		border-radius: 0.2rem;
-		box-shadow: 0px 2px 3px #ccc;
-		cursor: pointer;
-		&:active {
-			background: #40e49f;
-			color: #fff;
-			box-shadow: none;
-		}
-	}
-}
-</style>
+<style lang="less" scope></style>
 <style>
 .ivu-btn > .ivu-icon {
 	font-size: 12px;

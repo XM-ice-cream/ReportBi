@@ -43,7 +43,9 @@
 					@on-current-change="currentClick"
 				>
 					<template slot="operator" slot-scope="{ row }">
-						<Button class="tableBtn" type="text" @click="signForm(row)">预览</Button>
+						<div class="operator">
+							<p @click="signForm(row)">预览</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom

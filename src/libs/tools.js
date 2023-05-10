@@ -585,9 +585,9 @@ export const renderIsEnabled = (h, params) => {
   return h(
     "span", {
       style: {
-        color: type === 1 ? "#6db44b" : '#ec7050',
+        color: type === 1 ? "#4bcb0d" : '#ec7050',
         backgroundColor: type === 1 ? "#eefde3" : "#fde3e6",
-        border: type === 1 ? "1px solid #8cd867" : "1px solid #ec7050",
+        border: type === 1 ? "1px solid #4bcb0d" : "1px solid #ec7050",
         padding: "1px 10px",
         margin: "3px 0",
         borderRadius: "3px",

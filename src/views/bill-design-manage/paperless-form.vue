@@ -89,7 +89,9 @@
 					@on-current-change="currentClick"
 				>
 					<template slot="operator" slot-scope="{ row }">
-						<Button class="tableBtn" type="text" @click="signForm(row)">审核</Button>
+						<div class="operator">
+							<p @click="signForm(row)">审核</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom
@@ -112,7 +114,7 @@ import { getpagelistReq, addReq, modifyReq } from "@/api/bill-design-manage/pape
 import { getlistReq } from "@/api/bill-design-manage/paperless-template.js";
 export default {
 	components: {},
-	name: "PaperlessForm",
+	name: "paperless-form",
 	data() {
 		return {
 			searchPoptipModal: false,

@@ -77,7 +77,9 @@
 					:data="data"
 				>
 					<template slot="operator" slot-scope="{ row }">
-						<Button type="primary" class="update-btn" @click="updateStatus(row)">更新状态</Button>
+						<div class="operator">
+							<p @click="updateStatus(row)">更新状态</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom

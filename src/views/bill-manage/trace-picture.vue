@@ -69,7 +69,9 @@
 					:data="data"
 				>
 					<template slot="operation" slot-scope="{ row }">
-						<Button type="primary" @click="downLoadPicture(row)">下载图片</Button>
+						<div class="operator">
+							<p @click="downLoadPicture(row)">下载图片</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom

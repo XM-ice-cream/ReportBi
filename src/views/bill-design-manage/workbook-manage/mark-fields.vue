@@ -164,8 +164,8 @@ export default {
 		},
 		//数字类型
 		numberType(item) {
-			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
-			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction));
+			const numberFunction = ["count", "countDistinct"];
+			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
 		},
 
 		//关闭弹框

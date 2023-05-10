@@ -1061,20 +1061,18 @@ export default {
 		},
 		//cell 样式 数字/字符串
 		isNumberCell(item) {
-			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
-			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction))
-				? "drag-number"
-				: "drag-cell";
+			const numberFunction = ["count", "countDistinct"];
+			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction) ? "drag-number" : "drag-cell";
 		},
 		//数字类型
 		numberType(item) {
-			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
-			return item.dataType === "Number" || (item.calculatorFunction && !stringFunction.includes(item.calculatorFunction));
+			const numberFunction = ["count", "countDistinct"];
+			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
 		},
 		//字符串类型
 		stringType(item) {
-			const stringFunction = ["toChar", "YYYY", "MM", "DD", "Q", "WK", "HH"];
-			return item.dataType !== "Number" || !item.calculatorFunction || stringFunction.includes(item.calculatorFunction);
+			const numberFunction = ["count", "countDistinct"];
+			return item.dataType !== "Number" || !item.calculatorFunction || !numberFunction.includes(item.calculatorFunction);
 		},
 	},
 };

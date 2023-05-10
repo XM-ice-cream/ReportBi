@@ -125,12 +125,15 @@
 					@on-selection-change="selectClick"
 				>
 					<template slot-scope="{ row }" slot="reportType">
-						<Tag v-if="row.reportType === 'excel'" color="blue">Excel报表</Tag>
-						<Tag v-else-if="row.reportType === 'largescreen'" color="green">大屏报表</Tag>
+						<Tag v-if="row.reportType === 'excel'" color="success" type="dot" size="small">Excel报表</Tag>
+						<Tag v-else-if="row.reportType === 'largescreen'" color="warning" type="dot" size="small">大屏报表</Tag>
 					</template>
 					<template slot="operator" slot-scope="{ row }">
-						<Button class="tableBtn" type="text" @click="design(row)">设计</Button>&nbsp;
-						<Button class="tableBtn" type="text" @click="preview(row)">预览</Button>
+						<div class="operator">
+							<p @click="design(row)">设计</p>
+							<span></span>
+							<p @click="preview(row)">预览</p>
+						</div>
 					</template>
 				</Table>
 				<page-custom
@@ -224,7 +227,7 @@ export default {
 				{ title: "报表分类", key: "remark", align: "center", tooltip: true },
 				{ title: this.$t("dataSetDesc"), key: "reportDesc", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
-				{ title: this.$t("operator"), slot: "operator", align: "center", width: "100" },
+				{ title: this.$t("operator"), slot: "operator", align: "right", width: "100" },
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
@@ -438,21 +441,15 @@ export default {
 </script>
 
 <style scoped lang="less">
-.design-report-manage {
-	.tableBtn {
-		display: inline-block;
-		padding: 0.2rem;
-		color: #1890ff;
-		background: #f5f5f5;
-
-		border-radius: 0.2rem;
-		box-shadow: 0px 2px 3px #ccc;
-		cursor: pointer;
-		&:active {
-			background: #40e49f;
-			color: #fff;
-			box-shadow: none;
-		}
-	}
+/deep/.ivu-tag-dot-inner {
+	width: 8px;
+	height: 8px;
+	margin-right: 4px;
+}
+/deep/.ivu-tag-dot {
+	height: 100%;
+	border: none !important;
+	background: transparent !important;
+	line-height: 20px;
 }
 </style>
