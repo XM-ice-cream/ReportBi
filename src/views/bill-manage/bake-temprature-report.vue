@@ -8,18 +8,40 @@
 					<Row>
 						<i-col span="6">
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-								<Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
-									{{ $t("selectQuery") }}
+								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
+									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" :rules="ruleValidate" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form
+										ref="searchReq"
+										:model="req"
+										:label-width="80"
+										:label-colon="true"
+										:rules="ruleValidate"
+										@submit.native.prevent
+										@keyup.native.enter="searchClick"
+									>
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('startTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.startTime"></DatePicker>
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('startTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.startTime"
+											></DatePicker>
 										</FormItem>
 										<!-- 结束时间 -->
 										<FormItem :label="$t('endTime')" prop="endTime">
-											<DatePicker transfer type="datetime" :placeholder="$t('pleaseSelect') + $t('endTime')" format="yyyy-MM-dd HH:mm:ss" :options="$config.datetimeOptions" v-model="req.endTime"></DatePicker>
+											<DatePicker
+												transfer
+												type="datetime"
+												:placeholder="$t('pleaseSelect') + $t('endTime')"
+												format="yyyy-MM-dd HH:mm:ss"
+												:options="$config.datetimeOptions"
+												v-model="req.endTime"
+											></DatePicker>
 										</FormItem>
 										<!-- 工单 -->
 										<FormItem :label="$t('workOrder')" prop="workorder">
@@ -65,7 +87,14 @@
 						</i-col>
 					</Row>
 				</div>
-				<Table :border="tableConfig.border" :highlight-row="tableConfig.highlightRow" :height="tableConfig.height" :loading="tableConfig.loading" :columns="columns" :data="data">
+				<Table
+					:border="tableConfig.border"
+					:highlight-row="tableConfig.highlightRow"
+					:height="tableConfig.height"
+					:loading="tableConfig.loading"
+					:columns="columns"
+					:data="data"
+				>
 					<template #qty="{ row }">
 						<div @click="show(row, 1)" style="color: blue; cursor: pointer">
 							{{ row.qty }}

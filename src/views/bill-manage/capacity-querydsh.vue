@@ -8,7 +8,9 @@
 					<Row>
 						<i-col span="12">
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-								<Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">{{ $t("selectQuery") }}</Button>
+								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
+									<Icon type="ios-funnel" />
+								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form :label-width="70" :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->

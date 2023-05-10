@@ -7,8 +7,8 @@
 						<!-- 查询条件 -->
 						<i-col span="6">
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-								<Button type="primary" icon="ios-search" @click.stop="searchPoptipModal = !searchPoptipModal">
-									{{ $t("selectQuery") }}
+								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
+									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<div class="submitForm">

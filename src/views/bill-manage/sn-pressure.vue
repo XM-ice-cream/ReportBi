@@ -6,7 +6,9 @@
 			<Card :bordered="false" dis-hover class="card-style">
 				<div slot="title">
 					<Poptip v-model="poptipModal" class="poptip-style" placement="right-start" width="340" trigger="manual">
-						<Button type="primary" icon="ios-search" @click="poptipModal = !poptipModal">{{ $t("selectQuery") }}</Button>
+						<Button @click.stop="poptipModal = !poptipModal">
+							<Icon type="ios-funnel" />
+						</Button>
 						<div class="poptip-style-content" slot="content">
 							<Form class="poptip-style-content" ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent>
 								<!-- 工单ID -->

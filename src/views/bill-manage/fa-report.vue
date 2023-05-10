@@ -8,8 +8,8 @@
 					<Row>
 						<i-col span="6">
 							<Poptip v-model="poptipModal" class="poptip-style" placement="right-start" width="500" trigger="manual" transfer>
-								<Button type="primary" icon="ios-search" @click.stop="poptipModal = !poptipModal">
-									{{ $t("selectQuery") }}
+								<Button @click.stop="poptipModal = !poptipModal">
+									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<!-- @submit.native.prevent @keyup.native.enter="searchClick" -->

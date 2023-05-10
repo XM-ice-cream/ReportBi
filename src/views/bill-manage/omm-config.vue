@@ -85,8 +85,8 @@
 						<!-- 查询条件 -->
 						<i-col span="12">
 							<Poptip v-model="poptipModal" class="poptip-style" placement="right-start" width="400" transfer>
-								<Button type="primary" icon="ios-search">
-									{{ $t("selectQuery") }}
+								<Button @click.stop="poptipModal = !poptipModal">
+									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="60" :label-colon="true" @submit.native.prevent>
