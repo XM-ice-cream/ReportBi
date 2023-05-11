@@ -687,12 +687,8 @@ export default {
 		//数字类型
 		numberType(item) {
 			const numberFunction = ["count", "countDistinct"];
-			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
-		},
-		//字符串类型
-		stringType(item) {
-			const numberFunction = ["count", "countDistinct"];
-			return item.dataType !== "Number" || !item.calculatorFunction || !numberFunction.includes(item.calculatorFunction);
+			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
+			return item.isContinue === "1" ? true : item.isContinue === "0" ? false : isNotContinue;
 		},
 
 		//轴名 对应 字段名称

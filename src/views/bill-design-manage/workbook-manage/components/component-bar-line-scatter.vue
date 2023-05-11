@@ -69,6 +69,7 @@ export default {
 
 			option = visualMap ? { ...option, visualMap } : option;
 			console.log(option);
+			myChart.clear();
 			myChart.setOption(option, true);
 
 			window.addEventListener("resize", function () {

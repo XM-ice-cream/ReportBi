@@ -521,7 +521,7 @@ export default {
 			getChartsInfoReq(obj)
 				.then((res) => {
 					//存在有数据返回 但code=-1(数据超过最大范围)
-					if (res.code == 200 || res.result.length > 0) {
+					if (res.code == 200 || res?.result?.length > 0) {
 						if (res.code == -1) this.$Msg.warning(`${res.message}`);
 
 						this.chartsData = res?.result || [];
@@ -600,12 +600,6 @@ export default {
 						this.changeMarks(markIndex, "delete", data);
 					}
 					break;
-				case "sortby":
-					if (type == "row") this.selectObj.sortType = "row";
-					if (type == "column") this.selectObj.sortType = "column";
-					if (type == "mark") this.selectObj.sortType = "mark";
-					this.$refs.sortbyField.modelFlag = true;
-					break;
 				case "edit":
 					if (type == "filter") this.$refs.filterField.modelFlag = true;
 					if (type == "create-fileds") {
@@ -616,6 +610,24 @@ export default {
 						this.isAdd = false;
 						this.$refs.markField.modelFlag = true;
 					}
+					break;
+				case "sortby":
+					if (type == "row") this.selectObj.sortType = "row";
+					if (type == "column") this.selectObj.sortType = "column";
+					if (type == "mark") this.selectObj.sortType = "mark";
+					this.$refs.sortbyField.modelFlag = true;
+					break;
+				//连续
+				case "continuous":
+					if (type == "row") this.rowData[index].isContinue = "1";
+					if (type == "column") this.columnData[index].isContinue = "1";
+					if (type == "mark") this.markData[markIndex].data[index].isContinue = "1";
+					break;
+				//离散
+				case "discrete":
+					if (type == "row") this.rowData[index].isContinue = "0";
+					if (type == "column") this.columnData[index].isContinue = "0";
+					if (type == "mark") this.markData[markIndex].data[index].isContinue = "0";
 					break;
 
 				//转换为指标
@@ -629,26 +641,35 @@ export default {
 
 				// 函数执行
 				default:
-					if (type == "row") {
-						this.rowData[index] = {
-							...this.rowData[index],
-							calculatorFunction: name,
-							sortValue: [],
-						};
-					}
-
-					if (type === "column") {
-						this.columnData[index] = { ...this.columnData[index], calculatorFunction: name, sortValue: [], markValue: this.defaultMarkValue };
-					}
-					if (type === "mark") {
-						this.markData[markIndex].data[index] = {
-							...this.markData[markIndex].data[index],
-							calculatorFunction: name,
-							sortValue: [],
-						};
-						this.markData[markIndex].data[index].markValue = this.numberType(this.markData[markIndex].data[index]) ? this.defaultMarkValue : [];
-						const data = this.markData[markIndex].data[index];
-						this.changeMarks(markIndex, "update", data);
+					switch (type) {
+						case "row":
+							this.rowData[index] = {
+								...this.rowData[index],
+								calculatorFunction: name,
+								sortValue: [],
+								isContinue: name ? this.rowData[index].isContinue : "",
+							};
+							break;
+						case "column":
+							this.columnData[index] = {
+								...this.columnData[index],
+								calculatorFunction: name,
+								sortValue: [],
+								markValue: this.defaultMarkValue,
+								isContinue: name ? this.columnData[index].isContinue : "",
+							};
+							break;
+						case "mark":
+							this.markData[markIndex].data[index] = {
+								...this.markData[markIndex].data[index],
+								calculatorFunction: name,
+								sortValue: [],
+								isContinue: name ? this.markData[markIndex].data[index].isContinue : "",
+							};
+							this.markData[markIndex].data[index].markValue = this.numberType(this.markData[markIndex].data[index]) ? this.defaultMarkValue : [];
+							const data = this.markData[markIndex].data[index];
+							this.changeMarks(markIndex, "update", data);
+							break;
 					}
 					break;
 			}
@@ -739,40 +760,49 @@ export default {
 				this.$refs.filterField.modelFlag = true;
 			}
 			//标记(颜色、文本宽度开启弹框)
-			if (["labelWidth"].includes(id) && type !== "mark-box") {
-				this.selectObj = { ...this.markData[markIndex].data[newIndex], newIndex, datasetId, markIndex };
-				this.isAdd = true; //新增
-				this.$refs.markField.modelFlag = true;
+			if (["labelWidth", "color"].includes(id) && type !== "mark-box") {
+				//颜色 指标时 默认markValue为颜色区间
+				if (id == "color" && this.numberType(this.markData[markIndex].data[newIndex])) {
+					this.markData[markIndex].data[newIndex].markValue = this.defaultMarkValue;
+					//文本宽度
+				} else if (id === "labelWidth") {
+					this.selectObj = { ...this.markData[markIndex].data[newIndex], newIndex, datasetId, markIndex };
+					this.isAdd = true; //新增
+					this.$refs.markField.modelFlag = true;
+				}
 			}
 			//数据拖拽至行
 			if (id === "row" && type !== "row") {
-				const { columnType, dataType } = this.rowData[newIndex];
 				//如果标记为饼图 无法拖拽至行列中
 				if (this.markData[0].chartType == "componentPie") {
 					this.rowData.splice(newIndex, 1);
 					this.$Msg.warning("饼图无需拖拽字段到行中");
 					return;
 				}
+				const { columnType, dataType } = this.rowData[newIndex];
 				//转换为维度
 				if (columnType === "1" && dataType === "String") this.rowData[newIndex].calculatorFunction = "toChar";
 				//转换为指标
 				if (columnType === "1" && dataType === "Number") this.rowData[newIndex].calculatorFunction = "countDistinct";
+
 				this.rowData = JSON.parse(JSON.stringify(this.rowData));
 			}
 			//数据拖拽至列
 			if (id === "column" && type !== "column") {
-				const { columnType, dataType } = this.columnData[newIndex];
-
 				//如果标记为饼图 无法拖拽至行列中
 				if (this.markData[0].chartType == "componentPie") {
 					this.columnData.splice(newIndex, 1);
 					this.$Msg.warning("饼图无需拖拽字段到列中");
 					return;
 				}
+				const { columnType, dataType } = this.columnData[newIndex];
 				//转换为维度
 				if (columnType === "1" && dataType === "String") this.columnData[newIndex].calculatorFunction = "toChar";
 				//转换为指标
 				if (columnType === "1" && dataType === "Number") this.columnData[newIndex].calculatorFunction = "countDistinct";
+				//默认离散还是连续 1：连续，0：离散
+				// this.columnData[newIndex].isContinue = this.numberType(this.columnData[newIndex]) ? "1" : "0";
+
 				this.columnData = JSON.parse(JSON.stringify(this.columnData));
 			}
 		},
@@ -802,18 +832,20 @@ export default {
 		},
 		//更新排序数据
 		updateSort(newIndex, data, markIndex) {
-			if (data.sortType === "mark") {
-				this.markData[markIndex].data[newIndex] = { ...data };
-				this.changeMarks(markIndex, "update", data);
-				this.markData = JSON.parse(JSON.stringify(this.markData));
-			}
-			if (data.sortType === "row") {
-				this.rowData[newIndex] = { ...data };
-				this.rowData = JSON.parse(JSON.stringify(this.rowData));
-			}
-			if (data.sortType === "column") {
-				this.columnData[newIndex] = { ...data };
-				this.columnData = JSON.parse(JSON.stringify(this.columnData));
+			switch (data.sortType) {
+				case "mark":
+					this.markData[markIndex].data[newIndex] = { ...data };
+					this.changeMarks(markIndex, "update", data);
+					this.markData = JSON.parse(JSON.stringify(this.markData));
+					break;
+				case "row":
+					this.rowData[newIndex] = { ...data };
+					this.rowData = JSON.parse(JSON.stringify(this.rowData));
+					break;
+				case "column":
+					this.columnData[newIndex] = { ...data };
+					this.columnData = JSON.parse(JSON.stringify(this.columnData));
+					break;
 			}
 		},
 		//修改第0个标记，联动其余标记；其余标记均修改后，自动修改第0标记
@@ -1062,17 +1094,16 @@ export default {
 		//cell 样式 数字/字符串
 		isNumberCell(item) {
 			const numberFunction = ["count", "countDistinct"];
-			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction) ? "drag-number" : "drag-cell";
+			//未设置是否连续
+			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction) ? "drag-number" : "drag-cell";
+			//1:连续->数字类型；0：离散->字符串；其余的按照原有类型
+			return item.isContinue === "1" ? "drag-number" : item.isContinue === "0" ? "drag-cell" : isNotContinue;
 		},
 		//数字类型
 		numberType(item) {
 			const numberFunction = ["count", "countDistinct"];
-			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
-		},
-		//字符串类型
-		stringType(item) {
-			const numberFunction = ["count", "countDistinct"];
-			return item.dataType !== "Number" || !item.calculatorFunction || !numberFunction.includes(item.calculatorFunction);
+			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
+			return item.isContinue === "1" ? true : item.isContinue === "0" ? false : isNotContinue;
 		},
 	},
 };
