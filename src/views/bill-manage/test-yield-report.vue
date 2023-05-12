@@ -151,7 +151,10 @@
 														};
 													}
 												"
-												@values="changeSelectPage('workOrder')"
+												@values="
+													changeSelectPage('workOrder');
+													changeSelectPage('processName');
+												"
 											>
 											</v-selectpage>
 										</FormItem>
@@ -183,7 +186,6 @@
 														};
 													}
 												"
-												@values="changeSelectPage('processName')"
 											>
 											</v-selectpage>
 										</FormItem>
