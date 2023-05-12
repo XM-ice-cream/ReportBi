@@ -500,6 +500,7 @@ export default {
 					onDownloadProgress: function (progressEvent) {
 						that.showProgess(progressEvent);
 					},
+					timeout: 1000 * 60 * 60 * 60,
 				})
 				.then((res) => {
 					// 导出ZIP 文件
