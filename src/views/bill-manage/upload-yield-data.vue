@@ -2,9 +2,10 @@
 <template>
 	<div class="page-style">
 		<!-- 页面表格 -->
-		<div class="comment">
+		<div class="comment upload-yield-data">
 			<Card :bordered="false" dis-hover class="card-style">
-				<div style="display: flex; align-items: center; height: 100%; justify-content: center">
+				<Alert type="warning" style="text-align: center" show-icon>上传数据后<span class="tips">请等待1分钟后再查询数据</span>请知悉~</Alert>
+				<div class="upload">
 					<Upload
 						:show-upload-list="false"
 						:format="uploadFormat"
@@ -108,4 +109,18 @@ export default {
 	mounted() {},
 };
 </script>
-<style scoped></style>
+<style scoped lang="less">
+.upload-yield-data {
+	.tips {
+		font-size: 14px;
+		font-weight: bold;
+		padding: 0 10px;
+	}
+	.upload {
+		display: flex;
+		align-items: center;
+		height: 100%;
+		justify-content: center;
+	}
+}
+</style>
