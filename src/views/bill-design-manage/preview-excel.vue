@@ -263,6 +263,12 @@ export default {
 	height: calc(100% - 60px);
 	background: #f5f7f9;
 }
+.preview-excel .ivu-form-inline .ivu-form-item {
+	display: inline-block;
+	margin-right: 10px;
+	vertical-align: middle;
+	margin-bottom: 0px;
+}
 </style>
 <style scoped lang="less">
 .previewCard {

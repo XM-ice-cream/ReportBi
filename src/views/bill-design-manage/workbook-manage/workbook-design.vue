@@ -1141,7 +1141,7 @@ export default {
 			padding: 10px;
 			// border: 1px solid #27ce88;
 			// background: #f8fffc;
-			border: 1px solid #ccc;
+			border: 1px solid #e4e4e4;
 			.left-title {
 				padding: 10px;
 				font-weight: bold;
@@ -1211,14 +1211,14 @@ export default {
 				width: 100%;
 				height: 200px;
 				padding: 10px;
-				border: 1px dashed #ccc;
+				border: 1px dashed #e4e4e4;
 				border-bottom: none;
 			}
 			.mark {
 				width: 100%;
 				height: calc(100% - 200px);
 				padding: 10px;
-				border: 1px dashed #ccc;
+				border: 1px dashed #e4e4e4;
 				.mark-box {
 					width: 100%;
 					height: calc(100% - 250px);
@@ -1262,7 +1262,7 @@ export default {
 				.row,
 				.column {
 					height: 40px;
-					border: 1px solid #ccc;
+					border: 1px solid #e4e4e4;
 					margin-bottom: 10px;
 					.title {
 						display: inline-block;
@@ -1270,7 +1270,7 @@ export default {
 						line-height: 40px;
 						font-weight: bold;
 						text-align: center;
-						border-right: 1px solid #ccc;
+						border-right: 1px solid #e4e4e4;
 					}
 					.drag-right {
 						display: inline-block;
