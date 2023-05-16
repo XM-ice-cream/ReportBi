@@ -66,18 +66,12 @@ export default {
 				},
 			],
 			visualMap: {
-				min: 0,
-				max: 10,
-				calculable: true,
-				orient: "vertical",
 				right: 50,
-				bottom: "0",
-				inRange: {
-					color: ["transparent"],
-				},
+				bottom: 50,
 			},
 			//颜色的汇总值
 			colorResultSummary: [],
+			dimension: 0,
 		};
 	},
 	methods: {
@@ -409,6 +403,7 @@ export default {
 			this.colorResultSummary = []; //颜色
 			//说明均为维度
 			if (axisConstX.length) {
+				this.dimension = 5;
 				const { mark: markArray, type, color } = markObj[undefined];
 				objKeys.forEach((key) => {
 					obj[key].forEach((item) => {
@@ -480,6 +475,7 @@ export default {
 							if (Object.values(markObjColor)[0].startRange) {
 								//X轴、Y轴、...、数值 最后一个是热力图的对应的值
 								data = [value[0], value[1], { ...itemValue }, typeof value[0] === "number" ? value[0] : value[1]]; //取前两个
+								this.dimension = typeof value[0] === "number" ? 0 : 1;
 							} else {
 								//字符串
 								const colorName = itemValue[Object.keys(markObjColor)[0]];
@@ -525,8 +521,8 @@ export default {
 		//增减进度条
 		getDataZoom(xAxis, yAxis, groupByNumber) {
 			const showData = 15 / groupByNumber.length;
-			const xAxisEnd = { end: xAxis[0]?.data ? (showData / xAxis[0].data.length) * 100 : 100 };
-			const yAxisEnd = { end: yAxis[0]?.data ? (showData / yAxis[0].data.length) * 100 : 100 };
+			const xAxisEnd = { end: xAxis[0]?.data ? (15 / xAxis[0].data.length) * 100 : 100 };
+			const yAxisEnd = { end: yAxis[0]?.data ? (15 / yAxis[0].data.length) * 100 : 100 };
 			//滚动条设定  minValueSpan：最小显示的值数量
 			// const xAxisEnd = xAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
 			// const yAxisEnd = yAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
@@ -614,13 +610,28 @@ export default {
 			//说明字段为数字类型
 			if (JSON.stringify(color) !== "{}" && Object.values(color)[0]?.startRange) {
 				const { color } = markObj[undefined];
-				const { startRange, endRange } = Object.values(color)[0];
-				result = {
-					...this.visualMap,
-					inRange: { color: [startRange, endRange] },
-					min: Math.min.apply(null, this.colorResultSummary),
-					max: Math.max.apply(null, this.colorResultSummary),
-				};
+				const { startRange, endRange, colorType, pieces, outOfRange } = Object.values(color)[0];
+				//区段值
+				if (colorType === 0) {
+					result = {
+						...this.visualMap,
+						dimension: this.dimension,
+						pieces,
+						outOfRange: {
+							color: outOfRange,
+						},
+					};
+				} else {
+					//连续
+					result = {
+						...this.visualMap,
+						dimension: this.dimension,
+						calculable: true,
+						inRange: { color: [startRange, endRange] },
+						min: Math.min.apply(null, this.colorResultSummary),
+						max: Math.max.apply(null, this.colorResultSummary),
+					};
+				}
 			}
 			return result;
 		},

@@ -13,17 +13,63 @@
 					<Tree :data="submitData.markValue" :render="renderContent"></Tree>
 				</FormItem>
 				<!-- 数字类型颜色设定 -->
-				<FormItem label="颜色设定" v-if="submitData.innerText === 'color' && this.numberType(this.submitData)">
-					<ColorPicker v-model="submitData.markValue.startRange" recommend />
-					<div
-						class="color-bg"
-						:style="{
-							'--start': submitData.markValue.startRange,
-							'--end': submitData.markValue.endRange,
-						}"
-					></div>
-					<ColorPicker v-model="submitData.markValue.endRange" recommend />
-				</FormItem>
+				<template v-if="submitData.innerText === 'color' && this.numberType(this.submitData)">
+					<FormItem label="类型">
+						<RadioGroup v-model="submitData.markValue.colorType" type="button" button-style="solid">
+							<Radio :label="1" border>连续</Radio>
+							<Radio :label="0" border>区间</Radio>
+						</RadioGroup>
+					</FormItem>
+					<FormItem label="颜色设定">
+						<!-- 连续颜色设定 -->
+						<template v-if="submitData.markValue.colorType == 1">
+							<ColorPicker v-model="submitData.markValue.startRange" recommend />
+							<div
+								class="color-bg"
+								:style="{
+									'--start': submitData.markValue.startRange,
+									'--end': submitData.markValue.endRange,
+								}"
+							></div>
+							<ColorPicker v-model="submitData.markValue.endRange" recommend />
+						</template>
+						<!-- 区间颜色设定 -->
+						<template v-else>
+							<div class="add-box" @click="addClick"><icon custom="iconfont icon-add" class="add-icon" /> 添加颜色区段</div>
+
+							<Table :columns="columns" :data="submitData.markValue.pieces" :height="tableConfig.height" disabled-hover>
+								<!-- 大于 -->
+								<template #gt="{ row, index }">
+									<InputNumber type="text" v-model="submitData.markValue.pieces[index].gt" />
+								</template>
+								<!-- 小于 -->
+								<template #lte="{ row, index }">
+									<InputNumber type="text" v-model="submitData.markValue.pieces[index].lte" />
+								</template>
+								<!-- 颜色 -->
+								<template #color="{ row, index }">
+									<ColorPicker v-model="submitData.markValue.pieces[index].color" recommend transfer />
+								</template>
+								<!-- 自定义显示文本 -->
+								<template #label="{ row, index }">
+									<Input type="text" v-model="submitData.markValue.pieces[index].label" />
+								</template>
+								<!-- 操作 -->
+								<template #operator="{ row, index }">
+									<Button
+										type="error"
+										ghost
+										size="small"
+										@click="deleteClick(index, submitData.markValue.pieces)"
+										custom-icon="iconfont icon-delete"
+									></Button>
+								</template>
+							</Table>
+
+							<div style="margin-top: 50px">其余颜色： <ColorPicker v-model="submitData.markValue.outOfRange" recommend transfer /></div>
+						</template>
+					</FormItem>
+				</template>
 			</Form>
 		</div>
 		<Spin size="large" fix v-if="spinShow"></Spin>
@@ -57,7 +103,7 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				this.submitData = { ...this.selectObj };
+				this.submitData = JSON.parse(JSON.stringify(this.selectObj));
 				console.log("标记", this.submitData);
 				const { innerText } = this.submitData;
 				if (innerText === "labelWidth" && this.isAdd) {
@@ -77,9 +123,37 @@ export default {
 	data() {
 		return {
 			submitData: {},
+			tableConfig: { ...this.$config.tableConfig }, // table配置
 			colorSelect: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
 			modelFlag: false,
 			spinShow: false,
+			columns: [
+				{
+					title: "大于",
+					slot: "gt",
+					align: "center",
+				},
+				{
+					title: "小于",
+					slot: "lte",
+					align: "center",
+				},
+				{
+					title: "颜色",
+					slot: "color",
+					align: "center",
+				},
+				{
+					title: "自定义显示文本",
+					slot: "label",
+					align: "center",
+				},
+				{
+					title: "操作",
+					slot: "operator",
+					align: "center",
+				},
+			],
 		};
 	},
 	methods: {
@@ -168,6 +242,14 @@ export default {
 			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
 			return item.isContinue === "1" ? true : item.isContinue === "0" ? false : isNotContinue;
 		},
+		//新增字段
+		addClick() {
+			this.submitData.markValue.pieces.push({ gt: 0, lte: 50, color: "#27ce88" });
+		},
+		//删除字段
+		deleteClick(index, rows) {
+			rows.splice(index, 1);
+		},
 
 		//关闭弹框
 		cancelClick() {
@@ -179,6 +261,11 @@ export default {
 	},
 };
 </script>
+<style>
+.ivu-select-dropdown.ivu-transfer-no-max-height {
+	width: 260px;
+}
+</style>
 <style lang="less" scoped>
 .mark-fields {
 	height: 500px;
@@ -188,5 +275,12 @@ export default {
 	height: 24px;
 	margin: 10px 0;
 	background: linear-gradient(to right, var(--start), var(--end));
+}
+.add-box {
+	display: inline-block;
+	margin-bottom: 20px;
+	padding: 2px 10px;
+	background: #27ce88;
+	color: #fff;
 }
 </style>

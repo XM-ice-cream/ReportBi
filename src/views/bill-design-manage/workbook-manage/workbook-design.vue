@@ -420,7 +420,7 @@ export default {
 			columnData: [], //列值
 			rowData: [], //行值
 			markData: [{ name: "全部", chartType: "bar", data: [] }],
-			defaultMarkValue: { startRange: "red", endRange: "green" },
+			defaultMarkValue: { startRange: "red", endRange: "green", colorType: 1, pieces: [], outOfRange: "#999" },
 			chartList: [
 				{ label: "文本", value: "componentText" },
 				{ label: "柱状图", value: "bar" },
@@ -655,7 +655,6 @@ export default {
 								...this.columnData[index],
 								calculatorFunction: name,
 								sortValue: [],
-								markValue: this.defaultMarkValue,
 								isContinue: name ? this.columnData[index].isContinue : "",
 							};
 							break;
@@ -666,7 +665,9 @@ export default {
 								sortValue: [],
 								isContinue: name ? this.markData[markIndex].data[index].isContinue : "",
 							};
-							this.markData[markIndex].data[index].markValue = this.numberType(this.markData[markIndex].data[index]) ? this.defaultMarkValue : [];
+							this.markData[markIndex].data[index].markValue = this.numberType(this.markData[markIndex].data[index])
+								? { ...this.defaultMarkValue }
+								: [];
 							const data = this.markData[markIndex].data[index];
 							this.changeMarks(markIndex, "update", data);
 							break;
@@ -763,7 +764,7 @@ export default {
 			if (["labelWidth", "color"].includes(id) && type !== "mark-box") {
 				//颜色 指标时 默认markValue为颜色区间
 				if (id == "color" && this.numberType(this.markData[markIndex].data[newIndex])) {
-					this.markData[markIndex].data[newIndex].markValue = this.defaultMarkValue;
+					this.markData[markIndex].data[newIndex].markValue = { ...this.defaultMarkValue };
 					//文本宽度
 				} else if (id === "labelWidth") {
 					this.selectObj = { ...this.markData[markIndex].data[newIndex], newIndex, datasetId, markIndex };
@@ -1027,6 +1028,7 @@ export default {
 			this.rowData = []; //行值
 			this.markData = [{ name: "全部", chartType: "bar", data: [] }];
 			this.selectObj = {};
+			this.submitData.columnName = "";
 			this.chartsData = [];
 			this.btnDistabled = true;
 			this.$emit("update:modelFlag", false);
