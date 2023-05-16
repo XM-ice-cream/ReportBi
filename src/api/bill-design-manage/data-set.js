@@ -50,7 +50,7 @@ export const modifyDatacollectReq = data => {
 // 测试
 export const testTransformSet = data => {
   return requestCenter({
-    timeout: 1000 * 60 * 20, //最长等待20分钟
+    timeout: 1000 * 60 * 60, //最长等待60分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
     url: '/api/autoreportcenter/anonymous/v1/datacollect/testtransform',
     method: 'post',
