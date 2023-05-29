@@ -10,13 +10,15 @@ export default {
 		chartData: Object,
 	},
 	data() {
-		return {};
+		return {
+			myChart: null,
+		};
 	},
 
 	methods: {
 		pageLoad() {
 			// 基于准备好的dom，初始化echarts实例
-			let myChart = echarts.init(this.$el);
+			this.myChart = echarts.init(this.$el);
 			const _this = this;
 			let seriesResult = [];
 
@@ -69,12 +71,12 @@ export default {
 
 			option = visualMap ? { ...option, visualMap } : option;
 			console.log(option);
-			myChart.clear();
-			myChart.setOption(option, true);
+			this.myChart.clear();
+			this.myChart.setOption(option, true);
 
 			window.addEventListener("resize", function () {
-				if (myChart) {
-					myChart.resize();
+				if (this.myChart) {
+					this.myChart.resize();
 				}
 			});
 		},

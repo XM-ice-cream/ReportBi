@@ -15,14 +15,14 @@
 		<div class="create-field">
 			<div class="left-box">
 				<Input type="text" v-model="submitData.columnName" clearabled />
-				<!-- <draggable group="site" v-model="submitData.fieldFunction" id="filter"> -->
-				<Input
+				<monaco-editor v-model.trim="submitData.fieldFunction" language="sql" v-if="visib" ref="monacoEditorRef" />
+				<!-- <Input
 					v-model="submitData.fieldFunction"
 					type="textarea"
 					ref="fieldFunction"
 					:autosize="{ minRows: 20, maxRows: 20 }"
 					style="margin-top: 10px"
-				></Input>
+				></Input> -->
 				<!-- 校验信息 -->
 				<Alert :type="tipObj.code == 200 ? 'success' : 'error'" show-icon style="margin-top: 10px" v-if="tipObj.code">
 					数据类型:{{ tipObj.result }}
@@ -69,12 +69,12 @@
 <script>
 import { getlistReq as getDataItemReq, getlisttreeReq } from "@/api/system-manager/data-item";
 import { addCustomerFieldReq, getCustomerFieldReq, modifyCustomerFieldReq, checkCustomerFieldReq } from "@/api/bill-design-manage/workbook-manage.js";
-import { inputSelectContent } from "@/libs/tools";
 import draggable from "vuedraggable";
+import MonacoEditor from "@/components/monaco-editor/monaco-editor.vue";
 
 export default {
 	name: "create-fields",
-	components: { draggable },
+	components: { draggable, MonacoEditor },
 	props: {
 		selectObj: {
 			type: Object,
@@ -93,8 +93,7 @@ export default {
 				this.pageLoad();
 
 				this.$nextTick(() => {
-					//光标聚焦
-					inputSelectContent(this.$refs.fieldFunction);
+					this.visib = true;
 				});
 			}
 		},
@@ -106,6 +105,7 @@ export default {
 			modelFlag: false,
 			dataItemList: { all: [] },
 			blurIndex: 0,
+			visib: false,
 			liObj: {}, //li 标签点击选中值
 			typeList: [
 				{
@@ -167,22 +167,30 @@ export default {
 		},
 		//插入数据至光标处
 		async insertAtCursor(myValue) {
-			const myField = this.$refs.fieldFunction.$el.children[0];
+			//获取参数光标位置
+			const str = `${myValue}`;
+			const strlen = str.length;
+			const position = this.$refs.monacoEditorRef.getPosition();
+			const newPosition = { lineNumber: position.lineNumber, column: position.column + strlen };
+			this.$nextTick(() => {
+				this.$refs.monacoEditorRef.insertTextPosition(position, newPosition, str);
+			});
+			// const myField = this.$refs.fieldFunction.$el.children[0];
 
-			if (myField.selectionStart || myField.selectionStart === 0) {
-				let startPos = myField.selectionStart; //开始位置
-				let endPos = myField.selectionEnd; //结束位置
-				let selectionPos = endPos + myValue.length; //光标选中位置
+			// if (myField.selectionStart || myField.selectionStart === 0) {
+			// 	let startPos = myField.selectionStart; //开始位置
+			// 	let endPos = myField.selectionEnd; //结束位置
+			// 	let selectionPos = endPos + myValue.length; //光标选中位置
 
-				const fieldFunction = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
-				this.submitData = { ...this.submitData, fieldFunction };
+			// 	const fieldFunction = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+			// 	this.submitData = { ...this.submitData, fieldFunction };
 
-				await this.$nextTick(); // 这句是重点, 圈起来,不加的话后面两步有问题
-				myField.focus();
-				myField.setSelectionRange(selectionPos, selectionPos);
-			} else {
-				this.submitData = { ...this.submitData, fieldFunction: (this.submitData.fieldFunction += myValue) };
-			}
+			// 	await this.$nextTick(); // 这句是重点, 圈起来,不加的话后面两步有问题
+			// 	myField.focus();
+			// 	myField.setSelectionRange(selectionPos, selectionPos);
+			// } else {
+			// 	this.submitData = { ...this.submitData, fieldFunction: (this.submitData.fieldFunction += myValue) };
+			// }
 		},
 
 		//提交

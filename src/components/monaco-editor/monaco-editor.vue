@@ -75,6 +75,21 @@ export default {
 			this.$emit("input", this.editorInstance.getValue());
 			this.$emit("change", this.editorInstance.getValue());
 		},
+		//获取光标位置
+		getPosition() {
+			return this.editorInstance.getPosition();
+		},
+		//光标位置插入数据
+		insertTextPosition(position, newPosition, text) {
+			this.editorInstance.executeEdits("my-source", [
+				{
+					range: new monaco.Range(position.lineNumber, position.column, newPosition.lineNumber, newPosition.column),
+					text,
+				},
+			]);
+			//修改光标位置
+			this.editorInstance.setPosition(newPosition);
+		},
 		initEditor() {
 			this.MonacoEnvironment = {
 				getWorkerUrl: function () {

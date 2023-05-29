@@ -27,6 +27,8 @@
     "element-ui": "^2.9.2",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.2.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
     "lemon-imui": "^1.7.2",
     "lodash": "^4.17.15",
     "moment": "^2.29.4",

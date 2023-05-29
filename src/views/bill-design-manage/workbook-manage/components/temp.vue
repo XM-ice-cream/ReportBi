@@ -1,14 +1,17 @@
 <template>
 	<div class="workbook-temp">
-		<div class="title">{{ title }}</div>
-		<component
-			ref="componentRef"
-			:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
-			:ispreview="true"
-			:visib="visib"
-			:chartData="chartData"
-			:mark="mark"
-		/>
+		<div :style="tempStyle" ref="exportContent">
+			<div class="title">{{ title }}</div>
+			<button @click="exportPDF">导出</button>
+			<component
+				ref="componentRef"
+				:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
+				:ispreview="true"
+				:visib="visib"
+				:chartData="chartData"
+				:mark="mark"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -18,6 +21,11 @@ import componentPie from "./component-pie.vue"; //饼图
 import componentBoxplot from "./component-boxplot.vue"; //箱线图
 import componentHeatMap from "./component-heatmap.vue"; //热力图
 import componentText from "./component-text.vue"; //热力图
+
+import { formatDate } from "@/libs/tools";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 export default {
 	name: "componentsTemp",
 	components: { barLineScatter, componentPie, componentBoxplot, componentHeatMap, componentText },
@@ -40,6 +48,7 @@ export default {
 	data() {
 		return {
 			chartData: {},
+			tempStyle: { width: "1287px", height: "649px" },
 			// 数字属性
 			axisNumber: [
 				{
@@ -75,10 +84,60 @@ export default {
 		};
 	},
 	methods: {
+		//导出PDF
+		async exportPDF() {
+			// 导出 不分页的pdf
+			// const pdf = new jsPDF("p", "mm", "a4");
+			const content = this.$refs.exportContent;
+			const canvas = this.$refs.componentRef.myChart.getDom().getElementsByTagName("canvas")[0];
+			const _this = this;
+
+			// html2canvas(content, {
+			// 	scale: 2,
+			// }).then((canvas) => {
+			// 	const imgData = canvas.toDataURL("image/png");
+			// 	pdf.addImage(imgData, "PNG", 10, 10, 180, 240); // 将图片添加到 PDF 中
+			// 	pdf.save("export.pdf"); // 下载 PDF 文件
+			// });
+
+			// const canvas = this.$refs.componentRef.myChart.getDom().getElementsByTagName("canvas")[0];
+			// const img = new Image();
+			// img.src = canvas.toDataURL();
+			// document.body.appendChild(img);
+			// window.print();
+
+			// 创建 jsPDF 对象，并定义每页的高度
+			var doc = new jsPDF();
+			var pageHeight = doc.internal.pageSize.height;
+
+			// 使用 html2canvas 方法转换页面为图片，并分页输出
+			html2canvas(content).then(function (canvas) {
+				// 获取图片数据和尺寸
+				var imgData = canvas.toDataURL("image/png");
+				var imgWidth = 210; // A4 页面宽度
+				var imgHeight = (canvas.height * imgWidth) / canvas.width;
+				var pageCount = Math.ceil(imgHeight / pageHeight);
+
+				// 输出第一页
+				doc.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+				// 循环输出每一页
+				for (var i = 2; i <= pageCount; i++) {
+					doc.addPage();
+					var pageStart = (i - 1) * pageHeight;
+					var pageEnd = i * pageHeight;
+					doc.addImage(imgData, "PNG", 0, -pageStart, imgWidth, imgHeight);
+				}
+
+				// 下载 PDF 文件
+				doc.save(`${_this.title}${formatDate(new Date())}.pdf`);
+			});
+		},
 		//加载图表
 		pageLoad() {
 			if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
 			else this.chartData = this.dataLogic();
+			console.log(" this.chartData", this.chartData, this.$refs.componentRef);
 			this.$nextTick(() => {
 				this.$refs.componentRef.pageLoad();
 			});
@@ -528,80 +587,82 @@ export default {
 			// const yAxisEnd = yAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
 			const xAxisIndex = xAxis.map((item, index) => index);
 			const yAxisIndex = yAxis.map((item, index) => index);
-			return [
-				{
-					//区域缩放组件的类型为滑块，默认作用在x轴上
-					type: "slider",
-					//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-					filterMode: "none",
-					showDataShadow: false,
-					bottom: 22,
-					height: 10,
-					//区域缩放组件边框颜色
-					borderColor: "transparent",
-					//区域缩放组件边框背景
-					backgroundColor: "#e1eaf3",
-					//区域缩放组件上的手柄的样式
-					handleIcon:
-						"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
-					//手柄大小
-					handleSize: 18,
-					...xAxisEnd,
-					//为手柄设置阴影效果
-					handleStyle: {
-						shadowBlur: 6,
-						shadowOffsetX: 1,
-						shadowOffsetY: 2,
-						shadowColor: "#e1eaf3",
-					},
-					labelFormatter: "",
-					moveHandleSize: 12,
-					xAxisIndex: xAxisIndex,
-				},
-				{
-					//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
-					type: "inside",
-					//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-					filterMode: "none",
-					xAxisIndex: xAxisIndex,
-				},
-				{
-					//区域缩放组件的类型为滑块，默认作用在x轴上
-					type: "slider",
-					//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-					filterMode: "none",
-					showDataShadow: false,
-					right: 22,
-					width: 10,
-					//区域缩放组件边框颜色
-					borderColor: "transparent",
-					//区域缩放组件边框背景
-					backgroundColor: "#e1eaf3",
-					//区域缩放组件上的手柄的样式
-					handleIcon:
-						"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
-					//手柄大小
-					handleSize: 18,
-					...yAxisEnd,
-					//为手柄设置阴影效果
-					handleStyle: {
-						shadowBlur: 6,
-						shadowOffsetX: 1,
-						shadowOffsetY: 2,
-						shadowColor: "#e1eaf3",
-					},
-					labelFormatter: "",
-					yAxisIndex: yAxisIndex,
-					moveHandleSize: 12,
-				},
-				{
-					//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
-					type: "inside",
-					//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-					filterMode: "none",
-					yAxisIndex: yAxisIndex,
-				},
-			];
+			this.tempStyle.width = xAxis[0]?.data?.length > 15 ? `${xAxis[0].data.length * 50}px` : "100%";
+			this.tempStyle.height = yAxis[0]?.data?.length > 15 ? `${yAxis[0].data.length * 50}px` : "100%";
+			// return [
+			// 	{
+			// 		//区域缩放组件的类型为滑块，默认作用在x轴上
+			// 		type: "slider",
+			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+			// 		filterMode: "none",
+			// 		showDataShadow: false,
+			// 		bottom: 22,
+			// 		height: 10,
+			// 		//区域缩放组件边框颜色
+			// 		borderColor: "transparent",
+			// 		//区域缩放组件边框背景
+			// 		backgroundColor: "#e1eaf3",
+			// 		//区域缩放组件上的手柄的样式
+			// 		handleIcon:
+			// 			"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
+			// 		//手柄大小
+			// 		handleSize: 18,
+			// 		...xAxisEnd,
+			// 		//为手柄设置阴影效果
+			// 		handleStyle: {
+			// 			shadowBlur: 6,
+			// 			shadowOffsetX: 1,
+			// 			shadowOffsetY: 2,
+			// 			shadowColor: "#e1eaf3",
+			// 		},
+			// 		labelFormatter: "",
+			// 		moveHandleSize: 12,
+			// 		xAxisIndex: xAxisIndex,
+			// 	},
+			// 	{
+			// 		//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
+			// 		type: "inside",
+			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+			// 		filterMode: "none",
+			// 		xAxisIndex: xAxisIndex,
+			// 	},
+			// 	{
+			// 		//区域缩放组件的类型为滑块，默认作用在x轴上
+			// 		type: "slider",
+			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+			// 		filterMode: "none",
+			// 		showDataShadow: false,
+			// 		right: 22,
+			// 		width: 10,
+			// 		//区域缩放组件边框颜色
+			// 		borderColor: "transparent",
+			// 		//区域缩放组件边框背景
+			// 		backgroundColor: "#e1eaf3",
+			// 		//区域缩放组件上的手柄的样式
+			// 		handleIcon:
+			// 			"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
+			// 		//手柄大小
+			// 		handleSize: 18,
+			// 		...yAxisEnd,
+			// 		//为手柄设置阴影效果
+			// 		handleStyle: {
+			// 			shadowBlur: 6,
+			// 			shadowOffsetX: 1,
+			// 			shadowOffsetY: 2,
+			// 			shadowColor: "#e1eaf3",
+			// 		},
+			// 		labelFormatter: "",
+			// 		yAxisIndex: yAxisIndex,
+			// 		moveHandleSize: 12,
+			// 	},
+			// 	{
+			// 		//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
+			// 		type: "inside",
+			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
+			// 		filterMode: "none",
+			// 		yAxisIndex: yAxisIndex,
+			// 	},
+			// ];
 		},
 		//获取颜色
 		getVisualMap(markObj) {
@@ -738,12 +799,13 @@ export default {
 	},
 };
 </script>
-
+<style></style>
 <style scoped lang="less">
 .workbook-temp {
 	height: calc(100% - 50px);
 	padding: 5px;
 	margin: 5px;
+	overflow: auto;
 	.title {
 		text-align: center;
 		font-size: 16px;

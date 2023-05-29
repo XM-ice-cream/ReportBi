@@ -59,6 +59,9 @@
 									<Icon custom="iconfont icon-biaodanzujian-biaoge" class="icon" />{{ item }}
 								</li>
 							</ul>
+							<div class="custom-sql" draggable @dragend="addCustomSql($event)">
+								<Icon custom="iconfont icon-shezhi" class="icon" title="新自定义 SQL" />新自定义 SQL
+							</div>
 						</div>
 					</div>
 					<div slot="right" class="right-box">
@@ -73,6 +76,13 @@
 		</Modal>
 		<DataSetConfigConnecttable ref="datasetconfigconnecttable" :modalFlag.sync="connectModalFlag" :connectObj="connectObj" @updateEdge="updateEdge" />
 		<TableFilter ref="tablefilter" :modalFlag.sync="filterModalFlag" :selectObj="filterObj" @updateFilter="updateFilter" />
+		<DataSetCustomSql
+			ref="datasetCustomSql"
+			:modalFlag.sync="customSqlModalFlag"
+			:customObj="customObj"
+			:paramsTabel="data?.paramsList || []"
+			@updateCustomSql="updateCustomSql"
+		/>
 	</div>
 </template>
 <script>
@@ -80,12 +90,13 @@ import { getAllDatasourceReq } from "@/api/bill-design-manage/data-set.js";
 import { addReq, modifyReq, getTableListReq, getUsersReq } from "@/api/bill-design-manage/data-set-config.js";
 
 import DataSetConfigConnecttable from "./data-set-config-connecttable.vue";
+import DataSetCustomSql from "./data-set-custom-sql.vue";
 import G6 from "@antv/g6";
 import TableFilter from "./table-filter.vue";
 
 export default {
 	name: "DataSetConfigAddEdit",
-	components: { DataSetConfigConnecttable, TableFilter },
+	components: { DataSetConfigConnecttable, TableFilter, DataSetCustomSql },
 	props: {
 		modalFlag: {
 			required: true,
@@ -113,8 +124,11 @@ export default {
 			modalTitle: "数据集配置",
 			connectModalFlag: false,
 			filterModalFlag: false,
+			customSqlModalFlag: false,
+			customEvent: "", //自定义SQL节点信息
 			connectObj: {}, //关联表
 			filterObj: {}, //过滤表
+			customObj: {}, //自定义节点信息
 			submitData: { datasetName: "", datasetCode: "", sourceCode: "", filterTable: "", enabled: 1, content: "", user: "" },
 			filterList: [], //过滤后的值
 			userList: [], //数据源对应所有用户
@@ -419,9 +433,19 @@ export default {
 			this.connectModalFlag = true;
 			this.connectObj = { ...obj };
 		},
+		//添加自定义sql
+		addCustomSql(e) {
+			this.customSqlModalFlag = true;
+			this.customEvent = e;
+		},
+		//更新自定义sql
+		updateCustomSql(data, paramsList) {
+			this.addNodeImage(this.customEvent, data.label, 1, data, paramsList);
+		},
 
 		// 添加节点
-		addNodeImage(e, row) {
+		addNodeImage(e, row, isCustomSql, data, paramsList) {
+			console.log("e,row", e, row);
 			const isExistTable = this.data.nodes
 				.map((item) => item.label)
 				.filter((item) => {
@@ -437,9 +461,13 @@ export default {
 				x: point.x,
 				y: point.y,
 				type: "rect",
+				custom: isCustomSql ? data.sql : "",
+				isCustomSql: isCustomSql || 0,
 			};
 			this.data.nodes.push({ ...model });
+			this.data.customParamsList = paramsList;
 			this.graph.changeData(this.data);
+			console.log("this.data", this.data);
 		},
 		//更新边
 		updateEdge(val) {
@@ -471,6 +499,11 @@ export default {
 					outDiv.style.minWidth = "100px";
 					outDiv.style.zIndex = 999;
 					let htmlVal = ``;
+					// 编辑
+					htmlVal += `<p data-name='edit' style="padding: 3px 10px;cursor: pointer;"
+              onmouseenter="this.style.backgroundColor = '#27ce88';this.style.color = '#fff';"
+              onmouseleave="this.style.backgroundColor = '#fff';this.style.color = '#515a6e'">编辑</p>`;
+
 					// 对于表的筛选
 					htmlVal += `<p data-name='filter' style="padding: 3px 10px;cursor: pointer;"
               onmouseenter="this.style.backgroundColor = '#27ce88';this.style.color = '#fff';"
@@ -488,6 +521,7 @@ export default {
 					const name = target.getAttribute("data-name");
 					if (name === "delete") this.delNodes(item.getModel().id);
 					if (name === "filter") this.filterNodes(item.getModel());
+					if (name === "edit") this.editNodes(item.getModel());
 				},
 				offsetX: 16 + 10,
 				offsetY: 0,
@@ -523,7 +557,11 @@ export default {
 			this.filterModalFlag = true;
 			this.filterObj = { ...obj };
 		},
-
+		//节点 编辑
+		editNodes(model) {
+			console.log("节点 编辑", model);
+			this.customObj = model;
+		},
 		//获取数据源下拉框
 		getDataSourceList() {
 			const obj = { sourceType: "" };
@@ -581,9 +619,12 @@ export default {
 		.left-tree {
 			height: calc(100% - 320px);
 			padding: 10px;
-			overflow-y: auto;
 			font-weight: bold;
 			margin-top: 10px;
+			ul {
+				height: calc(100% - 30px);
+				overflow-y: auto;
+			}
 			li {
 				list-style: none;
 				padding-bottom: 10px;
@@ -591,10 +632,16 @@ export default {
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
+				cursor: pointer;
 			}
 			.icon {
 				font-size: 22px;
 				margin-right: 5px;
+			}
+			.custom-sql {
+				height: 20px;
+				margin-top: 10px;
+				cursor: pointer;
 			}
 		}
 	}
