@@ -1,18 +1,20 @@
 <template>
-	<div class="workbook-temp">
-		<div :style="tempStyle" ref="exportContent">
-			<div class="title">{{ title }}</div>
-			<Tooltip content="导出PDF" placement="top-start" class="download">
-				<icon custom="iconfont icon-pdfdayin" @click="exportPDF" />
-			</Tooltip>
-			<component
-				ref="componentRef"
-				:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
-				:ispreview="true"
-				:visib="visib"
-				:chartData="chartData"
-				:mark="mark"
-			/>
+	<div style="height: 100%; padding-top: 40px">
+		<div class="title">{{ title }}</div>
+		<Tooltip content="导出PDF" placement="top-start" class="download">
+			<icon custom="iconfont icon-pdfdayin" @click="exportPDF" />
+		</Tooltip>
+		<div class="workbook-temp" ref="workbookTempRef">
+			<div :style="tempStyle" ref="exportContent">
+				<component
+					ref="componentRef"
+					:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
+					:ispreview="true"
+					:visib="visib"
+					:chartData="chartData"
+					:mark="mark"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -87,7 +89,6 @@ export default {
 	methods: {
 		//导出PDF
 		async exportPDF() {
-			const content = this.$refs.exportContent;
 			const canvas = this.$refs.componentRef.myChart.getDom().getElementsByTagName("canvas")[0];
 			const direction = this.chartData.yAxis[0]?.type == "value" ? "l" : "p";
 			const filename = `${this.title}${formatDate(new Date())}.pdf`;
@@ -160,19 +161,6 @@ export default {
 				// 下载操作
 				pdf.save(filename);
 			});
-		},
-		//获取中文转helvetica编码
-		getHelvetica(content) {
-			let converted = "";
-			for (var i = 0; i < content.length; i++) {
-				var charCode = content.charCodeAt(i);
-				if (charCode < 128) {
-					converted += String.fromCharCode(charCode);
-				} else {
-					converted += "\ufffd"; // 将无法支持的字符替换为'?'
-				}
-			}
-			return converted;
 		},
 		//加载图表
 		pageLoad() {
@@ -400,7 +388,7 @@ export default {
 					data: objKeys,
 					show: false,
 				});
-				grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 20, right: 100 }];
+				grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 50, right: 200 }];
 			} else {
 				//行中有指标，列均为维度
 				xAxis = isAllNumber ? [] : this.axisNumber;
@@ -495,8 +483,8 @@ export default {
 					{
 						left: gridWidth + groupByString.length * 10,
 						bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90,
-						top: 20,
-						right: 100,
+						top: 50,
+						right: 200,
 					},
 				];
 			}
@@ -627,16 +615,22 @@ export default {
 		},
 		//增减进度条
 		getDataZoom(xAxis, yAxis, groupByNumber) {
-			const showData = 15 / groupByNumber.length;
-			const xAxisEnd = { end: xAxis[0]?.data ? (15 / xAxis[0].data.length) * 100 : 100 };
-			const yAxisEnd = { end: yAxis[0]?.data ? (15 / yAxis[0].data.length) * 100 : 100 };
+			// const showData = 15 / groupByNumber.length;
+			// const xAxisEnd = { end: xAxis[0]?.data ? (15 / xAxis[0].data.length) * 100 : 100 };
+			// const yAxisEnd = { end: yAxis[0]?.data ? (15 / yAxis[0].data.length) * 100 : 100 };
+			// const xAxisIndex = xAxis.map((item, index) => index);
+			// const yAxisIndex = yAxis.map((item, index) => index);
 			//滚动条设定  minValueSpan：最小显示的值数量
 			// const xAxisEnd = xAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
 			// const yAxisEnd = yAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
-			const xAxisIndex = xAxis.map((item, index) => index);
-			const yAxisIndex = yAxis.map((item, index) => index);
-			this.tempStyle.width = xAxis[0]?.data?.length > 15 ? `${xAxis[0].data.length * 16}px` : "100%";
-			this.tempStyle.height = yAxis[0]?.data?.length > 15 ? `${yAxis[0].data.length * 16}px` : "100%";
+			const { offsetWidth, offsetHeight } = this.$refs.workbookTempRef;
+			const width = offsetWidth - 20;
+			const height = offsetHeight - 20;
+			const xLength = width / 16 < xAxis[0]?.data?.length ? `${xAxis[0].data.length * 16}px` : `${width}px`;
+			const yLength = height / 16 < yAxis[0]?.data?.length ? `${yAxis[0].data.length * 16}px` : `${height}px`;
+			console.log(xLength, yLength, width);
+			this.tempStyle.width = xLength;
+			this.tempStyle.height = yLength;
 			// return [
 			// 	{
 			// 		//区域缩放组件的类型为滑块，默认作用在x轴上
@@ -850,28 +844,29 @@ export default {
 <style></style>
 <style scoped lang="less">
 .workbook-temp {
-	height: calc(100% - 50px);
+	width: 100%;
+	height: calc(100% - 20px);
 	padding: 5px;
 	margin: 5px;
 	overflow: auto;
-	.title {
-		text-align: center;
-		font-size: 16px;
-		font-weight: bold;
-		position: absolute;
-		top: 2%;
-		left: 50%;
-	}
-	.download {
-		position: absolute;
-		top: 2%;
-		right: 2%;
-		i {
-			font-size: 24px;
-			&:hover {
-				color: #27ce88;
-				font-size: 26px;
-			}
+}
+.title {
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	position: absolute;
+	top: 2%;
+	left: 50%;
+}
+.download {
+	position: absolute;
+	top: 2%;
+	right: 2%;
+	i {
+		font-size: 24px;
+		&:hover {
+			color: #27ce88;
+			font-size: 26px;
 		}
 	}
 }

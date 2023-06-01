@@ -1259,6 +1259,7 @@ export default {
 			width: calc(100% - 500px);
 			margin-left: 10px;
 			.row-column {
+				height: 130px;
 				.row,
 				.column {
 					height: 40px;
@@ -1282,9 +1283,8 @@ export default {
 				}
 			}
 			.right-content {
-				height: calc(100% - 100px);
+				height: calc(100% - 130px);
 				position: relative;
-				margin-top: 30px;
 				.title {
 					padding: 5px 10px;
 					font-weight: bold;
