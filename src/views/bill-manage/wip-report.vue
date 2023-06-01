@@ -19,6 +19,7 @@
 												ref="workOrder"
 												class="select-page-style"
 												v-if="searchPoptipModal"
+												multiple
 												key-field="workOrder"
 												show-field="workOrder"
 												:data="workerPageListUrl"
@@ -199,7 +200,7 @@ export default {
 							pageSize: this.req.pageSize, // 分页大小
 							pageIndex: this.req.pageIndex, // 当前页码
 							data: {
-								workOrder, //工单
+								workOrder: workOrder.toString(), //工单
 								pn,
 							},
 						};
@@ -276,7 +277,7 @@ export default {
 			let { workOrder, pn } = this.req;
 			if (workOrder || pn) {
 				let obj = {
-					workOrder, //工单
+					workOrder: workOrder.toString(), //工单
 					pn,
 				};
 				exportReq(obj).then((res) => {
@@ -291,6 +292,10 @@ export default {
 		// 点击重置按钮触发
 		resetClick() {
 			this.$refs.searchReq.resetFields();
+			this.searchPoptipModal = false;
+			this.$nextTick(() => {
+				this.searchPoptipModal = true;
+			});
 		},
 		// 自动改变表格高度
 		autoSize() {

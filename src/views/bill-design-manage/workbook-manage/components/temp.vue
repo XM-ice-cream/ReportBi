@@ -87,8 +87,6 @@ export default {
 	methods: {
 		//导出PDF
 		async exportPDF() {
-			// 导出 不分页的pdf
-			// const pdf = new jsPDF("p", "mm", "a4");
 			const content = this.$refs.exportContent;
 			const canvas = this.$refs.componentRef.myChart.getDom().getElementsByTagName("canvas")[0];
 			const direction = this.chartData.yAxis[0]?.type == "value" ? "l" : "p";
@@ -99,63 +97,34 @@ export default {
 		domToPdf(dom, filename, direction, title) {
 			document.documentElement.scrollTop = 0;
 			document.body.scrollTop = 0;
-			/*
-      html2Canvas参数说明
-      allowTaint：否允许跨域图片绘制
-      backgroundColor：指定截图背景颜色
-      canvas：指定截图结果输出的Canvas元素，如果不指定，则会创建一个新的Canvas元素
-      foreignObjectRendering：指定是否使用ForeignObject绘制，默认为false，使用ForeignObject可以支持复杂的CSS样式和布局，但是在一些浏览器中可能存在性能问题。
-      height：指定截图的高度，如果不指定，则使用自动计算的高度。
-      ignoreElements：指定忽略哪些DOM元素，可以是选择器表达式、DOM元素数组、或者函数。使用选择器表达式时，可以使用逗号分隔多个选择器；使用函数时，参数为当前DOM节点，返回值为true时会被忽略。
-      letterRendering：指定是否开启字形渲染，默认为false。如果设置为true，可能会导致较慢的渲染速度。
-      logging：指定是否显示日志信息，默认为false，如果设置为true，则会在控制台输出日志信息。
-      proxy：指定代理地址，如果需要跨域截图，则需要指定代理地址，否则会被浏览器拦截。
-      scale：指定截图的缩放比例，默认为1，可以设置为其他值来提高图像质量，但会导致截图时间增加。
-      useCORS：指定是否使用跨域资源共享（CORS）获取图像，默认为false。
-      width：指定截图的宽度，如果不指定，则使用自动计算的宽度。
-      */
 			html2Canvas(dom, {
 				allowTaint: true,
 				useCORS: true,
 			}).then((canvas) => {
-				let pdf = new jsPDF("landscape", "pt", "a4");
+				let pdf = new jsPDF("landscape", "pt");
 				pdf.setFontSize(8);
 				pdf.setTextColor("#767676");
 				//pdf 的宽高
-				let pdfWidth = pdf.internal.pageSize.getWidth();
-				let pdfHeight = pdf.internal.pageSize.getHeight();
+				console.log(pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+				let pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+				let pdfHeight = pdf.internal.pageSize.getHeight() - 20;
 
 				let contentWidth = canvas.width;
 				let contentHeight = canvas.height;
 				let ctx = canvas.getContext("2d");
-				// 将willReadFrequently属性设置为true
 				ctx.canvas.willReadFrequently = true;
-
-				// console.log("canvas", canvas, "contentWidth", contentWidth, "contentHeight", contentHeight, "cxt", ctx);
-				// 一页pdf显示html页面生成的canvas高度/宽度
-				// let pageHeight = (contentWidth * 841.89) / 592.28;
-				// let pageWidth = (contentHeight * 595.28) / 841.89;
-				// 未生成pdf的html页面高度/宽度
-				// let leftHeight = contentHeight;
-				// let leftWidth = contentWidth;
-
-				// a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
-				// (592.28 / contentWidth) * contentHeight
-				var bi = 572.28 / 821.89;
+				var bi = pdfHeight / pdfWidth;
 				var imgWidth = direction == "p" ? contentWidth : contentHeight / bi; // A4 页面宽度
-				var imgHeight = direction == "l" ? contentHeight : contentHeight * bi;
+				var imgHeight = direction == "l" ? contentHeight : contentWidth * bi;
 
-				let radio = imgWidth / imgHeight; //图片宽高比例
-				let docHeight = pdfHeight - 20; //页边距
-				let docWidth = pdfWidth - 20;
+				let contentRadio = Math.max(contentWidth / pdfWidth, contentHeight / pdfHeight);
+				if (contentRadio <= 1) {
+					imgWidth = contentWidth;
+					imgHeight = contentHeight;
+				}
 				// 页面偏移
-				// let position = 0;
 				let positionX = 0;
 				let positionY = 0;
-
-				// console.log("pageHeight", pageHeight, "leftHeight", leftHeight, "imgHeight", imgHeight);
-
-				// let pageData = canvas.toDataURL("image/jpeg", 1.0);
 
 				let iLength = Math.ceil(contentHeight / imgHeight);
 				let jLength = Math.ceil(contentWidth / imgWidth);
@@ -166,21 +135,13 @@ export default {
 					for (let j = 0; j < jLength; j++) {
 						let imageData = ctx.getImageData(positionX, positionY, imgWidth, imgHeight);
 
-						// console.log("imageData", position, "------", positionX, positionY, imgWidth, imgHeight, imageData);
-						// const imgDataUrl = imageData.data.toDataURL("image/png"); // 将ImageData对象转换为base64格式
 						let canvasTemp = document.createElement("canvas");
 						canvasTemp.width = imageData.width;
 						canvasTemp.height = imageData.height;
 						canvasTemp.getContext("2d").putImageData(imageData, 0, 0);
 						let base64Img = canvasTemp.toDataURL("image/png");
 
-						// var im = document.createElement("img"); //创建图片
-						// im.src = base64Img;
-						// //图片设置成和div一样大小
-						// im.style.width = imgWidth;
-						// im.style.height = imgHeight;
-						// dom.appendChild(im); //图片挂载到div上
-						let radioTmp = Math.min(821.89 / imgWidth, 572.28 / imgHeight);
+						let radioTmp = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
 						// 添加页眉
 						// pdf.text(`${title}`, pdf.internal.pageSize.width / 2, 10, "center");
 
@@ -196,36 +157,6 @@ export default {
 					}
 				}
 
-				// if (leftHeight < pageHeight && leftWidth < pageWidth) {
-				// 	/*addImage
-				//   1. 图象数据
-				//   2.图象格式：JPEG PNG GIF WEBP BMP
-				//   3.X:PDF 左上角x坐标轴
-				//   4.y:PDF 左上角Y坐标轴
-				//   5.width:图象在PDF文档中显示的宽度
-				//   6.height:图象在PDF文档中显示的高度
-				//   7.图象别名
-				//   8.压缩方式：NONE:不压缩 FAST 快速压缩
-				// 	 */
-				// 	pdf.addImage(pageData, "JPEG", 0, 0, imgWidth, imgHeight);
-				// } else {
-				// 	while (leftHeight > 0 || leftWidth > 0) {
-				// 		while (leftWidth > 0) {
-				// 			pdf.addImage(pageData, "JPEG", positionX, positionY, imgWidth, imgHeight);
-				// 			leftWidth -= pageWidth;
-				// 			positionX -= imgWidth;
-				// 		}
-				// 		while (leftHeight > 0) {
-				// 			pdf.addImage(pageData, "JPEG", positionX, positionY, imgWidth, imgHeight);
-				// 			leftHeight -= pageHeight;
-				// 			positionY -= imgHeight;
-				// 		}
-				// 		// 避免添加空白页
-				// 		// if (leftHeight > 0) {
-				// 		// 	pdf.addPage();
-				// 		// }
-				// 	}
-				// }
 				// 下载操作
 				pdf.save(filename);
 			});
@@ -469,7 +400,7 @@ export default {
 					data: objKeys,
 					show: false,
 				});
-				grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100 }];
+				grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 20, right: 100 }];
 			} else {
 				//行中有指标，列均为维度
 				xAxis = isAllNumber ? [] : this.axisNumber;
@@ -560,7 +491,14 @@ export default {
 						show: isAllNumber,
 					},
 				});
-				grid = [{ left: gridWidth + groupByString.length * 10, bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90 }];
+				grid = [
+					{
+						left: gridWidth + groupByString.length * 10,
+						bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90,
+						top: 20,
+						right: 100,
+					},
+				];
 			}
 			return { xAxis, yAxis, grid };
 		},
@@ -697,8 +635,8 @@ export default {
 			// const yAxisEnd = yAxis[0]?.data ? { minValueSpan: 15, maxValueSpan: 15 } : { end: 100 };
 			const xAxisIndex = xAxis.map((item, index) => index);
 			const yAxisIndex = yAxis.map((item, index) => index);
-			this.tempStyle.width = xAxis[0]?.data?.length > 15 ? `${xAxis[0].data.length * 20}px` : "100%";
-			this.tempStyle.height = yAxis[0]?.data?.length > 15 ? `${yAxis[0].data.length * 20}px` : "100%";
+			this.tempStyle.width = xAxis[0]?.data?.length > 15 ? `${xAxis[0].data.length * 16}px` : "100%";
+			this.tempStyle.height = yAxis[0]?.data?.length > 15 ? `${yAxis[0].data.length * 16}px` : "100%";
 			// return [
 			// 	{
 			// 		//区域缩放组件的类型为滑块，默认作用在x轴上

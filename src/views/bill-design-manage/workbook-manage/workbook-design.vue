@@ -1283,6 +1283,8 @@ export default {
 			}
 			.right-content {
 				height: calc(100% - 100px);
+				position: relative;
+				margin-top: 30px;
 				.title {
 					padding: 5px 10px;
 					font-weight: bold;
