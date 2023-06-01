@@ -88,9 +88,9 @@ export default {
 	},
 };
 </script>
-<style>
+<style lang="less" scoped>
 .charts {
-	height: 100%;
+	height: calc(100% - 32px);
 	width: 100%;
 }
 </style>

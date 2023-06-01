@@ -6,6 +6,13 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "1587096",
+      "name": "pdf打印",
+      "font_class": "pdfdayin",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
       "icon_id": "162882",
       "name": "设置",
       "font_class": "shezhi",

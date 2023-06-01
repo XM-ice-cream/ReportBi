@@ -86,7 +86,7 @@ export default {
 	},
 };
 </script>
-<style>
+<style lang="less" scoped>
 .charts {
 	height: 100%;
 	width: 100%;
