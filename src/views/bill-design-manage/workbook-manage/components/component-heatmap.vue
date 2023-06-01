@@ -10,13 +10,15 @@ export default {
 		chartData: Object,
 	},
 	data() {
-		return {};
+		return {
+			myChart: null,
+		};
 	},
 
 	methods: {
 		pageLoad() {
 			// 基于准备好的dom，初始化echarts实例
-			let myChart = echarts.init(this.$el);
+			this.myChart = echarts.init(this.$el);
 			const _this = this;
 			let seriesResult = [];
 
@@ -69,11 +71,11 @@ export default {
 				}),
 			};
 			console.log(option);
-			myChart.setOption(option, true);
+			this.myChart.setOption(option, true);
 
 			window.addEventListener("resize", function () {
-				if (myChart) {
-					myChart.resize();
+				if (this.myChart) {
+					this.myChart.resize();
 				}
 			});
 		},
