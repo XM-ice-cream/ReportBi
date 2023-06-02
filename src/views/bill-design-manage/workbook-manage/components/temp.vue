@@ -108,24 +108,26 @@ export default {
 				pdf.setFontSize(8);
 				pdf.setTextColor("#767676");
 				pdf.setFont("simhei");
-				//pdf 的宽高
-				console.log(pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
-				let pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-				let pdfHeight = pdf.internal.pageSize.getHeight() - 30;
 
-				let contentWidth = canvas.width;
-				let contentHeight = canvas.height;
 				let ctx = canvas.getContext("2d");
 				ctx.canvas.willReadFrequently = true;
-				var bi = pdfHeight / pdfWidth;
-				var imgWidth = direction == "p" ? contentWidth : contentHeight / bi; // A4 页面宽度
-				var imgHeight = direction == "l" ? contentHeight : contentWidth * bi;
+
+				//pdf 的宽高
+				let pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+				let pdfHeight = pdf.internal.pageSize.getHeight() - 30;
+				let contentWidth = canvas.width;
+				let contentHeight = canvas.height;
+
+				let bi = pdfHeight / pdfWidth;
+				let imgWidth = direction == "p" ? contentWidth : contentHeight / bi; // A4 页面宽度
+				let imgHeight = direction == "l" ? contentHeight : contentWidth * bi;
 
 				let contentRadio = Math.max(contentWidth / pdfWidth, contentHeight / pdfHeight);
 				if (contentRadio <= 1) {
 					imgWidth = contentWidth;
 					imgHeight = contentHeight;
 				}
+				const radioTmp = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
 				// 页面偏移
 				let positionX = 0;
 				let positionY = 0;
@@ -139,17 +141,13 @@ export default {
 					for (let j = 0; j < jLength; j++) {
 						let imageData = ctx.getImageData(positionX, positionY, imgWidth, imgHeight);
 
-						let canvasTemp = document.createElement("canvas");
-						canvasTemp.width = imageData.width;
-						canvasTemp.height = imageData.height;
-						canvasTemp.getContext("2d").putImageData(imageData, 0, 0);
-						let base64Img = canvasTemp.toDataURL("image/png");
+						let base64Img = this.getImageDataDataURL(imageData);
 
-						let radioTmp = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
 						// 添加页眉
 						pdf.text(`${title}`, pdf.internal.pageSize.width / 2, 10, "center");
-
+						//图片
 						pdf.addImage(base64Img, "JPEG", 10, 20, imgWidth * radioTmp, imgHeight * radioTmp);
+						//添加页尾
 						pdf.text(
 							"page " + (i * jLength + j + 1) + " of " + iLength * jLength,
 							pdf.internal.pageSize.width / 2,
@@ -164,6 +162,14 @@ export default {
 				// 下载操作
 				pdf.save(filename);
 			});
+		},
+		// 将 ImageData 转换为 base64 格式的图片数据
+		getImageDataDataURL(imageData) {
+			let canvasTemp = document.createElement("canvas");
+			canvasTemp.width = imageData.width;
+			canvasTemp.height = imageData.height;
+			canvasTemp.getContext("2d").putImageData(imageData, 0, 0);
+			return canvasTemp.toDataURL("image/png");
 		},
 		//加载图表
 		pageLoad() {
