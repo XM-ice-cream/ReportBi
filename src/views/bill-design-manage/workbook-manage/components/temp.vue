@@ -29,6 +29,8 @@ import { formatDate } from "@/libs/tools";
 import html2Canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+import "@/assets/js/simhei-normal.js";
+
 export default {
 	name: "componentsTemp",
 	components: { barLineScatter, componentPie, componentBoxplot, componentHeatMap, componentText },
@@ -105,10 +107,11 @@ export default {
 				let pdf = new jsPDF("landscape", "pt");
 				pdf.setFontSize(8);
 				pdf.setTextColor("#767676");
+				pdf.setFont("simhei");
 				//pdf 的宽高
 				console.log(pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
 				let pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-				let pdfHeight = pdf.internal.pageSize.getHeight() - 20;
+				let pdfHeight = pdf.internal.pageSize.getHeight() - 30;
 
 				let contentWidth = canvas.width;
 				let contentHeight = canvas.height;
@@ -144,9 +147,9 @@ export default {
 
 						let radioTmp = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
 						// 添加页眉
-						// pdf.text(`${title}`, pdf.internal.pageSize.width / 2, 10, "center");
+						pdf.text(`${title}`, pdf.internal.pageSize.width / 2, 10, "center");
 
-						pdf.addImage(base64Img, "JPEG", 10, 10, imgWidth * radioTmp, imgHeight * radioTmp);
+						pdf.addImage(base64Img, "JPEG", 10, 20, imgWidth * radioTmp, imgHeight * radioTmp);
 						pdf.text(
 							"page " + (i * jLength + j + 1) + " of " + iLength * jLength,
 							pdf.internal.pageSize.width / 2,
