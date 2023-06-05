@@ -6,17 +6,23 @@
 			<Card :bordered="false" dis-hover class="card-style" id="analogData">
 				<Row>
 					<Form ref="submitReq" :model="req" :label-width="150" :label-colon="false" :rules="ruleValidate" style="width: 70rem">
-						<FormItem label="线体" prop="lineName">
+						<FormItem label="分板前" prop="isSerin">
+							<i-switch size="large" v-model="req.isSerin" :true-value="1" :false-value="0">
+								<span slot="open">是</span>
+								<span slot="close">否</span>
+							</i-switch>
+						</FormItem>
+						<FormItem label="线体" prop="lineName" v-if="!req.isSerin">
 							<Select v-model="req.lineName" clearable size="default" @on-change="getEqpId">
 								<Option v-for="item in selectList.lineList" :value="item.lineName" :key="item.lineName">{{ item.lineName }}</Option>
 							</Select>
 						</FormItem>
-						<FormItem label="Dam设备" prop="damEqpId">
+						<FormItem label="Dam设备" prop="damEqpId" v-if="!req.isSerin">
 							<Select v-model="req.damEqpId" clearable size="default">
 								<Option v-for="item in selectList.EqpIdDamList" :value="item.eqpId" :key="item.eqpId">{{ item.eqpId }}</Option>
 							</Select>
 						</FormItem>
-						<FormItem label="Fill设备" prop="fillEqpId">
+						<FormItem label="Fill设备" prop="fillEqpId" v-if="!req.isSerin">
 							<Select v-model="req.fillEqpId" clearable size="default">
 								<Option v-for="item in selectList.EqpIdFillList" :value="item.eqpId" :key="item.eqpId">{{ item.eqpId }}</Option>
 							</Select>
@@ -39,7 +45,7 @@
 						</FormItem>
 						<FormItem>
 							<Button type="primary" @click="reset()" size="default">{{ $t("reset") }}</Button> &nbsp;&nbsp;
-							<Button type="primary" @click="submit('unitinfo')" size="default" :loading="loading.unitinfo">
+							<Button type="primary" @click="submit('unitinfo')" size="default" :loading="loading.unitinfo" v-if="!req.isSerin">
 								<span v-if="!loading.unitinfo">添加过站</span>
 								<span v-else>正在提交，请等待...</span>
 							</Button>
@@ -66,10 +72,13 @@
 				<div v-if="reqList.length" style="height: calc(100% - 28rem); overflow-y: scroll">
 					<template v-for="item in reqList">
 						<Alert type="success" show-icon>
-							<span :class="item.type">{{ item.type }}</span> {{ formatDate(item.currentDateTime) }} : {{ item.lineName }} Dam设备：{{
-								item.damEqpId
-							}}
-							Fill设备：{{ item.fillEqpId }} 替换Panel：{{ item.currentPanel }}
+							<span :class="item.type">{{ item.type }}</span>
+							<template v-if="!req.isSerin">
+								{{ formatDate(item.currentDateTime) }} : {{ item.lineName }} Dam设备：{{ item.damEqpId }} Fill设备：{{ item.fillEqpId }} 替换Panel：{{
+									item.currentPanel
+								}}
+							</template>
+							<template v-else> {{ formatDate(item.currentDateTime) }} : 替换Panel：{{ item.currentPanel }} </template>
 						</Alert>
 					</template>
 				</div>
@@ -79,7 +88,17 @@
 </template>
 
 <script>
-import { addUnitinfoTravel, addSerinData, addKnsData, addToolingData, getEqpIdReq, getLineReq } from "@/api/bill-manage/analog-data";
+import {
+	addUnitinfoTravel,
+	addSerinData,
+	addKnsData,
+	addToolingData,
+	getEqpIdReq,
+	getLineReq,
+	addToSerinData,
+	addToKnsData,
+	addToToolingData,
+} from "@/api/bill-manage/analog-data";
 import { formatDate } from "@/libs/tools";
 
 export default {
@@ -95,6 +114,7 @@ export default {
 				fillEqpId: "", //Fill设备
 				damEqpId: "", //Dam设备
 				currentDateTime: "", //过站时间
+				isSerin: 0,
 			}, //查询数据
 			//加载中
 			loading: {
@@ -192,13 +212,21 @@ export default {
 		},
 		// 获取该调用的API
 		apiData(flag) {
-			const temp = {
-				unitinfo: addUnitinfoTravel,
-				serin: addSerinData,
-				kns: addKnsData,
-				tooling: addToolingData,
-			};
-			return temp[flag];
+			const index = this.req.isSerin;
+			const temp = [
+				{
+					unitinfo: addUnitinfoTravel,
+					serin: addSerinData,
+					kns: addKnsData,
+					tooling: addToolingData,
+				},
+				{
+					serin: addToSerinData,
+					kns: addToKnsData,
+					tooling: addToToolingData,
+				},
+			];
+			return temp[index][flag];
 		},
 		//获取线体
 		getLine() {
@@ -256,8 +284,8 @@ export default {
 <style lang="less" scoped>
 #analogData {
 	.ivu-row {
-		margin-left: 15%;
-		margin-top: 8%;
+		padding-left: 15%;
+		padding-top: 8%;
 		// text-align: center;
 	}
 	/deep/.ivu-form .ivu-FormItem-label {

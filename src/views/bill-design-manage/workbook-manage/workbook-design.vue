@@ -10,42 +10,83 @@
 		<div class="workbook-container">
 			<div class="top-container">
 				<!-- 左侧数据集 -->
-				<div class="left-box">
-					<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
-						<!-- 工作簿名称 -->
-						<FormItem :label="$t('workBookName')" prop="workBookName">
-							<Input v-model.trim="submitData.workBookName" :placeholder="$t('pleaseEnter') + $t('workBookName')" cleabler />
-						</FormItem>
-						<!-- 工作簿编码 -->
-						<FormItem :label="$t('workBookCode')" prop="workBookCode">
-							<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" cleabler />
-						</FormItem>
-						<!-- 数据集 -->
-						<FormItem :label="$t('setName')" prop="datasetId">
-							<Select
-								v-model="submitData.datasetId"
-								filterable
-								clearable
-								:placeholder="$t('pleaseSelect') + $t('setName')"
-								@on-change="getColumnList"
-							>
-								<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
-							</Select>
-						</FormItem>
-						<!-- 最大数据量 -->
-						<FormItem label="最大数据量" prop="maxNumber">
-							<Input v-model.trim="submitData.maxNumber" :placeholder="$t('pleaseEnter') + '最大数据量【推荐2000笔】'" cleabler />
-						</FormItem>
-						<!-- 是否有效 -->
-						<FormItem :label="$t('enabled')" prop="enabled">
-							<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
-								<span slot="open">{{ $t("open") }}</span>
-								<span slot="close">{{ $t("close") }}</span>
-							</i-switch>
-						</FormItem>
-					</Form>
-					<Input v-model="submitData.columnName" placeholder="请筛选信息" clearable suffix="ios-search" @on-change="getColumnList" />
-					<div class="left-tree">
+				<div class="left-box" :class="baseInfoPanel">
+					<Collapse v-model="baseInfoPanel" class="baseinfo">
+						<Panel name="base">
+							基础信息
+							<template #content>
+								<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
+									<!-- 工作簿名称 -->
+									<FormItem :label="$t('workBookName')" prop="workBookName">
+										<Input v-model.trim="submitData.workBookName" :placeholder="$t('pleaseEnter') + $t('workBookName')" cleabler />
+									</FormItem>
+									<!-- 工作簿编码 -->
+									<FormItem :label="$t('workBookCode')" prop="workBookCode">
+										<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" cleabler />
+									</FormItem>
+
+									<!-- 厂区 -->
+									<FormItem label="厂区" prop="opt1">
+										<Select v-model="submitData.opt1" filterable clearable :placeholder="$t('pleaseSelect') + '厂区'">
+											<Option v-for="(item, index) in opt1List" :value="item.detailCode" :key="index">{{ item.detailName }}</Option>
+										</Select>
+									</FormItem>
+									<!-- 机种 -->
+									<FormItem label="机种" prop="opt2">
+										<Select
+											v-model="submitData.opt2"
+											filterable
+											clearable
+											:placeholder="$t('pleaseSelect') + $t('setName')"
+											@on-change="getColumnList"
+										>
+											<Option v-for="(item, index) in opt2List" :value="item.detailCode" :key="index">{{ item.detailName }}</Option>
+										</Select>
+									</FormItem>
+									<!-- 是否公共 -->
+									<FormItem label="公共模型" prop="opt3">
+										<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+											<span slot="open">是</span>
+											<span slot="close">否</span>
+										</i-switch>
+									</FormItem>
+									<!-- 数据集 -->
+									<FormItem :label="$t('setName')" prop="datasetId">
+										<Select
+											v-model="submitData.datasetId"
+											filterable
+											clearable
+											:placeholder="$t('pleaseSelect') + $t('setName')"
+											@on-change="getColumnList"
+										>
+											<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
+										</Select>
+									</FormItem>
+
+									<!-- 最大数据量 -->
+									<FormItem label="最大数据量" prop="maxNumber">
+										<Input v-model.trim="submitData.maxNumber" :placeholder="$t('pleaseEnter') + '最大数据量【推荐2000笔】'" cleabler />
+									</FormItem>
+									<!-- 是否有效 -->
+									<FormItem :label="$t('enabled')" prop="enabled">
+										<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+											<span slot="open">{{ $t("open") }}</span>
+											<span slot="close">{{ $t("close") }}</span>
+										</i-switch>
+									</FormItem>
+								</Form>
+							</template>
+						</Panel>
+					</Collapse>
+					<div class="left-tree" :style="baseInfoPanel == 'base' ? 'height: calc(100% - 410px)' : ''">
+						<Input
+							v-model="submitData.columnName"
+							placeholder="请筛选信息"
+							clearable
+							suffix="ios-search"
+							@on-change="getColumnList"
+							style="margin-bottom: 10px"
+						/>
 						<ul class="tree">
 							<li v-for="(item, index) in data" :key="index" class="tree-father">
 								<div @click="item.isShow = !item.isShow" class="textOverhidden">
@@ -332,6 +373,8 @@ import {
 	modifyCustomerFieldReq,
 	getChartsInfoReq,
 } from "@/api/bill-design-manage/workbook-manage.js";
+import { getlistReq } from "@/api/system-manager/data-item";
+
 import { getEchoReq } from "@/api/bill-design-manage/workbook-design";
 import CreateFields from "./create-fields.vue";
 import FilterFields from "./filter-fields.vue";
@@ -373,6 +416,7 @@ export default {
 					}
 					this.getDataSetList();
 					this.getColumnList(); //获取左侧列
+					this.getDataItemData(); //数据字典
 				});
 			}
 		},
@@ -390,6 +434,7 @@ export default {
 
 	data() {
 		return {
+			baseInfoPanel: "base",
 			btnDistabled: true,
 			isAdd: true,
 			tabValue: "data",
@@ -399,6 +444,8 @@ export default {
 			dragstartData: "",
 			contextData: "", //菜单
 			chartsData: [], //查询获取的图表信息
+			opt1List: [], //厂区
+			opt2List: [], //机种
 			selectObj: {},
 			submitData: {
 				id: "",
@@ -411,6 +458,9 @@ export default {
 				columnName: "",
 				chartType: "bar",
 				maxNumber: 2000,
+				opt1: "jx",
+				opt2: "comonTemplate",
+				opt3: 1, //是否为公共
 			},
 			columnList: [],
 			columnTypeList: [],
@@ -1066,6 +1116,18 @@ export default {
 			});
 			// this.updateDragData(); //修改拖拽的行列标记
 		},
+		// 获取数据字典数据
+		async getDataItemData() {
+			this.opt1List = await this.getDataItemDetailList("biTemplateFactory");
+			this.opt2List = await this.getDataItemDetailList("biTemplateModel");
+		},
+		async getDataItemDetailList(itemCode) {
+			let arr = [];
+			await getlistReq({ itemCode, enabled: 1 }).then((res) => {
+				if (res.code === 200) arr = res.result || [];
+			});
+			return arr;
+		},
 		//当饼图时，行、列不可拖拽样式
 		isDisabledCell() {
 			return this.markData[0].chartType == "componentPie" ? "disabled-cell" : "";
@@ -1125,6 +1187,9 @@ export default {
 .rename-input {
 	width: calc(100% - 18px) !important;
 }
+.left-box .ivu-collapse {
+	border: none;
+}
 </style>
 <style scoped lang="less">
 .disabled-cell {
@@ -1138,10 +1203,13 @@ export default {
 		height: 100%;
 		.left-box {
 			width: 300px;
-			padding: 10px;
+
 			// border: 1px solid #27ce88;
 			// background: #f8fffc;
 			border: 1px solid #e4e4e4;
+			.baseinfo {
+				margin-bottom: 10px;
+			}
 			.left-title {
 				padding: 10px;
 				font-weight: bold;
@@ -1149,10 +1217,11 @@ export default {
 				margin-bottom: 10px;
 			}
 			.left-tree {
-				height: calc(100% - 250px);
+				height: calc(100% - 50px);
+				padding: 10px;
 				margin-top: 5px;
 				.tree {
-					height: 100%;
+					height: calc(100% - 40px);
 					overflow: auto;
 					li {
 						list-style: none;

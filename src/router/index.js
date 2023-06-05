@@ -145,7 +145,7 @@ router.beforeEach((to, form, next) => {
           if (menu) store.commit('updateMenuId', menu.id)
           if (localRead('isFirst') === 'true') {
             localSave('isFirst', false)
-            setTimeout(() => window.location.reload(), 500)
+            setTimeout(() => window.location.reload(), 1000)
           }
           next({
             replace: true,
