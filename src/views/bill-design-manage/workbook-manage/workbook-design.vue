@@ -45,7 +45,7 @@
 									</FormItem>
 									<!-- 是否公共 -->
 									<FormItem label="公共模型" prop="opt3">
-										<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+										<i-switch size="large" v-model="submitData.opt3" :true-value="1" :false-value="0">
 											<span slot="open">是</span>
 											<span slot="close">否</span>
 										</i-switch>
@@ -392,7 +392,7 @@ export default {
 			default: () => false,
 		},
 		workbookIsAdd: {
-			type: Boolean,
+			type: [Boolean || String],
 			default: () => false,
 		},
 		workbookSelectObj: {

@@ -7,6 +7,10 @@
 				<div slot="title">
 					<Row>
 						<i-col span="6">
+							<!-- 返回按钮 -->
+							<Button @click="turnBack">
+								<Icon custom="iconfont icon-arrows_left" />
+							</Button>
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
 								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
 									<Icon type="ios-funnel" />
@@ -53,6 +57,12 @@
 					<template slot="datasetId" slot-scope="{ row }">
 						<span>{{ dataSetIdName[row.datasetId] }}</span>
 					</template>
+					<template slot="opt1" slot-scope="{ row }">
+						<span>{{ opt1List[row.opt1] }}</span>
+					</template>
+					<template slot="opt2" slot-scope="{ row }">
+						<Tag :color="opt2Color[row.opt2]" type="dot" v-if="row.opt2">{{ opt2List[row.opt2] }}</Tag>
+					</template>
 					<template slot="operator" slot-scope="{ row }">
 						<div class="operator">
 							<p @click="preview(row)">预览</p>
@@ -80,6 +90,8 @@ import { getpagelistReq, deleteReq } from "@/api/bill-design-manage/workbook-man
 import { getButtonBoolean, renderIsEnabled, renderDate } from "@/libs/tools";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import WorkbookDesign from "./workbook-manage/workbook-design.vue";
+import { getlistReq as getDataItemReq } from "@/api/system-manager/data-item";
+
 export default {
 	components: { WorkbookDesign },
 	name: "workbook-manage",
@@ -89,7 +101,8 @@ export default {
 			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
 			tableConfig: { ...this.$config.tableConfig }, // table配置
 			data: [], // 表格数据
-
+			opt1List: {},
+			opt2List: {},
 			btnData: [],
 			datasetList: [], //获取所有数据集
 			isAdd: true,
@@ -108,6 +121,7 @@ export default {
 			req: {
 				workBookName: "",
 				workBookCode: "",
+				nodeId: "",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -119,9 +133,12 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
+				{ title: "类别", slot: "opt2", align: "center", tooltip: true, minWidth: 80 },
+				{ title: "厂区", slot: "opt1", align: "center", tooltip: true, minWidth: 80 },
 				{ title: this.$t("workBookName"), key: "workBookName", align: "center", tooltip: true, minWidth: 80 },
 				{ title: this.$t("workBookCode"), key: "workBookCode", align: "center", tooltip: true, minWidth: 80 },
 				{ title: this.$t("setName"), slot: "datasetId", align: "center", tooltip: true, minWidth: 80 },
+
 				{ title: this.$t("createUser"), key: "createUserName", minWidth: 80, align: "center", tooltip: true },
 				{ title: this.$t("createDate"), key: "createDate", minWidth: 125, render: renderDate, align: "center", tooltip: true },
 				{ title: this.$t("modifyUser"), key: "modifyUserName", minWidth: 80, align: "center", tooltip: true },
@@ -138,12 +155,19 @@ export default {
 			], // 表格数据
 		};
 	},
-	activated() {
+	mounted() {
+		const { nodeId, authorityBtn } = JSON.parse(window.localStorage.getItem("previewBiPermission"));
+		//按钮权限
+		this.btnData = authorityBtn.map((item) => {
+			const name = item.name?.split("-")[1] || item.name;
+			return { ...item, name, title: this.btnToChinese(name) };
+		});
+		this.req = { ...this.req, nodeId, authorityBtn };
+		this.getDataItemData();
 		this.pageLoad();
 		this.autoSize();
 		this.getDataSetList();
 		window.addEventListener("resize", () => this.autoSize());
-		getButtonBoolean(this, this.btnData);
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
@@ -160,7 +184,7 @@ export default {
 		pageLoad() {
 			this.data = [];
 			this.tableConfig.loading = true;
-			const { workBookName, workBookCode } = this.req;
+			const { workBookName, workBookCode, nodeId } = this.req;
 			let obj = {
 				orderField: "createDate", // 排序字段
 				ascending: true, // 是否升序
@@ -169,6 +193,7 @@ export default {
 				data: {
 					workBookName,
 					workBookCode,
+					nodeId,
 				},
 			};
 			getpagelistReq(obj)
@@ -182,6 +207,12 @@ export default {
 				})
 				.catch(() => (this.tableConfig.loading = false));
 			this.searchPoptipModal = false;
+		},
+		//返回
+		turnBack() {
+			this.$router.push({
+				name: "preview-bi",
+			});
 		},
 		// 点击新增按钮触发
 		addClick() {
@@ -235,6 +266,16 @@ export default {
 				}
 			});
 		},
+		//按钮对应中文
+		btnToChinese(name) {
+			const obj = {
+				add: "新增",
+				edit: "编辑",
+				delete: "删除",
+				copy: "复制",
+			};
+			return obj[name];
+		},
 
 		// 某一行高亮时触发
 		currentClick(currentRow) {
@@ -262,16 +303,42 @@ export default {
 			const href = this.skipUrl("workbookPreview", id);
 			window.open(href, "_blank");
 		},
+		// 获取数据字典数据
+		async getDataItemData() {
+			const color = [
+				"primary",
+				"success",
+				"warning",
+				"#00346c",
+				"#08b9c6",
+				"#ffa2d3",
+				"#722ed1",
+				"#1890ff",
+				"#13c7d3",
+				"#52c41a",
+				"#fbb414",
+				"#fb8c59",
+				"#fb541c",
+				"#eb2faf",
+			];
+			this.opt2Color = {};
+			this.opt1List = await this.getDataItemDetailList("biTemplateFactory");
+			this.opt2List = await this.getDataItemDetailList("biTemplateModel");
+			Object.keys(this.opt2List).forEach((item, index) => (this.opt2Color[item] = color[index]));
+		},
 
 		// 获取数据字典数据
 		async getDataItemDetailList(itemCode) {
-			let arr = [];
+			let obj = {};
 			await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
 				if (res.code === 200) {
-					arr = res.result || [];
+					res.result.forEach((item) => {
+						const { detailName, detailCode } = item;
+						obj[detailCode] = detailName;
+					}) || [];
 				}
 			});
-			return arr;
+			return obj;
 		},
 		skipUrl(key, id) {
 			const obj = {
@@ -303,4 +370,10 @@ export default {
 };
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+:deep(.ivu-tag-text) {
+	color: #515a6e;
+	width: 30px;
+	display: inline-block;
+}
+</style>

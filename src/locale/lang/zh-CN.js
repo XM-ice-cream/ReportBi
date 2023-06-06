@@ -2007,6 +2007,7 @@ export default {
   'virtual-sn': "虚拟SN",
   'upload-yield-data': '上传良率',
   'inventory-report': 'Inventory报表',
+  'preview-bi': 'BI',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',

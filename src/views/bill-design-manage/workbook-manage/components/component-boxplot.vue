@@ -93,7 +93,7 @@ export default {
 						type: "shadow",
 					},
 				},
-				dataZoom: dataZoom.map((item) => {
+				dataZoom: dataZoom?.map((item) => {
 					return { ...item, filterMode: "empty" };
 				}),
 				grid: grid,

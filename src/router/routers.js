@@ -76,7 +76,16 @@ const otherRouter = [{
         icon: 'iconfont icon-home'
       },
       component: () => import( /* webpackChunkName: "home" */ '@/views/other-page/home')
-    }]
+    }, {
+      path: '/bill-design-manage/workbook-manage',
+      name: 'workbook-manage',
+      meta: {
+        title: '工作簿管理',
+        hideInMenu: true,
+        notCache: true
+      },
+      component: () => import( /* webpackChunkName: "workbook-manage" */ '@/views/bill-design-manage/workbook-manage.vue')
+    }, ]
   },
   {
     path: '/userInfo',
