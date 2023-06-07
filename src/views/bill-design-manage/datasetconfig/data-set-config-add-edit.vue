@@ -80,7 +80,7 @@
 			ref="datasetCustomSql"
 			:modalFlag.sync="customSqlModalFlag"
 			:customObj="customObj"
-			:paramsTabel="data?.paramsList || []"
+			:paramsTabel="data?.customParamsList || []"
 			@updateCustomSql="updateCustomSql"
 		/>
 	</div>
@@ -125,6 +125,7 @@ export default {
 			connectModalFlag: false,
 			filterModalFlag: false,
 			customSqlModalFlag: false,
+			isCustomSqlAdd: false, //是否是添加自定义sql
 			customEvent: "", //自定义SQL节点信息
 			connectObj: {}, //关联表
 			filterObj: {}, //过滤表
@@ -428,19 +429,24 @@ export default {
 		//边双击
 		edgeDblclick(model) {
 			const { id, type, relations, source, target, startPoint, style, incidenceRelation } = model;
-			let obj = { id, type, relations, source, target, startPoint, style, incidenceRelation };
+			const sourceInfo = this.data.nodes.filter((item) => item.id === source)[0];
+			const targetInfo = this.data.nodes.filter((item) => item.id === target)[0];
+			let obj = { id, type, relations, source, target, startPoint, style, incidenceRelation, sourceInfo, targetInfo };
 			obj.incidenceRelation = obj?.incidenceRelation || "left join";
 			this.connectModalFlag = true;
 			this.connectObj = { ...obj };
 		},
 		//添加自定义sql
 		addCustomSql(e) {
+			this.customObj = {};
 			this.customSqlModalFlag = true;
 			this.customEvent = e;
+			this.isCustomSqlAdd = true;
 		},
 		//更新自定义sql
 		updateCustomSql(data, paramsList) {
-			this.addNodeImage(this.customEvent, data.label, 1, data, paramsList);
+			if (this.isCustomSqlAdd) this.addNodeImage(this.customEvent, data.label, 1, data, paramsList);
+			else this.updateNodeImage(data, paramsList);
 		},
 
 		// 添加节点
@@ -461,13 +467,20 @@ export default {
 				x: point.x,
 				y: point.y,
 				type: "rect",
-				custom: isCustomSql ? data.sql : "",
+				customsql: isCustomSql ? data.customsql : "",
 				isCustomSql: isCustomSql || 0,
 			};
 			this.data.nodes.push({ ...model });
 			this.data.customParamsList = paramsList;
 			this.graph.changeData(this.data);
 			console.log("this.data", this.data);
+		},
+		//刷新节点
+		updateNodeImage(data, paramsList) {
+			const index = this.data.nodes.findIndex((item) => item.id === data.id);
+			this.data.nodes[index] = { ...data };
+			this.data.customParamsList = paramsList;
+			this.graph.changeData(this.data);
 		},
 		//更新边
 		updateEdge(val) {
@@ -552,15 +565,20 @@ export default {
 		},
 		//节点 过滤器筛选
 		filterNodes(model) {
-			const { id, condition, label } = model;
-			let obj = { id, condition, label };
 			this.filterModalFlag = true;
-			this.filterObj = { ...obj };
+			this.filterObj = { ...model };
 		},
 		//节点 编辑
 		editNodes(model) {
 			console.log("节点 编辑", model);
-			this.customObj = model;
+			//自定义节点编辑
+			if (model.isCustomSql) {
+				this.customObj = model;
+				this.isCustomSqlAdd = false;
+				this.$nextTick(() => {
+					this.customSqlModalFlag = true;
+				});
+			}
 		},
 		//获取数据源下拉框
 		getDataSourceList() {

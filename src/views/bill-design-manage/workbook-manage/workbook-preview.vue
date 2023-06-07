@@ -157,11 +157,10 @@ export default {
 				return;
 			}
 			//数据集
-			const { datasetId, maxNumber } = this.submitData;
+			// const { datasetId, maxNumber } = this.submitData;
 			const obj = {
-				datasetId,
+				...this.submitData,
 				filterItems,
-				maxNumber,
 				calcItems: this.rowData.concat(this.columnData),
 				markItems: this.markData.map((item) => item.data).flat(),
 			};

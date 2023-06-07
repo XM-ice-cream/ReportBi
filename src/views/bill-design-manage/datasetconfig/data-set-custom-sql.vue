@@ -10,7 +10,7 @@
 						<Input v-model="submitData.label" placeholder="请输入自定义SQL名称" />
 					</FormItem>
 				</Form>
-				<monaco-editor v-model.trim="submitData.sql" language="sql" v-if="visib" ref="monacoEditorRef" />
+				<monaco-editor v-model.trim="submitData.customsql" language="sql" v-if="visib" ref="monacoEditorRef" />
 				<Button type="primary" :icon="isShow ? 'md-arrow-dropdown' : 'md-arrow-dropright'" @click="isShow = !isShow" style="margin-top: 10px"
 					>插入参数</Button
 				>
@@ -103,6 +103,9 @@ export default {
 	watch: {
 		modalFlag(newVal) {
 			if (newVal) {
+				this.submitData = { ...this.customObj };
+				this.parmasList = this.paramsTabel;
+				console.log("this.customObj", this.submitData, this.parmasList);
 				this.$nextTick(() => {
 					this.visib = true;
 				});
@@ -182,6 +185,7 @@ export default {
 		async pageLoad() {},
 		//提交
 		submitClick() {
+			//查询参数
 			let paramsData = this.parmasList.map((item) => {
 				if (item.paramType == "DateTime") {
 					item.sampleItem = formatDate(item.sampleItem);
@@ -194,7 +198,7 @@ export default {
 		//插入参数
 		insertParamsClick(data) {
 			//获取参数光标位置
-			const str = ` <参数.${data.paramName}>`;
+			const str = ` @${data.paramName}`;
 			const strlen = str.length;
 			const position = this.$refs.monacoEditorRef.getPosition();
 			const newPosition = { lineNumber: position.lineNumber, column: position.column + strlen };
@@ -220,6 +224,9 @@ export default {
 		},
 		// 关闭模态框
 		closeDialog() {
+			this.$refs.submitReq.resetFields();
+			this.submitData.customsql = "";
+			this.parmasList = [];
 			this.$emit("update:modalFlag", false);
 		},
 	},

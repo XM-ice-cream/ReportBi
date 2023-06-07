@@ -123,11 +123,19 @@ export default {
 		},
 		//获取字段 源表
 		getFieldList() {
-			const { id } = this.selectObj;
-			const obj = {
+			console.log(this.selectObj);
+			const { id, isCustomSql, customsql } = this.selectObj;
+			let obj = {
 				sourceCode: id.split(":")[0],
 				tableName: id.split(":")[1].split("(")[0],
 			};
+			if (isCustomSql) {
+				obj = {
+					sourceCode: id.split(":")[0],
+					tableName: customsql,
+					type: "sql",
+				};
+			}
 			getColumnListReq(obj).then((res) => {
 				if (res.code == 200) {
 					this.columnList =

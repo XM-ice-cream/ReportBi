@@ -127,6 +127,7 @@ export default {
 				this.autoSize();
 				window.addEventListener("resize", () => this.autoSize());
 				this.$nextTick(() => {
+					console.log("this.connectObj", this.connectObj);
 					const { relations } = this.connectObj;
 					this.data = relations ? [...relations] : [];
 				});
@@ -170,11 +171,16 @@ export default {
 		},
 		//获取字段 源表
 		getSourceFieldList() {
-			const { source } = this.connectObj;
-			const sourceObj = {
+			const { sourceInfo, source } = this.connectObj;
+			let sourceObj = {
 				sourceCode: source.split(":")[0],
 				tableName: source.split(":")[1].split("(")[0],
 			};
+			//自定义sql
+			if (sourceInfo?.isCustomSql) {
+				sourceObj = { sourceCode: source.split(":")[0], tableName: sourceInfo.customsql, type: "sql" };
+			}
+
 			getColumnListReq(sourceObj).then((res) => {
 				if (res.code == 200) {
 					this.sourceList =
@@ -191,11 +197,15 @@ export default {
 		},
 		//获取字段 源表
 		getTargetFieldList() {
-			const { target } = this.connectObj;
-			const targetObj = {
+			const { target, targetInfo } = this.connectObj;
+			let targetObj = {
 				sourceCode: target.split(":")[0],
 				tableName: target.split(":")[1].split("(")[0],
 			};
+			//自定义sql
+			if (targetInfo?.isCustomSql) {
+				targetObj = { sourceCode: target.split(":")[0], tableName: targetInfo.customsql, type: "sql" };
+			}
 			getColumnListReq(targetObj).then((res) => {
 				if (res.code == 200) {
 					this.targetList =

@@ -158,7 +158,7 @@ export default {
 	mounted() {
 		const { nodeId, authorityBtn } = JSON.parse(window.localStorage.getItem("previewBiPermission"));
 		//按钮权限
-		this.btnData = authorityBtn.map((item) => {
+		this.btnData = authorityBtn?.map((item) => {
 			const name = item.name?.split("-")[1] || item.name;
 			return { ...item, name, title: this.btnToChinese(name) };
 		});
