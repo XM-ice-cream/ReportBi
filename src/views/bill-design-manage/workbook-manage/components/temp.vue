@@ -578,8 +578,10 @@ export default {
 							//数字
 							if (Object.values(markObjColor)[0].startRange) {
 								//X轴、Y轴、...、数值 最后一个是热力图的对应的值
-								data = [value[0], value[1], { ...itemValue }, typeof value[0] === "number" ? value[0] : value[1]]; //取前两个
-								this.dimension = typeof value[0] === "number" ? 0 : 1;
+								//判断是否为数字类型
+								const value0IsNumber = /^\d+$/.test(value[0]);
+								data = [value[0], value[1], { ...itemValue }, value0IsNumber ? value[0] : value[1]]; //取前两个
+								this.dimension = value0IsNumber ? 0 : 1;
 							} else {
 								//字符串
 								const colorName = itemValue[Object.keys(markObjColor)[0]];
