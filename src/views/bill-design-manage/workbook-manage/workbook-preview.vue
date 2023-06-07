@@ -45,7 +45,23 @@
 									</div>
 								</div>
 							</Poptip>
+							<Form inline :labelWidth="100" style="display: inline-block; line-height: 2">
+								<FormItem label="Refresh">
+									<i-switch size="default" v-model="refreshObj.isRefresh">
+										<template #open>
+											<span>开</span>
+										</template>
+										<template #close>
+											<span>关</span>
+										</template>
+									</i-switch>
+								</FormItem>
+								<FormItem label="刷新频率/分钟" v-if="refreshObj.isRefresh">
+									<InputNumber v-model="refreshObj.refeshRate" controls-outside :min="1" :step="1" />
+								</FormItem>
+							</Form>
 						</i-col>
+
 						<!-- 标题 -->
 						<i-col span="12">
 							<div class="report-title">{{ $route.query.reportName }}</div>
@@ -91,7 +107,19 @@ export default {
 			markData: [],
 			chartsData: [],
 			columnTypeList: [],
+			refreshObj: { isRefresh: false, refeshRate: 1 },
+			interval: null,
 		};
+	},
+	watch: {
+		"refreshObj.isRefresh": {
+			handler() {
+				const { isRefresh, refeshRate } = this.refreshObj;
+				this.settingTime(isRefresh, refeshRate);
+			},
+			deep: true,
+			immediate: true,
+		},
 	},
 	activated() {},
 	methods: {
@@ -181,6 +209,18 @@ export default {
 				filterItems.push({ ...item, filterValue });
 			});
 			return { flag, filterItems };
+		},
+		// 设置定时器
+		settingTime(isRefresh, refeshRate) {
+			if (this.interval) {
+				clearInterval(this.interval);
+			}
+			if (isRefresh) {
+				//定时执行锁定操作
+				this.interval = setInterval(() => {
+					this.searchClick();
+				}, 1000 * 60 * refeshRate);
+			}
 		},
 		//页面重置
 		resetClick() {
