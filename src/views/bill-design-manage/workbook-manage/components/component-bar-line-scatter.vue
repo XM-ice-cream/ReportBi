@@ -27,7 +27,9 @@ export default {
 			//series 根据颜色类别 分类
 			let temp = {};
 			series.forEach((item) => {
-				const { stack } = item;
+				const { stack, type } = item;
+				//散点图不要堆叠
+				if (type === "scatter") delete item.stack;
 				//name存在 说明有分类
 				if (item.data[0].name) {
 					item.data.forEach((data) => {
