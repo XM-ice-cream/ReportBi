@@ -101,6 +101,11 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.submitData = { ...this.selectObj, showData: 0 };
+
+				if (this.selectObj.columnType == "DATE") {
+					const time = this.selectObj.filterValue.split(",");
+					if (time.length == 2) this.submitData = { ...this.submitData, timeType: "datetime", startTime: time[0], endTime: time[1] };
+				}
 				this.autoSize();
 				window.addEventListener("resize", () => this.autoSize());
 			}
