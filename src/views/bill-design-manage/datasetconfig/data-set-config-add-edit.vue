@@ -29,7 +29,7 @@
 								</FormItem>
 							</Form>
 						</div>
-						<Form ref="submitRef" :model="submitData" :label-width="60">
+						<Form ref="submitRef" :model="submitData" :label-width="60" :rules="rulesValidate">
 							<!-- 数据源 -->
 							<FormItem label="数据源" prop="sourceCode">
 								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getUserList" clearable>
@@ -153,6 +153,12 @@ export default {
 					{
 						required: true,
 						message: `${this.$t("pleaseEnter")}数据集编码`,
+					},
+				],
+				sourceCode: [
+					{
+						required: true,
+						message: `${this.$t("pleaseSelect")}数据源`,
 					},
 				],
 			},
@@ -438,10 +444,14 @@ export default {
 		},
 		//添加自定义sql
 		addCustomSql(e) {
-			this.customObj = {};
-			this.customSqlModalFlag = true;
-			this.customEvent = e;
-			this.isCustomSqlAdd = true;
+			this.$refs.submitRef.validate((validate) => {
+				if (validate) {
+					this.customObj = {};
+					this.customSqlModalFlag = true;
+					this.customEvent = e;
+					this.isCustomSqlAdd = true;
+				}
+			});
 		},
 		//更新自定义sql
 		updateCustomSql(data, paramsList) {
@@ -451,29 +461,32 @@ export default {
 
 		// 添加节点
 		addNodeImage(e, row, isCustomSql, data, paramsList) {
-			console.log("e,row", e, row);
-			const isExistTable = this.data.nodes
-				.map((item) => item.label)
-				.filter((item) => {
-					return item?.split("(")[0] === row;
-				});
-			const label = isExistTable.length === 0 ? row : `${row}(${isExistTable.length})`;
-			const { sourceCode } = this.submitData;
-			const point = this.graph.getPointByClient(e.x, e.y); //将屏幕坐标转换为渲染坐标
-			const model = {
-				id: `${sourceCode}:${row}:${isExistTable.length}`,
-				label: `${label}`,
-				nodeType: 0,
-				x: point.x,
-				y: point.y,
-				type: "rect",
-				customsql: isCustomSql ? data.customsql : "",
-				isCustomSql: isCustomSql || 0,
-			};
-			this.data.nodes.push({ ...model });
-			this.data.customParamsList = paramsList;
-			this.graph.changeData(this.data);
-			console.log("this.data", this.data);
+			this.$refs.submitRef.validate((validate) => {
+				if (validate) {
+					const isExistTable = this.data.nodes
+						.map((item) => item.label)
+						.filter((item) => {
+							return item?.split("(")[0] === row;
+						});
+					const label = isExistTable.length === 0 ? row : `${row}(${isExistTable.length})`;
+					const { sourceCode } = this.submitData;
+					const point = this.graph.getPointByClient(e.x, e.y); //将屏幕坐标转换为渲染坐标
+					const model = {
+						id: `${sourceCode}:${row}:${isExistTable.length}`,
+						label: `${label}`,
+						nodeType: 0,
+						x: point.x,
+						y: point.y,
+						type: "rect",
+						customsql: isCustomSql ? data.customsql : "",
+						isCustomSql: isCustomSql || 0,
+					};
+					this.data.nodes.push({ ...model });
+					this.data.customParamsList = paramsList;
+					this.graph.changeData(this.data);
+					console.log("this.data", this.data);
+				}
+			});
 		},
 		//刷新节点
 		updateNodeImage(data, paramsList) {

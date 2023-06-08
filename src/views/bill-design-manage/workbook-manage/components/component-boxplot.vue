@@ -97,12 +97,33 @@ export default {
 					return { ...item, filterMode: "empty" };
 				}),
 				grid: grid,
-				xAxis: xAxis,
-				yAxis: yAxis,
+				xAxis:
+					xAxis[0]?.type == "value"
+						? xAxis.map((item) => {
+								return {
+									...item,
+									min: function (value) {
+										return value.min;
+									},
+								};
+						  })
+						: xAxis,
+				yAxis:
+					yAxis[0]?.type == "value"
+						? yAxis.map((item) => {
+								return {
+									...item,
+									min: function (value) {
+										return value.min;
+									},
+								};
+						  })
+						: yAxis,
 				series: boxplotScatter,
 			};
 
 			this.myChart.setOption(option, true);
+			console.log("this.myChart", option);
 			window.addEventListener("resize", function () {
 				if (this.myChart) {
 					this.myChart.resize();

@@ -753,7 +753,7 @@ export default {
 		tooltipFormatter(params, groupByString) {
 			// console.log(groupByString, params);
 			let aa = [""];
-			const { value, marker, seriesType, percent } = params;
+			const { value, marker, seriesType, percent } = params[0] || params;
 			const tooltipValue = value[4] ? value[4] : value[2];
 			Object.keys(tooltipValue).forEach((dataitem) => {
 				if (groupByString.includes(dataitem)) {
