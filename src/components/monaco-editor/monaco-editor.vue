@@ -104,6 +104,7 @@ export default {
 			this.editorInstance.onDidChangeModelContent(() => {
 				this.onValueChange();
 			});
+			//ctrl + s 保存
 			this.editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, () => {
 				this.$emit("save", this.editorInstance.getValue());
 			});
