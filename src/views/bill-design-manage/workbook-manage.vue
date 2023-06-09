@@ -133,7 +133,7 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: "类别", slot: "opt2", align: "center", tooltip: true, minWidth: 80 },
+				{ title: "类别", slot: "opt2", align: "center", tooltip: true, width: 120 },
 				{ title: "厂区", slot: "opt1", align: "center", tooltip: true, minWidth: 80 },
 				{ title: this.$t("workBookName"), key: "workBookName", align: "center", tooltip: true, minWidth: 80 },
 				{ title: this.$t("workBookCode"), key: "workBookCode", align: "center", tooltip: true, minWidth: 80 },
@@ -373,7 +373,6 @@ export default {
 <style scoped lang="less">
 :deep(.ivu-tag-text) {
 	color: #515a6e;
-	width: 30px;
 	display: inline-block;
 }
 </style>
