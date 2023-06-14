@@ -31,3 +31,40 @@ export const getMarksReq = data => {
     data
   })
 }
+
+//图片新增base64
+export const addImageReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/v1/ftpfile/insert',
+    method: 'post',
+    data
+  })
+}
+//图片删除
+export const deleteImageReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/v1/ftpfile/delete',
+    method: 'post',
+    data
+  })
+}
+//图片编辑
+export const updateImageReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/v1/ftpfile/update',
+    method: 'post',
+    data
+  })
+}
+//图片查询
+export const getImageReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/v1/ftpfile/getlist',
+    method: 'post',
+    data
+  })
+}

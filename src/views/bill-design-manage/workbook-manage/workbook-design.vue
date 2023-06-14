@@ -375,7 +375,7 @@ import {
 } from "@/api/bill-design-manage/workbook-manage.js";
 import { getlistReq } from "@/api/system-manager/data-item";
 
-import { getEchoReq } from "@/api/bill-design-manage/workbook-design";
+import { getEchoReq, deleteImageReq } from "@/api/bill-design-manage/workbook-design";
 import CreateFields from "./create-fields.vue";
 import FilterFields from "./filter-fields.vue";
 import MarkFields from "./mark-fields.vue";
@@ -418,6 +418,9 @@ export default {
 					this.getColumnList(); //获取左侧列
 					this.getDataItemData(); //数据字典
 				});
+			} else {
+				//删除导出PDF 缓存id
+				deleteImageReq({ id: this.submitData.id });
 			}
 		},
 		changeRowColumn() {
@@ -1128,6 +1131,7 @@ export default {
 			});
 			return arr;
 		},
+
 		//当饼图时，行、列不可拖拽样式
 		isDisabledCell() {
 			return this.markData[0].chartType == "componentPie" ? "disabled-cell" : "";

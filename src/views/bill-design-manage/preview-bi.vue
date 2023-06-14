@@ -84,14 +84,14 @@ export default {
 			};
 			getpagelisttreeReq(obj).then((res) => {
 				if (res.code === 200) {
-					console.log("res.result.data;", res.result.data);
 					const data = res.result.data;
-					data.forEach((item) => {
+					data.forEach((item, index) => {
 						const { name, remark } = item;
+						const intRemark = parseInt(remark);
 						if (name.indexOf("Template") > -1) this.roleBtn.push({ ...item });
 						else {
-							if (!this.authorityBtn[parseInt(remark)]) this.authorityBtn[parseInt(remark)] = [];
-							this.authorityBtn[parseInt(remark)].push({ ...item });
+							if (!this.authorityBtn[intRemark]) this.authorityBtn[intRemark] = [];
+							this.authorityBtn[intRemark].push({ ...item });
 						}
 					});
 					this.roleBtn.unshift({

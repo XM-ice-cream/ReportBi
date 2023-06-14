@@ -1,21 +1,35 @@
 <template>
-	<div style="height: 100%; padding-top: 40px">
+	<div class="temp" v-if="visib">
 		<div class="title">{{ title }}</div>
-		<Tooltip content="导出PDF" placement="top-start" class="download">
-			<icon custom="iconfont icon-pdfdayin" @click="exportPDF" />
-		</Tooltip>
+
+		<Dropdown class="download" @on-click="exportPDF">
+			<icon custom="iconfont icon-pdfdayin" />
+			<template #list>
+				<DropdownMenu>
+					<DropdownItem :name="0">导出当前PDF</DropdownItem>
+					<DropdownItem :name="1">导出批量PDF</DropdownItem>
+				</DropdownMenu>
+			</template>
+		</Dropdown>
+
 		<div class="workbook-temp" ref="workbookTempRef">
 			<div :style="tempStyle" ref="exportContent">
 				<component
 					ref="componentRef"
+					v-if="visib"
 					:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
+					:id="id"
+					:title="title"
 					:ispreview="true"
 					:visib="visib"
+					:tempStyle="tempStyle"
 					:chartData="chartData"
 					:mark="mark"
 				/>
 			</div>
 		</div>
+		<canvas id="canvas-img" />
+		<canvas id="canvas-base64" />
 	</div>
 </template>
 <script>
@@ -24,7 +38,7 @@ import componentPie from "./component-pie.vue"; //饼图
 import componentBoxplot from "./component-boxplot.vue"; //箱线图
 import componentHeatMap from "./component-heatmap.vue"; //热力图
 import componentText from "./component-text.vue"; //热力图
-
+import { addImageReq, updateImageReq, getImageReq, deleteImageReq } from "@/api/bill-design-manage/workbook-design";
 import { formatDate } from "@/libs/tools";
 import html2Canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -39,6 +53,7 @@ export default {
 		event: "input",
 	},
 	props: {
+		id: String,
 		type: String,
 		visib: Boolean,
 		row: Array, //行
@@ -52,6 +67,7 @@ export default {
 	},
 	data() {
 		return {
+			modalLoading: false,
 			chartData: {},
 			tempStyle: { width: "1287px", height: "649px" },
 			// 数字属性
@@ -86,96 +102,187 @@ export default {
 			//颜色的汇总值
 			colorResultSummary: [],
 			dimension: 0,
+			domCanvas: null,
+			pdf: "",
+			canvasTemp: null,
 		};
 	},
 	methods: {
 		//导出PDF
-		async exportPDF() {
-			const canvas = this.$refs.componentRef.myChart.getDom().getElementsByTagName("canvas")[0];
-			const direction = this.chartData.yAxis[0]?.type == "value" ? "l" : "p";
-			const filename = `${this.title}${formatDate(new Date())}.pdf`;
-			const title = this.title;
-			this.domToPdf(canvas, filename, direction, title);
+		exportPDF(type) {
+			//创建PDF
+			this.pdf = new jsPDF("landscape", "pt");
+			this.pdf.setFontSize(8);
+			this.pdf.setTextColor("#767676");
+			this.pdf.setFont("simhei");
+			//PDF名称
+			let filename = "";
+
+			//导出当前工作簿
+			if (!type) {
+				const dom = this.$refs.componentRef.myChart[this.id].getDom().getElementsByTagName("canvas")[0];
+
+				html2Canvas(dom, { allowTaint: true, useCORS: true }).then((canvas) => {
+					let contentWidth = canvas.width;
+					let contentHeight = canvas.height;
+					let ctx = canvas.getContext("2d");
+
+					ctx.canvas.willReadFrequently = true;
+					const direction = this.chartData.yAxis && this.chartData.yAxis[0]?.type == "value" ? "l" : "p";
+					filename = `${this.title}_`;
+					const title = this.title;
+					const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index: 1, indexLength: 1 };
+					this.domToPdf(obj);
+				});
+			} else {
+				//获取对应人员 导出打开界面的所有工作簿
+				getImageReq().then(async (res) => {
+					const result = res.result || [];
+					for (let index = 0; index < result.length; index++) {
+						const item = result[index];
+						const { canvas, direction, title, tempStyle } = JSON.parse(item.imageJson);
+
+						const { width: contentWidth, height: contentHeight } = tempStyle;
+						const ctx = await this.drawImage(canvas, contentWidth, contentHeight);
+						filename += `${title}_`;
+
+						const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index, indexLength: result.length - 1 };
+						await this.domToPdf(obj);
+					}
+					// result?.forEach(async (item, index) => {
+
+					// });
+				});
+			}
 		},
-		domToPdf(dom, filename, direction, title) {
+		//导出pdf
+		async domToPdf(data) {
+			const { ctx, direction, title, contentWidth, contentHeight, filename, index, indexLength } = data;
 			document.documentElement.scrollTop = 0;
 			document.body.scrollTop = 0;
-			html2Canvas(dom, {
-				allowTaint: true,
-				useCORS: true,
-			}).then((canvas) => {
-				let pdf = new jsPDF("landscape", "pt");
-				pdf.setFontSize(8);
-				pdf.setTextColor("#767676");
-				pdf.setFont("simhei");
 
-				let ctx = canvas.getContext("2d");
-				ctx.canvas.willReadFrequently = true;
+			//pdf 的宽高
+			let pdfWidth = this.pdf.internal.pageSize.getWidth() - 20;
+			let pdfHeight = this.pdf.internal.pageSize.getHeight() - 30;
 
-				//pdf 的宽高
-				let pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-				let pdfHeight = pdf.internal.pageSize.getHeight() - 30;
-				let contentWidth = canvas.width;
-				let contentHeight = canvas.height;
+			let bi = pdfHeight / pdfWidth;
+			let imgWidth = direction == "p" ? contentWidth : contentHeight / bi; // A4 页面宽度
+			let imgHeight = direction == "l" ? contentHeight : contentWidth * bi;
 
-				let bi = pdfHeight / pdfWidth;
-				let imgWidth = direction == "p" ? contentWidth : contentHeight / bi; // A4 页面宽度
-				let imgHeight = direction == "l" ? contentHeight : contentWidth * bi;
+			let contentRadio = Math.max(contentWidth / pdfWidth, contentHeight / pdfHeight);
+			if (contentRadio <= 1) {
+				imgWidth = contentWidth;
+				imgHeight = contentHeight;
+			}
+			const radioTmp = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+			// 页面偏移
+			let positionX = 0;
+			let positionY = 0;
 
-				let contentRadio = Math.max(contentWidth / pdfWidth, contentHeight / pdfHeight);
-				if (contentRadio <= 1) {
-					imgWidth = contentWidth;
-					imgHeight = contentHeight;
-				}
-				const radioTmp = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-				// 页面偏移
-				let positionX = 0;
-				let positionY = 0;
+			let iLength = Math.ceil(contentHeight / imgHeight);
+			let jLength = Math.ceil(contentWidth / imgWidth);
 
-				let iLength = Math.ceil(contentHeight / imgHeight);
-				let jLength = Math.ceil(contentWidth / imgWidth);
-
-				for (let i = 0; i < iLength; i++) {
-					positionX = 0;
-					positionY = i * imgHeight;
-					for (let j = 0; j < jLength; j++) {
-						let imageData = ctx.getImageData(positionX, positionY, imgWidth, imgHeight);
-
-						let base64Img = this.getImageDataDataURL(imageData);
-
-						// 添加页眉
-						pdf.text(`${title}`, pdf.internal.pageSize.width / 2, 10, "center");
-						//图片
-						pdf.addImage(base64Img, "JPEG", 10, 20, imgWidth * radioTmp, imgHeight * radioTmp);
-						//添加页尾
-						pdf.text(
-							"page " + (i * jLength + j + 1) + " of " + iLength * jLength,
-							pdf.internal.pageSize.width / 2,
-							pdf.internal.pageSize.height - 10,
-							"center"
-						);
-						if (!(i == iLength - 1 && j == jLength - 1)) pdf.addPage();
-						positionX = (j + 1) * imgWidth;
+			for (let i = 0; i < iLength; i++) {
+				positionX = 0;
+				positionY = i * imgHeight;
+				for (let j = 0; j < jLength; j++) {
+					let imageData = ctx.getImageData(positionX, positionY, imgWidth, imgHeight);
+					// let imageData = ctx.getImageData(0, 0, contentWidth, contentHeight);
+					let base64Img = this.getImageDataDataURL(imageData);
+					// await this.createImage(base64Img, "截图");
+					// 添加页眉
+					this.pdf.text(`${title}`, this.pdf.internal.pageSize.width / 2, 10, "center");
+					//图片
+					this.pdf.addImage(base64Img, "JPEG", 10, 20, imgWidth * radioTmp, imgHeight * radioTmp);
+					//添加页尾
+					this.pdf.text(
+						"page " + (i * jLength + j + 1) + " of " + iLength * jLength,
+						this.pdf.internal.pageSize.width / 2,
+						this.pdf.internal.pageSize.height - 10,
+						"center"
+					);
+					if (!(i == iLength - 1 && j == jLength - 1 && index == indexLength)) {
+						this.pdf.addPage();
 					}
+					positionX = (j + 1) * imgWidth;
 				}
+			}
 
-				// 下载操作
-				pdf.save(filename);
-			});
+			// 清空整个 Canvas
+			ctx.clearRect(0, 0, contentWidth, contentHeight);
+			// 下载操作(下载到最后一个生成pdf)
+			// await this.$nextTick();
+			if (index == indexLength) this.pdf.save(`${filename}${formatDate(new Date())}.pdf`);
+		},
+		createImage(base64Img, type) {
+			const div = document.getElementsByClassName("workbook-temp")[0];
+			var im = document.createElement("img"); //创建图片
+			var p = document.createElement("p");
+			p.appendChild(document.createTextNode(`---------------,${type}`));
+			im.src = base64Img;
+			//图片设置成和div一样大小
+			im.style.width = 900;
+			im.style.height = 600;
+			div.appendChild(p);
+			div.appendChild(im);
 		},
 		// 将 ImageData 转换为 base64 格式的图片数据
 		getImageDataDataURL(imageData) {
-			let canvasTemp = document.createElement("canvas");
-			canvasTemp.width = imageData.width;
-			canvasTemp.height = imageData.height;
-			canvasTemp.getContext("2d").putImageData(imageData, 0, 0);
-			return canvasTemp.toDataURL("image/png");
+			// 从内存中清除 <canvas> 元素
+			if (this.canvasTemp?.width) {
+				this.canvasTemp.width = 0;
+				this.canvasTemp.height = 0;
+				this.canvasTemp = null;
+			}
+
+			this.canvasTemp = document.getElementById("canvas-base64");
+
+			this.canvasTemp.width = imageData.width;
+			this.canvasTemp.height = imageData.height;
+			const context = this.canvasTemp.getContext("2d");
+
+			context.putImageData(imageData, 0, 0);
+			const base64Image = this.canvasTemp.toDataURL("image/png");
+			// this.createImage(base64Image, "ImageData");
+			//清空内容
+			context.clearRect(0, 0, 2000, 2000);
+
+			return base64Image;
 		},
+		//base64码转成canvas
+		drawImage(base64Image, width, height) {
+			// 从内存中清除 <canvas> 元素
+			if (this.domCanvas?.width) {
+				this.domCanvas.width = 0;
+				this.domCanvas.height = 0;
+				this.domCanvas = null;
+			}
+			// 创建一个新的 canvas 元素
+			this.domCanvas = document.getElementById("canvas-img");
+			this.domCanvas.width = width;
+			this.domCanvas.height = height;
+
+			const ctx = this.domCanvas.getContext("2d");
+
+			const img = new Image();
+			const promise = new Promise((resolve) => {
+				img.onload = function () {
+					ctx.drawImage(img, 0, 0);
+					resolve();
+				};
+			});
+			img.src = base64Image;
+
+			return promise.then(() => {
+				// this.createImage(this.domCanvas.toDataURL(), "转成canvas");
+				return ctx;
+			});
+		},
+
 		//加载图表
 		pageLoad() {
 			if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
 			else this.chartData = this.dataLogic();
-			console.log(" this.chartData", this.chartData, this.$refs.componentRef);
 			this.$nextTick(() => {
 				this.$refs.componentRef.pageLoad();
 			});
@@ -280,7 +387,6 @@ export default {
 				xString.forEach((item, index) => {
 					Object.keys(stringObj).forEach((value) => {
 						if (!axisConstX[index]) axisConstX[index] = [];
-						console.log(value[item]);
 						axisConstX[index].push(stringObj[value][0][item]);
 					});
 				});
@@ -314,7 +420,6 @@ export default {
 					});
 				}
 			}
-			console.log("行列数据与", obj, stringObj, axisConstX, axisConst);
 			const objKeys = Object.keys(obj);
 
 			//标记
@@ -549,7 +654,6 @@ export default {
 				const markValue = markObj[item] ? markObj[item] : markObj[undefined];
 				//颜色、标签
 				const { color: markObjColor, mark: markArray, type } = markValue;
-				console.log("markObjColor", markValue);
 				//legend 设定
 				if (JSON.stringify(markObjColor) !== "{}" && !Object.values(markObjColor)[0].startRange) {
 					Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
@@ -639,7 +743,6 @@ export default {
 			const height = offsetHeight - 20;
 			const xLength = width / 16 < xAxis[0]?.data?.length ? `${xAxis[0].data.length * 16}px` : `${width}px`;
 			const yLength = height / 16 < yAxis[0]?.data?.length ? `${yAxis[0].data.length * 16}px` : `${height}px`;
-			console.log(xLength, yLength, width);
 			this.tempStyle.width = xLength;
 			this.tempStyle.height = yLength;
 			// return [
@@ -751,7 +854,6 @@ export default {
 		},
 		//提示框
 		tooltipFormatter(params, groupByString) {
-			// console.log(groupByString, params);
 			let aa = [""];
 			const { value, marker, seriesType, percent } = params[0] || params;
 			const tooltipValue = value[4] ? value[4] : value[2];
@@ -854,30 +956,33 @@ export default {
 </script>
 <style></style>
 <style scoped lang="less">
-.workbook-temp {
-	width: 100%;
-	height: calc(100% - 20px);
-	padding: 5px;
-	margin: 5px;
-	overflow: auto;
-}
-.title {
-	text-align: center;
-	font-size: 16px;
-	font-weight: bold;
-	position: absolute;
-	top: 2%;
-	left: 50%;
-}
-.download {
-	position: absolute;
-	top: 2%;
-	right: 2%;
-	i {
-		font-size: 24px;
-		&:hover {
-			color: #27ce88;
-			font-size: 26px;
+.temp {
+	height: 100%;
+	padding-top: 40px;
+	.workbook-temp {
+		width: calc(100% - 10px);
+		height: calc(100% - 40px);
+		padding: 5px;
+		margin: 5px;
+		overflow: auto;
+	}
+	.title {
+		text-align: center;
+		font-size: 16px;
+		font-weight: bold;
+		position: absolute;
+		top: 2%;
+		left: 50%;
+	}
+	.download {
+		position: absolute;
+		top: 2%;
+		right: 2%;
+		i {
+			font-size: 24px;
+			&:hover {
+				color: #27ce88;
+			}
 		}
 	}
 }

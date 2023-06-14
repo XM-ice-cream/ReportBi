@@ -1,8 +1,10 @@
 <template>
-	<div id="boxplotchart" class="charts"></div>
+	<div :id="'boxplotchart' + id" class="charts" ref="barchart"></div>
 </template>
 <script>
 import * as echarts from "echarts";
+import { addImageReq } from "@/api/bill-design-manage/workbook-design";
+
 //如果想要使用echarts内的 echarts.dataTool.prepareBoxplotData 此函数，需要引入以下dataTool
 require("echarts/dist/extension/dataTool.js");
 
@@ -10,19 +12,22 @@ export default {
 	name: "componentBoxplot",
 	props: {
 		chartData: Object,
+		id: String,
+		tempStyle: Object,
+		title: String,
 	},
 	data() {
 		return {
-			myChart: "",
+			myChart: {},
 		};
 	},
 	methods: {
 		pageLoad() {
-			if (this.myChart != null && this.myChart != "" && this.myChart != undefined) {
-				this.myChart.dispose();
+			if (this.myChart[this.id] != null && this.myChart[this.id] != "" && this.myChart[this.id] != undefined) {
+				this.myChart[this.id].dispose();
 			}
 			// 基于准备好的dom，初始化echarts实例
-			this.myChart = echarts.init(document.getElementById("boxplotchart"));
+			this.myChart[this.id] = echarts.init(document.getElementById(`boxplotchart${this.id}`));
 
 			const _this = this;
 			let isReverse = false; //是否翻转
@@ -122,12 +127,32 @@ export default {
 				series: boxplotScatter,
 			};
 
-			this.myChart.setOption(option, true);
-			console.log("this.myChart", option);
+			this.myChart[this.id].setOption(option, true);
+			// 存缓存
+			this.$nextTick(() => {
+				this.chartToBase64(this.myChart[this.id]).then((base64) => {
+					const direction = yAxis[0]?.type == "value" ? "l" : "p"; //PDF方向
+					const width = this.$refs.barchart.offsetWidth; //宽
+					const height = this.$refs.barchart.offsetHeight; //高
+					const obj = {
+						id: this.id,
+						imageJson: JSON.stringify({ canvas: base64, title: this.title, direction, tempStyle: { width, height } }),
+					};
+					addImageReq(obj);
+				});
+			});
 			window.addEventListener("resize", function () {
-				if (this.myChart) {
-					this.myChart.resize();
+				if (this.myChart[this.id]) {
+					this.myChart[this.id].resize();
 				}
+			});
+		},
+		// 将图表转换为 base64 字符串
+		chartToBase64(chart) {
+			return new Promise((resolve, reject) => {
+				chart.on("finished", () => {
+					resolve(chart.getDataURL());
+				});
 			});
 		},
 	},

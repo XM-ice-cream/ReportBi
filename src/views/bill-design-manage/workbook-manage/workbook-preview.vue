@@ -71,6 +71,7 @@
 				<!-- 工作区 -->
 				<componentsTemp
 					ref="tempRef"
+					:id="submitData.id"
 					:type="markData[0]?.chartType || 'bar'"
 					:title="submitData.workBookName"
 					:visib="true"
@@ -86,7 +87,7 @@
 <script>
 import componentsTemp from "./components/temp.vue";
 import { getChartsInfoReq } from "@/api/bill-design-manage/workbook-manage.js";
-import { getEchoReq } from "@/api/bill-design-manage/workbook-design";
+import { getEchoReq, deleteImageReq } from "@/api/bill-design-manage/workbook-design";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { formatDate, commaSplitString } from "@/libs/tools";
 
@@ -169,7 +170,6 @@ export default {
 					//存在有数据返回 但code=-1(数据超过最大范围)
 					if (res.code == 200 || res.result?.length > 0) {
 						if (res.code == -1) this.$Msg.warning(`${res.message}`);
-
 						this.chartsData = res?.result || [];
 						this.$nextTick(() => {
 							this.$refs.tempRef.pageLoad();
@@ -238,9 +238,21 @@ export default {
 			});
 			return arr;
 		},
+		// 页面关闭之前，触发提示框
+		async beforeunloadHandler(e) {
+			// 确保在关闭窗口时的 API 请求已完成
+			e.preventDefault(); // 取消默认行为
+			// e.returnValue = ""; // 需要在一些浏览器中设置该属性
+			await deleteImageReq({ id: this.submitData.id });
+		},
+	},
+	beforeUnmount() {
+		window.removeEventListener("beforeunload", this.beforeUnloadHandler);
+		window.close();
 	},
 	mounted() {
 		this.submitData.id = this.$route.query.id;
+		window.addEventListener("beforeunload", (e) => this.beforeunloadHandler(e)); //监听页面关闭
 		this.getDataItemData(); //获取数据字典类型
 		this.$nextTick(() => {
 			this.pageLoad();

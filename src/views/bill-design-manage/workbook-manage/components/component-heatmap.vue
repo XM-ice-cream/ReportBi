@@ -1,24 +1,29 @@
 <!-- 热力图 -->
 <template>
-	<div id="heatmap" class="charts" ref="heatmap"></div>
+	<div :id="'heatmap' + id" class="charts" ref="heatmap"></div>
 </template>
 <script>
 import * as echarts from "echarts";
+import { addImageReq } from "@/api/bill-design-manage/workbook-design";
+
 export default {
 	name: "componentHeatMap",
 	props: {
 		chartData: Object,
+		id: String,
+		tempStyle: Object,
+		title: String,
 	},
 	data() {
 		return {
-			myChart: null,
+			myChart: {},
 		};
 	},
 
 	methods: {
 		pageLoad() {
 			// 基于准备好的dom，初始化echarts实例
-			this.myChart = echarts.init(this.$el);
+			this.myChart[this.id] = echarts.init(document.getElementById(`heatmap${this.id}`));
 			const _this = this;
 			let seriesResult = [];
 
@@ -71,12 +76,32 @@ export default {
 				}),
 			};
 			console.log(option);
-			this.myChart.setOption(option, true);
-
+			this.myChart[this.id].setOption(option, true);
+			// 存缓存
+			this.$nextTick(() => {
+				this.chartToBase64(this.myChart[this.id]).then((base64) => {
+					const direction = yAxis[0]?.type == "value" ? "l" : "p"; //PDF方向
+					const width = this.$refs.heatmap.offsetWidth; //宽
+					const height = this.$refs.heatmap.offsetHeight; //高
+					const obj = {
+						id: this.id,
+						imageJson: JSON.stringify({ canvas: base64, title: this.title, direction, tempStyle: { width, height } }),
+					};
+					addImageReq(obj);
+				});
+			});
 			window.addEventListener("resize", function () {
-				if (this.myChart) {
-					this.myChart.resize();
+				if (this.myChart[this.id]) {
+					this.myChart[this.id].resize();
 				}
+			});
+		},
+		// 将图表转换为 base64 字符串
+		chartToBase64(chart) {
+			return new Promise((resolve, reject) => {
+				chart.on("finished", () => {
+					resolve(chart.getDataURL());
+				});
 			});
 		},
 	},
