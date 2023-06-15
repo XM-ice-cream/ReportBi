@@ -28,8 +28,8 @@
 				/>
 			</div>
 		</div>
-		<canvas id="canvas-img" />
-		<canvas id="canvas-base64" />
+		<canvas id="canvas-img" style="display: none" />
+		<canvas id="canvas-base64" style="display: none" />
 	</div>
 </template>
 <script>

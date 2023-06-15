@@ -332,6 +332,7 @@
 						<componentsTemp
 							v-if="modelFlag"
 							ref="tempRef"
+							:id="submitData.id"
 							:title="submitData.workBookName"
 							:type="markData[0]?.chartType || 'bar'"
 							:visib="true"
