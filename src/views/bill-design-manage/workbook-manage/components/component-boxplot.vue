@@ -141,11 +141,11 @@ export default {
 					addImageReq(obj);
 				});
 			});
-			window.addEventListener("resize", function () {
-				if (this.myChart[this.id]) {
-					this.myChart[this.id].resize();
-				}
-			});
+			// window.addEventListener("resize", function () {
+			// 	if (this.myChart[this.id]) {
+			// 		this.myChart[this.id].resize();
+			// 	}
+			// });
 		},
 		// 将图表转换为 base64 字符串
 		chartToBase64(chart) {

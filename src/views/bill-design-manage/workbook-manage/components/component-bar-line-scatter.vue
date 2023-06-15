@@ -22,6 +22,9 @@ export default {
 
 	methods: {
 		pageLoad() {
+			if (this.myChart[this.id] != null && this.myChart[this.id] != "" && this.myChart[this.id] != undefined) {
+				this.myChart[this.id].dispose();
+			}
 			// 基于准备好的dom，初始化echarts实例
 			this.myChart[this.id] = echarts.init(document.getElementById(`barchart${this.id}`));
 			const _this = this;
@@ -94,11 +97,11 @@ export default {
 				});
 			});
 
-			window.addEventListener("resize", function () {
-				if (this.myChart[this.id] || "") {
-					this.myChart[this.id].resize();
-				}
-			});
+			// window.addEventListener("resize", function () {
+			// 	if (this.myChart[this.id] || "") {
+			// 		this.myChart[this.id].resize();
+			// 	}
+			// });
 		},
 		// 将图表转换为 base64 字符串
 		chartToBase64(chart) {

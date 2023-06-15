@@ -977,7 +977,7 @@ export default {
 	.download {
 		position: absolute;
 		top: 2%;
-		right: 2%;
+		right: 4%;
 		i {
 			font-size: 24px;
 			&:hover {

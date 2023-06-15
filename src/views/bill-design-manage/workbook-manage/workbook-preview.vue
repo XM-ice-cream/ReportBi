@@ -5,7 +5,7 @@
 				<div slot="title">
 					<Row class="content-top">
 						<!-- 查询条件 -->
-						<i-col span="6">
+						<i-col span="11">
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
 								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
 									<Icon type="ios-funnel" />
@@ -65,6 +65,9 @@
 						<!-- 标题 -->
 						<i-col span="12">
 							<div class="report-title">{{ $route.query.reportName }}</div>
+						</i-col>
+						<i-col span="1" style="text-align: right">
+							<Button type="primary" @click="closeClick" class="close-btn"><Icon type="md-close" /></Button>
 						</i-col>
 					</Row>
 				</div>
@@ -238,22 +241,35 @@ export default {
 			});
 			return arr;
 		},
-		// 页面关闭之前，触发提示框
-		async beforeunloadHandler(e) {
-			// 确保在关闭窗口时的 API 请求已完成
-			e.preventDefault(); // 取消默认行为
-			// e.returnValue = ""; // 需要在一些浏览器中设置该属性
+		async closeClick() {
 			await deleteImageReq({ id: this.submitData.id });
+			window.close();
 		},
+		// // 页面关闭之前，触发提示框
+		// beforeunloadHandler(e) {
+		// 	var confirmationMessage = "你确定要离开吗？";
+		// 	(e || window.event).returnValue = confirmationMessage;
+		// 	return confirmationMessage;
+		// },
+		// // 页面关闭
+		// unloadHandler(e) {
+		// 	// 退出登录
+		// 	deleteImageReq({ id: this.submitData.id });
+		// },
 	},
-	beforeUnmount() {
-		window.removeEventListener("beforeunload", this.beforeUnloadHandler);
-		window.close();
+	beforeDestroy() {},
+	destroyed() {
+		window.removeEventListener("beforeunload", (e) => this.beforeunloadHandler(e));
+		window.removeEventListener("unload", (e) => this.unloadHandler(e));
+	},
+	created() {
+		this.getDataItemData(); //获取数据字典类型
 	},
 	mounted() {
 		this.submitData.id = this.$route.query.id;
-		window.addEventListener("beforeunload", (e) => this.beforeunloadHandler(e)); //监听页面关闭
-		this.getDataItemData(); //获取数据字典类型
+		window.addEventListener("beforeunload", (e) => this.beforeunloadHandler(e));
+		window.addEventListener("unload", (e) => this.unloadHandler(e));
+
 		this.$nextTick(() => {
 			this.pageLoad();
 		});
@@ -261,4 +277,8 @@ export default {
 };
 </script>
 <style></style>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.close-btn {
+	border-radius: 50%;
+}
+</style>
