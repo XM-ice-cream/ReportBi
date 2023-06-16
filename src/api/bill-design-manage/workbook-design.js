@@ -63,7 +63,6 @@ export const updateImageReq = data => {
 export const getImageReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    loading: true,
     url: '/api/autoreportcenter/v1/ftpfile/getlist',
     method: 'post',
     data

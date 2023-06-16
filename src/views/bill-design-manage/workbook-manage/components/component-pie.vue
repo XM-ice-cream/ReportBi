@@ -50,16 +50,12 @@ export default {
 				//如果id存在 则存入缓存
 				if (this.id) {
 					this.chartToBase64(this.myChart[this.id]).then(async (base64) => {
-						//压缩
-						const pressCanvas = await compress(base64).then((res) => {
-							return res;
-						});
 						const direction = "p"; //PDF方向
 						const width = this.$refs.piechart.offsetWidth; //宽
 						const height = this.$refs.piechart.offsetHeight; //高
 						const obj = {
 							id: this.id,
-							imageJson: JSON.stringify({ canvas: pressCanvas, title: this.title, direction, tempStyle: { width, height } }),
+							imageJson: JSON.stringify({ canvas: base64, title: this.title, direction, tempStyle: { width, height } }),
 						};
 						addImageReq(obj);
 					});

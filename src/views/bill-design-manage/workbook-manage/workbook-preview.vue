@@ -256,10 +256,10 @@ export default {
 		// 	return confirmationMessage;
 		// },
 		// // 页面关闭
-		// unloadHandler(e) {
-		// 	// 退出登录
-		// 	deleteImageReq({ id: this.submitData.id });
-		// },
+		async unloadHandler(e) {
+			// 退出登录
+			await deleteImageReq({ id: this.submitData.id });
+		},
 	},
 	beforeDestroy() {},
 	destroyed() {

@@ -108,7 +108,7 @@ export default {
 	},
 	methods: {
 		//导出PDF
-		exportPDF(type) {
+		async exportPDF(type) {
 			//创建PDF
 			this.pdf = new jsPDF("landscape", "pt");
 			this.pdf.setFontSize(8);
@@ -135,23 +135,39 @@ export default {
 				});
 			} else {
 				//获取对应人员 导出打开界面的所有工作簿
-				getImageReq().then(async (res) => {
-					const result = res.result || [];
-					for (let index = 0; index < result.length; index++) {
-						const item = result[index];
+				let pageTotalTemp = 1;
+				let pageIndexTemp = 1;
+				this.$Spin.show();
+				for (let i = pageIndexTemp; i <= pageTotalTemp; i++) {
+					const obj = {
+						orderField: "id",
+						ascending: true,
+						pageSize: 1,
+						pageIndex: pageIndexTemp,
+						total: 0,
+						data: {},
+					};
+					await getImageReq(obj).then(async (res) => {
+						const result = res?.result || [];
+						const { pageSize, pageIndex, totalPage, data } = result;
+						const item = data[0];
+
+						pageTotalTemp = totalPage;
+
 						const { canvas, direction, title, tempStyle } = JSON.parse(item.imageJson);
 
 						const { width: contentWidth, height: contentHeight } = tempStyle;
 						const ctx = await this.drawImage(canvas, contentWidth, contentHeight);
 						filename += `${title}_`;
 
-						const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index, indexLength: result.length - 1 };
+						const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index: pageIndexTemp, indexLength: pageTotalTemp };
 						await this.domToPdf(obj);
-					}
-					// result?.forEach(async (item, index) => {
+						pageIndexTemp++;
+						// result?.forEach(async (item, index) => {
 
-					// });
-				});
+						// });
+					});
+				}
 			}
 		},
 		//导出pdf
@@ -211,7 +227,10 @@ export default {
 			ctx.clearRect(0, 0, contentWidth, contentHeight);
 			// 下载操作(下载到最后一个生成pdf)
 			// await this.$nextTick();
-			if (index == indexLength) this.pdf.save(`${filename}${formatDate(new Date())}.pdf`);
+			if (index == indexLength) {
+				this.pdf.save(`${filename}${formatDate(new Date())}.pdf`);
+				this.$Spin.hide(); //隐藏loading
+			}
 		},
 		createImage(base64Img, type) {
 			const div = document.getElementsByClassName("workbook-temp")[0];
