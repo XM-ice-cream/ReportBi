@@ -335,7 +335,7 @@
 							:id="submitData.id"
 							:title="submitData.workBookName"
 							:type="markData[0]?.chartType || 'bar'"
-							:visib="true"
+							:visib="visib"
 							:value="chartsData"
 							:row="rowData"
 							:column="columnData"
@@ -438,6 +438,7 @@ export default {
 
 	data() {
 		return {
+			visib: false,
 			baseInfoPanel: "base",
 			btnDistabled: true,
 			isAdd: true,
@@ -562,6 +563,7 @@ export default {
 				markData.push(item.data);
 			});
 			this.$Spin.show();
+			this.visib = false;
 			const obj = {
 				maxNumber: parseInt(maxNumber),
 				datasetId,
@@ -579,6 +581,7 @@ export default {
 						if (res.code == -1) this.$Msg.warning(`${res.message}`);
 
 						this.chartsData = res?.result || [];
+						this.visib = true;
 						this.$nextTick(() => {
 							this.$refs.tempRef.pageLoad();
 						});
@@ -588,6 +591,7 @@ export default {
 				})
 				.finally(() => {
 					this.$Spin.hide();
+					this.visib = true;
 				});
 		},
 

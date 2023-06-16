@@ -77,7 +77,7 @@
 					:id="submitData.id"
 					:type="markData[0]?.chartType || 'bar'"
 					:title="submitData.workBookName"
-					:visib="true"
+					:visib="visib"
 					:value="chartsData"
 					:row="rowData"
 					:column="columnData"
@@ -113,6 +113,7 @@ export default {
 			columnTypeList: [],
 			refreshObj: { isRefresh: false, refeshRate: 1 },
 			interval: null,
+			visib: false,
 		};
 	},
 	watch: {
@@ -162,6 +163,7 @@ export default {
 			}
 			//数据集
 			// const { datasetId, maxNumber } = this.submitData;
+			this.visib = false;
 			const obj = {
 				...this.submitData,
 				filterItems,
@@ -174,6 +176,7 @@ export default {
 					if (res.code == 200 || res.result?.length > 0) {
 						if (res.code == -1) this.$Msg.warning(`${res.message}`);
 						this.chartsData = res?.result || [];
+						this.visib = true;
 						this.$nextTick(() => {
 							this.$refs.tempRef.pageLoad();
 						});
@@ -183,14 +186,15 @@ export default {
 				})
 				.finally(() => {
 					this.searchPoptipModal = false;
+					this.visib = true;
 				});
 		},
 		//获取字段类型
 		getFieldsType(type, columnType) {
 			const obj = {
-				STRING: this.columnTypeList[0].detailCode.indexOf(columnType) > -1,
-				NUMBER: this.columnTypeList[1].detailCode.indexOf(columnType) > -1,
-				DATE: this.columnTypeList[2].detailCode.indexOf(columnType) > -1,
+				STRING: this.columnTypeList[0]?.detailCode.indexOf(columnType) > -1,
+				NUMBER: this.columnTypeList[1]?.detailCode.indexOf(columnType) > -1,
+				DATE: this.columnTypeList[2]?.detailCode.indexOf(columnType) > -1,
 			};
 			return obj[type];
 		},

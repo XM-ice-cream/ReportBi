@@ -1,10 +1,11 @@
 <!-- 柱状图 -->
 <template>
-	<div :id="'barchart' + id" class="charts" ref="barchart"></div>
+	<div :id="'barchart' + id" class="charts" ref="barchart" v-if="visib"></div>
 </template>
 <script>
 import * as echarts from "echarts";
 import { addImageReq } from "@/api/bill-design-manage/workbook-design";
+import { compress } from "@/libs/tools";
 
 export default {
 	name: "componentBar",
@@ -13,6 +14,7 @@ export default {
 		id: String,
 		tempStyle: Object,
 		title: String,
+		visib: Boolean,
 	},
 	data() {
 		return {
@@ -85,16 +87,23 @@ export default {
 			this.myChart[this.id].setOption(option, true);
 			// 存缓存
 			this.$nextTick(() => {
-				this.chartToBase64(this.myChart[this.id]).then((base64) => {
-					const direction = yAxis[0]?.type == "value" ? "l" : "p"; //PDF方向
-					const width = this.$refs.barchart.offsetWidth; //宽
-					const height = this.$refs.barchart.offsetHeight; //高
-					const obj = {
-						id: this.id,
-						imageJson: JSON.stringify({ canvas: base64, title: this.title, direction, tempStyle: { width, height } }),
-					};
-					addImageReq(obj);
-				});
+				//如果id存在 则存入缓存
+				if (this.id) {
+					this.chartToBase64(this.myChart[this.id]).then(async (base64) => {
+						//压缩
+						const pressCanvas = await compress(base64).then((res) => {
+							return res;
+						});
+						const direction = yAxis[0]?.type == "value" ? "l" : "p"; //PDF方向
+						const width = this.$refs.barchart.offsetWidth; //宽
+						const height = this.$refs.barchart.offsetHeight; //高
+						const obj = {
+							id: this.id,
+							imageJson: JSON.stringify({ canvas: pressCanvas, title: this.title, direction, tempStyle: { width, height } }),
+						};
+						addImageReq(obj);
+					});
+				}
 			});
 
 			// window.addEventListener("resize", function () {
@@ -107,7 +116,7 @@ export default {
 		chartToBase64(chart) {
 			return new Promise((resolve, reject) => {
 				chart.on("finished", () => {
-					resolve(chart.getDataURL());
+					resolve(chart.getDataURL({ backgroundColor: "#fff" }));
 				});
 			});
 		},

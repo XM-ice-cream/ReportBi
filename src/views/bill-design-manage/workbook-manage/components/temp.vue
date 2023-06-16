@@ -16,7 +16,6 @@
 			<div :style="tempStyle" ref="exportContent">
 				<component
 					ref="componentRef"
-					v-if="visib"
 					:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
 					:id="id"
 					:title="title"
