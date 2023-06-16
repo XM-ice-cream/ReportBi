@@ -45,7 +45,7 @@
 									</FormItem>
 									<!-- 是否公共 -->
 									<FormItem label="公共模型" prop="opt3">
-										<i-switch size="large" v-model="submitData.opt3" :true-value="1" :false-value="0">
+										<i-switch size="large" v-model="submitData.opt3" true-value="1" false-value="0">
 											<span slot="open">是</span>
 											<span slot="close">否</span>
 										</i-switch>
@@ -119,8 +119,8 @@
 											<!-- 任意类型 -->
 											<icon custom="iconfont icon-huatifuhao" v-else />
 
-											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop>
-												{{ subitem.columnName }}
+											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop :title="subitem.columnName">
+												<span class="columnname-text">{{ subitem.columnName }}</span>
 												<!-- 下拉框 -->
 												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem, 0, 0, 'create-fileds')">
 													<Icon type="ios-arrow-down"></Icon>
@@ -465,7 +465,7 @@ export default {
 				maxNumber: 2000,
 				opt1: "jx",
 				opt2: "comonTemplate",
-				opt3: 1, //是否为公共
+				opt3: "1", //是否为公共
 			},
 			columnList: [],
 			columnTypeList: [],
@@ -1267,6 +1267,14 @@ export default {
 									background: #00b180;
 									color: #fff;
 								}
+							}
+							.columnname-text {
+								display: inline-block;
+								width: calc(100% - 15px);
+								height: 100%;
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
 							}
 
 							& > i {

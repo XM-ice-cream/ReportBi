@@ -14,7 +14,7 @@
 	>
 		<div class="create-field">
 			<div class="left-box">
-				<Input type="text" v-model="submitData.columnName" clearabled />
+				<Input type="text" v-model="submitData.columnName" clearabled style="margin-bottom: 20px" />
 				<monaco-editor v-model.trim="submitData.fieldFunction" language="sql" v-if="visib" ref="monacoEditorRef" @save="checkRules" />
 				<!-- <Input
 					v-model="submitData.fieldFunction"
