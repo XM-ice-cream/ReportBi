@@ -422,6 +422,13 @@ export default {
 			} else {
 				//删除导出PDF 缓存id
 				deleteImageReq({ id: this.submitData.id });
+				//删除缓存localStorage
+				let data = window.localStorage.getItem("workBook");
+				data = data.split(",");
+				const dataIndex = data.findIndex((item) => item === this.submitData.id);
+				data.splice(dataIndex, 1);
+				if (data.length > 0) window.localStorage.setItem("workBook", data.toString());
+				else window.localStorage.removeItem("workBook");
 			}
 		},
 		changeRowColumn() {

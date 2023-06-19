@@ -145,7 +145,9 @@ export default {
 						pageSize: 1,
 						pageIndex: pageIndexTemp,
 						total: 0,
-						data: {},
+						data: {
+							id: window.localStorage.getItem("workBook"),
+						},
 					};
 					await getImageReq(obj).then(async (res) => {
 						const result = res?.result || [];

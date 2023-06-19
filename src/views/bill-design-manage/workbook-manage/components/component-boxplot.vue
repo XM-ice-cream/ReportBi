@@ -144,6 +144,11 @@ export default {
 						};
 						addImageReq(obj);
 					});
+					//localStorage 存入缓存id,根据id获取对应批量PDF
+					let data = window.localStorage.getItem("workBook");
+					data = data?.split(",") || [];
+					data.push(this.id);
+					window.localStorage.setItem("workBook", data.toString());
 				}
 			});
 			// window.addEventListener("resize", function () {

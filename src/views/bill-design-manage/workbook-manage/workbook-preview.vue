@@ -247,24 +247,29 @@ export default {
 		},
 		async closeClick() {
 			await deleteImageReq({ id: this.submitData.id });
+			this.deleteLocalStorage(); //删除缓存
 			window.close();
 		},
+		//删除缓存
+		deleteLocalStorage() {
+			let data = window.localStorage.getItem("workBook");
+			data = data.split(",");
+			const dataIndex = data.findIndex((item) => item === this.submitData.id);
+			data.splice(dataIndex, 1);
+			if (data.length > 0) window.localStorage.setItem("workBook", data.toString());
+			else window.localStorage.removeItem("workBook");
+		},
 		// // 页面关闭之前，触发提示框
-		// beforeunloadHandler(e) {
-		// 	var confirmationMessage = "你确定要离开吗？";
-		// 	(e || window.event).returnValue = confirmationMessage;
-		// 	return confirmationMessage;
-		// },
-		// // 页面关闭
-		async unloadHandler(e) {
-			// 退出登录
-			await deleteImageReq({ id: this.submitData.id });
+		beforeunloadHandler(e) {
+			this.deleteLocalStorage();
+			// e.preventDefault(); // 兼容Firefox或其他浏览器
+			// e.returnValue = ""; // 兼容Chrome
+			// return ""; // 兼容IE
 		},
 	},
 	beforeDestroy() {},
 	destroyed() {
 		window.removeEventListener("beforeunload", (e) => this.beforeunloadHandler(e));
-		window.removeEventListener("unload", (e) => this.unloadHandler(e));
 	},
 	created() {
 		this.getDataItemData(); //获取数据字典类型
@@ -272,7 +277,6 @@ export default {
 	mounted() {
 		this.submitData.id = this.$route.query.id;
 		window.addEventListener("beforeunload", (e) => this.beforeunloadHandler(e));
-		window.addEventListener("unload", (e) => this.unloadHandler(e));
 
 		this.$nextTick(() => {
 			this.pageLoad();
