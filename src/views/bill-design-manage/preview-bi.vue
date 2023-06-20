@@ -4,6 +4,29 @@
 		<!-- 页面表格 -->
 		<div class="comment">
 			<Card :bordered="false" dis-hover class="card-style">
+				<div slot="title">
+					<Form ref="searchReq" :model="req" inline :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+						<!-- 机种 -->
+						<FormItem label="机种" prop="model">
+							<Select
+								v-model="req.model"
+								clearable
+								:placeholder="$t('pleaseSelect') + '机种'"
+								transfer
+								filterable
+								cleabler
+								@on-change="searchClick"
+								style="width: 200px"
+							>
+								<Option v-for="(item, i) in modelList" :value="item.title" :label="item.title" :key="i"></Option>
+							</Select>
+						</FormItem>
+						<FormItem>
+							<!-- 按钮 -->
+							<Button type="primary" @click="searchClick()">{{ $t("query") }}</Button>
+						</FormItem>
+					</Form>
+				</div>
 				<!-- 预览Card -->
 				<div class="previewCard">
 					<template v-for="item in roleBtn">
@@ -38,9 +61,11 @@ export default {
 			selectObj: null, //表格选中
 			formatDate: formatDate,
 			roleBtn: [], //该角色下的报表权限卡片
+			roleBtnCopy: [],
 			pageConfig: { ...this.$config.pageConfig },
 			authorityBtn: {},
-			req: {}, //查询数据
+			req: { model: "" }, //查询数据
+			modelList: [],
 		};
 	},
 	mounted() {
@@ -52,6 +77,11 @@ export default {
 		next();
 	},
 	methods: {
+		//查询
+		searchClick() {
+			this.roleBtn = this.req.model ? this.roleBtnCopy.filter((item) => item.title === this.req.model) : this.roleBtnCopy;
+			console.log(this.roleBtn, this.roleBtnCopy);
+		},
 		// 跳转到工作簿管理
 		turnToWorkBookManage(href, index) {
 			const obj = { nodeId: href, authorityBtn: this.authorityBtn[index] };
@@ -101,6 +131,9 @@ export default {
 						remark: "公共模型,所有人都可查看",
 						sortCode: 0,
 					});
+					this.modelList = this.roleBtn;
+					this.roleBtnCopy = this.roleBtn;
+					console.log("this.modelList", this.modelList);
 				}
 			});
 		},
@@ -109,8 +142,10 @@ export default {
 </script>
 <style>
 .preview-bi .comment .ivu-card-body {
-	height: 100%;
 	background: #f5f7f9;
+}
+.preview-bi .ivu-form-item {
+	margin-bottom: 0;
 }
 </style>
 <style scoped lang="less">
@@ -125,7 +160,8 @@ export default {
 	background-color: #f5f7f9;
 	padding-bottom: 1rem;
 	.cardCell {
-		width: 32%;
+		/*	width: 32%;*/
+		width: 23.8%;
 		/* background: #ccc; */
 		border: 2px solid #fafcff;
 		box-shadow: 3px 5px 7px #d0dbf194;
@@ -144,7 +180,7 @@ export default {
 		}
 		.img {
 			width: 100%;
-			height: 260px;
+			height: 240px;
 			border-radius: 12px 12px 0 0;
 		}
 		.title {

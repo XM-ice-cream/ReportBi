@@ -56,44 +56,39 @@
 								<span class="name" :title="item.reportName">
 									{{ item.reportName }}
 								</span>
-								<!-- <span class='title-dot'>
-                  <Button @click="preview(item.reportCode)">
-                    <Icon type="md-eye" />预览
-                  </Button>
-                  <Button @click="design(item.reportCode)">
-                    <Icon type="md-create" />设计
-                  </Button>
-                </span> -->
 							</span>
-							<div class="content">
-								<!-- <div>
-                  报表类型： <span class="value" style="color: #41ce27;">
-                    <template v-if="item.reportType==='excel'">Excel报表</template>
-                    <template v-else>大屏报表</template>
-                  </span>
-                </div> -->
-								<div>
-									报表类别：
-									<span class="value" :title="item.remark" style="font-weight: bold">
-										{{ item.remark }}
-									</span>
-								</div>
-								<div>
-									报表编码：
-									<span class="value" :title="item.reportCode">
-										{{ item.reportCode }}
-									</span>
-								</div>
-								<div>
-									创建时间：
-									<span class="value" :title="formatDate(item.createDate)">
-										{{ formatDate(item.createDate) }}
-									</span>
-								</div>
-								<div>
-									修改时间： <span class="value" :title="formatDate(item.modifyDate)">{{ formatDate(item.modifyDate) }}</span>
-								</div>
-							</div>
+							<Row :gutter="24">
+								<Col :xl="24" :xxl="12">
+									<div class="box">
+										报表类别
+										<span class="value" :title="item.remark" style="font-weight: bold">
+											{{ item.remark }}
+										</span>
+									</div>
+								</Col>
+								<Col :xl="24" :xxl="12">
+									<div class="box">
+										报表编码
+										<span class="value" :title="item.reportCode">
+											{{ item.reportCode }}
+										</span>
+									</div>
+								</Col>
+								<Col :xl="24" :xxl="12">
+									<div class="box">
+										创建时间
+										<span class="value" :title="formatDate(item.createDate)">
+											{{ formatDate(item.createDate, "yyyy-MM-dd") }}
+										</span>
+									</div>
+								</Col>
+								<Col :xl="24" :xxl="12">
+									<div class="box">
+										修改时间
+										<span class="value" :title="formatDate(item.modifyDate)">{{ formatDate(item.modifyDate, "yyyy-MM-dd") }}</span>
+									</div>
+								</Col>
+							</Row>
 						</div>
 					</template>
 				</div>
@@ -269,6 +264,9 @@ export default {
 	vertical-align: middle;
 	margin-bottom: 0px;
 }
+.preview-excel .ivu-col {
+	margin: 5px 0;
+}
 </style>
 <style scoped lang="less">
 .previewCard {
@@ -282,16 +280,16 @@ export default {
 	background-color: #f5f7f9;
 	padding-bottom: 1rem;
 	.cardCell {
-		width: 315px;
+		width: 23.8%;
 		/* background: #ccc; */
 		border: 2px solid #fafcff;
 		box-shadow: 3px 5px 7px #d0dbf194;
-		padding: 2px;
+		padding: 20px;
 		margin-top: 15px;
 		margin-left: 15px;
 		position: relative;
 		background: #fff;
-		border-radius: 12px;
+		border-radius: 0px;
 		cursor: pointer;
 		transition: all 0.2s ease-out;
 		&:hover {
@@ -315,16 +313,17 @@ export default {
 				width: 3rem;
 				height: 3rem;
 				line-height: 3rem;
-				background: #52d8a0;
+				background: #52d8a03b;
 				/* padding: 0.3rem; */
 				display: inline-block;
 				text-align: center;
-				border-radius: 50%;
+				border-radius: 10px;
 				margin-right: 0.7rem;
 				position: relative;
+				box-shadow: 1px 2px 6px #cccc;
 				i {
 					font-size: 1.72rem;
-					color: #fff;
+					color: #52d79f;
 					position: absolute;
 					top: 50%;
 					left: 50%;
@@ -338,6 +337,8 @@ export default {
 				display: inline-block;
 				text-overflow: ellipsis;
 				white-space: nowrap;
+				color: #4f6185;
+				font-weight: bold;
 			}
 			//操作--预览与编辑
 			.title-dot {
@@ -361,14 +362,11 @@ export default {
 				}
 			}
 		}
-		.content {
-			margin-left: 3.8rem;
-			line-height: 1.7rem;
-			padding-bottom: 1rem;
-
-			div {
-				padding: 0.1rem;
-			}
+		.box {
+			line-height: 30px;
+			padding: 5px 10px;
+			background: #f7f9fc;
+			color: #7c8994;
 			.value {
 				display: inline-block;
 				width: calc(100% - 4rem);
@@ -378,7 +376,8 @@ export default {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
-				padding: 0 0.5rem;
+				color: #334670;
+				font-weight: bold;
 			}
 		}
 	}
