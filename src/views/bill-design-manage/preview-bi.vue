@@ -133,7 +133,6 @@ export default {
 					});
 					this.modelList = this.roleBtn;
 					this.roleBtnCopy = this.roleBtn;
-					console.log("this.modelList", this.modelList);
 				}
 			});
 		},

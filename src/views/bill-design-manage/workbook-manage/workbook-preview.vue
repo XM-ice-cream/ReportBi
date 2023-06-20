@@ -255,7 +255,7 @@ export default {
 			let data = window.localStorage.getItem("workBook");
 			data = data.split(",");
 			const dataIndex = data.findIndex((item) => item === this.submitData.id);
-			data.splice(dataIndex, 1);
+			if (dataIndex > -1) data.splice(dataIndex, 1);
 			if (data.length > 0) window.localStorage.setItem("workBook", data.toString());
 			else window.localStorage.removeItem("workBook");
 		},
