@@ -4,11 +4,11 @@ import store from '@/store'
 import routers from './routers'
 import i18n from '@/locale'
 import {
-  localRead,
-  localSave,
-  sessionSave,
   setTitle,
-  userLocalInfo
+  userLocalInfo,
+  localRead,
+  localReadObject,
+  sessionSave
 } from '@/libs/utils'
 import {
   watermarkFn
@@ -18,6 +18,7 @@ import {
 // import * as signalR from '@aspnet/signalr'
 
 Vue.use(VueRouter)
+const LOGIN_PAGE_NAME = 'login'
 
 // 消息提示判断
 // const signalrTips = (vm, data) => {
@@ -64,32 +65,25 @@ router.beforeEach((to, form, next) => {
   //清空所有msg提示
   vm.$Message.destroy()
   vm.$Loading.start()
+  // 判断是否进入检测 vm.$config.nameList 等页面
+  if (vm.$config.nameList.includes(to.name)) {
+    //解决公共报表 页面不带token问题
+    let userInfo = localReadObject(localRead("currentUser") + 'Obj');
+    sessionSave("userName", userInfo.userName);
+    sessionSave("password", userInfo.password);
+    next()
+  }
   // 判断是否登录
-  if (Object.keys(to.query).includes('localObj')) {
-    const localObj = JSON.parse(to.query.localObj)
-    sessionSave('userName', localObj.userName)
-    localSave('configip', to.query.configip)
-    localSave('reportip', to.query.reportip)
-    localSave('projectVersion', to.query.projectVersion)
-    localSave('reportDesignIp', to.query.reportDesignIp)
-    localSave('isFirst', true)
-    const toName = to.path.split('/')[2]
-    localObj.tagNavList = [{
-      name: 'home',
-      meta: {
-        hideInMenu: true,
-        icon: "iconfont icon-home",
-        notCache: true,
-        title: "首页",
-      },
-      params: {},
-      query: {},
-    }]
-    userLocalInfo(localObj)
-    next({
-      replace: true,
-      name: toName
-    })
+  else if (!userLocalInfo().token) {
+    // 未登录
+    if (to.name !== LOGIN_PAGE_NAME) {
+      // 要跳转的页面不是登录页面
+      next({
+        replace: true,
+        name: LOGIN_PAGE_NAME
+      })
+      vm.$Loading.finish()
+    } else next()
   } else {
     // 已登录
     let locked = userLocalInfo().locked || 0
@@ -103,6 +97,13 @@ router.beforeEach((to, form, next) => {
         content: `${i18n.t('unlockTipsPwd')}`,
         duration: 3
       })
+    } else if (to.name === LOGIN_PAGE_NAME) {
+      // 要跳转的页面是登录页
+      next({
+        replace: true,
+        name: vm.$config.homeName
+      }) // 跳转到homeName页
+      vm.$Loading.finish()
     } else {
       const errorPageName = ['error-500', 'error-401', 'error-404', ]
       // 菜单导航是否获取
@@ -126,8 +127,27 @@ router.beforeEach((to, form, next) => {
         //   })
         //   // 解绑事件
         //   vm.$signalr.off('public')
+        //   // vm.$signalr.off(store.state.id)
         //   // 接受所有消息
         //   vm.$signalr.on('public', data => signalrTips(vm, data))
+        //   // 接受个人消息
+        //   // vm.$signalr.on(store.state.id, data => {
+        //   //   if (data.messageType === 4) {
+        //   //     // 验证账号是否被登录
+        //   //     let introspect = () => {
+        //   //       if (userLocalInfo().token) {
+        //   //         setTimeout(() => {
+        //   //           store.dispatch('handleIntrospect', vm).then(() => { })
+        //   //         }, 500)
+        //   //       } else {
+        //   //         setTimeout(() => {
+        //   //           introspect()
+        //   //         }, 1000)
+        //   //       }
+        //   //     }
+        //   //     introspect()
+        //   //   }
+        //   // })
         // }
         // 判断是否有权限跳转该页面
         const menu = store.getters.allRouteList.find(x => x.name === to.name)
@@ -142,11 +162,7 @@ router.beforeEach((to, form, next) => {
         store.dispatch('handleGetLeftMenuList').then(() => {
           store.state.routeList.forEach(item => router.addRoute(item))
           const menu = store.getters.allRouteList.find(x => to.path.split('/')[2] === x.name)
-          if (menu) store.commit('updateMenuId', menu.id)
-          if (localRead('isFirst') === 'true') {
-            localSave('isFirst', false)
-            setTimeout(() => window.location.reload(), 1000)
-          }
+          if (menu) store.commit('updateMenuId', userLocalInfo().mId)
           next({
             replace: true,
             ...to
@@ -160,7 +176,7 @@ router.beforeEach((to, form, next) => {
           })
           store.dispatch('handleLogOut').then(() => {})
           next({
-            name: 'error-500'
+            name: LOGIN_PAGE_NAME
           })
         })
       } else next()
@@ -173,9 +189,14 @@ router.afterEach((to) => {
   let vm = router.app
   // 设置页面名称
   setTitle(to, vm)
-  vm.$Loading.finish()
+  vm.$Loading.finish();
   // 添加水印
   watermarkFn(to.meta.watermarkRemove || store.state.userName)
 })
-
+//解决报错 ncaught (in promise) Error: Redirected when going from "/secs-equipment" to "/secs-eqp-detail" via a navigation guard.
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location, onResolve, onReject) {
+  if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
+  return originalPush.call(this, location).catch(err => err)
+}
 export default router

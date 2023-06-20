@@ -2,6 +2,15 @@ import Main from '@/components/main'
 
 // 其他页面路由模块
 const otherRouter = [{
+    path: '/login',
+    name: 'login',
+    meta: {
+      title: 'Login - 登录',
+      hideInMenu: true,
+      notCache: true
+    },
+    component: () => import( /* webpackChunkName: "login" */ '@/views/login/login.vue')
+  }, {
     path: '/bill-design-manage/excelreport-preview',
     name: 'excelreport-preview',
     meta: {

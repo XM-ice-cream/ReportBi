@@ -1,0 +1,67 @@
+.login {
+	width: 100%;
+	height: 100%;
+	//background-image: url('../../assets/images/login-bg2.jpg');
+	background: url("../../assets/images/login-bg.png") center bottom;
+	/* 设置背景图片会不会随着屏幕滚动 */
+	background-attachment: fixed;
+	/* 此时会保持图像的纵横比并将图像缩放成将完全覆盖背景定位区域的最小大小。 */
+	background-size: cover;
+	/* 去掉好像也没什么 */
+	display: flex;
+	/* 设置height:100vh，能够保证元素无论是否有没有内容，高度都等于屏幕高度。 */
+	min-height: 100vh;
+	flex-direction: column;
+	background-color: #000;
+	background-size: cover;
+	background-position: center;
+	position: relative;
+	&-con {
+		position: absolute;
+		right: 9%;
+		top: 55%;
+		transform: translateY(-60%);
+		width: 300px;
+		&-header {
+			font-size: 16px;
+			font-weight: 300;
+			text-align: center;
+			padding: 30px 0;
+		}
+		.form-con {
+			padding: 10px 0 0;
+		}
+		.login-tip {
+			font-size: 10px;
+			text-align: center;
+			color: #c3c3c3;
+		}
+	}
+}
+
+.logoOpacity {
+	animation: logoOpacity 5s ease-in-out infinite;
+}
+
+@keyframes logoOpacity {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.8;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+@-webkit-keyframes logoOpacity {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.8;
+	}
+	100% {
+		opacity: 1;
+	}
+}
