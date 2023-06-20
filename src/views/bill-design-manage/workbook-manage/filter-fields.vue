@@ -82,7 +82,7 @@
 	</Modal>
 </template>
 <script>
-import { formatDate } from "@/libs/tools";
+import { formatDate, commaSplitString } from "@/libs/tools";
 import { getselectvalueReq } from "@/api/bill-design-manage/workbook-design.js";
 export default {
 	name: "filter-fields",
@@ -196,13 +196,14 @@ export default {
 		},
 		//提交
 		submitClick() {
-			const { newIndex, startTime, endTime, columnType, showData } = this.submitData;
+			const { newIndex, startTime, endTime, columnType, showData, filterValue } = this.submitData;
 			if (columnType === "DATE" && !showData) {
 				this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
 				this.submitData.startTime = formatDate(startTime);
 				this.submitData.endTime = formatDate(endTime);
+			} else {
+				this.submitData.filterValue = commaSplitString(filterValue).join();
 			}
-			// else (this.submitData.filterValue = commaSplitString(filterValue).join()), (this.modelFlag = false);
 
 			this.$emit("updateFilter", newIndex, this.submitData); //取消后 删除拖拽的cell
 			this.$refs.submitReq.resetFields();
