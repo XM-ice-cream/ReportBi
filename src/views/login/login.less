@@ -65,3 +65,28 @@
 		opacity: 1;
 	}
 }
+// 适配
+@media (min-width: 1536px) {
+	.login-con {
+		width: 340px !important;
+		height: 400px;
+	}
+	:deep(.login-con .ivu-card-head) {
+		padding: 10px 16px 10px 16px !important;
+	}
+	:deep(.login-con .ivu-form-item) {
+		margin-bottom: 30px;
+	}
+}
+@media (min-width: 1920px) {
+	.login-con {
+		width: 410px !important;
+		height: 490px;
+	}
+	:deep(.login-con .ivu-card-head) {
+		padding: 30px 16px 25px 16px !important;
+	}
+	:deep(.login-con .ivu-form-item) {
+		margin-bottom: 40px;
+	}
+}

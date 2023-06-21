@@ -133,6 +133,9 @@ export default {
 	.ivu-btn {
 		font-size: 22px !important;
 		height: 46px !important;
+		padding: 0px;
+		border: none;
+		background: linear-gradient(45deg, #38fbfe, #5b56e3);
 	}
 
 	.ivu-card {

@@ -30,7 +30,11 @@
 				</Select>
 			</FormItem>
 			<FormItem>
-				<Button @click="handleSubmit" size="default" type="primary" long :loading="loginLoading" class="login-button">{{ $t("login") }}</Button>
+				<Button @click="handleSubmit" size="default" type="primary" long class="login-button">
+					<a href="#" class="price-btn">
+						<span><Icon type="ios-loading" v-if="loginLoading" />{{ $t("login") }}</span>
+					</a>
+				</Button>
 				<Row class="button-style">
 					<i-col span="12">
 						<span type="text" @click="addClick" style="float: left">注册账号</span>
@@ -157,6 +161,71 @@ export default {
 };
 </script>
 <style lang="less">
+.login-button {
+	& > span {
+		display: block;
+		width: 100%;
+		height: 100%;
+		margin: 0px;
+		line-height: 46px;
+	}
+	.price-btn {
+		color: #ffffff;
+		position: relative;
+		display: inline-block;
+		overflow: hidden;
+		/* padding: 15px 50px; */
+		/* border-radius: 50px; */
+		text-align: center;
+		text-transform: capitalize;
+		display: block;
+		width: 100%;
+		height: 100%;
+		& > span {
+			color: #ffffff;
+			position: relative;
+			z-index: 2;
+			& > i {
+				margin-right: 10px;
+				animation: changeright 1s linear infinite;
+			}
+		}
+
+		&:hover {
+			color: #ffffff;
+		}
+
+		&:hover::before {
+			animation: criss-cross-left 0.8s both;
+			animation-direction: alternate;
+		}
+		&:hover::after {
+			animation: criss-cross-right 0.8s both;
+			animation-direction: alternate;
+		}
+		&::before,
+		&::after {
+			position: absolute;
+			top: 50%;
+			content: "";
+			width: 20px;
+			height: 20px;
+			background-color: #27ce88;
+			border-radius: 50%;
+			color: #ffffff;
+		}
+		&::before {
+			left: -20px;
+			transform: translate(-50%, -50%);
+		}
+		&::after {
+			right: -20px;
+			transform: translate(50%, -50%);
+		}
+	}
+	&:before {
+	}
+}
 .login-button:hover {
 	background-color: #27ce99;
 	border: none;
@@ -169,5 +238,50 @@ export default {
 }
 .button-style span:hover {
 	color: #5eaaff;
+}
+
+@keyframes criss-cross-left {
+	0% {
+		left: -20px;
+	}
+	50% {
+		left: 50%;
+		width: 20px;
+		height: 20px;
+	}
+	100% {
+		left: 50%;
+		width: 375px;
+		height: 375px;
+	}
+}
+
+@keyframes criss-cross-right {
+	0% {
+		right: -20px;
+	}
+	50% {
+		right: 50%;
+		width: 20px;
+		height: 20px;
+	}
+	100% {
+		right: 50%;
+		width: 375px;
+		height: 375px;
+	}
+}
+@keyframes changeright {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	50% {
+		transform: rotate(180deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }
 </style>
