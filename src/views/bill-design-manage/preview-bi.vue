@@ -164,7 +164,6 @@ export default {
 		/* background: #ccc; */
 		border: 2px solid #fafcff;
 		box-shadow: 3px 5px 7px #d0dbf194;
-		padding: 2px;
 		margin-top: 15px;
 		margin-left: 15px;
 		position: relative;
@@ -180,7 +179,7 @@ export default {
 		.img {
 			width: 100%;
 			height: 240px;
-			border-radius: 12px 12px 0 0;
+			border-radius: 10px 10px 0 0;
 		}
 		.title {
 			width: 100%;
