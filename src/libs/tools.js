@@ -969,6 +969,20 @@ export const commaSplitString = (str = "") => {
   return [...new Set(arr)];
 };
 /**
+ * 字符串中',' 、回车转数组 '1,2 3'转成['1','2','3']
+ * @param str 待处理字符串
+ */
+export const commaSplitReturnString = (str = "") => {
+  let arr = [];
+  let strArr = str.split(",");
+  strArr.map((item) => {
+    item.split(/\r?\n/).map((o) => {
+      if (o) arr.push(o);
+    });
+  });
+  return [...new Set(arr)];
+};
+/**
  * 限制多选个数
  * @param str 字符串
  * @param limitLength 字符串长度,默认2000
