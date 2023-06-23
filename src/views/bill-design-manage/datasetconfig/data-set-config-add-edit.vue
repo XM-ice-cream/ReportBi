@@ -11,8 +11,8 @@
 			<div class="modal-content">
 				<Split v-model="splitValue">
 					<div slot="left" class="left-box">
+						<div class="left-title">基础信息</div>
 						<div class="left-top">
-							<div class="left-title">基础信息</div>
 							<Form ref="submitRef" :model="submitData" :label-width="90" :rules="rulesValidate">
 								<FormItem label="数据集名称" prop="datasetName">
 									<Input v-model="submitData.datasetName" :placeholder="$t('pleaseEnter') + '数据集名称'" />
@@ -628,18 +628,27 @@ export default {
 	.left-box {
 		height: 100%;
 		padding: 10px;
-		.left-top {
-			background: #f2f2f2;
-			padding: 10px;
-			/* border: 1px solid #78ce780f; */
+		background: #f6f8fc;
+		.left-title {
+			font-size: 14px;
+			padding: 5px;
+			padding-left: 10px;
 			margin-bottom: 10px;
-			border-radius: 5px;
-			.left-title {
-				padding: 5px;
-				margin-bottom: 10px;
-				font-weight: bold;
-				border-bottom: 2px solid #fff;
+			font-weight: bold;
+			border-bottom: 2px solid #fff;
+			&:before {
+				content: "";
+				width: 4px;
+				height: 17px;
+				background: #27ce88;
+				position: absolute;
+				left: 10px;
+				top: 17px;
 			}
+		}
+		.left-top {
+			padding: 10px;
+			margin-bottom: 10px;
 		}
 
 		.name-label {

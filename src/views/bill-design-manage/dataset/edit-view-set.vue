@@ -12,7 +12,8 @@
 					</Col>
 					<Col :xs="24" :sm="20" :md="7" :lg="7" :xl="7">
 						<FormItem label="数据集编码" prop="setCode">
-							<Input :disabled="updataDisabled" v-model.trim="formData.setCode" placeholder="唯一标识" size="small" />
+							<span v-if="updataDisabled">{{ formData.setCode }}</span>
+							<Input v-else v-model.trim="formData.setCode" placeholder="唯一标识" size="small" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="20" :md="7" :lg="7" :xl="7">
@@ -177,8 +178,8 @@
 			</Form>
 			<div slot="footer" class="dialog-footer">
 				<Button @click="closeDialog">取消</Button>
-				<Button type="primary" @click="submit('form')">保存</Button>
-				<Button type="primary" @click="submit('form', true)">保存并跳转至报表设计管理</Button>
+				<Button @click="submit('form')">保存</Button>
+				<Button @click="submit('form', true)">保存并跳转至报表设计管理</Button>
 			</div>
 		</Modal>
 		<Modal :title="title" v-model="dialogPermissionVisible" :mask-closable="false" :closable="true" width="60%">

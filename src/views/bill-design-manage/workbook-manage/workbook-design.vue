@@ -357,8 +357,8 @@
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
 			<Button @click="previewClick" class="preview-btn" :disabled="!btnDistabled">预览</Button>
+			<Button @click="submitClick(false)" :disabled="!btnDistabled">{{ $t("submit") }}</Button>
 			<Button @click="submitClick(true)" class="preview-btn" :disabled="!btnDistabled">提交并预览</Button>
-			<Button type="primary" @click="submitClick(false)" :disabled="!btnDistabled">{{ $t("submit") }}</Button>
 		</div>
 	</Modal>
 </template>
@@ -1340,12 +1340,21 @@ export default {
 				}
 			}
 			.title {
-				padding: 4px;
+				padding: 4px 10px;
 				// background: #82c43e;
 				// color: #fff;
-				background: #eaeaea;
-				text-align: center;
 				margin-bottom: 5px;
+				position: relative;
+
+				&:before {
+					content: "";
+					width: 5px;
+					height: 15px;
+					background: #27ce88;
+					position: absolute;
+					left: 0;
+					/* margin-left: 10px; */
+				}
 			}
 		}
 		.right-box {
@@ -1378,11 +1387,6 @@ export default {
 			.right-content {
 				height: calc(100% - 130px);
 				position: relative;
-				.title {
-					padding: 5px 10px;
-					font-weight: bold;
-					font-size: 18px;
-				}
 			}
 		}
 	}

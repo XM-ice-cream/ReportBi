@@ -21,10 +21,6 @@
 								<Option v-for="(item, i) in modelList" :value="item.title" :label="item.title" :key="i"></Option>
 							</Select>
 						</FormItem>
-						<FormItem>
-							<!-- 按钮 -->
-							<Button type="primary" @click="searchClick()">{{ $t("query") }}</Button>
-						</FormItem>
 					</Form>
 				</div>
 				<!-- 预览Card -->

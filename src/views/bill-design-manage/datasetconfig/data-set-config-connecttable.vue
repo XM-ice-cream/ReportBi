@@ -1,15 +1,14 @@
 /**数据集配置 关联 */
 <template>
 	<!-- 数据集 -->
-	<Modal :title="modalTitle" :mask-closable="false" :width="1000" :closable="true" v-model="modalFlag" :before-close="closeDialog">
-		<Form :label-width="70" inline>
-			<FormItem label="关联关系" prop="incidenceRelation">
-				<Select v-model.trim="connectObj.incidenceRelation" size="small" placeholder="请选择关联关系" clearable style="width: 200px">
-					<Option v-for="item in incidenceList" :key="item.value" :label="item.label" :value="item.value" />
-				</Select>
-			</FormItem>
-		</Form>
-		<div class="add-box" @click="addClick"><icon custom="iconfont icon-add" class="add-icon" /> 添加更多字段</div>
+	<Modal :mask-closable="false" :width="1000" :closable="true" v-model="modalFlag" :before-close="closeDialog">
+		<template #header>
+			<p class="ivu-modal-header-inner" style="display: inline">{{ modalTitle }}</p>
+			<Select v-model.trim="connectObj.incidenceRelation" size="small" placeholder="请选择关联关系" clearable style="width: 200px; margin-left: 10px">
+				<Option v-for="item in incidenceList" :key="item.value" :label="item.label" :value="item.value" />
+			</Select>
+		</template>
+		<Button type="primary" @click="addClick" class="add-box"> <icon custom="iconfont icon-add" class="add-icon" />新增</Button>
 		<div class="modal-content">
 			<Table :columns="columns" :data="data" :height="tableConfig.height" disabled-hover>
 				<!-- 源表 -->
@@ -227,17 +226,20 @@ export default {
 				{
 					title: source.split(":")[1],
 					slot: "source",
+					align: "center",
 				},
 				{
-					title: "",
+					title: "关系符",
 					slot: "symbol",
+					align: "center",
 				},
 				{
 					title: target.split(":")[1],
 					slot: "target",
+					align: "center",
 				},
 				{
-					title: "#",
+					title: "操作",
 					slot: "operator",
 					width: 60,
 					align: "center",
@@ -311,28 +313,28 @@ export default {
 }
 .field-select .ivu-select-selected-value {
 	text-align: center;
-	background: #00374421;
+	background: #f5fff4;
 	margin-bottom: 6px;
 	border-radius: 3px;
 	color: #000;
 	padding-right: 12px !important;
 	/* width: 55px; */
-	border: 1px solid #3b2c2c1a;
+	border-radius: 0px;
+	border: none;
+	border-bottom: 1px solid #52d8a0;
 }
 </style>
 <style lang="less" scoped>
 .add-box {
-	color: #6f6f6f;
-	margin-top: 10px;
+	margin-left: 880px;
 	margin-bottom: 10px;
-	cursor: pointer;
-	.add-icon {
-		text-align: right;
-		margin-right: 5px;
-		border: 1px solid #6f6f6f;
-		padding: 3px;
-		font-size: 1px;
-		border-radius: 50%;
+	padding: 0 8px;
+	height: 27px;
+	border-radius: 0px;
+	i {
+		font-size: 12px;
+		margin-right: 2px;
+		padding: 2px;
 	}
 }
 .ivu-select-item {

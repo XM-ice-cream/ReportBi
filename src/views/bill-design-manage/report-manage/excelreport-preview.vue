@@ -8,7 +8,7 @@
 						<i-col span="6">
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
 								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
-									<Icon type="ios-funnel" />
+									<Icon type="ios-funnel" style="font-size: 0.82rem; margin-right: 0" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<div class="submitForm">

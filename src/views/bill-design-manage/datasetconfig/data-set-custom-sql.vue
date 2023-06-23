@@ -232,21 +232,7 @@ export default {
 	},
 };
 </script>
-<style>
-.field-select .ivu-select-arrow {
-	visibility: hidden;
-}
-.field-select .ivu-select-selected-value {
-	text-align: center;
-	background: #00374421;
-	margin-bottom: 6px;
-	border-radius: 3px;
-	color: #000;
-	padding-right: 12px !important;
-	/* width: 55px; */
-	border: 1px solid #3b2c2c1a;
-}
-</style>
+<style></style>
 <style lang="less" scoped>
 .add-box {
 	color: #6f6f6f;
