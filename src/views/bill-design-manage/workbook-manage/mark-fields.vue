@@ -3,7 +3,7 @@
 	<!-- 函数管理 -->
 	<Modal :title="isAdd ? '标记' : '标记'" v-model="modelFlag" width="800" draggable :mask-closable="false" :mask="true" :before-close="cancelClick">
 		<div class="mark-fields">
-			<Form ref="submitReq" :model="submitData" :label-width="100" :label-colon="true">
+			<Form ref="submitReq" :model="submitData" :label-width="100">
 				<!-- 文本宽度 -->
 				<FormItem label="文本宽度" prop="markValue" v-if="submitData.innerText === 'labelWidth'">
 					<InputNumber v-model="submitData.markValue" controls-outside :step="10" />

@@ -2,7 +2,7 @@
 <template>
 	<div class="page-style">
 		<Modal v-model="modalFlag" title="Link 扩展SN" @on-ok="submitClick" @on-cancel="cancelClick" :mask-closable="false" :closable="false">
-			<Form ref="submitReq" :model="submitData" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="getWorkOrderNumber">
+			<Form ref="submitReq" :model="submitData" :label-width="80" @submit.native.prevent @keyup.native.enter="getWorkOrderNumber">
 				<!-- 工单 -->
 				<FormItem label="工单">
 					<Input ref="workorder" v-model.trim="submitData.workorder" :placeholder="$t('pleaseEnter') + '工单'" clearable></Input>
@@ -24,15 +24,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form
-										ref="searchReq"
-										:model="req"
-										:label-width="80"
-										:label-colon="true"
-										@submit.native.prevent
-										@keyup.native.enter="searchClick"
-										:rules="ruleValidate"
-									>
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick" :rules="ruleValidate">
 										<!-- 工单 -->
 										<FormItem label="工单" prop="workorder">
 											<Input v-model.trim="req.workorder" :placeholder="$t('pleaseEnter') + '工单'" clearable></Input>

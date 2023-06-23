@@ -12,15 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form
-										:rules="ruleValidate"
-										:label-width="70"
-										:label-colon="true"
-										@submit.native.prevent
-										ref="searchReq"
-										:model="req"
-										@keyup.native.enter="searchClick"
-									>
+									<Form :rules="ruleValidate" :label-width="70" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker

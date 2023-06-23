@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 工单 -->
 										<FormItem label="工单" prop="workOrder">
 											<Input v-model.trim="req.workOrder" clearabled :placeholder="$t('pleaseEnter') + '工单'" />

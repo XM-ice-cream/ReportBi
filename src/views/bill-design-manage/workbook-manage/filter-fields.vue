@@ -11,7 +11,7 @@
 		:before-close="cancelClick"
 	>
 		<div class="filter-fields">
-			<Form ref="submitReq" :model="submitData" :label-width="100" :label-colon="true">
+			<Form ref="submitReq" :model="submitData" :label-width="100">
 				<!-- 显示数据 -->
 				<FormItem label="显示数据" prop="showData">
 					<i-switch size="small" v-model="submitData.showData" :true-value="1" :false-value="0"> </i-switch>

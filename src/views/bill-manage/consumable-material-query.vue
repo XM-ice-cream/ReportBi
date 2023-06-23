@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="60" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="60" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 大板序号 -->
 										<FormItem :label="$t('panelNo')">
 											<Input type="text" v-model="req.panel" :placeholder="$t('pleaseEnter') + $t('panelNo') + $t('multiple,separated')"></Input>

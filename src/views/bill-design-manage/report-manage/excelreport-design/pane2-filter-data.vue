@@ -3,7 +3,7 @@
 	<div class="pane2-filter-data">
 		<!-- 左侧抽屉 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="750" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :model="rightForm" :label-width="110" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="rightForm" :label-width="110" @submit.native.prevent>
 				<!-- 自定义分组类型：条件，公式分组 -->
 				<FormItem label="父格条件" prop="isFather">
 					<Checkbox v-model="rightForm.isFather" size="small">将父格作为过滤条件（适用于父子格来自于同一个数据集）</Checkbox>

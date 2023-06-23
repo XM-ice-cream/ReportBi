@@ -1,7 +1,7 @@
 <template>
 	<!-- 右侧抽屉 Form表单 -->
 	<Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-		<Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+		<Form ref="submitData" :model="submitData" :label-width="90" @submit.native.prevent>
 			<!-- 机种 -->
 			<FormItem :label="$t('modelName')" prop="modelName">
 				<Input v-model="submitData.modelName" :placeholder="$t('pleaseEnter') + $t('modelName')" />

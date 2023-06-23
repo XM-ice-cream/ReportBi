@@ -1,6 +1,6 @@
 /* 抽检配置 */
 <template>
-	<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="120" :label-colon="true">
+	<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="120">
 		<!-- 抽检类型 -->
 		<FormItem :label="$t('planType')" prop="samplingType">
 			<RadioGroup v-model="submitData.samplingType">

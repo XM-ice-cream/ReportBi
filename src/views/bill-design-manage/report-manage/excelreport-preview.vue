@@ -12,7 +12,7 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<div class="submitForm">
-										<Form ref="submitReq" :label-width="80" :label-colon="true">
+										<Form ref="submitReq" :label-width="80">
 											<template v-for="item in tableData2">
 												<span class="title">{{ item.title }} </span>
 												<template v-for="(subitem, subindex) in item.children">

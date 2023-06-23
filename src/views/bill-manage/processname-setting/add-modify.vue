@@ -1,7 +1,7 @@
 <template>
 	<!-- 右侧抽屉 Form表单 -->
 	<Drawer v-model="drawerFlag" :title="drawerTitle" width="900" :mask-closable="false" @on-close="cancelClick">
-		<Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+		<Form ref="submitData" :model="submitData" :label-width="90" @submit.native.prevent>
 			<!-- 当前流程 -->
 			<FormItem label="当前流程" prop="routeID">
 				<v-selectpage

@@ -1,7 +1,7 @@
 <template>
 	<!-- 右侧抽屉 Form表单 -->
 	<Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-		<Form ref="submitData" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+		<Form ref="submitData" :model="submitData" :label-width="90" @submit.native.prevent>
 			<!-- 群组类型 -->
 			<FormItem label="群组类型" prop="grouP_TYPE">
 				<Select v-model.tirm="submitData.grouP_TYPE" transfer :placeholder="$t('pleaseSelect') + '群组类型'" clearable>

@@ -3,7 +3,7 @@
 	<div class="page-style design-report-manage">
 		<!-- 左侧抽屉 -->
 		<Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true" :before-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
+			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
 				<Row :gutter="10">
 					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
 						<!-- 报表名称 -->
@@ -73,7 +73,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 报表类型 -->
 										<FormItem :label="$t('reportType')" prop="reportType">
 											<Select v-model="req.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')" transfer cleabler>

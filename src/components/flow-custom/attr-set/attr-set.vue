@@ -22,7 +22,7 @@
 				<!--   属性设置   -->
 				<Card :bordered="false" dis-hover :padding="8" style="height: 420px; overflow-y: auto">
 					<!--   节点属性   -->
-					<Form v-if="cellSelected === 'nodeSet'" :label-width="120" :label-colon="true">
+					<Form v-if="cellSelected === 'nodeSet'" :label-width="120">
 						<div v-show="eleType === 'node'">
 							<FormItem :label="$t('name')">
 								<treeselect
@@ -127,7 +127,7 @@
 						</FormItem>
 					</Form>
 					<!--   设备绑定   -->
-					<Form v-if="cellSelected === 'equipmentBind' && eleType === 'node'" :label-width="120" :label-colon="true">
+					<Form v-if="cellSelected === 'equipmentBind' && eleType === 'node'" :label-width="120">
 						<!-- 绑定设备 -->
 						<FormItem :label="$t('equipmentBind')">
 							<v-selectpage
@@ -178,7 +178,7 @@
 						@on-trackGo-submit="trackChange"
 					/>
 					<!--   abb规则   -->
-					<Form v-if="cellSelected === 'ABBRule' && eleType === 'node'" :label-width="80" :label-colon="true">
+					<Form v-if="cellSelected === 'ABBRule' && eleType === 'node'" :label-width="80">
 						<!-- abb规则 -->
 						<FormItem :label="$t('ABBRule')">
 							<Input v-model="model.testAbb" :placeholder="$t('pleaseEnter') + $t('ABBRule')" />

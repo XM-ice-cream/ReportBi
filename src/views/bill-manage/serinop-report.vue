@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" :rules="ruleValiadate">
+									<Form ref="searchReq" :model="req" :label-width="80" :rules="ruleValiadate">
 										<!-- 站点 -->
 										<FormItem :label="$t('stepName')" prop="stationType">
 											<Select v-model="req.stationType" clearable filterable :placeholder="`${$t('pleaseEnter')} 站点`">

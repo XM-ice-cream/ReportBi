@@ -12,7 +12,7 @@
 		>
 			<!-- 页面表格 -->
 			<div class="comment">
-				<Form ref="searchReq" :model="selectObj" :label-width="120" :label-colon="true" @submit.native.prevent>
+				<Form ref="searchReq" :model="selectObj" :label-width="120" @submit.native.prevent>
 					<!-- trackingno -->
 					<FormItem label="TrackingNo" prop="trackingno">
 						<Input v-model.trim="selectObj.trackingno" :placeholder="$t('pleaseEnter') + 'TrackingNo'" />

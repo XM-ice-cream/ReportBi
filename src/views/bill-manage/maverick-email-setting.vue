@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="50" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="50" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 群组类型 -->
 										<FormItem label="群组类型" prop="grouP_TYPE">
 											<Select v-model.tirm="req.grouP_TYPE" transfer :placeholder="$t('pleaseSelect') + '群组类型'" clearable>

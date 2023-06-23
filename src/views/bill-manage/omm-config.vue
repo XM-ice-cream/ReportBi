@@ -3,7 +3,7 @@
 	<div class="page-style">
 		<!-- 右侧抽屉 Form表单 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" @submit.native.prevent>
 				<!-- 站点 -->
 				<FormItem label="站点" prop="station">
 					<Select v-model="submitData.station" clearable transfer :placeholder="$t('pleaseEnter') + '站点'">
@@ -89,7 +89,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="60" :label-colon="true" @submit.native.prevent>
+									<Form ref="searchReq" :model="req" :label-width="60" @submit.native.prevent>
 										<!-- 站点 -->
 										<FormItem label="站点" prop="station">
 											<Select v-model="req.station" clearable transfer :placeholder="$t('pleaseEnter') + '站点'">

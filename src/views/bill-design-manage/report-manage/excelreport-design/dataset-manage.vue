@@ -4,7 +4,7 @@
 		<div class="tableTabs">
 			<Tabs>
 				<TabPane label="数据集" :index="1" name="数据集">
-					<Form :label-width="150" :label-colon="true" inline @keyup.enter.native="queryAllDataSet">
+					<Form :label-width="150" inline @keyup.enter.native="queryAllDataSet">
 						<FormItem label="数据集名称">
 							<Input type="text" v-model="req.setName" cleabler />
 						</FormItem>
@@ -42,7 +42,7 @@
 				</TabPane>
 				<TabPane label="对应关系" :index="2" name="对应关系" v-if="dataSetDataList.length > 0">
 					<template v-for="(item, index) in dataSetDataList">
-						<Form :label-width="80" :label-colon="true" inline>
+						<Form :label-width="80" inline>
 							<FormItem label="数据集1">
 								<Select v-model="dataSetDataList[index].setName" clearable filterable transfer @on-change="setCodeChange(index)">
 									<Option v-for="(dataBaseItem, dataBaseIndex) in dataBaseList" :value="dataBaseItem.setName" :key="dataBaseIndex">

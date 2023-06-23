@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 数据集编码 -->
 										<FormItem :label="$t('setCode')" prop="setCode">
 											<Input v-model="req.setCode" :placeholder="$t('pleaseEnter') + $t('setCode')" @on-search="searchClick" />

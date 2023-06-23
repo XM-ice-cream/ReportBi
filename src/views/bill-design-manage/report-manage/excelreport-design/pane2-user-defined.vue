@@ -3,7 +3,7 @@
 	<div class="pane2-user-defined">
 		<!-- 左侧抽屉 -->
 		<Drawer v-model="drawerFlag" title="自定义分组" width="750" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :model="rightForm" :label-width="110" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="rightForm" :label-width="110" @submit.native.prevent>
 				<!-- 自定义分组类型：条件，公式分组 -->
 				<FormItem label="自定义分组" prop="userDefinedType">
 					<Select v-model="rightForm.userDefinedType" size="small" transfer class="showtype">

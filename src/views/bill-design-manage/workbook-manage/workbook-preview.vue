@@ -12,7 +12,7 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<div class="submitForm">
-										<Form ref="submitReq" :label-width="80" :label-colon="true">
+										<Form ref="submitReq" :label-width="80">
 											<template v-for="item in filterData">
 												<FormItem :label="item.columnRename">
 													<!-- 数组 -->

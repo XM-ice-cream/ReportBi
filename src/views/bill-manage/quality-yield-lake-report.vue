@@ -14,14 +14,7 @@
 											<Icon type="ios-funnel" />
 										</Button>
 										<div class="poptip-style-content" slot="content">
-											<Form
-												:label-width="70"
-												:label-colon="true"
-												@submit.native.prevent
-												ref="searchReq"
-												:model="req"
-												@keyup.native.enter="searchClick"
-											>
+											<Form :label-width="70" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="searchClick">
 												<!-- 流程名称 -->
 												<FormItem label="流程名称" prop="routeName">
 													<Select v-model="req.routeName">

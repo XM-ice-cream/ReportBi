@@ -3,7 +3,7 @@
 	<div class="page-style">
 		<!-- 右侧抽屉 Form表单 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :label-width="90" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :label-width="90" @submit.native.prevent>
 				<!-- 批量新增参数 -->
 				<FormItem label="批量新增" prop="batchData">
 					<Input type="text" v-model="batchData" placeholder="格式:SN1,SN2,SN3,SN4....SNn;Scrap" />
@@ -26,7 +26,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker

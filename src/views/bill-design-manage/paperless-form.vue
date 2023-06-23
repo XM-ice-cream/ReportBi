@@ -3,7 +3,7 @@
 	<div class="page-style">
 		<!-- 左侧抽屉 -->
 		<Modal v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" :closable="true" :before-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
+			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
 				<!-- 单据编码 -->
 				<FormItem label="单据编码">
 					<label>{{ submitData.billNumber }}</label>
@@ -46,7 +46,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 模板名称 -->
 										<FormItem label="模板名称" prop="templateId">
 											<Select v-model="req.templateId" clearable :placeholder="$t('pleaseSelect') + '模板名称'" transfer>

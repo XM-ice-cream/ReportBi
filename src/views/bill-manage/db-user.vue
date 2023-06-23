@@ -3,7 +3,7 @@
 	<div class="page-style">
 		<!-- 右侧抽屉 Form表单 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitData" :model="submitData" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitData" :model="submitData" :rules="ruleValidate" :label-width="120" @submit.native.prevent>
 				<!-- 员工工号 -->
 				<FormItem label="员工工号" prop="userID">
 					<Input v-model="submitData.userID" :placeholder="$t('pleaseEnter') + '员工工号'" :disabled="!isAdd" />
@@ -49,7 +49,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker

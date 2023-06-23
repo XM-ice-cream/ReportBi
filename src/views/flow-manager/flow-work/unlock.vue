@@ -3,7 +3,7 @@
 	<div>
 		<!-- 左侧抽屉 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="520" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" @submit.native.prevent>
 				<!-- 条码类型 -->
 				<FormItem :label="$t('barCodingType')" prop="barCodeType">
 					<Select

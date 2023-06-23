@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="70" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="70" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 预览服务器 -->
 										<FormItem :label="$t('previewServer')" prop="previewServerIP">
 											<Select transfer v-model="req.previewServerIP" clearable :placeholder="$t('pleaseSelect') + $t('previewServer')">

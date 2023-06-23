@@ -3,7 +3,7 @@
 	<!-- 函数管理 -->
 	<Modal :title="modalTitle" v-model="modelFlag" width="800" draggable :mask-closable="false" :mask="true" :before-close="cancelClick">
 		<div class="sortby-fields">
-			<Form ref="submitReq" :model="submitData" :label-width="100" :label-colon="true">
+			<Form ref="submitReq" :model="submitData" :label-width="100">
 				<!-- 排序类别 -->
 				<FormItem label="排序" prop="sortBy">
 					<Select v-model="submitData.sortBy" clearabled @on-change="changeSortBy">

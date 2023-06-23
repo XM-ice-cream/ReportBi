@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="50" :label-colon="true" @submit.native.prevent>
+									<Form ref="searchReq" :model="req" :label-width="50" @submit.native.prevent>
 										<!-- 小条码 -->
 										<FormItem :label="$t('sn')" prop="unitId">
 											<Input v-model.trim="req.unitId" :placeholder="$t('pleaseEnter') + $t('sn') + $t('multiple,separated')" />

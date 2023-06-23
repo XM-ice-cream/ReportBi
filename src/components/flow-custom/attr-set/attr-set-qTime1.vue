@@ -1,5 +1,5 @@
 <template>
-	<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" :label-colon="true">
+	<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" >
 		<Tabs v-model="stationName" @on-click="tabsClick">
 			<TabPane :label="$t('stationIn')" name="stationIn"></TabPane>
 			<TabPane :label="$t('stationOut')" name="stationOut"></TabPane>

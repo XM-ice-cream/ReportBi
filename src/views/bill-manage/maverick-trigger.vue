@@ -18,7 +18,6 @@
 												ref="searchReq"
 												:model="req"
 												:label-width="80"
-												:label-colon="true"
 												:rules="ruleValidate"
 												@submit.native.prevent
 												@keyup.native.enter="searchClick"

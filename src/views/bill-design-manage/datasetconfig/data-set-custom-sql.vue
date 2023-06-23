@@ -4,7 +4,7 @@
 	<Modal :title="modalTitle" :mask-closable="false" :width="1000" :closable="true" v-model="modalFlag" :before-close="closeDialog">
 		<Tabs class="comment" @on-click="isShow = false">
 			<TabPane label="自定义SQL">
-				<Form ref="submitReq" :model="submitData" :label-width="120" :label-colon="true" @submit.native.prevent>
+				<Form ref="submitReq" :model="submitData" :label-width="120" @submit.native.prevent>
 					<!-- 自定义sql名称 -->
 					<FormItem label="自定义sql名称" prop="label">
 						<Input v-model="submitData.label" placeholder="请输入自定义SQL名称" />

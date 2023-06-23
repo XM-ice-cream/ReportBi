@@ -7,7 +7,7 @@
 				<div slot="title">
 					<Row>
 						<i-col span="18">
-							<Form ref="searchReq" :model="req" inline :label-colon="true" class="card-style-form" @submit.native.prevent>
+							<Form ref="searchReq" :model="req" inline class="card-style-form" @submit.native.prevent>
 								<!-- 起始时间 -->
 								<FormItem :label="$t('startTime')" prop="startTime">
 									<DatePicker

@@ -3,7 +3,7 @@
 	<div class="pane3-condition">
 		<!-- 左侧抽屉 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="600" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :model="rightForm" :label-width="80" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="rightForm" :label-width="80" @submit.native.prevent>
 				<FormItem label="属性" prop="type">
 					<Select v-model="rightForm.type" size="small" transfer class="showtype" :label-in-value="true" @on-change="typeChange">
 						<Option v-for="item in attrList" :key="item.value" :value="item.value">{{ item.label }}</Option>

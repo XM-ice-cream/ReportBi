@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" :label-colon="true">
+		<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90">
 			<!--站内-->
 			<Row>
 				<i-col span="12">

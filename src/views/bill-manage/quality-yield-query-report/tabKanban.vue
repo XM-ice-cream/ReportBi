@@ -3,7 +3,7 @@
 		<Card :bordered="false" dis-hover class="card-style">
 			<div slot="title">
 				<Row>
-					<Form :label-width="70" inline :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="pageLoad">
+					<Form :label-width="70" inline @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="pageLoad">
 						<!-- 起始时间 -->
 						<FormItem :label="$t('startTime')" prop="startTime">
 							<DatePicker

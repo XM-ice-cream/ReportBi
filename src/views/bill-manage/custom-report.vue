@@ -12,15 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form
-										ref="searchReq"
-										:rules="ruleValidate"
-										:model="req"
-										:label-width="80"
-										:label-colon="true"
-										@submit.native.prevent
-										@keyup.native.enter="searchClick"
-									>
+									<Form ref="searchReq" :rules="ruleValidate" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<FormItem :label="$t('database')" prop="databaseId">
 											<Select transfer v-model="req.databaseId" clearable :placeholder="$t('pleaseSelect') + $t('database')">
 												<Option v-for="(item, i) in databaseData" :value="item.id" :key="i">

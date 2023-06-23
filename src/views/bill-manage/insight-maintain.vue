@@ -12,7 +12,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="60" :label-colon="true" @submit.native.prevent>
+									<Form ref="searchReq" :model="req" :label-width="60" @submit.native.prevent>
 										<div class="poptip-style-button">
 											<Button @click="resetClick">{{ $t("reset") }}</Button>
 											<Button type="primary" @click="searchClick">{{ $t("query") }}</Button>
@@ -51,7 +51,7 @@
 		<!-- 左侧抽屉 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="520" :mask-closable="false" @on-close="cancelClick">
 			<!--   设备绑定   -->
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="110" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="110" @submit.native.prevent>
 				<!-- 机种 -->
 				<FormItem :label="$t('modelkey')" prop="modelkey">
 					<Input clearable v-model.trim="submitData.modelkey" :placeholder="$t('pleaseEnter') + $t('modelkey')" />

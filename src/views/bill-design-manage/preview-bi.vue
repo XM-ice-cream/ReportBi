@@ -5,7 +5,7 @@
 		<div class="comment">
 			<Card :bordered="false" dis-hover class="card-style">
 				<div slot="title">
-					<Form ref="searchReq" :model="req" inline :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+					<Form ref="searchReq" :model="req" inline :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 						<!-- 机种 -->
 						<FormItem label="机种" prop="model">
 							<Select

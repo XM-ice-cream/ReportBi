@@ -3,7 +3,7 @@
 	<div class="page-style">
 		<!-- 右侧抽屉 Form表单 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :label-width="90" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="submitData" :label-width="90" @submit.native.prevent>
 				<FormItem label="FA回复信息" prop="fA_REASON">
 					<Input v-model="submitData.fA_REASON" :placeholder="$t('pleaseEnter') + 'FA回复信息'" clearable />
 				</FormItem>
@@ -30,15 +30,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form
-										ref="searchReq"
-										:model="req"
-										:label-width="80"
-										:label-colon="true"
-										:rules="ruleValidate"
-										@submit.native.prevent
-										@keyup.native.enter="searchClick"
-									>
+									<Form ref="searchReq" :model="req" :label-width="80" :rules="ruleValidate" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker

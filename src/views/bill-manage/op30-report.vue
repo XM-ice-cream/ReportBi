@@ -10,7 +10,7 @@
 							<Icon type="ios-funnel" />
 						</Button>
 						<div class="poptip-style-content" slot="content">
-							<Form class="poptip-style-content" ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent>
+							<Form class="poptip-style-content" ref="searchReq" :model="req" :label-width="80" @submit.native.prevent>
 								<!-- 开始日期 -->
 								<FormItem :label="$t('startTime')" prop="startTime" v-show="!req.isAuto">
 									<DatePicker

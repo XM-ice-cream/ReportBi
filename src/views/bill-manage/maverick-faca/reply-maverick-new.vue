@@ -3,7 +3,7 @@
 	<div style="height: 100%">
 		<!-- 页面表格 -->
 		<div class="comment">
-			<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" @submit.native.prevent>
 				<!-- 回复群组 -->
 				<FormItem label="回复群组" prop="mailDepartArry">
 					<CheckboxGroup v-model="req.mailDepartArry" clearable @on-change="changeChekBox">
@@ -13,7 +13,7 @@
 			</Form>
 			<div style="display: flex; justify-content: space-between">
 				<!-- FA -->
-				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
+				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" @submit.native.prevent>
 					<!-- 回复类型 -->
 					<FormItem label="回复类型">
 						<Label style="font-weight: bold">FA</Label>
@@ -69,7 +69,7 @@
 					</FormItem>
 				</Form>
 				<!-- CA-->
-				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
+				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" @submit.native.prevent>
 					<!-- 回复类型 -->
 					<FormItem label="回复类型">
 						<Label style="font-weight: bold">CA</Label>
@@ -124,7 +124,7 @@
 					</FormItem>
 				</Form>
 				<!-- Q-->
-				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent>
+				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" @submit.native.prevent>
 					<!-- 回复类型 -->
 					<FormItem label="回复类型">
 						<Label style="font-weight: bold">Q</Label>
@@ -162,7 +162,7 @@
 				</Form>
 			</div>
 			<!-- checkPoint -->
-			<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" :label-colon="true" @submit.native.prevent inline>
+			<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="120" @submit.native.prevent inline>
 				<!-- checkPoint -->
 				<FormItem label="checkPoint" prop="ischeckPoint">
 					<Checkbox v-model="req.ischeckPoint"></Checkbox>

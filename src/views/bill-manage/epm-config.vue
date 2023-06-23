@@ -3,7 +3,7 @@
 	<div class="page-style">
 		<!-- 右侧抽屉 Form表单 -->
 		<Drawer v-model="drawerFlag" :title="drawerTitle" width="500" :mask-closable="false" @on-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="90" @submit.native.prevent>
 				<!-- 项目 -->
 				<FormItem label="项目" prop="item">
 					<Input v-model="submitData.item" :placeholder="$t('pleaseEnter') + '项目'" />
@@ -71,7 +71,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="60" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="60" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 项目 -->
 										<FormItem label="项目" prop="item">
 											<Input v-model.trim="req.item" :placeholder="$t('pleaseEnter') + '项目'" />

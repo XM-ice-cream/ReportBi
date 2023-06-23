@@ -2,7 +2,7 @@
 	<div style="height: 100%">
 		<Modal fullscreen v-model="modal" footer-hide title="Fullscreen Modal" :mask-closable="false" :scrollable="true" @on-cancel="modalCancel">
 			<Row>
-				<Form :label-width="70" inline :label-colon="true" @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="pageLoad">
+				<Form :label-width="70" inline @submit.native.prevent ref="searchReq" :model="req" @keyup.native.enter="pageLoad">
 					<!-- 起始时间 -->
 					<FormItem :label="$t('startTime')" prop="startTime">
 						<DatePicker

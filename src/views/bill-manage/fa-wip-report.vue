@@ -14,7 +14,7 @@
 											<Icon type="ios-funnel" />
 										</Button>
 										<div class="poptip-style-content" slot="content">
-											<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true">
+											<Form ref="searchReq" :model="req" :label-width="80">
 												<!-- 起始时间 -->
 												<FormItem :label="$t('startTime')" prop="startTime">
 													<DatePicker

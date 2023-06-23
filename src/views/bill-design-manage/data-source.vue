@@ -2,10 +2,20 @@
 <template>
 	<div class="page-style">
 		<!-- 左侧抽屉 -->
-		<Modal v-model="drawerFlag" :title="drawerTitle" width="1000" :mask-closable="false" :closable="true" :before-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
+		<Modal
+			v-model="drawerFlag"
+			draggable
+			scrollable
+			width="800"
+			:title="drawerTitle"
+			:mask-closable="false"
+			:closable="true"
+			:before-close="cancelClick"
+			:reset-drag-position="true"
+		>
+			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
 				<Row :gutter="10">
-					<Col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 数据源类型 -->
 						<FormItem :label="$t('dataSourceType')" prop="sourceType">
 							<Select v-model="submitData.sourceType" clearable :placeholder="$t('pleaseSelect') + $t('status')" transfer>
@@ -15,14 +25,14 @@
 							</Select>
 						</FormItem>
 					</Col>
-					<Col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 数据源编码 -->
 						<FormItem :label="$t('dataSourceCode')" prop="sourceCode">
 							<Input v-model.trim="submitData.sourceCode" :placeholder="$t('pleaseEnter') + $t('dataSourceCode')" v-if="this.isAdd" />
 							<span v-else>{{ submitData.sourceCode }}</span>
 						</FormItem>
 					</Col>
-					<Col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 数据源名称 -->
 						<FormItem :label="$t('dataSourceName')" prop="sourceName">
 							<Input v-model.trim="submitData.sourceName" :placeholder="$t('pleaseEnter') + $t('dataSourceName')" />
@@ -90,8 +100,8 @@
 			<!-- 按钮 -->
 			<div slot="footer">
 				<Button size="small" @click="cancelClick">取消</Button>
-				<Button size="small" @click="testClick" class="testBtn">测试</Button>
-				<Button size="small" @click="submitClick(false)" style="padding: 5px 16px">保存</Button>
+				<Button size="small" @click="testClick">测试</Button>
+				<Button size="small" @click="submitClick(false)">保存</Button>
 				<Button size="small" @click="submitClick(true)">保存并跳转至数据集</Button>
 			</div>
 		</Modal>
@@ -106,7 +116,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 										<!-- 数据源编码 -->
 										<FormItem :label="$t('dataSourceCode')" prop="sourceCode">
 											<Input v-model="req.sourceCode" :placeholder="$t('pleaseEnter') + $t('dataSourceCode')" @on-search="searchClick" />

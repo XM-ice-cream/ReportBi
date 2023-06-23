@@ -13,7 +13,7 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<!-- @submit.native.prevent @keyup.native.enter="searchClick" -->
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent>
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent>
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker

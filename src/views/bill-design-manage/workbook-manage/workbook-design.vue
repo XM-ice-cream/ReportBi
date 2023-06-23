@@ -15,7 +15,7 @@
 						<Panel name="base">
 							基础信息
 							<template #content>
-								<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100" :label-colon="true">
+								<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
 									<!-- 工作簿名称 -->
 									<FormItem :label="$t('workBookName')" prop="workBookName">
 										<Input v-model.trim="submitData.workBookName" :placeholder="$t('pleaseEnter') + $t('workBookName')" cleabler />

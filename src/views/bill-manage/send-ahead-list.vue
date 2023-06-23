@@ -2,7 +2,7 @@
 <template>
 	<div class="page-style send-ahead-report">
 		<Drawer v-model="drawerFlag" :title="`Sendahead List${isAdd ? '新增' : '编辑'}`" width="650" :mask-closable="false" :before-close="cancelClick">
-			<Form ref="submitReq" :model="submitData" :label-width="80" :label-colon="true" @submit.native.prevent>
+			<Form ref="submitReq" :model="submitData" :label-width="80" @submit.native.prevent>
 				<!-- 机种 -->
 				<FormItem label="机种" prop="project">
 					<Select v-model="submitData.project" clearable filterable :placeholder="$t('pleaseSelect') + '机种'" transfer>
@@ -80,7 +80,7 @@
 									<Icon type="ios-funnel" />
 								</Button>
 								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" :label-colon="true" @submit.native.prevent>
+									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent>
 										<!-- 起始时间 -->
 										<FormItem :label="$t('startTime')" prop="startTime">
 											<DatePicker

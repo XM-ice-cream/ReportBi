@@ -10,7 +10,7 @@
 							<Icon type="ios-funnel" />
 						</Button>
 						<div class="poptip-style-content" slot="content">
-							<Form :label-width="80" :label-colon="true" @submit.native.prevent @keyup.native.enter="searchClick">
+							<Form :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 								<FormItem :label="$t('workOrder')" prop="workOrder">
 									<Input v-model="req.workOrder" :placeholder="$t('pleaseEnter') + $t('workOrder')" />
 								</FormItem>

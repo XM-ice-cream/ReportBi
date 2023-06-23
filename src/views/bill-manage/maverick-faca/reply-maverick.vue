@@ -5,7 +5,7 @@
 		<Drawer class="reply-maverick" v-model="drawerFlag" title="回复列表信息" width="800" :mask-closable="false" @on-close="cancelClick">
 			<!-- 页面表格 -->
 			<div class="comment">
-				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="90" :label-colon="true" @submit.native.prevent>
+				<Form ref="submitReq" :model="req" :rules="ruleValidate" :label-width="90" @submit.native.prevent>
 					<!-- 回复类型 -->
 					<FormItem label="回复类型">
 						<Label>{{ selectArr[0].status }}</Label>
