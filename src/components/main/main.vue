@@ -56,7 +56,7 @@ import Language from "./components/language";
 import Message from "./components/message";
 import ErrorStore from "./components/error-store";
 import { mapMutations, mapGetters } from "vuex";
-import { getNewTagList, routeEqual, initMenuList } from "@/libs/utils";
+import { getNewTagList, routeEqual, initMenuList, userLocalInfo } from "@/libs/utils";
 import { objEqual } from "@/libs/tools";
 import routers from "@/router/routers";
 import minLogo from "@/assets/images/logo-min.png";
@@ -163,7 +163,10 @@ export default {
 			let list = [];
 			initMenuList(list, this.menuList);
 			let menu = list.find((x) => x.name === item.name);
-			if (menu) this.$store.commit("updateMenuId", menu.id);
+			if (menu) {
+				userLocalInfo({ mId: menu.id });
+				this.$store.commit("updateMenuId", menu.id);
+			}
 			this.turnToPage(item);
 		},
 		refreshView() {
@@ -197,8 +200,10 @@ export default {
 			let list = [];
 			initMenuList(list, this.menuList);
 			let menu = list.find((x) => x.name === newRoute.name);
-			if (menu) this.$store.commit("updateMenuId", menu.id);
-
+			if (menu) {
+				userLocalInfo({ mId: menu.id });
+				this.$store.commit("updateMenuId", menu.id);
+			}
 			const { name, query, params, meta } = newRoute;
 			this.addTag({
 				route: { name, query, params, meta },

@@ -98,6 +98,7 @@ export default {
   }) {
     return new Promise((resolve) => {
       userLocalInfo({
+        mId: "",
         token: '',
         refreshToken: '',
         userInfo: {},
