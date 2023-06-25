@@ -27,10 +27,13 @@
 				<div class="previewCard">
 					<template v-for="item in roleBtn">
 						<div class="cardCell" title="点击查看" @click="turnToWorkBookManage(item.href, item.sortCode)">
-							<img src="../../assets/images/bg2.jpg" class="img" />
+							<!-- <img src="../../assets/images/bg2.jpg" class="img" /> -->
 							<span class="title">
 								<span class="name" :title="item.title">
+									<Icon type="ios-apps" v-if="item.name == 'commonTemplate'" />
+									<Icon type="ios-stats" v-else />
 									{{ item.title }}
+									<Icon type="md-arrow-forward" class="icon-forward" />
 								</span>
 								<span class="sub-name">
 									{{ item.remark }}
@@ -155,22 +158,28 @@ export default {
 	background-color: #f5f7f9;
 	padding-bottom: 1rem;
 	.cardCell {
-		/*	width: 32%;*/
 		width: 23.8%;
 		/* background: #ccc; */
 		border: 2px solid #fafcff;
 		box-shadow: 3px 5px 7px #d0dbf194;
 		margin-top: 15px;
 		margin-left: 15px;
+		padding: 10px 15px;
 		position: relative;
 		background: #fff;
-		border-radius: 12px;
+		border-radius: 0;
 		cursor: pointer;
 		transition: all 0.2s ease-out;
 		&:hover {
 			transform: translateY(-5px);
 			box-shadow: 0 6px 16px 2px rgba(7 12 20 8%) !important;
-			border: 2px solid #009cf1 !important;
+			.title .name {
+				color: #27ce88;
+				.icon-forward {
+					color: #27ce88;
+					animation: promotionV5G023Arrow 0.9s linear infinite;
+				}
+			}
 		}
 		.img {
 			width: 100%;
@@ -179,30 +188,53 @@ export default {
 		}
 		.title {
 			width: 100%;
-			line-height: 2rem;
 			display: inline-block;
-			padding: 0.1rem;
-			margin: 0.2rem;
-			padding-bottom: 0.9rem;
-			font-size: 0.92rem;
-			color: #3a3b3ae0;
-			overflow: hidden;
-
-			white-space: nowrap;
-
+			padding: 10px;
 			.name {
 				width: 100%;
-				font-weight: 600;
+				/* font-weight: 600; */
 				display: block;
 				text-overflow: ellipsis;
+				padding: 5px 0;
+				font-size: 20px;
+				color: #222222;
+				position: relative;
+				height: 50px;
+				i {
+					font-size: 24px;
+					color: #27ce88;
+				}
+				.icon-forward {
+					position: absolute;
+					right: 0px;
+					color: #222222;
+				}
 			}
 			.sub-name {
 				width: 100%;
 				display: block;
 				text-overflow: ellipsis;
 				font-size: 0.14rem;
+				padding: 10px 0;
 			}
 		}
+	}
+}
+@keyframes promotionV5G023Arrow {
+	0% {
+		right: 0;
+	}
+
+	33% {
+		right: 6px;
+	}
+
+	67% {
+		right: 6px;
+	}
+
+	100% {
+		right: 0px;
 	}
 }
 </style>
