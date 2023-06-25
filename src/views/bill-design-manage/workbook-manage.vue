@@ -369,6 +369,16 @@ export default {
 	},
 };
 </script>
+<style>
+.workbook-manage .ivu-table .ivu-tag-dot {
+	width: 100px;
+	position: relative;
+}
+.workbook-manage .ivu-table .ivu-tag-dot-inner {
+	float: left;
+	top: 7px;
+}
+</style>
 
 <style scoped lang="less">
 :deep(.ivu-tag-text) {
