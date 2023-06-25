@@ -24,7 +24,7 @@
 					</Form>
 				</div>
 				<!-- 预览Card -->
-				<div class="previewCard">
+				<div class="previewBiCard">
 					<template v-for="item in roleBtn">
 						<div class="cardCell" title="点击查看" @click="turnToWorkBookManage(item.href, item.sortCode)">
 							<!-- <img src="../../assets/images/bg2.jpg" class="img" /> -->
@@ -147,7 +147,7 @@ export default {
 }
 </style>
 <style scoped lang="less">
-.previewCard {
+.previewBiCard {
 	height: calc(100% - 55px);
 	display: flex;
 	flex-wrap: wrap;
@@ -235,6 +235,28 @@ export default {
 
 	100% {
 		right: 0px;
+	}
+}
+
+// 适配
+@media (min-width: 1280px) {
+	.previewBiCard .cardCell {
+		width: 31.6%;
+	}
+}
+@media (min-width: 1536px) {
+	.previewBiCard .cardCell {
+		width: 23.7%;
+	}
+}
+@media (min-width: 1745.45px) {
+	.previewBiCard .cardCell {
+		width: 23.8%;
+	}
+}
+@media (min-width: 1920px) {
+	.previewBiCard .cardCell {
+		width: 24%;
 	}
 }
 </style>

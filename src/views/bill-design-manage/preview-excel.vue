@@ -46,7 +46,7 @@
 					</Form>
 				</div>
 				<!-- 预览Card -->
-				<div class="previewCard">
+				<div class="previewExcelCard">
 					<template v-for="item in data">
 						<div class="cardCell" title="点击查看" @click="preview(item.reportCode, item.reportName)">
 							<span class="title">
@@ -269,7 +269,7 @@ export default {
 }
 </style>
 <style scoped lang="less">
-.previewCard {
+.previewExcelCard {
 	height: calc(100% - 55px);
 	display: flex;
 	flex-wrap: wrap;
@@ -380,6 +380,27 @@ export default {
 				font-weight: bold;
 			}
 		}
+	}
+}
+// 适配
+@media (min-width: 1280px) {
+	.previewExcelCard .cardCell {
+		width: 31.6%;
+	}
+}
+@media (min-width: 1536px) {
+	.previewExcelCard .cardCell {
+		width: 23.7%;
+	}
+}
+@media (min-width: 1745.45px) {
+	.previewExcelCard .cardCell {
+		width: 23.8%;
+	}
+}
+@media (min-width: 1920px) {
+	.previewExcelCard .cardCell {
+		width: 24%;
 	}
 }
 </style>
