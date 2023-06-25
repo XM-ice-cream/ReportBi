@@ -10,339 +10,357 @@
 		<div class="workbook-container">
 			<div class="top-container">
 				<!-- 左侧数据集 -->
-				<div class="left-box" :class="baseInfoPanel">
-					<Collapse v-model="baseInfoPanel" class="baseinfo">
-						<Panel name="base">
-							基础信息
-							<template #content>
-								<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
-									<!-- 工作簿名称 -->
-									<FormItem :label="$t('workBookName')" prop="workBookName">
-										<Input v-model.trim="submitData.workBookName" :placeholder="$t('pleaseEnter') + $t('workBookName')" cleabler />
-									</FormItem>
-									<!-- 工作簿编码 -->
-									<FormItem :label="$t('workBookCode')" prop="workBookCode">
-										<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" cleabler />
-									</FormItem>
+				<Split v-model="split">
+					<template #left>
+						<div class="left-box" :class="baseInfoPanel">
+							<Collapse v-model="baseInfoPanel" class="baseinfo">
+								<Panel name="base">
+									基础信息
+									<template #content>
+										<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
+											<!-- 工作簿名称 -->
+											<FormItem :label="$t('workBookName')" prop="workBookName">
+												<Input v-model.trim="submitData.workBookName" :placeholder="$t('pleaseEnter') + $t('workBookName')" cleabler />
+											</FormItem>
+											<!-- 工作簿编码 -->
+											<FormItem :label="$t('workBookCode')" prop="workBookCode">
+												<Input v-model.trim="submitData.workBookCode" :placeholder="$t('pleaseEnter') + $t('workBookCode')" cleabler />
+											</FormItem>
 
-									<!-- 厂区 -->
-									<FormItem label="厂区" prop="opt1">
-										<Select v-model="submitData.opt1" filterable clearable :placeholder="$t('pleaseSelect') + '厂区'">
-											<Option v-for="(item, index) in opt1List" :value="item.detailCode" :key="index">{{ item.detailName }}</Option>
-										</Select>
-									</FormItem>
-									<!-- 机种 -->
-									<FormItem label="机种" prop="opt2">
-										<Select
-											v-model="submitData.opt2"
-											filterable
-											clearable
-											:placeholder="$t('pleaseSelect') + $t('setName')"
-											@on-change="getColumnList"
+											<!-- 厂区 -->
+											<FormItem label="厂区" prop="opt1">
+												<Select v-model="submitData.opt1" filterable clearable :placeholder="$t('pleaseSelect') + '厂区'">
+													<Option v-for="(item, index) in opt1List" :value="item.detailCode" :key="index">{{ item.detailName }}</Option>
+												</Select>
+											</FormItem>
+											<!-- 机种 -->
+											<FormItem label="机种" prop="opt2">
+												<Select
+													v-model="submitData.opt2"
+													filterable
+													clearable
+													:placeholder="$t('pleaseSelect') + $t('setName')"
+													@on-change="getColumnList"
+												>
+													<Option v-for="(item, index) in opt2List" :value="item.detailCode" :key="index">{{ item.detailName }}</Option>
+												</Select>
+											</FormItem>
+											<!-- 是否公共 -->
+											<FormItem label="公共模型" prop="opt3">
+												<i-switch size="large" v-model="submitData.opt3" true-value="1" false-value="0">
+													<span slot="open">是</span>
+													<span slot="close">否</span>
+												</i-switch>
+											</FormItem>
+											<!-- 数据集 -->
+											<FormItem :label="$t('setName')" prop="datasetId">
+												<Select
+													v-model="submitData.datasetId"
+													filterable
+													clearable
+													:placeholder="$t('pleaseSelect') + $t('setName')"
+													@on-change="getColumnList"
+												>
+													<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
+												</Select>
+											</FormItem>
+
+											<!-- 最大数据量 -->
+											<FormItem label="最大数据量" prop="maxNumber">
+												<Input v-model.trim="submitData.maxNumber" :placeholder="$t('pleaseEnter') + '最大数据量【推荐2000笔】'" cleabler />
+											</FormItem>
+											<!-- 是否有效 -->
+											<FormItem :label="$t('enabled')" prop="enabled">
+												<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
+													<span slot="open">{{ $t("open") }}</span>
+													<span slot="close">{{ $t("close") }}</span>
+												</i-switch>
+											</FormItem>
+										</Form>
+									</template>
+								</Panel>
+							</Collapse>
+							<div class="left-tree" :style="baseInfoPanel == 'base' ? 'height: calc(100% - 410px)' : ''">
+								<Input
+									v-model="submitData.columnName"
+									placeholder="请筛选信息"
+									clearable
+									suffix="ios-search"
+									@on-change="getColumnList"
+									style="margin-bottom: 10px"
+								/>
+								<ul class="tree">
+									<li v-for="(item, index) in data" :key="index" class="tree-father">
+										<div @click="item.isShow = !item.isShow" class="textOverhidden">
+											<Icon type="ios-arrow-forward" :style="{ transform: item.isShow ? 'rotate(90deg)' : 'rotate(0deg)' }" />
+											<Icon type="md-apps" /> {{ item.labelName }}
+										</div>
+
+										<ul class="subtree" v-if="item.isShow">
+											<draggable
+												v-model="item.children"
+												:group="{ name: 'site', pull: 'clone', put: 'false' }"
+												:sort="false"
+												:forceFallback="true"
+												style="height: 99%"
+												dragClass="dragClass"
+												@end="(e) => dragEnd(e, 'tree')"
+											>
+												<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
+													<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
+													<template v-if="['2'].includes(subitem.columnType)">
+														<span style="color: #2bac25; margin-right: -5px; margin-top: -2px">=</span>
+													</template>
+													<!-- 表 对应字段 -->
+													<!-- 字符串 -->
+													<icon custom="iconfont icon-string" v-if="subitem.dataType === 'String'" />
+													<!-- 数字 -->
+													<icon custom="iconfont icon-huatifuhao" v-else-if="subitem.dataType === 'Number'" style="color: #2bac25" />
+													<!-- 时间 -->
+													<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
+													<!-- 任意类型 -->
+													<icon custom="iconfont icon-huatifuhao" v-else />
+
+													<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop :title="subitem.columnName">
+														<span class="columnname-text">{{ subitem.columnName }}</span>
+														<!-- 下拉框 -->
+														<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem, 0, 0, 'create-fileds')">
+															<Icon type="ios-arrow-down"></Icon>
+															<template #list>
+																<DropdownMenu>
+																	<!-- 编辑 -->
+																	<DropdownItem name="edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
+																	<!-- 维度转指标 传0【自定义字段不可转】 -->
+																	<DropdownItem name="indicators" v-if="subitem.columnType != '2' && subitem.dataType !== 'Number'"
+																		>转换为指标</DropdownItem
+																	>
+																	<!-- 指标转维度 传1【自定义字段不可转】 -->
+																	<DropdownItem name="dimension" v-if="subitem.columnType != '2' && subitem.dataType == 'Number'"
+																		>转换为维度</DropdownItem
+																	>
+																	<!-- 创建计算字段 -->
+																	<DropdownItem name="create">创建计算字段</DropdownItem>
+																	<!-- 删除 -->
+																	<DropdownItem name="delete" v-if="subitem.columnType == '2'">删除</DropdownItem>
+																</DropdownMenu>
+															</template>
+														</Dropdown>
+													</div>
+												</li>
+											</draggable>
+										</ul>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</template>
+					<template #right>
+						<Split v-model="split2">
+							<template #left>
+								<!-- 筛选器、标记 -->
+								<div class="center-box">
+									<!-- 筛选器 -->
+									<div class="filter">
+										<div class="title">筛选器</div>
+										<draggable
+											group="site"
+											v-model="filterData"
+											id="filter"
+											ghost-class="ghost"
+											style="height: calc(100% - 50px); overflow: auto"
+											@end="(e) => dragEnd(e, 'filter')"
 										>
-											<Option v-for="(item, index) in opt2List" :value="item.detailCode" :key="index">{{ item.detailName }}</Option>
-										</Select>
-									</FormItem>
-									<!-- 是否公共 -->
-									<FormItem label="公共模型" prop="opt3">
-										<i-switch size="large" v-model="submitData.opt3" true-value="1" false-value="0">
-											<span slot="open">是</span>
-											<span slot="close">否</span>
-										</i-switch>
-									</FormItem>
-									<!-- 数据集 -->
-									<FormItem :label="$t('setName')" prop="datasetId">
-										<Select
-											v-model="submitData.datasetId"
-											filterable
-											clearable
-											:placeholder="$t('pleaseSelect') + $t('setName')"
-											@on-change="getColumnList"
-										>
-											<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
-										</Select>
-									</FormItem>
-
-									<!-- 最大数据量 -->
-									<FormItem label="最大数据量" prop="maxNumber">
-										<Input v-model.trim="submitData.maxNumber" :placeholder="$t('pleaseEnter') + '最大数据量【推荐2000笔】'" cleabler />
-									</FormItem>
-									<!-- 是否有效 -->
-									<FormItem :label="$t('enabled')" prop="enabled">
-										<i-switch size="large" v-model="submitData.enabled" :true-value="1" :false-value="0">
-											<span slot="open">{{ $t("open") }}</span>
-											<span slot="close">{{ $t("close") }}</span>
-										</i-switch>
-									</FormItem>
-								</Form>
-							</template>
-						</Panel>
-					</Collapse>
-					<div class="left-tree" :style="baseInfoPanel == 'base' ? 'height: calc(100% - 410px)' : ''">
-						<Input
-							v-model="submitData.columnName"
-							placeholder="请筛选信息"
-							clearable
-							suffix="ios-search"
-							@on-change="getColumnList"
-							style="margin-bottom: 10px"
-						/>
-						<ul class="tree">
-							<li v-for="(item, index) in data" :key="index" class="tree-father">
-								<div @click="item.isShow = !item.isShow" class="textOverhidden">
-									<Icon type="ios-arrow-forward" :style="{ transform: item.isShow ? 'rotate(90deg)' : 'rotate(0deg)' }" />
-									<Icon type="md-apps" /> {{ item.labelName }}
-								</div>
-
-								<ul class="subtree" v-if="item.isShow">
-									<draggable
-										v-model="item.children"
-										:group="{ name: 'site', pull: 'clone', put: 'false' }"
-										:sort="false"
-										:forceFallback="true"
-										style="height: 99%"
-										dragClass="dragClass"
-										@end="(e) => dragEnd(e, 'tree')"
-									>
-										<li class="subtree-li" v-for="(subitem, subIndex) in item.children" :key="subIndex">
-											<!-- 自定义字段 0 代表维度转换为指标 1 代表指标转维度 2 代表自定义字段-->
-											<template v-if="['2'].includes(subitem.columnType)">
-												<span style="color: #47a67f; margin-right: -5px; margin-top: -2px">=</span>
-											</template>
-											<!-- 表 对应字段 -->
-											<!-- 字符串 -->
-											<icon custom="iconfont icon-string" v-if="subitem.dataType === 'String'" />
-											<!-- 数字 -->
-											<icon custom="iconfont icon-huatifuhao" v-else-if="subitem.dataType === 'Number'" style="color: #47a67f" />
-											<!-- 时间 -->
-											<icon custom="iconfont icon-riqishijian" v-else-if="subitem.dataType === 'DateTime'" />
-											<!-- 任意类型 -->
-											<icon custom="iconfont icon-huatifuhao" v-else />
-
-											<div :class="subitem.dataType === 'Number' ? 'number-value' : 'value'" @click.stop :title="subitem.columnName">
-												<span class="columnname-text">{{ subitem.columnName }}</span>
+											<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
+												<div class="textOverhidden" style="width: 80%" @dblclick="item.isEdit = true" v-if="!item.isEdit">
+													{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
+												</div>
+												<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
 												<!-- 下拉框 -->
-												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, subitem, 0, 0, 'create-fileds')">
+												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
 													<Icon type="ios-arrow-down"></Icon>
 													<template #list>
 														<DropdownMenu>
 															<!-- 编辑 -->
-															<DropdownItem name="edit" v-if="subitem.columnType == '2'">编辑</DropdownItem>
-															<!-- 维度转指标 传0【自定义字段不可转】 -->
-															<DropdownItem name="indicators" v-if="subitem.columnType != '2' && subitem.dataType !== 'Number'"
-																>转换为指标</DropdownItem
-															>
-															<!-- 指标转维度 传1【自定义字段不可转】 -->
-															<DropdownItem name="dimension" v-if="subitem.columnType != '2' && subitem.dataType == 'Number'"
-																>转换为维度</DropdownItem
-															>
-															<!-- 创建计算字段 -->
-															<DropdownItem name="create">创建计算字段</DropdownItem>
+															<DropdownItem name="edit">编辑筛选器</DropdownItem>
 															<!-- 删除 -->
-															<DropdownItem name="delete" v-if="subitem.columnType == '2'">删除</DropdownItem>
+															<DropdownItem name="delete">删除筛选器</DropdownItem>
 														</DropdownMenu>
 													</template>
 												</Dropdown>
-											</div>
-										</li>
-									</draggable>
-								</ul>
-							</li>
-						</ul>
-					</div>
-				</div>
-				<!-- 筛选器、标记 -->
-				<div class="center-box">
-					<!-- 筛选器 -->
-					<div class="filter">
-						<div class="title">筛选器</div>
-						<draggable
-							group="site"
-							v-model="filterData"
-							id="filter"
-							ghost-class="ghost"
-							style="height: calc(100% - 50px); overflow: auto"
-							@end="(e) => dragEnd(e, 'filter')"
-						>
-							<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
-								<div class="textOverhidden" style="width: 80%" @dblclick="item.isEdit = true" v-if="!item.isEdit">
-									{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
-								</div>
-								<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
-								<!-- 下拉框 -->
-								<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
-									<Icon type="ios-arrow-down"></Icon>
-									<template #list>
-										<DropdownMenu>
-											<!-- 编辑 -->
-											<DropdownItem name="edit">编辑筛选器</DropdownItem>
-											<!-- 删除 -->
-											<DropdownItem name="delete">删除筛选器</DropdownItem>
-										</DropdownMenu>
-									</template>
-								</Dropdown>
-							</span>
-						</draggable>
-					</div>
-					<!-- 标记 -->
-					<div class="mark">
-						<div class="title">标记</div>
-						<!-- 手风琴 -->
-						<Collapse accordion v-model="collapse" style="max-height: calc(100% - 30px); overflow: hidden">
-							<Panel
-								v-for="(item, markIndex) in markData"
-								:key="markIndex"
-								:name="markIndex.toString()"
-								class="markPanel"
-								:title="item.name"
-								@dblclick.stop
-							>
-								{{ item.name }}
-
-								<template #content>
-									<Select v-model="markData[markIndex].chartType" clearable placeholder="请选择图表" @on-change="changeMarks(markIndex)">
-										<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-									</Select>
-									<div class="mark-box">
-										<draggable
-											group="site"
-											v-model="markData[markIndex].data"
-											:id="`color,${markIndex}`"
-											ghost-class="ghost"
-											class="box-cell"
-											:name="markIndex"
-										>
-											<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
-										</draggable>
-										<!-- 文本宽度只能在 全部 中设定 -->
-										<draggable
-											group="site"
-											v-model="markData[markIndex].data"
-											:id="`labelWidth,${markIndex}`"
-											ghost-class="ghost"
-											class="box-cell"
-											v-if="markIndex == 0"
-										>
-											<div class="labelWidth"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
-										</draggable>
-
-										<draggable group="site" v-model="markData[markIndex].data" :id="`mark,${markIndex}`" ghost-class="ghost" class="box-cell">
-											<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
-										</draggable>
-										<draggable group="site" v-model="markData[markIndex].data" :id="`info,${markIndex}`" ghost-class="ghost" class="box-cell">
-											<div class="detail-info"><Icon type="ios-more" />详细信息</div>
-										</draggable>
-										<!-- 角度只能在 全部且饼图 中设定-->
-										<draggable
-											group="site"
-											v-model="markData[markIndex].data"
-											:id="`angle,${markIndex}`"
-											ghost-class="ghost"
-											class="box-cell"
-											v-if="markIndex == 0 && markData[markIndex].chartType == 'componentPie'"
-										>
-											<div class="angle"><Icon custom="iconfont icon-jiaodu" />角度</div>
-										</draggable>
-										<draggable
-											group="site"
-											v-model="markData[markIndex].data"
-											:id="`mark-box,${markIndex}`"
-											ghost-class="ghost"
-											@end="(e) => dragEnd(e, 'mark-box', markIndex)"
-											style="width: 100%; max-height: 200px; overflow: auto"
-										>
-											<div v-for="(item, index) in markData[markIndex].data" :key="index" style="display: flex; align-items: center">
-												<!-- 图标 -->
-												<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
-												<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
-												<Icon type="ios-more" v-if="item.innerText === 'info'" />
-												<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
-												<Icon custom="iconfont icon-jiaodu" v-if="item.innerText === 'angle'" />
-												<!-- 字段显示 -->
-												<div :class="isNumberCell(item)">
-													<div
-														class="textOverhidden"
-														style="width: 80%"
-														:title="calculatorObj(item.calculatorFunction, item.columnRename)"
-														@dblclick="changeMarkIsEdit(markIndex, index)"
-														v-if="!markData[markIndex].data[index].isEdit"
-													>
-														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />
-														{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
-													</div>
-													<Input
-														type="text"
-														v-model="markData[markIndex].data[index].columnRename"
-														v-if="markData[markIndex].data[index].isEdit"
-														@on-blur="markData[markIndex].data[index].isEdit = false"
-														class="rename-input"
-													/>
-													<!-- 下拉选 -->
-													<DropdownFields type="mark" :data="item" :index="index" :markIndex="markIndex" @dropDownClick="dropDownClick" />
-												</div>
-											</div>
+											</span>
 										</draggable>
 									</div>
-								</template>
-							</Panel>
-						</Collapse>
-					</div>
-				</div>
-				<!-- 行列 、工作区-->
-				<div class="right-box">
-					<!-- 行列拖拽 -->
-					<div class="row-column">
-						<!-- 行 -->
-						<div class="row" :class="isDisabledCell()">
-							<span class="title">列</span>
-							<draggable group="site" v-model="columnData" class="drag-right" ghost-class="ghost" id="column" @end="(e) => dragEnd(e, 'column')">
-								<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
-										<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
-											calculatorObj(item.calculatorFunction, item.columnRename)
-										}}
-									</span>
-									<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
-									<!-- 下拉选 -->
-									<DropdownFields type="column" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
-								</span>
-							</draggable>
-						</div>
-						<!-- 列 -->
-						<div class="column" :class="isDisabledCell()">
-							<span class="title">行</span>
-							<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
-								<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-									<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
-										<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
-											calculatorObj(item.calculatorFunction, item.columnRename)
-										}}
-									</span>
-									<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
-									<!-- 下拉选 -->
-									<DropdownFields type="row" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
-								</span>
-							</draggable>
-						</div>
-						<!-- 查询按钮 -->
-						<Button type="primary" @click="searchClick" class="search-btn">{{ $t("search") }}</Button>
-					</div>
-					<!-- 工作区 -->
-					<div class="right-content">
-						<componentsTemp
-							v-if="modelFlag"
-							ref="tempRef"
-							:id="submitData.id"
-							:title="submitData.workBookName"
-							:type="markData[0]?.chartType || 'bar'"
-							:visib="visib"
-							:value="chartsData"
-							:row="rowData"
-							:column="columnData"
-							:mark="markData"
-						/>
-					</div>
-				</div>
+									<!-- 标记 -->
+									<div class="mark">
+										<div class="title">标记</div>
+										<!-- 手风琴 -->
+										<Collapse accordion v-model="collapse" style="max-height: calc(100% - 30px); overflow: hidden">
+											<Panel
+												v-for="(item, markIndex) in markData"
+												:key="markIndex"
+												:name="markIndex.toString()"
+												class="markPanel"
+												:title="item.name"
+												@dblclick.stop
+											>
+												{{ item.name }}
+
+												<template #content>
+													<Select v-model="markData[markIndex].chartType" clearable placeholder="请选择图表" @on-change="changeMarks(markIndex)">
+														<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+													</Select>
+													<div class="mark-box">
+														<draggable
+															group="site"
+															v-model="markData[markIndex].data"
+															:id="`color,${markIndex}`"
+															ghost-class="ghost"
+															class="box-cell"
+															:name="markIndex"
+														>
+															<div class="color"><Icon custom="iconfont icon-yansefangan" />颜色</div>
+														</draggable>
+														<!-- 文本宽度只能在 全部 中设定 -->
+														<draggable
+															group="site"
+															v-model="markData[markIndex].data"
+															:id="`labelWidth,${markIndex}`"
+															ghost-class="ghost"
+															class="box-cell"
+															v-if="markIndex == 0"
+														>
+															<div class="labelWidth"><Icon custom="iconfont icon-kuandu" />文本宽度</div>
+														</draggable>
+
+														<draggable group="site" v-model="markData[markIndex].data" :id="`mark,${markIndex}`" ghost-class="ghost" class="box-cell">
+															<div class="tag"><Icon custom="iconfont icon-biaojibiaoqian" />标签</div>
+														</draggable>
+														<draggable group="site" v-model="markData[markIndex].data" :id="`info,${markIndex}`" ghost-class="ghost" class="box-cell">
+															<div class="detail-info"><Icon type="ios-more" />详细信息</div>
+														</draggable>
+														<!-- 角度只能在 全部且饼图 中设定-->
+														<draggable
+															group="site"
+															v-model="markData[markIndex].data"
+															:id="`angle,${markIndex}`"
+															ghost-class="ghost"
+															class="box-cell"
+															v-if="markIndex == 0 && markData[markIndex].chartType == 'componentPie'"
+														>
+															<div class="angle"><Icon custom="iconfont icon-jiaodu" />角度</div>
+														</draggable>
+														<draggable
+															group="site"
+															v-model="markData[markIndex].data"
+															:id="`mark-box,${markIndex}`"
+															ghost-class="ghost"
+															@end="(e) => dragEnd(e, 'mark-box', markIndex)"
+															style="width: 100%; max-height: 200px; overflow: auto"
+														>
+															<div v-for="(item, index) in markData[markIndex].data" :key="index" style="display: flex; align-items: center">
+																<!-- 图标 -->
+																<Icon custom="iconfont icon-yansefangan" v-if="item.innerText === 'color'" />
+																<Icon custom="iconfont icon-biaojibiaoqian" v-if="item.innerText === 'mark'" />
+																<Icon type="ios-more" v-if="item.innerText === 'info'" />
+																<Icon custom="iconfont icon-kuandu" v-if="item.innerText === 'labelWidth'" />
+																<Icon custom="iconfont icon-jiaodu" v-if="item.innerText === 'angle'" />
+																<!-- 字段显示 -->
+																<div :class="isNumberCell(item)">
+																	<div
+																		class="textOverhidden"
+																		style="width: 80%"
+																		:title="calculatorObj(item.calculatorFunction, item.columnRename)"
+																		@dblclick="changeMarkIsEdit(markIndex, index)"
+																		v-if="!markData[markIndex].data[index].isEdit"
+																	>
+																		<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />
+																		{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
+																	</div>
+																	<Input
+																		type="text"
+																		v-model="markData[markIndex].data[index].columnRename"
+																		v-if="markData[markIndex].data[index].isEdit"
+																		@on-blur="markData[markIndex].data[index].isEdit = false"
+																		class="rename-input"
+																	/>
+																	<!-- 下拉选 -->
+																	<DropdownFields type="mark" :data="item" :index="index" :markIndex="markIndex" @dropDownClick="dropDownClick" />
+																</div>
+															</div>
+														</draggable>
+													</div>
+												</template>
+											</Panel>
+										</Collapse>
+									</div>
+								</div>
+							</template>
+							<template #right>
+								<!-- 行列 、工作区-->
+								<div class="right-box">
+									<!-- 行列拖拽 -->
+									<div class="row-column">
+										<!-- 行 -->
+										<div class="row" :class="isDisabledCell()">
+											<span class="title">列</span>
+											<draggable
+												group="site"
+												v-model="columnData"
+												class="drag-right"
+												ghost-class="ghost"
+												id="column"
+												@end="(e) => dragEnd(e, 'column')"
+											>
+												<span v-for="(item, index) in columnData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
+													<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
+														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
+															calculatorObj(item.calculatorFunction, item.columnRename)
+														}}
+													</span>
+													<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
+													<!-- 下拉选 -->
+													<DropdownFields type="column" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
+												</span>
+											</draggable>
+										</div>
+										<!-- 列 -->
+										<div class="column" :class="isDisabledCell()">
+											<span class="title">行</span>
+											<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
+												<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
+													<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
+														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
+															calculatorObj(item.calculatorFunction, item.columnRename)
+														}}
+													</span>
+													<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
+													<!-- 下拉选 -->
+													<DropdownFields type="row" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
+												</span>
+											</draggable>
+										</div>
+										<!-- 查询按钮 -->
+										<Button type="primary" @click="searchClick" class="search-btn">{{ $t("search") }}</Button>
+									</div>
+									<!-- 工作区 -->
+									<div class="right-content">
+										<componentsTemp
+											v-if="modelFlag"
+											ref="tempRef"
+											:id="submitData.id"
+											:title="submitData.workBookName"
+											:type="markData[0]?.chartType || 'bar'"
+											:visib="visib"
+											:value="chartsData"
+											:row="rowData"
+											:column="columnData"
+											:mark="markData"
+										/>
+									</div></div
+							></template>
+						</Split>
+					</template>
+				</Split>
 			</div>
 
 			<!-- 创建自定义字段 -->
@@ -445,6 +463,8 @@ export default {
 
 	data() {
 		return {
+			split: 0.18,
+			split2: 0.18,
 			visib: false,
 			baseInfoPanel: "base",
 			btnDistabled: true,
@@ -1206,6 +1226,12 @@ export default {
 .left-box .ivu-collapse {
 	border: none;
 }
+.workbook-container .ivu-split-trigger {
+	border: 1px solid #eef0f5;
+}
+.workbook-container .ivu-split-trigger-vertical {
+	background: transparent;
+}
 </style>
 <style scoped lang="less">
 .disabled-cell {
@@ -1218,10 +1244,7 @@ export default {
 		display: flex;
 		height: 100%;
 		.left-box {
-			width: 300px;
-
-			// border: 1px solid #27ce88;
-			// background: #f8fffc;
+			height: 100%;
 			border: 1px solid #e4e4e4;
 			.baseinfo {
 				margin-bottom: 10px;
@@ -1261,8 +1284,7 @@ export default {
 								line-height: 20px;
 								padding: 0px 8px;
 								&:hover {
-									background: #4996b2;
-									color: #fff;
+									background: #ecedff;
 								}
 							}
 							.number-value {
@@ -1271,8 +1293,7 @@ export default {
 								line-height: 20px;
 								padding: 0px 8px;
 								&:hover {
-									background: #00b180;
-									color: #fff;
+									background: #e7f5e6;
 								}
 							}
 							.columnname-text {
@@ -1285,7 +1306,7 @@ export default {
 							}
 
 							& > i {
-								color: #367e9c;
+								color: #545bd9;
 								width: 20px;
 								text-align: center;
 								padding: 2px;
@@ -1297,21 +1318,20 @@ export default {
 			}
 		}
 		.center-box {
-			width: 200px;
 			height: 100%;
-			margin-left: 10px;
+			border-radius: 5px;
+			border: 1px solid #e5f1ec;
+			margin: 0 5px;
 			.filter {
 				width: 100%;
-				height: 200px;
+				height: 40%;
 				padding: 10px;
-				border: 1px dashed #e4e4e4;
-				border-bottom: none;
+				border-bottom: 1px dashed #e4e4e4;
 			}
 			.mark {
 				width: 100%;
-				height: calc(100% - 200px);
+				height: 60%;
 				padding: 10px;
-				border: 1px dashed #e4e4e4;
 				.mark-box {
 					width: 100%;
 					height: calc(100% - 250px);
@@ -1348,24 +1368,48 @@ export default {
 
 				&:before {
 					content: "";
-					width: 5px;
+					width: 4px;
 					height: 15px;
 					background: #27ce88;
 					position: absolute;
 					left: 0;
-					/* margin-left: 10px; */
+					top: 6px;
 				}
+			}
+			&:after {
+				position: absolute;
+				content: "";
+				width: 10px;
+				height: 20px;
+				background: #fff;
+				top: 38.9%;
+				right: 5px;
+				border-radius: 10px 0 0 10px;
+				border: 1px solid #e5f1ec;
+				border-right: none;
+			}
+			&:before {
+				position: absolute;
+				content: "";
+				width: 10px;
+				height: 20px;
+				background: #fff;
+				top: 38.9%;
+				left: 5px;
+				border-radius: 0 10px 10px 0;
+				border: 1px solid #e5f1ec;
+				border-left: none;
 			}
 		}
 		.right-box {
-			width: calc(100% - 500px);
+			height: 100%;
 			margin-left: 10px;
 			.row-column {
 				height: 130px;
 				.row,
 				.column {
 					height: 40px;
-					border: 1px solid #e4e4e4;
+					border-bottom: 1px solid #e4e4e4;
 					margin-bottom: 10px;
 					.title {
 						display: inline-block;
@@ -1373,7 +1417,6 @@ export default {
 						line-height: 40px;
 						font-weight: bold;
 						text-align: center;
-						border-right: 1px solid #e4e4e4;
 					}
 					.drag-right {
 						display: inline-block;
@@ -1395,26 +1438,37 @@ export default {
 		width: calc(100% - 23px);
 		padding: 2px 20px 2px 10px;
 		text-align: center;
-		background: #4996b2;
-		color: #fff;
+		background: #ecedff;
+		color: #5f6779;
 		border-radius: 10px;
 		margin: 4px;
 		display: inline-block;
+		position: relative;
+		/*	i {
+			position: absolute;
+			left: 5px;
+			top: 5px;
+		}*/
 	}
 	.drag-number {
 		width: calc(100% - 23px);
-		padding: 2px 20px 2px 10px;
+		padding: 2px 10px 2px 10px;
 		text-align: center;
-		background: #00b180;
-		color: #fff;
+		background: #e7f5e6;
+		color: #5f6779;
 		border-radius: 10px;
 		margin: 4px;
 		display: inline-block;
+		position: relative;
+		/* i {
+			position: absolute;
+			left: 5px;
+			top: 5px;
+		} */
 	}
 	.ghost {
-		background: #4996b2 !important;
+		background: #ecedff !important;
 		list-style: none;
-		color: #fff;
 		z-index: 9999999999999999;
 		width: fit-content;
 		padding: 2px 20px;
@@ -1426,9 +1480,8 @@ export default {
 		}
 	}
 	.dragClass {
-		background: #4996b2 !important;
+		background: #ecedff !important;
 		list-style: none;
-		color: #fff;
 		z-index: 9999999999999999;
 		width: fit-content;
 		padding: 2px 20px;
