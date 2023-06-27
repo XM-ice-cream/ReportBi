@@ -35,13 +35,7 @@
 											</FormItem>
 											<!-- 机种 -->
 											<FormItem label="机种" prop="opt2">
-												<Select
-													v-model="submitData.opt2"
-													filterable
-													clearable
-													:placeholder="$t('pleaseSelect') + $t('setName')"
-													@on-change="getColumnList"
-												>
+												<Select v-model="submitData.opt2" filterable clearable :placeholder="$t('pleaseSelect') + $t('setName')">
 													<Option v-for="(item, index) in opt2List" :value="item.detailCode" :key="index">{{ item.detailName }}</Option>
 												</Select>
 											</FormItem>
@@ -421,8 +415,10 @@ export default {
 	},
 	watch: {
 		modelFlag(newVal) {
+			console.log("监听：", newVal);
 			if (newVal) {
 				this.$nextTick(() => {
+					console.log(1);
 					//编辑 或 复制
 					if (this.workbookIsAdd !== true) {
 						this.submitData = { ...this.submitData, ...this.workbookSelectObj };
@@ -432,9 +428,9 @@ export default {
 							this.submitData.workBookName = `${this.submitData.workBookName}_copy`;
 						}
 						this.pageLoad(); //查询信息
+						this.getColumnList(); //获取左侧列
 					}
 					this.getDataSetList();
-					this.getColumnList(); //获取左侧列
 					this.getDataItemData(); //数据字典
 				});
 			} else {
@@ -442,8 +438,8 @@ export default {
 				deleteImageReq({ id: this.submitData.id });
 				//删除缓存localStorage
 				let data = window.localStorage.getItem("workBook");
-				data = data.split(",");
-				const dataIndex = data.findIndex((item) => item === this.submitData.id);
+				data = data?.split(",") || [];
+				const dataIndex = data?.findIndex((item) => item === this.submitData.id) || -1;
 				if (dataIndex > -1) data.splice(dataIndex, 1);
 				if (data.length > 0) window.localStorage.setItem("workBook", data.toString());
 				else window.localStorage.removeItem("workBook");
@@ -624,6 +620,8 @@ export default {
 
 		//获取左侧数据集对应表及字段
 		getColumnList() {
+			//数据清空时会触发
+			if (!this.modelFlag) return;
 			const { datasetId, columnName } = this.submitData;
 			const obj = { datasetId, enabled: 1, columnName };
 			getTabelColumnReq(obj).then((res) => {
@@ -646,6 +644,8 @@ export default {
 						});
 						return { labelName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
 					});
+				} else {
+					this.$Msg.error(res.message);
 				}
 			});
 		},
@@ -1107,6 +1107,7 @@ export default {
 		},
 		//取消
 		cancelClick() {
+			this.$emit("update:modelFlag", false);
 			this.data = [];
 			this.filterData = []; //过滤值
 			this.columnData = []; //列值
@@ -1116,7 +1117,6 @@ export default {
 			this.submitData.columnName = "";
 			this.chartsData = [];
 			this.btnDistabled = true;
-			this.$emit("update:modelFlag", false);
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
 		},
 		//改变列、行信息的时候 修改标记

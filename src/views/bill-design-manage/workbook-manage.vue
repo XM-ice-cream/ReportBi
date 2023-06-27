@@ -155,6 +155,11 @@ export default {
 			], // 表格数据
 		};
 	},
+	watch: {
+		modelFlag(newVal) {
+			console.log("监听2：", newVal);
+		},
+	},
 	mounted() {
 		const { nodeId, authorityBtn } = JSON.parse(window.localStorage.getItem("previewBiPermission"));
 		//按钮权限

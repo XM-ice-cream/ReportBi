@@ -1,91 +1,11 @@
 [
 	{
 		"id": 1,
-		"name": "锦溪SIP_测试",
+		"name": "报表设计_测试",
 		"value": "http://10.32.44.33:8088",
 		"reportIp": "http://localhost:8081",
-		"reportip": "http://10.32.44.33:8700",
-		"reportDesignIp": "http://10.32.44.33:8700",
-		"eapIp": "http://10.32.44.33:8088"
-	},
-
-	{
-		"id": 2,
-		"name": "锦溪SIP_测试MySql",
-		"value": "http://10.32.44.33:8089",
-		"reportIp": "http://localhost:8081",
-		"reportip": "http://10.32.42.30:5700",
-		"reportDesignIp": "http://10.191.21.54:8700",
-		"eapIp": "http://10.32.44.33:8089"
-	},
-	{
-		"id": 3,
-		"name": "锦溪SIP_正式",
-		"value": "http://10.32.36.130:8000",
-		"reportIp": "http://localhost:8081",
-		"reportip": "http://10.32.44.112:5700",
-		"reportDesignIp": "http://10.32.44.116:8700",
-		"eapIp": "http://10.32.36.130:8000"
-	},
-	{
-		"id": 4,
-		"name": "巴城_测试",
-		"value": "http://10.32.44.33:8090",
-		"reportIp": "http://localhost:8081",
-		"reportip": "http://172.30.50.19:5700",
-		"reportDesignIp": "http://10.191.21.54:8700",
-		"eapIp": " http://10.58.2.100:8000"
-	},
-	{
-		"id": 5,
-		"name": "巴城_正式",
-		"value": "http://10.191.19.51:8000",
-		"reportIp": "http://localhost:8081",
-		"reportip": "http://10.191.19.55:5700",
-		"reportDesignIp": "http://10.191.21.54:8700"
-	},
-	{
-		"id": 6,
-		"name": "淀山湖_正式",
-		"value": "http://10.57.12.12:8000",
-		"reportIp": "http://localhost:8081",
-		"reportip": "http://10.57.12.12:5700",
-		"reportDesignIp": "http://10.191.21.54:8700",
-		"eapIp": "http://10.58.2.100:8000"
-	},
-	{
-		"id": 7,
-		"name": "越南_正式Linux",
-		"value": "http://10.171.11.89:8000",
-		"reportIp": "http://10.171.11.89:8200",
-		"logo": "http://10.171.11.89/img/logo.jpg",
-		"reportDesignIp": "http://10.191.21.54:8700",
-		"eapIp": "http://10.171.11.74:8000"
-	},
-	{
-		"id": 8,
-		"name": "巴城_数仓",
-		"value": "http://10.191.19.51:8000",
-		"reportIp": "http://localhost:8081",
-		"reportip": "http://10.191.19.56:8080",
-		"reportDesignIp": "http://10.191.21.54:8700"
-	},
-	{
-		"id": 9,
-		"name": "越南",
-		"value": "http://10.171.13.65:8000",
-		"reportDesignIp": "http://10.171.11.114:5700",
-		"reportIp": "http://localhost:8081",
 		"reportip": "http://10.171.11.114:5700",
-		"eapIp": "http://10.171.11.74:8000"
-	},
-	{
-		"id": 10,
-		"name": "报表设计_测试",
-		"value": "http://10.32.36.130:8000",
-		"reportIp": "http://localhost:8081",
-		"reportip": "http://10.171.11.114:5700",
-		"reportDesignIp": "http://10.32.44.115:8700",
+		"reportDesignIp": "http://10.32.44.36:8700",
 		"eapIp": "http://10.32.36.130:8000"
 	}
 ]
