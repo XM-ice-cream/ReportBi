@@ -85,11 +85,32 @@ export default {
 
 						itemStyle: {
 							normal: {
-								color: "#13c2c2",
+								color: "#27ce88",
 								lineStyle: {
-									color: "#13c2c2",
+									color: "#27ce88",
 									width: 2,
 								},
+							},
+						},
+						areaStyle: {
+							normal: {
+								color: new echarts.graphic.LinearGradient(
+									0,
+									0,
+									0,
+									1,
+									[
+										{
+											offset: 0,
+											color: "rgba(39, 206, 136,0.3)",
+										},
+										{
+											offset: 0.9,
+											color: "rgba(39, 206, 136,0)",
+										},
+									],
+									false
+								),
 							},
 						},
 						data: [220, 182, 191, 234, 290, 330, 410, 301, 254, 290, 330, 410],
@@ -100,9 +121,9 @@ export default {
 								distance: 10,
 								offset: [1, 1],
 								lineHeight: 20,
-								backgroundColor: "#13c2c2",
+								backgroundColor: "#27ce88",
 								borderRadius: 5,
-								borderColor: "#13c2c2",
+								borderColor: "#27ce88",
 								borderWidth: "1",
 								padding: [5, 15, 4],
 								color: "#fff",

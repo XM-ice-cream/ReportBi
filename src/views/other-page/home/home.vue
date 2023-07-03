@@ -3,7 +3,14 @@
 		<div class="home-header">
 			<div class="header-left">
 				<avatar-custom :imgUrl="headIcon" v-if="headIcon"></avatar-custom>
-				<img class="head-portrait" src="../../../assets/images/default-head.png" v-else />
+				<template v-else>
+					<div class="avatar-custom">
+						<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small">
+							<img class="head-portrait" src="../../../assets/images/default-head.png" />
+						</span>
+					</div>
+				</template>
+
 				<div class="user-info">
 					<div class="user-content">
 						<p>
@@ -25,15 +32,15 @@
 				</div>
 			</div>
 			<div class="header-right">
-				<div class="header-box">
+				<div class="header-box home-card">
 					<div class="title">模板数量</div>
 					<div class="num">50</div>
 				</div>
-				<div class="header-box">
+				<div class="header-box home-card">
 					<div class="title">访问次数</div>
 					<div class="num">10</div>
 				</div>
-				<div class="header-box">
+				<div class="header-box home-card" style="border-radius: 0 20px 0 0">
 					<div class="title">新增数</div>
 					<div class="num">10</div>
 				</div>
@@ -42,9 +49,9 @@
 		<div class="home-content">
 			<div class="content-left">
 				<RadioGroup v-model="req.dateType" type="button" button-style="solid" size="default" class="content-radio">
-					<Radio label="year">年</Radio>
 					<Radio label="month">月</Radio>
-					<Radio label="day">日</Radio>
+					<Radio label="week">周</Radio>
+					<Radio label="day">天</Radio>
 				</RadioGroup>
 				<!-- 收藏表单 -->
 				<Tabs type="card" :draggable="true">
@@ -181,7 +188,7 @@ export default {
 			],
 			req: {
 				type: "BI",
-				dateType: "year",
+				dateType: "month",
 			},
 			data: {
 				top5Data: [
@@ -371,9 +378,11 @@ export default {
 	border: none;
 	padding: 10px 50px;
 	height: 100%;
+	font-size: 16px;
+	font-weight: bold;
 }
 .home-content .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-nav-container {
-	height: 40px;
+	height: 50px;
 }
 .home-content .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-nav-wrap {
 	height: 100%;
@@ -384,13 +393,20 @@ export default {
 .home-content .ivu-tabs-nav {
 	height: 100%;
 }
-.home-content .ivu-radio-group-button .ivu-radio-wrapper:first-child {
+.home-content .ivu-radio-group-button .ivu-radio-wrapper:first-child,
+.home-content .ivu-radio-group-button .ivu-radio-wrapper:last-child {
 	border-radius: 0px;
+}
+.home .ivu-radio-group-button .ivu-radio-wrapper {
+	border: none;
 }
 </style>
 <style scoped lang="less">
 .home-style {
 	background: #f5f7f9;
+}
+.home-card {
+	box-shadow: -1px 1px 6px #e0e6ea;
 }
 .home-header {
 	height: 200px;
@@ -410,8 +426,8 @@ export default {
 		justify-content: center;
 		align-items: center;
 		.avatar-custom {
-			width: 200px;
-			height: 200px;
+			width: 180px;
+			height: 180px;
 			display: inline-block;
 			margin-right: 10px;
 			:deep(.ivu-avatar-small) {
@@ -421,6 +437,7 @@ export default {
 				border-radius: 50%;
 				box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
 				box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;
+				background: #f5f7f9;
 			}
 		}
 		.user-content {
@@ -449,7 +466,7 @@ export default {
 					padding-right: 30px;
 				}
 				span:last-child {
-					font-size: 12px;
+					font-size: 14px;
 					font-weight: normal;
 					display: inline-block;
 					width: calc(100% - 103px);
@@ -501,8 +518,9 @@ export default {
 					background: #f1f2fd;
 					position: absolute;
 					border-radius: 50%;
-					left: -21%;
-					top: -41%;
+					left: 0%;
+					top: -40%;
+					animation: rotate 5s linear infinite;
 				}
 				&:after {
 					content: "";
@@ -513,6 +531,7 @@ export default {
 					border-radius: 50%;
 					left: 16%;
 					top: 82%;
+					animation: rotate 5s linear infinite;
 				}
 			}
 			&:nth-child(2) {
@@ -528,16 +547,18 @@ export default {
 					border-radius: 50%;
 					left: 39%;
 					top: -70%;
+					animation: rotate 5s linear infinite;
 				}
 				&:after {
 					content: "";
-					width: 150px;
+					width: 220px;
 					height: 200px;
 					background: #f1f6fd;
 					position: absolute;
 					border-radius: 50%;
-					left: -5%;
-					top: 28%;
+					left: 0%;
+					top: 36%;
+					animation: rotate 5s linear infinite;
 				}
 			}
 			&:nth-child(3) {
@@ -546,23 +567,25 @@ export default {
 				}
 				&:before {
 					content: "";
-					width: 304px;
+					width: 200px;
 					height: 200px;
 					background: #eafbfd;
 					position: absolute;
 					border-radius: 50%;
-					left: -34%;
+					left: 13%;
 					top: -41%;
+					animation: rotate 5s linear infinite;
 				}
 				&:after {
 					content: "";
-					width: 150px;
-					height: 150px;
+					width: 610px;
+					height: 580px;
 					background: #d2f0ed;
 					position: absolute;
 					border-radius: 50%;
-					right: -20%;
-					top: 66%;
+					left: 175px;
+					top: 164px;
+					animation: rotate 5s linear infinite;
 				}
 			}
 		}
@@ -586,6 +609,7 @@ export default {
 		position: relative;
 		.content-radio {
 			position: absolute;
+			top: 5px;
 			right: 0;
 			z-index: 1;
 		}
@@ -616,28 +640,31 @@ export default {
 						transform: translate(-50%, -50%);
 						color: #000;
 						font-weight: bold;
+						padding: 10px;
+						font-size: 16px;
 					}
 					&:hover {
 						background: #22936512;
 						cursor: pointer;
 						border: 1px solid #5dc79c;
 						.name {
-							font-size: 16px;
+							font-size: 18px;
 						}
 					}
 				}
 			}
 		}
 		.line-chart {
-			height: calc(100% - 200px - 40px - 10px;);
+			height: calc(100% - 200px - 50px - 10px - 10px);
 			background: #fff;
+			margin-top: 10px;
 		}
 	}
 	.content-right {
-		height: 100%;
-		width: 30%;
+		height: calc(100% - 10px);
+		width: calc(30% - 40px);
 		background: #fff;
-		margin-right: 10px;
+		margin: 10px;
 		.content-top,
 		.content-bottom {
 			height: 50%;
@@ -647,7 +674,6 @@ export default {
 
 				.box {
 					padding: 0 20px;
-					line-height: 25px;
 					font-size: 16px;
 					margin: 20px 0;
 					display: flex;
@@ -677,33 +703,42 @@ export default {
 							font-weight: bold;
 							font-style: italic;
 							color: #fff;
-							height: 30px;
-							background: #3968a261;
+							/*	height: 30px;*/
+							background: #406196;
 							transform: perspective(10px) rotateX(-5deg);
-							border: 1px solid #3968a261;
+							border: 1px solid #4c6a9d;
+							display: inline-block;
+							padding: 7px;
 						}
 						&.num {
 							color: #30cbc0;
 							font-weight: bold;
+							cursor: pointer;
+							font-size: 18px;
 						}
 					}
 					&:nth-child(1) {
 						span.order {
-							background: #ff625c;
-							border: 1px solid #ff625c;
+							background: #c45550;
+							border: 1px solid #a95b61;
 						}
 					}
 					&:nth-child(2) {
 						span.order {
-							background: #fac000;
-							border: 1px solid #fac000;
+							background: #c48c63;
+							border: 1px solid #e6a355;
 						}
 					}
 					&:nth-child(3) {
 						span.order {
-							background: #5b9ffe;
-							border: 1px solid #5b9ffe;
+							background: #166fd5;
+							border: 1px solid #26649e;
 						}
+					}
+					&:hover {
+						background: #cccccc17;
+						font-weight: bold;
+						cursor: pointer;
 					}
 				}
 			}
@@ -712,6 +747,19 @@ export default {
 			height: calc(50% - 20px);
 			margin-bottom: 0;
 		}
+	}
+}
+@keyframes rotate {
+	0% {
+		transform: translate(-50%, 0) rotateZ(0deg);
+	}
+
+	50% {
+		transform: translate(-50%, -2%) rotateZ(180deg);
+	}
+
+	100% {
+		transform: translate(-50%, 0%) rotateZ(360deg);
 	}
 }
 </style>
