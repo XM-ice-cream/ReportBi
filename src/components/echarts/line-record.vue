@@ -12,7 +12,10 @@ export default {
 			required: false,
 			default: "0",
 		},
-		data: {},
+		data: {
+			type: Array,
+			default: () => [],
+		},
 	},
 
 	data() {
@@ -27,14 +30,14 @@ export default {
 			let option = {
 				grid: {
 					left: "5%",
-					right: "10%",
+					right: "5%",
 					top: "20%",
 					bottom: "15%",
 					containLabel: true,
 				},
 				tooltip: {
+					trigger: "axis",
 					show: true,
-					trigger: "item",
 				},
 
 				xAxis: [
@@ -53,7 +56,7 @@ export default {
 						splitLine: {
 							show: false,
 						},
-						data: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+						data: this.data.map((item) => item.dateStr),
 					},
 				],
 				yAxis: [
@@ -79,10 +82,10 @@ export default {
 				],
 				series: [
 					{
+						name: "访问次数",
 						type: "line",
 						symbol: "circle",
 						symbolSize: 0,
-
 						itemStyle: {
 							normal: {
 								color: "#27ce88",
@@ -113,7 +116,7 @@ export default {
 								),
 							},
 						},
-						data: [220, 182, 191, 234, 290, 330, 410, 301, 254, 290, 330, 410],
+						data: this.data.map((item) => item.clickCount),
 						markPoint: {
 							label: {
 								show: true,
@@ -149,9 +152,6 @@ export default {
 			};
 			this.recordLineChart.setOption(option, true);
 		},
-	},
-	mounted() {
-		this.initChart();
 	},
 };
 </script>

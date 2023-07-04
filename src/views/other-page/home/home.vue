@@ -34,27 +34,27 @@
 			<div class="header-right">
 				<div class="header-box home-card">
 					<div class="title">模板数量</div>
-					<div class="num">50</div>
+					<div class="num">{{ data.workbookCount }}</div>
 				</div>
 				<div class="header-box home-card">
 					<div class="title">访问次数</div>
-					<div class="num">10</div>
+					<div class="num">{{ data.clickCount }}</div>
 				</div>
 				<div class="header-box home-card" style="border-radius: 0 20px 0 0">
 					<div class="title">新增数</div>
-					<div class="num">10</div>
+					<div class="num">{{ data.addCount }}</div>
 				</div>
 			</div>
 		</div>
 		<div class="home-content">
 			<div class="content-left">
-				<RadioGroup v-model="req.dateType" type="button" button-style="solid" size="default" class="content-radio">
+				<RadioGroup v-model="req.dateType" type="button" button-style="solid" size="default" class="content-radio" @on-change="pageLoad('')">
 					<Radio label="month">月</Radio>
 					<Radio label="week">周</Radio>
 					<Radio label="day">天</Radio>
 				</RadioGroup>
 				<!-- 收藏表单 -->
-				<Tabs type="card" :draggable="true">
+				<Tabs type="card" v-model="req.type" @on-click="pageLoad('')">
 					<TabPane label="BI" name="BI">
 						<div class="left-collect">
 							<div class="title">收藏模板</div>
@@ -79,8 +79,8 @@
 
 				<!-- 访问次数折线图 -->
 				<div class="line-chart">
-					<div class="title">访问记录</div>
-					<LineRecord index="0" v-if="isShow" style="height: calc(100% - 70px)" />
+					<div class="title">{{ lineChartTitle }}</div>
+					<LineRecord index="0" ref="lineRecordChartRef" v-if="isShow" :data="data.lineRecordData" style="height: calc(100% - 70px)" />
 				</div>
 			</div>
 			<!-- top5 -->
@@ -88,11 +88,11 @@
 				<div class="content-top">
 					<div class="title">访问次数Top5</div>
 					<div class="content">
-						<div class="box" v-for="item in data.top5Data">
-							<span class="order">NO.{{ item.sort }}</span>
-							<span class="model-type">{{ item.type }}</span>
-							<span class="model-name">{{ item.name }}</span>
-							<span class="num">{{ item.num }}</span>
+						<div class="box" v-for="(item, index) in data.top5Data" @click="getTopChartRecord(item.workBooId, index)">
+							<span class="order">NO.{{ index + 1 }}</span>
+							<span class="model-type textOverhidden">{{ item.modelName }}</span>
+							<span class="model-name textOverhidden">{{ item.workBookName }}</span>
+							<span class="num">{{ item.clickCount }}</span>
 						</div>
 					</div>
 				</div>
@@ -108,8 +108,7 @@
 </template>
 
 <script>
-import { getindexjsonReq } from "@/api/organize-manager/user-manager";
-import { getpagelistReq } from "@/api/system-manager/developer-center";
+import { getreportbirecordReq, gettopfiveReq, gettopchartrecordReq } from "@/api/other-page/home";
 import { formatDate } from "@/libs/tools";
 import AvatarCustom from "@/components/avatar-custom";
 import LineRecord from "@/components/echarts/line-record";
@@ -123,106 +122,13 @@ export default {
 			isShow: false,
 			modalFlag: false,
 			modalTitle: "",
-			navIndex: null,
-			qr: {
-				text: "功能开发中......",
-			},
-			bar: {
-				barValue: "~VSUFCR.",
-				barList: [
-					{
-						name: "设置为回车结尾",
-						text: "~VSUFCR.",
-					},
-					{
-						name: "设置为table结尾",
-						text: "~SUFBK29909.",
-					},
-					{
-						name: "删除末尾",
-						text: "~SUFCA2.",
-					},
-				],
-			},
-			carrierObj: {
-				carrierCode: "",
-				carrierValue: "",
-				carrierCount: 0,
-				codeColor: "",
-			},
-			infoObj: {
-				systemName: "",
-				systemVersion: "",
-				userTotal: 0,
-				userLine: 0,
-				userActive: 0,
-				pVDay: 0,
-				pVYear: 0,
-				apiDay: 0,
-				apiYear: 0,
-			},
-			navList: [
-				{
-					iconName: "iconfont icon-bar_code",
-					iconColor: "#4ab91c",
-					navName: this.$t("barCodeSetting"),
-					id: "barCodeSetting",
-				},
-				{ iconName: "iconfont icon-qr_code", iconColor: "#FF3333", navName: this.$t("qrCode"), id: "qrCode" },
-				{ iconName: "iconfont icon-check", iconColor: "#CCFF99", navName: this.$t("carrierCheck"), id: "carrierCheck" },
-				{
-					iconName: "iconfont icon-barchart",
-					iconColor: "#6699FF",
-					navName: this.$t("publicReport"),
-					id: "publicReport",
-				},
-				// {iconName: "iconfont icon-mobile", iconColor: "#66CC33", navName: "白泽TV",id:'tv'},
-				{ iconName: "iconfont icon-paper", iconColor: "#66CCFF", navName: "流程控制台", id: "flowConsole" },
-				// {
-				//   iconName: "iconfont icon-paper",
-				//   iconColor: "#66FF66",
-				//   navName: this.$t("chatAuthorization"),
-				//   id:chatAuthorization
-				// },
-				{ iconName: "iconfont icon-buliang", iconColor: "#996699", navName: "错误代码", id: "errorCode" },
-			],
+			lineChartTitle: "访问记录",
 			req: {
 				type: "BI",
 				dateType: "month",
 			},
 			data: {
-				top5Data: [
-					{
-						sort: 1,
-						type: "公共模型",
-						name: "SN 总数BY Config",
-						num: 50,
-					},
-					{
-						sort: 2,
-						type: "公共模型",
-						name: "SN 总数BY Config",
-						num: 50,
-					},
-					{
-						sort: 3,
-						type: "公共模型",
-						name: "SN 总数BY Config",
-						num: 50,
-					},
-					{
-						sort: 4,
-						type: "公共模型",
-						name: "SN 总数BY Config",
-						num: 50,
-					},
-					{
-						sort: 5,
-						type: "公共模型",
-						name: "SN 总数BY Config",
-						num: 50,
-					},
-				],
+				top5Data: [],
 				modelList: [
 					{
 						name: "SN 总数BY Config",
@@ -234,8 +140,8 @@ export default {
 						name: "LINENAME(NCC)",
 					},
 				],
+				lineRecordData: [],
 			},
-			versionList: [],
 			userIP: this.$store.state.ip,
 			headIcon: this.$store.state.avatarImgPath,
 			account: this.$store.state.account,
@@ -285,45 +191,60 @@ export default {
 	},
 	mounted() {
 		this.$Message.destroy();
-		this.getIndexJson();
-		this.getVersionData();
 		this.changeTips();
 		this.changeText();
+		this.pageLoad();
 		this.$nextTick(() => {
 			this.isShow = true;
 		});
 	},
 	methods: {
-		// 获取首页数据
-		getIndexJson() {
-			getindexjsonReq().then((res) => {
-				if (res.code === 200) {
-					this.infoObj.systemName = res.result.systemName;
-					this.infoObj.systemVersion = res.result.systemCoreVersion;
-					this.infoObj.userTotal = res.result.userTotalCount;
-					this.infoObj.userActive = res.result.userActiveCount;
-					this.infoObj.userLine = res.result.userOnLineCount;
-					this.infoObj.pVDay = res.result.pvDay;
-					this.infoObj.pVYear = res.result.pvYear;
-					this.infoObj.apiDay = res.result.apiDay;
-					this.infoObj.apiYear = res.result.apiYear;
+		pageLoad() {
+			this.lineChartTitle = "访问记录";
+			this.getNum();
+			this.getTopFive();
+			this.getTopChartRecord("");
+		},
+		//获取汇总数量
+		getNum() {
+			const obj = {
+				dateType: this.req.dateType,
+				reportType: this.req.type,
+			};
+			getreportbirecordReq(obj).then((res) => {
+				if (res.code == 200) {
+					const { workbookCount, clickCount, addCount } = res.result;
+					this.data = { ...this.data, workbookCount, clickCount, addCount };
 				}
 			});
 		},
-		// 获取版本数据
-		getVersionData() {
+		//获取top5
+		getTopFive() {
 			const obj = {
-				orderField: "id", // 排序字段
-				ascending: false, // 是否升序
-				pageSize: 50, // 分页大小
-				pageIndex: 1, // 当前页码
-				data: { enabled: 1 },
+				dateType: this.req.dateType,
+				reportType: this.req.type,
 			};
-			getpagelistReq(obj).then((res) => {
+			gettopfiveReq(obj).then((res) => {
 				if (res.code === 200) {
-					this.versionList = res.result.data || [];
-					this.versionList.forEach((o) => {
-						o.formCreateDate = formatDate(o.createDate) || null;
+					const data = res?.result || [];
+					this.data.top5Data = data;
+				}
+			});
+		},
+		//折线图
+		getTopChartRecord(id, index) {
+			if (id) this.lineChartTitle = `访问记录【${this.data.top5Data[index].workBookName}】`;
+			const obj = {
+				id,
+				dateType: this.req.dateType,
+				reportType: this.req.type,
+			};
+			gettopchartrecordReq(obj).then((res) => {
+				if (res.code === 200) {
+					const data = res?.result || [];
+					this.data.lineRecordData = data;
+					this.$nextTick(() => {
+						this.$refs.lineRecordChartRef.initChart();
 					});
 				}
 			});
@@ -332,11 +253,6 @@ export default {
 		modalCancel() {
 			this.modalFlag = false;
 			this.modalTitle = "";
-			this.navIndex = null;
-			this.carrierObj.carrierCount = 0;
-			this.carrierObj.carrierValue = "";
-			this.carrierObj.carrierCode = "";
-			this.carrierObj.codeColor = "";
 		},
 		// 判断当前时间
 		changeTips() {
@@ -352,18 +268,6 @@ export default {
 		changeText() {
 			let randomTextIndex = Math.round(Math.random() * this.textList.length);
 			this.textTip = this.textList[randomTextIndex];
-		},
-		changeVipLevel(val) {
-			const state = {
-				0: "v0",
-				1: "v1",
-				2: "v2",
-				3: "v3",
-				4: "v4",
-				5: "v5",
-				6: "v6",
-			};
-			return state[val];
 		},
 	},
 };
@@ -437,7 +341,7 @@ export default {
 				border-radius: 50%;
 				box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
 				box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;
-				background: #f5f7f9;
+				background: #faf6f7;
 			}
 		}
 		.user-content {
@@ -495,9 +399,10 @@ export default {
 				color: #778290;
 				position: absolute;
 				top: 70%;
-				left: 55%;
+				left: 50%;
 				font-size: 15px;
-				transform: translate(-70%, -55%);
+				transform: translate(-50%, -70%);
+				z-index: 1;
 			}
 			.num {
 				position: absolute;
@@ -578,8 +483,8 @@ export default {
 				}
 				&:after {
 					content: "";
-					width: 610px;
-					height: 580px;
+					width: 700px;
+					height: 690px;
 					background: #d2f0ed;
 					position: absolute;
 					border-radius: 50%;
@@ -624,13 +529,18 @@ export default {
 				align-content: center;
 				justify-content: flex-start;
 				align-items: center;
+				margin: 0 10px;
+				padding: 10px 0;
+				overflow-x: auto;
+				overflow-y: hidden;
 				.box {
 					width: 200px;
-					height: calc(100% - 20px);
-					margin: 20px;
+					height: 100%;
 					border: 1px solid #efefef;
 					position: relative;
 					border-radius: 10px;
+					flex-shrink: 0;
+					margin: 0 10px;
 					.name {
 						width: 100%;
 						position: absolute;
@@ -651,6 +561,10 @@ export default {
 							font-size: 18px;
 						}
 					}
+				}
+				&::-webkit-scrollbar-thumb {
+					border-radius: 5px;
+					background-color: #f5f7f9;
 				}
 			}
 		}
@@ -709,6 +623,11 @@ export default {
 							border: 1px solid #4c6a9d;
 							display: inline-block;
 							padding: 7px;
+						}
+						&.model-type,
+						&.model-name {
+							width: 200px;
+							text-align: center;
 						}
 						&.num {
 							color: #30cbc0;
