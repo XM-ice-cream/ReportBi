@@ -90,7 +90,7 @@
 					<div class="content">
 						<div class="box" v-for="(item, index) in data.top5Data" @click="getTopChartRecord(item.workBooId, index)">
 							<span class="order">NO.{{ index + 1 }}</span>
-							<span class="model-type textOverhidden">{{ item.modelName }}</span>
+							<span class="model-type textOverhidden">{{ templateList[item.modelName] }}模型</span>
 							<span class="model-name textOverhidden">{{ item.workBookName }}</span>
 							<span class="num">{{ item.clickCount }}</span>
 						</div>
@@ -109,6 +109,7 @@
 
 <script>
 import { getreportbirecordReq, gettopfiveReq, gettopchartrecordReq } from "@/api/other-page/home";
+import { getlistReq } from "@/api/system-manager/data-item";
 import { formatDate } from "@/libs/tools";
 import AvatarCustom from "@/components/avatar-custom";
 import LineRecord from "@/components/echarts/line-record";
@@ -123,6 +124,7 @@ export default {
 			modalFlag: false,
 			modalTitle: "",
 			lineChartTitle: "访问记录",
+			templateList: {}, //模板list
 			req: {
 				type: "BI",
 				dateType: "month",
@@ -194,6 +196,7 @@ export default {
 		this.changeTips();
 		this.changeText();
 		this.pageLoad();
+		this.getDataItemData();
 		this.$nextTick(() => {
 			this.isShow = true;
 		});
@@ -253,6 +256,16 @@ export default {
 		modalCancel() {
 			this.modalFlag = false;
 			this.modalTitle = "";
+		}, // 获取数据字典数据
+		async getDataItemData() {
+			this.templateList = await this.getDataItemDetailList("biTemplateModel");
+		},
+		async getDataItemDetailList(itemCode) {
+			let arr = {};
+			await getlistReq({ itemCode, enabled: 1 }).then((res) => {
+				if (res.code === 200) res.result?.forEach((item) => (arr[item.detailCode] = item.detailName)) || [];
+			});
+			return arr;
 		},
 		// 判断当前时间
 		changeTips() {
