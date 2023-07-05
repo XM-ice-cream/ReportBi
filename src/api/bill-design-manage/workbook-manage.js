@@ -6,7 +6,7 @@ import {
 export const getpagelistReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/biworkbook/getpagelist',
+    url: '/biworkbook/getpagelist',
     method: 'post',
     data
   })
@@ -16,7 +16,7 @@ export const getpagelistReq = data => {
 export const addReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/biworkbook/insert',
+    url: '/biworkbook/insert',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export const addReq = data => {
 export const modifyReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/biworkbook/modify',
+    url: '/biworkbook/modify',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export const modifyReq = data => {
 export const deleteReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/biworkbook/delete',
+    url: '/biworkbook/delete',
     method: 'post',
     data
   })
@@ -44,7 +44,7 @@ export const deleteReq = data => {
 export const getTabelColumnReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/biworkbookdata/gettablecolumn',
+    url: '/biworkbookdata/gettablecolumn',
     method: 'post',
     data
   })
@@ -53,7 +53,7 @@ export const getTabelColumnReq = data => {
 export const addCustomerFieldReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/insert',
+    url: '/bicustomerfield/insert',
     method: 'post',
     data
   })
@@ -62,7 +62,7 @@ export const addCustomerFieldReq = data => {
 export const modifyCustomerFieldReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/modify',
+    url: '/bicustomerfield/modify',
     method: 'post',
     data
   })
@@ -72,7 +72,7 @@ export const modifyCustomerFieldReq = data => {
 export const getCustomerFieldReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/getentity',
+    url: '/bicustomerfield/getentity',
     method: 'post',
     data
   })
@@ -81,7 +81,7 @@ export const getCustomerFieldReq = data => {
 export const deleteCustomerFieldReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/delete',
+    url: '/bicustomerfield/delete',
     method: 'post',
     data
   })
@@ -90,7 +90,7 @@ export const deleteCustomerFieldReq = data => {
 export const checkCustomerFieldReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bicustomerfield/syntaxRules',
+    url: '/bicustomerfield/syntaxRules',
     method: 'post',
     data
   })
@@ -101,7 +101,7 @@ export const getChartsInfoReq = data => {
     timeout: 20 * 60 * 1000, //最长等待20分钟
     loading: true,
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bicalculator/execute',
+    url: '/bicalculator/execute',
     method: 'post',
     data
   })

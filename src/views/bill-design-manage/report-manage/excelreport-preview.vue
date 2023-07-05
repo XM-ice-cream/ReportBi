@@ -489,7 +489,7 @@ export default {
 		},
 		//导出function
 		exportReqFun(obj, type, fileName) {
-			const httpPath = `${window.localStorage.getItem("reportDesignIp")}/api/autoreportcenter/anonymous/v1/reportexcel/export`;
+			const httpPath = `${window.localStorage.getItem("reportDesignIp")}/reportexcel/export`;
 			const that = this;
 			this.$Spin.show();
 			//后端导出excel

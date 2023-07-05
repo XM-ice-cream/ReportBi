@@ -6,7 +6,7 @@ import {
 export const getpagelistReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/getpagelist',
+    url: '/bidataset/getpagelist',
     method: 'post',
     data
   })
@@ -16,7 +16,7 @@ export const getpagelistReq = data => {
 export const addReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/insert',
+    url: '/bidataset/insert',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export const addReq = data => {
 export const modifyReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/modify',
+    url: '/bidataset/modify',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export const modifyReq = data => {
 export const deleteReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/delete',
+    url: '/bidataset/delete',
     method: 'post',
     data
   })
@@ -43,7 +43,7 @@ export const deleteReq = data => {
 export const getTableListReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/gettablelist',
+    url: '/bidataset/gettablelist',
     method: 'post',
     data
   })
@@ -52,7 +52,7 @@ export const getTableListReq = data => {
 export const getUsersReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/getuserlist',
+    url: '/bidataset/getuserlist',
     method: 'post',
     data
   })
@@ -61,7 +61,7 @@ export const getUsersReq = data => {
 export const getColumnListReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/getcolumnlist',
+    url: '/bidataset/getcolumnlist',
     method: 'post',
     data
   })
@@ -70,7 +70,7 @@ export const getColumnListReq = data => {
 export const getDataSetListReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bidataset/getselectlist',
+    url: '/bidataset/getselectlist',
     method: 'post',
     data
   })

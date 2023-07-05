@@ -6,7 +6,7 @@ import {
 export const getpagelistReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/report/getpagelist',
+    url: '/report/getpagelist',
     method: 'post',
     data
   })
@@ -15,7 +15,7 @@ export const getpagelistReq = data => {
 export const insertReportReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/report/insert',
+    url: '/report/insert',
     method: 'post',
     data
   })
@@ -24,7 +24,7 @@ export const insertReportReq = data => {
 export const deleteReportReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/report/batchdelete',
+    url: '/report/batchdelete',
     method: 'post',
     data
   })
@@ -33,7 +33,7 @@ export const deleteReportReq = data => {
 export const modifyReportReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/report/modify',
+    url: '/report/modify',
     method: 'post',
     data
   })
@@ -42,7 +42,7 @@ export const modifyReportReq = data => {
 export const insertExcelReportReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportexcel/insert',
+    url: '/reportexcel/insert',
     method: 'post',
     data
   })
@@ -51,7 +51,7 @@ export const insertExcelReportReq = data => {
 export const modifyExcelReportReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportexcel/modify',
+    url: '/reportexcel/modify',
     method: 'post',
     data
   })
@@ -61,7 +61,7 @@ export const getExcelByReportcodeReq = data => {
   return requestCenter({
     timeout: 1000 * 60 * 5, //最长等待五分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportexcel/detailbyreportcode',
+    url: '/reportexcel/detailbyreportcode',
     method: 'get',
     params: data
   })
@@ -71,7 +71,7 @@ export const getExcelPreviewReq = data => {
   return requestCenter({
     timeout: 1000 * 60 * 60, //最长等待60分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportexcel/preview',
+    url: '/reportexcel/preview',
     method: 'post',
     data
   })
@@ -81,7 +81,7 @@ export const getTotalPageReq = data => {
   return requestCenter({
     timeout: 1000 * 60 * 60, //最长等待60分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportexcel/countPreview',
+    url: '/reportexcel/countPreview',
     method: 'post',
     data
   })
@@ -90,7 +90,7 @@ export const getTotalPageReq = data => {
 export const checkFunctionReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/dynamiccode/syntaxrules',
+    url: '/dynamiccode/syntaxrules',
     method: 'post',
     data
   })
@@ -99,7 +99,7 @@ export const checkFunctionReq = data => {
 export const getParamsReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportexcel/firstPreview',
+    url: '/reportexcel/firstPreview',
     method: 'post',
     data
   })
@@ -118,7 +118,7 @@ export const addScreenReq = data => {
   return requestCenter({
     timeout: 1000 * 60 * 5, //最长等待五分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportdashboard/insert',
+    url: '/reportdashboard/insert',
     method: 'post',
     data,
   })
@@ -128,7 +128,7 @@ export const previewScreenReq = data => {
   return requestCenter({
     timeout: 1000 * 60 * 5, //最长等待五分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportdashboard/preview',
+    url: '/reportdashboard/preview',
     method: 'get',
     params: data,
   })
@@ -138,7 +138,7 @@ export const getDataReq = data => {
   return requestCenter({
     timeout: 1000 * 60 * 5, //最长等待五分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/reportdashboard/getdata',
+    url: '/reportdashboard/getdata',
     method: 'post',
     data,
   })
@@ -147,7 +147,7 @@ export const getDataReq = data => {
 export const getDictReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datadicts/getpagelist',
+    url: '/datadicts/getpagelist',
     method: 'post',
     data,
   })

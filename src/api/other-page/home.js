@@ -7,7 +7,7 @@ import {
 export const getreportbirecordReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/index/getreportbirecord',
+    url: '/index/getreportbirecord',
     method: 'post',
     data
   })
@@ -16,7 +16,7 @@ export const getreportbirecordReq = data => {
 export const gettopfiveReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/index/getTopFive',
+    url: '/index/getTopFive',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export const gettopfiveReq = data => {
 export const gettopchartrecordReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/index/getTopChartRecord',
+    url: '/index/getTopChartRecord',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export const gettopchartrecordReq = data => {
 export const getmodelrecordReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/index/getModelRecord',
+    url: '/index/getModelRecord',
     method: 'post',
     data
   })

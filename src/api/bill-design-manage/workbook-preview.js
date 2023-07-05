@@ -6,7 +6,7 @@ import {
 export const getWorkbookInfoReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/biworkbook/preview',
+    url: '/biworkbook/preview',
     method: 'post',
     data
   })

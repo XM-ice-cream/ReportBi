@@ -7,7 +7,7 @@ export const getpagelistReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl:  window.localStorage.getItem("reportDesignIp"),
-        url: '/api/autoreportcenter/anonymous/v1/datasource/getpagelist',
+        url: '/datasource/getpagelist',
         method: 'post',
         data
     })
@@ -17,7 +17,7 @@ export const insertDataSourceReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl:  window.localStorage.getItem("reportDesignIp"),
-        url: '/api/autoreportcenter/anonymous/v1/datasource/insert',
+        url: '/datasource/insert',
         method: 'post',
         data
     })
@@ -27,7 +27,7 @@ export const deleteDataSourceReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl:  window.localStorage.getItem("reportDesignIp"),
-        url: '/api/autoreportcenter/anonymous/v1/datasource/delete',
+        url: '/datasource/delete',
         method: 'post',
         data
     })
@@ -37,7 +37,7 @@ export const modifyDataSourceReq = data => {
     return requestCenter({
         timeout: 0,
         baseUrl:  window.localStorage.getItem("reportDesignIp"),
-        url: '/api/autoreportcenter/anonymous/v1/datasource/modify',
+        url: '/datasource/modify',
         method: 'post',
         data
     })
@@ -47,7 +47,7 @@ export const testConnection = data => {
     return requestCenter({
         timeout: 0,
         baseUrl:  window.localStorage.getItem("reportDesignIp"),
-        url: '/api/autoreportcenter/anonymous/v1/datasource/testconnection',
+        url: '/datasource/testconnection',
         method: 'post',
         data
     })

@@ -6,7 +6,7 @@ import {
 export const getselectvalueReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/bicalculator/selectvalue',
+    url: '/bicalculator/selectvalue',
     method: 'post',
     data
   })
@@ -16,7 +16,7 @@ export const getselectvalueReq = data => {
 export const getEchoReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/biworkbook/getEcho',
+    url: '/biworkbook/getEcho',
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export const getMarksReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
     timeout: 10 * 60 * 1000, //最长等待10分钟
-    url: '/api/autoreportcenter/anonymous/v1/bicalculator/getmarkvalue',
+    url: '/bicalculator/getmarkvalue',
     method: 'post',
     data
   })

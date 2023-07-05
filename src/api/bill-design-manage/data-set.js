@@ -6,7 +6,7 @@ import {
 export const getpagelistReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/getpagelist',
+    url: '/datacollect/getpagelist',
     method: 'post',
     data
   })
@@ -15,7 +15,7 @@ export const getpagelistReq = data => {
 export const getPagelistNoCaseresult = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/getPagelistNoCaseresult',
+    url: '/datacollect/getPagelistNoCaseresult',
     method: 'post',
     data
   })
@@ -24,7 +24,7 @@ export const getPagelistNoCaseresult = data => {
 export const insertDatacollectReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/insert',
+    url: '/datacollect/insert',
     method: 'post',
     data
   })
@@ -33,7 +33,7 @@ export const insertDatacollectReq = data => {
 export const deleteDatacollectReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/delete',
+    url: '/datacollect/delete',
     method: 'post',
     data
   })
@@ -42,7 +42,7 @@ export const deleteDatacollectReq = data => {
 export const modifyDatacollectReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/modify',
+    url: '/datacollect/modify',
     method: 'post',
     data
   })
@@ -52,7 +52,7 @@ export const testTransformSet = data => {
   return requestCenter({
     timeout: 1000 * 60 * 60, //最长等待60分钟
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/testtransform',
+    url: '/datacollect/testtransform',
     method: 'post',
     data
   })
@@ -61,7 +61,7 @@ export const testTransformSet = data => {
 export const getAllDatasourceReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/queryalldatasource',
+    url: '/datacollect/queryalldatasource',
     method: 'post',
     data
   })
@@ -70,12 +70,12 @@ export const getAllDatasourceReq = data => {
 export const getDeatilByIdReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/anonymous/v1/datacollect/getdetailbysetcode',
+    url: '/datacollect/getdetailbysetcode',
     method: 'post',
     data
   })
 }
 // 获取数据集信息表分页数据
-export const setCodePageListUrl = () => `${window.localStorage.getItem("reportDesignIp")}/api/autoreportcenter/anonymous/v1/datacollect/getCodeList`
+export const setCodePageListUrl = () => `${window.localStorage.getItem("reportDesignIp")}/datacollect/getCodeList`
 //获取对应数据集的第一个字段的值
-export const getValueBySetcodePageListUrl = () => `${window.localStorage.getItem("reportDesignIp")}/api/autoreportcenter/anonymous/v1/datacollect/getFirstValues`
+export const getValueBySetcodePageListUrl = () => `${window.localStorage.getItem("reportDesignIp")}/datacollect/getFirstValues`
