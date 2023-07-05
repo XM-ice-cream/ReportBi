@@ -108,7 +108,7 @@ export const getParamsReq = data => {
 export const uploadImageReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/v1/ftpfile/uploadimage',
+    url: '/ftpfile/uploadimage',
     method: 'post',
     data,
   })

@@ -36,7 +36,7 @@ export const getMarksReq = data => {
 export const addImageReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/v1/ftpfile/insert',
+    url: '/ftpfile/insert',
     method: 'post',
     data
   })
@@ -45,7 +45,7 @@ export const addImageReq = data => {
 export const deleteImageReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/v1/ftpfile/delete',
+    url: '/ftpfile/delete',
     method: 'post',
     data
   })
