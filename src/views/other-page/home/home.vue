@@ -99,7 +99,7 @@
 				<div class="content-bottom">
 					<div class="title">模型占比</div>
 					<div class="content">
-						<PieModel index="0" v-if="isShow" />
+						<PieModel index="0" ref="pieModelRef" v-if="isShow" :data="data.modelRecordData" />
 					</div>
 				</div>
 			</div>
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import { getreportbirecordReq, gettopfiveReq, gettopchartrecordReq } from "@/api/other-page/home";
+import { getreportbirecordReq, gettopfiveReq, gettopchartrecordReq, getmodelrecordReq } from "@/api/other-page/home";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { formatDate } from "@/libs/tools";
 import AvatarCustom from "@/components/avatar-custom";
@@ -143,6 +143,7 @@ export default {
 					},
 				],
 				lineRecordData: [],
+				modelRecordData: [],
 			},
 			userIP: this.$store.state.ip,
 			headIcon: this.$store.state.avatarImgPath,
@@ -207,6 +208,7 @@ export default {
 			this.getNum();
 			this.getTopFive();
 			this.getTopChartRecord("");
+			this.getModelRecord();
 		},
 		//获取汇总数量
 		getNum() {
@@ -248,6 +250,21 @@ export default {
 					this.data.lineRecordData = data;
 					this.$nextTick(() => {
 						this.$refs.lineRecordChartRef.initChart();
+					});
+				}
+			});
+		},
+		//获取模型占比
+		getModelRecord() {
+			const obj = {
+				dateType: this.req.dateType,
+				reportType: this.req.type,
+			};
+			getmodelrecordReq(obj).then((res) => {
+				if (res.code === 200) {
+					this.data.modelRecordData = res?.result || [];
+					this.$nextTick(() => {
+						this.$refs.pieModelRef.initChart();
 					});
 				}
 			});

@@ -30,3 +30,12 @@ export const gettopchartrecordReq = data => {
     data
   })
 }
+// 获取模型占比
+export const getmodelrecordReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/api/autoreportcenter/anonymous/v1/index/getModelRecord',
+    method: 'post',
+    data
+  })
+}

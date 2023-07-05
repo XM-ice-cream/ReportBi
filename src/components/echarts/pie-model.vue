@@ -12,7 +12,10 @@ export default {
 			required: false,
 			default: "0",
 		},
-		data: {},
+		data: {
+			type: Array,
+			default: () => [],
+		},
 	},
 
 	data() {
@@ -61,15 +64,9 @@ export default {
 						labelLine: {
 							show: false,
 						},
-						data: [
-							{ value: 1048, name: "公共模型" },
-							{ value: 735, name: "通用模型" },
-							{ value: 580, name: "Sensor模型" },
-							{ value: 484, name: "SIP模型" },
-							{ value: 300, name: "Sample模型" },
-							{ value: 1, name: "Other模型" },
-							{ value: 50, name: "NCC模型" },
-						],
+						data: this.data.map((item) => {
+							return { value: item.counts, name: item.modelName };
+						}),
 					},
 				],
 			};
