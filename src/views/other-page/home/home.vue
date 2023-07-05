@@ -127,7 +127,7 @@ export default {
 			templateList: {}, //模板list
 			req: {
 				type: "BI",
-				dateType: "month",
+				dateType: "day",
 			},
 			data: {
 				top5Data: [],
