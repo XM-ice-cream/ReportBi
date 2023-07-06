@@ -35,8 +35,8 @@ export default {
 				legend: {
 					type: "scroll",
 					orient: "vertical",
-					right: 50,
-					top: 20,
+					right: 20,
+					top: "25%",
 					bottom: 20,
 				},
 				series: [

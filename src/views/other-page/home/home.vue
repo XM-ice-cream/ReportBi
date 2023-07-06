@@ -1,86 +1,78 @@
 <template>
 	<div class="page-style overflowY home-style">
-		<div class="home-header">
-			<div class="header-left">
-				<avatar-custom :imgUrl="headIcon" v-if="headIcon"></avatar-custom>
-				<template v-else>
-					<div class="avatar-custom">
-						<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small">
-							<img class="head-portrait" src="../../../assets/images/default-head.png" />
-						</span>
-					</div>
-				</template>
-
-				<div class="user-info">
-					<div class="user-content">
-						<p>
-							<span>工号</span><span>{{ account }}</span>
-						</p>
-						<p>
-							<span>姓名</span><span>{{ userName }}</span>
-						</p>
-						<p>
-							<span>电话号码</span><span>{{ phone }}</span>
-						</p>
-						<p>
-							<span>邮箱</span><span>{{ email }}</span>
-						</p>
-					</div>
-					<p class="tip">
-						{{ textTip }}
-					</p>
-				</div>
-			</div>
-			<div class="header-right">
-				<div class="header-box home-card">
-					<div class="title">模板数量</div>
-					<div class="num">{{ data.workbookCount }}</div>
-				</div>
-				<div class="header-box home-card">
-					<div class="title">访问次数</div>
-					<div class="num">{{ data.clickCount }}</div>
-				</div>
-				<div class="header-box home-card" style="border-radius: 0 20px 0 0">
-					<div class="title">新增数</div>
-					<div class="num">{{ data.addCount }}</div>
-				</div>
-			</div>
-		</div>
 		<div class="home-content">
 			<div class="content-left">
-				<RadioGroup v-model="req.dateType" type="button" button-style="solid" size="default" class="content-radio" @on-change="pageLoad('')">
-					<Radio label="month">月</Radio>
-					<Radio label="week">周</Radio>
-					<Radio label="day">天</Radio>
-				</RadioGroup>
-				<!-- 收藏表单 -->
-				<Tabs type="card" v-model="req.type" @on-click="pageLoad('')">
-					<TabPane label="BI" name="BI">
-						<div class="left-collect">
-							<div class="title">收藏模板</div>
-							<div class="content">
-								<div class="box" v-for="item in data.modelList">
-									<div class="name textOverhidden">{{ item.name }}</div>
-								</div>
-							</div>
-						</div>
-					</TabPane>
-					<TabPane label="Report" name="Report">
-						<div class="left-collect">
-							<div class="title">收藏模板</div>
-							<div class="content">
-								<div class="box" v-for="item in data.modelList">
-									<div class="name textOverhidden">{{ item.name }}</div>
-								</div>
-							</div>
-						</div>
-					</TabPane>
-				</Tabs>
+				<div class="home-header">
+					<!-- <div class="header-left"> -->
 
-				<!-- 访问次数折线图 -->
-				<div class="line-chart">
-					<div class="title">{{ lineChartTitle }}</div>
-					<LineRecord index="0" ref="lineRecordChartRef" v-if="isShow" :data="data.lineRecordData" style="height: calc(100% - 70px)" />
+					<!-- </div> -->
+					<div class="header-box home-card">
+						<avatar-custom :imgUrl="headIcon" v-if="headIcon" class="home-icon"></avatar-custom>
+						<template v-else>
+							<div class="avatar-custom home-icon">
+								<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small">
+									<img class="head-portrait" src="../../../assets/images/default-head.png" />
+								</span>
+							</div>
+						</template>
+						<div class="user-info">
+							<div class="user-content">
+								<p>
+									<span>工号</span><span>{{ account }}</span>
+								</p>
+								<p>
+									<span>姓名</span><span>{{ userName }}</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="header-box home-card">
+						<!-- <div class="title">模板数量</div>
+							<div class="num">{{ data.workbookCount }}</div> -->
+					</div>
+					<div class="header-box home-card">
+						<!-- <div class="title">访问次数</div>
+							<div class="num">{{ data.clickCount }}</div> -->
+					</div>
+					<div class="header-box home-card">
+						<!-- <div class="title">新增数</div>
+							<div class="num">{{ data.addCount }}</div> -->
+					</div>
+				</div>
+				<div class="content">
+					<RadioGroup v-model="req.dateType" type="button" button-style="solid" size="default" class="content-radio" @on-change="pageLoad('')">
+						<Radio label="month">月</Radio>
+						<Radio label="week">周</Radio>
+						<Radio label="day">天</Radio>
+					</RadioGroup>
+					<!-- 收藏表单 -->
+					<Tabs type="card" v-model="req.type" @on-click="pageLoad('')">
+						<TabPane label="BI" name="BI">
+							<div class="left-collect">
+								<div class="title">收藏模板</div>
+								<div class="content">
+									<div class="box" v-for="item in data.modelList">
+										<div class="name textOverhidden">{{ item.name }}</div>
+									</div>
+								</div>
+							</div>
+						</TabPane>
+						<TabPane label="Report" name="Report">
+							<div class="left-collect">
+								<div class="title">收藏模板</div>
+								<div class="content">
+									<div class="box" v-for="item in data.modelList">
+										<div class="name textOverhidden">{{ item.name }}</div>
+									</div>
+								</div>
+							</div>
+						</TabPane>
+					</Tabs>
+					<!-- 访问次数折线图 -->
+					<div class="line-chart">
+						<div class="title">{{ lineChartTitle }}</div>
+						<LineRecord index="0" ref="lineRecordChartRef" v-if="isShow" :data="data.lineRecordData" style="height: calc(100% - 70px)" />
+					</div>
 				</div>
 			</div>
 			<!-- top5 -->
@@ -342,192 +334,9 @@ export default {
 .home-card {
 	box-shadow: -1px 1px 6px #e0e6ea;
 }
-.home-header {
-	height: 200px;
-	width: 100%;
-	margin-bottom: 10px;
-	display: flex;
-	.header-left {
-		flex: 0.3;
-		height: 100%;
-		margin: 0 10px;
-		background: #fff;
-		border-radius: 50% 0 0 0;
-		position: relative;
-		display: flex;
-		flex-direction: row;
-		align-content: center;
-		justify-content: center;
-		align-items: center;
-		.avatar-custom {
-			width: 180px;
-			height: 180px;
-			display: inline-block;
-			margin-right: 10px;
-			:deep(.ivu-avatar-small) {
-				margin: 14px;
-				width: calc(100% - 28px);
-				height: calc(100% - 28px);
-				border-radius: 50%;
-				box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
-				box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;
-				background: #faf6f7;
-			}
-		}
-		.user-content {
-			width: 100%;
-			position: absolute;
-			top: 50%;
-			transform: translate(0, -65%);
-		}
-		.user-info {
-			display: inline-block;
-			width: calc(100% - 220px);
-			height: calc(100% - 10px);
-			margin-left: 10px;
-			position: relative;
-			p {
-				padding-top: 10px;
 
-				span:first-child {
-					width: 90px;
-					display: inline-block;
-					font-size: 14px;
-					font-weight: bold;
-					/*两端对齐*/
-					text-align: justify;
-					text-align-last: justify;
-					padding-right: 30px;
-				}
-				span:last-child {
-					font-size: 14px;
-					font-weight: normal;
-					display: inline-block;
-					width: calc(100% - 103px);
-				}
-			}
-			.tip {
-				position: absolute;
-				bottom: 10px;
-				color: #baaaaaa3;
-				right: 0px;
-			}
-		}
-	}
-	.header-right {
-		flex: 0.7;
-		height: 100%;
-		.header-box {
-			width: calc(100% / 3 - 20px);
-			height: 100%;
-			margin: 0 10px;
-			background: #fff;
-			display: inline-block;
-			position: relative;
-			overflow: hidden;
-			.title {
-				color: #778290;
-				position: absolute;
-				top: 70%;
-				left: 50%;
-				font-size: 15px;
-				transform: translate(-50%, -70%);
-				z-index: 1;
-			}
-			.num {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				font-size: 38px;
-				font-weight: bold;
-			}
-			&:nth-child(1) {
-				.num {
-					color: #897eed;
-				}
-				&:before {
-					content: "";
-					width: 200px;
-					height: 200px;
-					background: #f1f2fd;
-					position: absolute;
-					border-radius: 50%;
-					left: 0%;
-					top: -40%;
-					animation: rotate 5s linear infinite;
-				}
-				&:after {
-					content: "";
-					width: 110px;
-					height: 100px;
-					background: #f1f2fd;
-					position: absolute;
-					border-radius: 50%;
-					left: 16%;
-					top: 82%;
-					animation: rotate 5s linear infinite;
-				}
-			}
-			&:nth-child(2) {
-				.num {
-					color: #5b9ffe;
-				}
-				&:before {
-					content: "";
-					width: 200px;
-					height: 200px;
-					background: #edf3fd;
-					position: absolute;
-					border-radius: 50%;
-					left: 39%;
-					top: -70%;
-					animation: rotate 5s linear infinite;
-				}
-				&:after {
-					content: "";
-					width: 220px;
-					height: 200px;
-					background: #f1f6fd;
-					position: absolute;
-					border-radius: 50%;
-					left: 0%;
-					top: 36%;
-					animation: rotate 5s linear infinite;
-				}
-			}
-			&:nth-child(3) {
-				.num {
-					color: #30cbc0;
-				}
-				&:before {
-					content: "";
-					width: 200px;
-					height: 200px;
-					background: #eafbfd;
-					position: absolute;
-					border-radius: 50%;
-					left: 13%;
-					top: -41%;
-					animation: rotate 5s linear infinite;
-				}
-				&:after {
-					content: "";
-					width: 700px;
-					height: 690px;
-					background: #d2f0ed;
-					position: absolute;
-					border-radius: 50%;
-					left: 175px;
-					top: 164px;
-					animation: rotate 5s linear infinite;
-				}
-			}
-		}
-	}
-}
 .home-content {
-	height: calc(100% - 200px - 10px);
+	height: 100%;
 	display: flex;
 	.title {
 		height: 50px;
@@ -542,73 +351,127 @@ export default {
 		height: 100%;
 		margin: 0 10px;
 		position: relative;
-		.content-radio {
-			position: absolute;
-			top: 5px;
-			right: 0;
-			z-index: 1;
-		}
-		.left-collect {
+		.home-header {
 			height: 200px;
+			width: 100%;
 			margin-bottom: 10px;
-			background: #fff;
-			.content {
-				height: calc(100% - 70px);
-				display: flex;
-				flex-wrap: nowrap;
-				align-content: center;
-				justify-content: flex-start;
-				align-items: center;
-				margin: 0 10px;
-				padding: 10px 0;
-				overflow-x: auto;
-				overflow-y: hidden;
-				.box {
-					width: 200px;
-					height: 100%;
-					border: 1px solid #efefef;
-					position: relative;
-					border-radius: 10px;
-					flex-shrink: 0;
-					margin: 0 10px;
-					.name {
-						width: 100%;
-						position: absolute;
-						text-align: center;
-						top: 50%;
-						left: 50%;
-						transform: translate(-50%, -50%);
-						color: #000;
-						font-weight: bold;
-						padding: 10px;
-						font-size: 16px;
-					}
-					&:hover {
-						background: #22936512;
-						cursor: pointer;
-						border: 1px solid #5dc79c;
-						.name {
-							font-size: 18px;
-						}
-					}
+			display: flex;
+			position: relative;
+			justify-content: space-between;
+			align-items: flex-end;
+			.header-box {
+				width: calc(100% / 4 - 20px);
+				height: 70%;
+				background: #fff;
+				position: relative;
+				margin: 10px 0;
+				.title {
+					color: #778290;
+					position: absolute;
+					top: 70%;
+					left: 50%;
+					font-size: 15px;
+					transform: translate(-50%, -70%);
+					z-index: 1;
 				}
-				&::-webkit-scrollbar-thumb {
-					border-radius: 5px;
-					background-color: #f5f7f9;
+				.num {
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					font-size: 38px;
+					font-weight: bold;
+				}
+				.avatar-custom {
+					width: 100px;
+					height: 100px;
+					display: inline-block;
+					margin-right: 10px;
+					position: absolute;
+					top: -50px;
+					:deep(.ivu-avatar-small) {
+						margin: 14px;
+						width: calc(100% - 28px);
+						height: calc(100% - 28px);
+						border-radius: 50%;
+						box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
+						box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;
+						background: #faf6f7;
+					}
 				}
 			}
 		}
-		.line-chart {
-			height: calc(100% - 200px - 50px - 10px - 10px);
-			background: #fff;
-			margin-top: 10px;
+		.content {
+			height: calc(100% - 200px - 10px);
+			position: relative;
+			.content-radio {
+				position: absolute;
+				top: 5px;
+				right: 0;
+				z-index: 1;
+			}
+			.left-collect {
+				height: 200px;
+				margin-bottom: 10px;
+				background: #fff;
+				.content {
+					height: calc(100% - 70px);
+					display: flex;
+					flex-wrap: nowrap;
+					align-content: center;
+					justify-content: flex-start;
+					align-items: center;
+					margin: 0 10px;
+					padding: 10px 0;
+					overflow-x: auto;
+					overflow-y: hidden;
+					.box {
+						width: 200px;
+						height: 100%;
+						border: 1px solid #efefef;
+						position: relative;
+						border-radius: 10px;
+						flex-shrink: 0;
+						margin: 0 10px;
+						.name {
+							width: 100%;
+							position: absolute;
+							text-align: center;
+							top: 50%;
+							left: 50%;
+							transform: translate(-50%, -50%);
+							color: #000;
+							font-weight: bold;
+							padding: 10px;
+							font-size: 16px;
+						}
+						&:hover {
+							background: #22936512;
+							cursor: pointer;
+							border: 1px solid #5dc79c;
+							.name {
+								font-size: 18px;
+							}
+						}
+					}
+					&::-webkit-scrollbar-thumb {
+						border-radius: 5px;
+						background-color: #f5f7f9;
+					}
+				}
+			}
+			.line-chart {
+				height: calc(100% - 200px - 50px - 10px - 10px);
+				background: #fff;
+				margin-top: 10px;
+			}
 		}
 	}
 	.content-right {
-		height: calc(100% - 10px);
+		height: 100%;
 		width: calc(30% - 40px);
 		background: #fff;
-		margin: 10px;
+		margin: 0 10px;
 		.content-top,
 		.content-bottom {
 			height: 50%;

@@ -106,3 +106,22 @@ export const getChartsInfoReq = data => {
     data
   })
 }
+
+//获取用户收藏
+export const getCollectReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/BIWorkbook/getCollectEntity',
+    method: 'post',
+    data
+  })
+}
+//修改用户收藏
+export const modifyCollectReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/BIWorkbook/modifyCollect',
+    method: 'post',
+    data
+  })
+}

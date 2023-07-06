@@ -66,6 +66,11 @@
 					<template slot="operator" slot-scope="{ row }">
 						<div class="operator">
 							<p @click="preview(row)">预览</p>
+							<span></span>
+							<p>
+								<i class="iconfont icon-menu-like menu-like" title="加入收藏"></i>
+								<i class="iconfont icon-menu-like-active menu-like" title="取消收藏"></i>
+							</p>
 						</div>
 					</template>
 				</Table>
@@ -86,7 +91,7 @@
 </template>
 
 <script>
-import { getpagelistReq, deleteReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { getpagelistReq, deleteReq, getCollectReq, modifyCollectReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { getButtonBoolean, renderIsEnabled, renderDate } from "@/libs/tools";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import WorkbookDesign from "./workbook-manage/workbook-design.vue";
@@ -107,6 +112,7 @@ export default {
 			datasetList: [], //获取所有数据集
 			isAdd: true,
 			selectObj: {}, //表格选中
+			collectObj: {}, //收藏工作簿
 			dataSetIdName: {},
 			submitData: {
 				id: "",
@@ -151,7 +157,7 @@ export default {
 					tooltip: true,
 				},
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled, width: 80 },
-				{ title: "操作", slot: "operator", align: "center", width: 80 },
+				{ title: "操作", slot: "operator", align: "center", width: 120 },
 			], // 表格数据
 		};
 	},
@@ -172,6 +178,7 @@ export default {
 		this.pageLoad();
 		this.autoSize();
 		this.getDataSetList();
+		this.getCollectList(); //获取用户收藏数
 		window.addEventListener("resize", () => this.autoSize());
 	},
 	// 导航离开该组件的对应路由时调用
@@ -212,6 +219,15 @@ export default {
 				})
 				.catch(() => (this.tableConfig.loading = false));
 			this.searchPoptipModal = false;
+		},
+		//获取用户收藏
+		getCollectList() {
+			const obj = { type: "BI" };
+			getCollectReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.collectObj = { ...res.result };
+				}
+			});
 		},
 		//返回
 		turnBack() {
