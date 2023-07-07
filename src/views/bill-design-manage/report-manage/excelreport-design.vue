@@ -208,7 +208,9 @@ export default {
 					},
 				],
 			};
-			options.data = this.sheetData;
+			options.data = this.sheetData.map((item) => {
+				return { ...item, scrollLeft: 0 };
+			});
 			this.$nextTick(() => {
 				$(function () {
 					luckysheet.create(options);
