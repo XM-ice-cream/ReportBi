@@ -96,6 +96,7 @@ export default {
 		},
 		//排序
 		changeSortBy() {
+			this.tableConfig.loading = false;
 			if (this.submitData.sortBy === "manual" && (!this.submitData.sortValue || this.submitData?.sortValue?.length == 0)) {
 				this.getAllValue();
 			}

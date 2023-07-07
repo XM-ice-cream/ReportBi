@@ -322,6 +322,7 @@ export default {
 	border-radius: 0px;
 	border: none;
 	border-bottom: 1px solid #52d8a0;
+	font-weight: bold;
 }
 </style>
 <style lang="less" scoped>
@@ -354,9 +355,12 @@ export default {
 }
 :deep(.ivu-table th) {
 	border-bottom: 1px solid #fff;
+	height: 50px !important;
+	line-height: 50px;
 }
 :deep(.ivu-table td) {
 	border-bottom: 1px solid #fff;
+	padding-bottom: 20px;
 }
 :deep(table > tr > td:nth-child(1) > .ivu-select-selection) {
 	border: none;

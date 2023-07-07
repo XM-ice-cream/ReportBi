@@ -327,7 +327,7 @@ export default {
 	overflow-x: hidden;
 	align-content: flex-start;
 	background-color: #f5f7f9;
-	padding-bottom: 1rem;
+	padding-bottom: 14px;
 	.cardCell {
 		width: 23.8%;
 		/* background: #ccc; */
