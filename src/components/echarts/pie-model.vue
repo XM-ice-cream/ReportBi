@@ -71,6 +71,11 @@ export default {
 				],
 			};
 			this.modelPieChart.setOption(option, true);
+			window.addEventListener("resize", () => {
+				if (this.modelPieChart) {
+					this.modelPieChart.resize();
+				}
+			});
 		},
 	},
 	mounted() {

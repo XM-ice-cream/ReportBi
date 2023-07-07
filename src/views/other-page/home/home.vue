@@ -10,7 +10,7 @@
 						<avatar-custom :imgUrl="headIcon" v-if="headIcon" class="home-icon" shape="square"></avatar-custom>
 						<template v-else>
 							<div class="avatar-custom home-icon">
-								<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small">
+								<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small ivu-head">
 									<img class="head-portrait" src="../../../assets/images/default-head.png" />
 								</span>
 							</div>
@@ -410,12 +410,26 @@ export default {
 						/*	box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
 						box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;*/
 						background: #13c2c2;
+						transition: 0.6s;
+						-webkit-transition: 0.6s;
+						-moz-transition: 0.6s;
 					}
 					i {
 						font-size: 34px;
 						line-height: 70px;
+						transition: 0.6s;
+						-webkit-transition: 0.6s;
+						-moz-transition: 0.6s;
 					}
 				}
+				&:hover .ivu-avatar-small > i {
+					display: inline-block;
+					transform: scale(-1) rotate(180deg);
+				}
+				/*&:hover .ivu-head {
+					display: inline-block;
+					transform: scale(-1) rotate(180deg);
+				}*/
 			}
 		}
 		.content {

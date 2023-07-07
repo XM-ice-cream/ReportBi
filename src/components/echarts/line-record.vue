@@ -151,6 +151,11 @@ export default {
 				],
 			};
 			this.recordLineChart.setOption(option, true);
+			window.addEventListener("resize", () => {
+				if (this.recordLineChart) {
+					this.recordLineChart.resize();
+				}
+			});
 		},
 	},
 };
