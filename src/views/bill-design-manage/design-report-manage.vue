@@ -123,6 +123,7 @@
 					:data="data"
 					@on-current-change="currentClick"
 					@on-selection-change="selectClick"
+					@on-row-dblclick="design"
 				>
 					<template slot-scope="{ row }" slot="reportType">
 						<Tag v-if="row.reportType === 'excel'" color="success" type="dot" size="small">Excel报表</Tag>
