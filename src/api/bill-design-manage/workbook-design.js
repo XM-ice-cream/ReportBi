@@ -54,7 +54,7 @@ export const deleteImageReq = data => {
 export const updateImageReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/v1/ftpfile/update',
+    url: '/ftpfile/update',
     method: 'post',
     data
   })
@@ -63,7 +63,7 @@ export const updateImageReq = data => {
 export const getImageReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/api/autoreportcenter/v1/ftpfile/getlist',
+    url: '/ftpfile/getlist',
     method: 'post',
     data
   })
