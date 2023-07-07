@@ -7,7 +7,7 @@
 
 					<!-- </div> -->
 					<div class="header-box home-card">
-						<avatar-custom :imgUrl="headIcon" v-if="headIcon" class="home-icon"></avatar-custom>
+						<avatar-custom :imgUrl="headIcon" v-if="headIcon" class="home-icon" shape="square"></avatar-custom>
 						<template v-else>
 							<div class="avatar-custom home-icon">
 								<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small">
@@ -15,28 +15,35 @@
 								</span>
 							</div>
 						</template>
-						<div class="user-info">
-							<div class="user-content">
-								<p>
-									<span>工号</span><span>{{ account }}</span>
-								</p>
-								<p>
-									<span>姓名</span><span>{{ userName }}</span>
-								</p>
-							</div>
+						<span class="num" style="font-size: 24px">{{ account }}</span>
+						<span class="title">{{ userName }}</span>
+					</div>
+					<div class="header-box home-card">
+						<div class="avatar-custom home-icon">
+							<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small" style="background: #eeca38">
+								<i class="iconfont icon-moban"></i>
+							</span>
 						</div>
+						<span class="title">模板数量</span>
+						<span class="num">{{ data.workbookCount }}</span>
 					</div>
 					<div class="header-box home-card">
-						<!-- <div class="title">模板数量</div>
-							<div class="num">{{ data.workbookCount }}</div> -->
+						<div class="avatar-custom home-icon">
+							<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small" style="background: #ef8d60">
+								<i class="iconfont icon-fangwenmingxi"></i>
+							</span>
+						</div>
+						<span class="title">访问次数</span>
+						<span class="num">{{ data.clickCount }}</span>
 					</div>
 					<div class="header-box home-card">
-						<!-- <div class="title">访问次数</div>
-							<div class="num">{{ data.clickCount }}</div> -->
-					</div>
-					<div class="header-box home-card">
-						<!-- <div class="title">新增数</div>
-							<div class="num">{{ data.addCount }}</div> -->
+						<div class="avatar-custom home-icon">
+							<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small" style="background: #52bce3">
+								<i class="iconfont icon-xinzeng"></i>
+							</span>
+						</div>
+						<span class="title">新增数</span>
+						<span class="num">{{ data.addCount }}</span>
 					</div>
 				</div>
 				<div class="content">
@@ -51,7 +58,7 @@
 							<div class="left-collect">
 								<div class="title">收藏模板</div>
 								<div class="content">
-									<div class="box" v-for="item in data.modelList">
+									<div class="box" v-for="item in data.modelList" @click="preview(item)">
 										<div class="name textOverhidden">{{ item.name }}</div>
 									</div>
 								</div>
@@ -61,7 +68,7 @@
 							<div class="left-collect">
 								<div class="title">收藏模板</div>
 								<div class="content">
-									<div class="box" v-for="item in data.modelList">
+									<div class="box" v-for="item in data.modelList" @click="preview(item)">
 										<div class="name textOverhidden">{{ item.name }}</div>
 									</div>
 								</div>
@@ -101,6 +108,7 @@
 
 <script>
 import { getreportbirecordReq, gettopfiveReq, gettopchartrecordReq, getmodelrecordReq } from "@/api/other-page/home";
+import { getCollectReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { formatDate } from "@/libs/tools";
 import AvatarCustom from "@/components/avatar-custom";
@@ -123,17 +131,7 @@ export default {
 			},
 			data: {
 				top5Data: [],
-				modelList: [
-					{
-						name: "SN 总数BY Config",
-					},
-					{
-						name: "panel location(N01&N02)",
-					},
-					{
-						name: "LINENAME(NCC)",
-					},
-				],
+				modelList: [],
 				lineRecordData: [],
 				modelRecordData: [],
 			},
@@ -186,8 +184,6 @@ export default {
 	},
 	mounted() {
 		this.$Message.destroy();
-		this.changeTips();
-		this.changeText();
 		this.pageLoad();
 		this.getDataItemData();
 		this.$nextTick(() => {
@@ -201,6 +197,7 @@ export default {
 			this.getTopFive();
 			this.getTopChartRecord("");
 			this.getModelRecord();
+			this.getCollectList();
 		},
 		//获取汇总数量
 		getNum() {
@@ -261,6 +258,36 @@ export default {
 				}
 			});
 		},
+		//获取用户收藏
+		getCollectList() {
+			const obj = { type: this.req.type };
+			getCollectReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.data.modelList = res.result || [];
+				}
+			});
+		},
+		//跳转页面
+		preview(data) {
+			const { collect, name } = data;
+			const type = this.req.type;
+			let params = type == "BI" ? { id: collect } : { reportCode: collect, reportName: name };
+			let skipName = `${type}Preview`;
+			const href = this.skipUrl(skipName, { ...params });
+			window.open(href, "_blank");
+		},
+		//跳转路径
+		skipUrl(key, data) {
+			const obj = {
+				ReportPreview: "/bill-design-manage/excelreport-preview",
+				BIPreview: "/bill-design-manage/workbook-preview",
+			};
+			const { href } = this.$router.resolve({
+				path: obj[key],
+				query: { ...data },
+			});
+			return href;
+		},
 		// 弹窗取消事件
 		modalCancel() {
 			this.modalFlag = false;
@@ -275,21 +302,6 @@ export default {
 				if (res.code === 200) res.result?.forEach((item) => (arr[item.detailCode] = item.detailName)) || [];
 			});
 			return arr;
-		},
-		// 判断当前时间
-		changeTips() {
-			let date = new Date();
-			if (date.getHours() >= 0 && date.getHours() < 12) {
-				this.hoursTip = "早安";
-			} else if (date.getHours() >= 12 && date.getHours() < 18) {
-				this.hoursTip = "午安";
-			} else {
-				this.hoursTip = "晚上好";
-			}
-		},
-		changeText() {
-			let randomTextIndex = Math.round(Math.random() * this.textList.length);
-			this.textTip = this.textList[randomTextIndex];
 		},
 	},
 };
@@ -368,11 +380,11 @@ export default {
 				.title {
 					color: #778290;
 					position: absolute;
-					top: 70%;
+					top: 80%;
 					left: 50%;
 					font-size: 15px;
-					transform: translate(-50%, -70%);
-					z-index: 1;
+					transform: translate(-50%, -50%);
+					padding: 0px;
 				}
 				.num {
 					position: absolute;
@@ -386,17 +398,22 @@ export default {
 					width: 100px;
 					height: 100px;
 					display: inline-block;
-					margin-right: 10px;
 					position: absolute;
-					top: -50px;
+					top: 0;
+					left: 50%;
+					transform: translate(-50%, -50%);
 					:deep(.ivu-avatar-small) {
 						margin: 14px;
 						width: calc(100% - 28px);
 						height: calc(100% - 28px);
-						border-radius: 50%;
-						box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
-						box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;
-						background: #faf6f7;
+						border-radius: 10px;
+						/*	box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
+						box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;*/
+						background: #13c2c2;
+					}
+					i {
+						font-size: 34px;
+						line-height: 70px;
 					}
 				}
 			}
@@ -478,11 +495,14 @@ export default {
 			margin-bottom: 20px;
 			.content {
 				height: calc(100% - 70px);
-
+				display: flex;
+				flex-wrap: wrap;
+				align-content: space-around;
+				width: 100%;
 				.box {
+					width: 100%;
 					padding: 0 20px;
 					font-size: 16px;
-					margin: 20px 0;
 					display: flex;
 					flex-direction: row;
 					justify-content: space-between;
@@ -490,6 +510,7 @@ export default {
 					align-content: center;
 					/*	box-shadow: 3px 4px 10px #cec9c936;*/
 					position: relative;
+
 					&:before {
 						/*	box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.16);*/
 						position: absolute;
@@ -508,11 +529,9 @@ export default {
 						/*排序*/
 						&.order {
 							font-weight: bold;
-							font-style: italic;
 							color: #fff;
 							/*	height: 30px;*/
 							background: #406196;
-							transform: perspective(10px) rotateX(-5deg);
 							border: 1px solid #4c6a9d;
 							display: inline-block;
 							padding: 7px;

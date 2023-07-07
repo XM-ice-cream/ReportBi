@@ -111,16 +111,25 @@ export const getChartsInfoReq = data => {
 export const getCollectReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/BIWorkbook/getCollectEntity',
+    url: '/BIWorkbook/getCollectList',
     method: 'post',
     data
   })
 }
-//修改用户收藏
-export const modifyCollectReq = data => {
+//新增用户收藏
+export const addCollectReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/BIWorkbook/modifyCollect',
+    url: '/BIWorkbook/insertCollect',
+    method: 'post',
+    data
+  })
+}
+//删除用户收藏
+export const deleteCollectReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/BIWorkbook/deleteCollect',
     method: 'post',
     data
   })

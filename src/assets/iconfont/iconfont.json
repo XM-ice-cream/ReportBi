@@ -6,6 +6,27 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "3851366",
+      "name": "模板",
+      "font_class": "moban",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "4360998",
+      "name": "新增",
+      "font_class": "xinzeng",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "20402838",
+      "name": "访问明细",
+      "font_class": "fangwenmingxi",
+      "unicode": "e641",
+      "unicode_decimal": 58945
+    },
+    {
       "icon_id": "1587096",
       "name": "pdf打印",
       "font_class": "pdfdayin",

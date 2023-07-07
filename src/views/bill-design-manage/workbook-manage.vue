@@ -68,8 +68,15 @@
 							<p @click="preview(row)">预览</p>
 							<span></span>
 							<p>
-								<i class="iconfont icon-menu-like menu-like" title="加入收藏"></i>
-								<i class="iconfont icon-menu-like-active menu-like" title="取消收藏"></i>
+								<i
+									class="iconfont icon-menu-like-active menu-like"
+									title="取消收藏"
+									style="color: #ffb300"
+									v-if="collectList.map((item) => item.collect).includes(row.id)"
+									@click="deleteCollectList(row.id)"
+								></i>
+
+								<i class="iconfont icon-menu-like menu-like" title="加入收藏" style="color: #ffb300" v-else @click="addCollectList(row)"></i>
 							</p>
 						</div>
 					</template>
@@ -91,7 +98,7 @@
 </template>
 
 <script>
-import { getpagelistReq, deleteReq, getCollectReq, modifyCollectReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { getpagelistReq, deleteReq, getCollectReq, addCollectReq, deleteCollectReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { getButtonBoolean, renderIsEnabled, renderDate } from "@/libs/tools";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import WorkbookDesign from "./workbook-manage/workbook-design.vue";
@@ -112,7 +119,7 @@ export default {
 			datasetList: [], //获取所有数据集
 			isAdd: true,
 			selectObj: {}, //表格选中
-			collectObj: {}, //收藏工作簿
+			collectList: [], //收藏工作簿
 			dataSetIdName: {},
 			submitData: {
 				id: "",
@@ -161,11 +168,7 @@ export default {
 			], // 表格数据
 		};
 	},
-	watch: {
-		modelFlag(newVal) {
-			console.log("监听2：", newVal);
-		},
-	},
+
 	mounted() {
 		const { nodeId, authorityBtn } = JSON.parse(window.localStorage.getItem("previewBiPermission"));
 		//按钮权限
@@ -225,7 +228,28 @@ export default {
 			const obj = { type: "BI" };
 			getCollectReq(obj).then((res) => {
 				if (res.code == 200) {
-					this.collectObj = { ...res.result };
+					this.collectList = res.result || [];
+				}
+			});
+		},
+		//新增用户收藏
+		addCollectList(data) {
+			const { id, workBookName } = data;
+			console.log("data", data);
+			const obj = { type: "BI", collect: id, name: workBookName };
+			addCollectReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.getCollectList();
+				}
+			});
+		},
+		//删除用户收藏
+		deleteCollectList(data) {
+			const id = this.collectList.filter((item) => item.collect === data)[0].id;
+			const obj = { id };
+			deleteCollectReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.getCollectList();
 				}
 			});
 		},

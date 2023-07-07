@@ -55,6 +55,23 @@
 								</span>
 								<span class="name" :title="item.reportName">
 									{{ item.reportName }}
+									<span style="float: right">
+										<i
+											class="iconfont icon-menu-like-active menu-like"
+											title="取消收藏"
+											style="color: #ffb300"
+											v-if="collectList.map((item) => item.collect).includes(item.reportCode)"
+											@click.stop="deleteCollectList(item.reportCode)"
+										></i>
+
+										<i
+											class="iconfont icon-menu-like menu-like"
+											title="加入收藏"
+											style="color: #ffb300"
+											v-else
+											@click.stop="addCollectList(item)"
+										></i>
+									</span>
 								</span>
 							</span>
 							<Row :gutter="24">
@@ -107,6 +124,7 @@
 </template>
 
 <script>
+import { getCollectReq, addCollectReq, deleteCollectReq } from "@/api/bill-design-manage/workbook-manage.js";
 import { formatDate } from "@/libs/tools";
 import { getpagelistReq } from "@/api/bill-design-manage/report-manage";
 import { getpagelisttreeReq } from "@/api/organize-manager/authorize-manager/menu-manager";
@@ -118,6 +136,7 @@ export default {
 		return {
 			data: [], // 结果集
 			selectObj: null, //表格选中
+			collectList: [], //收藏
 			formatDate: formatDate,
 			roleBtn: [], //该角色下的报表权限卡片
 			remarkList: [], //报表类型下拉
@@ -132,6 +151,7 @@ export default {
 		};
 	},
 	mounted() {
+		this.getCollectList(); //获取收藏
 		this.getRoleBtn();
 		this.getDataItemData();
 	},
@@ -237,6 +257,35 @@ export default {
 				}
 			});
 			return arr;
+		},
+		//获取用户收藏
+		getCollectList() {
+			const obj = { type: "Report" };
+			getCollectReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.collectList = res.result || [];
+				}
+			});
+		},
+		//新增用户收藏
+		addCollectList(data) {
+			const { reportCode, reportName } = data;
+			const obj = { type: "Report", collect: reportCode, name: reportName };
+			addCollectReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.getCollectList();
+				}
+			});
+		},
+		//删除用户收藏
+		deleteCollectList(data) {
+			const id = this.collectList.filter((item) => item.collect === data)[0].id;
+			const obj = { id };
+			deleteCollectReq(obj).then((res) => {
+				if (res.code == 200) {
+					this.getCollectList();
+				}
+			});
 		},
 
 		// 选择第几页
