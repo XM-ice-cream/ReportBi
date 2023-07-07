@@ -1,9 +1,7 @@
 <template>
 	<!-- 函数管理 -->
-	<Modal title="数据集管理" v-model="outerVisible" class="functionModal" width="1200">
-		<div class="function-editor" id="function-editor">
-			<monaco-editor v-model.trim="rightForm.v" language="sql" style="height: 200px" v-if="outerVisible" />
-		</div>
+	<Modal title="数据集管理" v-model="outerVisible" class="functionModal" width="1200" :mask-closable="false" @on-close="cancelClick">
+		<monaco-editor v-model.trim="rightForm.v" language="sql" style="height: 200px" v-if="functionVisible" />
 		<div class="function-content">
 			<div class="function-type">
 				<Menu :active-name="menuType" @on-select="(name) => (menuType = name)">
@@ -33,7 +31,7 @@
 			</div>
 		</div>
 		<div slot="footer" class="dialog-footer">
-			<Button @click="outerVisible = false">取 消</Button>
+			<Button @click="cancelClick">取 消</Button>
 			<Button type="primary" @click="autoChangeFunc">确定 </Button>
 		</div>
 	</Modal>
@@ -59,11 +57,19 @@ export default {
 			deep: true,
 			immediate: true,
 		},
+		outerVisible(newVal) {
+			if (newVal) {
+				setTimeout(() => {
+					this.functionVisible = true;
+				}, 300);
+			}
+		},
 	},
 	data() {
 		return {
 			rightForm: {},
 			outerVisible: false,
+			functionVisible: false,
 			menuType: "0",
 			menuName: "0",
 			dataItemList: [],
@@ -72,14 +78,15 @@ export default {
 	methods: {
 		//提交
 		autoChangeFunc() {
-			this.outerVisible = false;
-			this.rightForm.m = this.rightForm.v;
-			this.$emit("autoChangeFunc", this.rightForm);
+			const rightForm = { ...this.rightForm, m: this.rightForm.v };
+			this.$emit("autoChangeFunc", rightForm);
+			this.cancelClick();
 		},
 		//双击
 		menuDblclick(val) {
 			this.rightForm.v = `=${val.detailCode}()`;
 			this.rightForm.m = `=${val.detailCode}()`;
+			this.rightForm = JSON.parse(JSON.stringify(this.rightForm));
 		},
 		// 获取业务数据
 		async getDataItemData() {
@@ -111,6 +118,12 @@ export default {
 				}
 			});
 			return arr;
+		},
+		//取消
+		cancelClick() {
+			this.outerVisible = false;
+			this.functionVisible = false;
+			this.rightForm = {};
 		},
 	},
 };
