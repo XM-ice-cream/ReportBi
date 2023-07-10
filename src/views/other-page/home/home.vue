@@ -413,6 +413,11 @@ export default {
 						transition: 0.6s;
 						-webkit-transition: 0.6s;
 						-moz-transition: 0.6s;
+						img {
+							transition: 0.6s;
+							-webkit-transition: 0.6s;
+							-moz-transition: 0.6s;
+						}
 					}
 					i {
 						font-size: 34px;
@@ -423,6 +428,10 @@ export default {
 					}
 				}
 				&:hover .ivu-avatar-small > i {
+					display: inline-block;
+					transform: scale(-1) rotate(180deg);
+				}
+				&:hover :deep(.ivu-avatar-small > img) {
 					display: inline-block;
 					transform: scale(-1) rotate(180deg);
 				}
