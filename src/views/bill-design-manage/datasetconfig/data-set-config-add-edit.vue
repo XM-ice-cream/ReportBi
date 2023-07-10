@@ -299,7 +299,7 @@ export default {
 		},
 		filterData() {
 			const keyWord = this.submitData.filterTable?.toUpperCase() || "";
-			const reg = new RegExp(keyWord);
+			const reg = new RegExp(keyWord, "i");
 			const arr = [];
 			this.treeData.forEach((item) => {
 				if (reg.test(item)) {
