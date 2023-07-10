@@ -103,6 +103,8 @@ export default {
   simpleSpelling: '简拼',
   phone: '手机号',
   email: '邮箱',
+  superAdmin: '超管',
+  lastPasswordChangeTime: "修改密码时间",
   company: '公司',
   department: '部门',
   belongDepartment: '所属部门',

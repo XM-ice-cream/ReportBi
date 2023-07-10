@@ -1,51 +1,58 @@
 <template>
 	<div class="page-style user-info">
-		<Split v-model="split">
-			<!--左侧导航栏-->
-			<div slot="left" class="split-pane">
-				<Card :padding="0" :bordered="false" dis-hover>
-					<CellGroup @on-click="cellClick">
-						<Cell :name="1" :selected="cellSelected === 1">{{ userInfo }}</Cell>
-						<Cell :name="2" :selected="cellSelected === 2">{{ updatePwd }}</Cell>
-					</CellGroup>
-				</Card>
+		<!--右侧展示栏-->
+		<Card :bordered="false" dis-hover class="info-card">
+			<template #title>
+				{{ userInfo }}
+			</template>
+			<div style="width: fit-content; margin: 0px auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+				<div class="info-head">
+					<avatar-custom :imgUrl="req.headIcon" :avatarSize="'120'"></avatar-custom>
+					<upload-custom
+						class="upload-head"
+						title="更换头像"
+						uploadIcon="md-cloud-upload"
+						:uploadUrl="uploadHeadIcon"
+						:uploadHeight="33"
+						:multiple="uploadMultiple"
+						@upload-success="uploadSuccess"
+					>
+						<p slot="button" class="upload-head"><Button type="primary" size="default" style="margin-top: 10px">修改</Button></p>
+					</upload-custom>
+				</div>
+				<Form :label-width="170" :label-colon="false" label-position="left" style="display: inline-block">
+					<FormItem :label="$t('account')">{{ req.account }}</FormItem>
+					<FormItem :label="$t('userName')">{{ req.userName }}</FormItem>
+					<FormItem :label="$t('phone')">{{ req.phone }}</FormItem>
+					<FormItem :label="$t('email')">{{ req.email }}</FormItem>
+					<FormItem :label="$t('superAdmin')">
+						<i-switch size="large" v-model="req.superAdmin">
+							<span slot="open">是</span>
+							<span slot="close">否</span>
+						</i-switch>
+					</FormItem>
+					<FormItem :label="$t('lastPasswordChangeTime')">{{ formatDate(req.lastPasswordChangeTime) }}</FormItem>
+				</Form>
 			</div>
-			<!--右侧展示栏-->
-			<div slot="right" class="split-pane">
-				<Card v-show="isUserInfo === 1" :bordered="false" dis-hover>
-					<p slot="title">{{ userInfo }}</p>
-					<Form :label-width="80" :label-colon="false">
-						<FormItem :label="$t('headIcon')" class="user-head">
-							<avatar-custom :imgUrl="req.headIcon" :avatarSize="'146'"></avatar-custom>
-							<upload-custom
-								:uploadUrl="uploadHeadIcon"
-								:uploadHeight="33"
-								:multiple="uploadMultiple"
-								@upload-success="uploadSuccess"
-								class="upload-head"
-								title="更换头像"
-							></upload-custom>
-						</FormItem>
-						<FormItem :label="$t('account')">{{ req.account }}</FormItem>
-						<FormItem :label="$t('userName')">{{ req.userName }}</FormItem>
-						<FormItem :label="$t('roleName')" v-if="false">{{ req.roleName }}</FormItem>
-						<FormItem :label="$t('organizeName')" v-if="false">{{ req.organizeName }}</FormItem>
-						<FormItem :label="$t('phone')">{{ req.phone }}</FormItem>
-						<FormItem :label="$t('email')">{{ req.email }}</FormItem>
-					</Form>
-				</Card>
-				<Card :bordered="false" v-show="isUserInfo === 2" dis-hover>
-					<p slot="title">{{ updatePwd }}</p>
-					<Form ref="req" :model="req" :rules="ruleValidate" label-position="top" :label-colon="false" class="pwd-form">
-						<FormItem style="color: rgba(0, 0, 0, 0.45)">{{ $t("userInfoTips") }}</FormItem>
-						<FormItem :label="$t('oldPwd')" prop="oldPwd"><Input v-model="req.oldPwd" clearable /></FormItem>
-						<FormItem :label="$t('newPwd')" prop="newPwd"><Input v-model="req.newPwd" clearable /></FormItem>
-						<FormItem :label="$t('surePwd')" prop="surePwd"><Input v-model="req.surePwd" clearable /></FormItem>
+		</Card>
+		<Card :bordered="false" dis-hover class="pwd-card">
+			<template #title>
+				{{ updatePwd }}
+			</template>
+			<div style="width: 70%; margin: 0 auto">
+				<Form ref="req" :model="req" :rules="ruleValidate" label-width="200" :label-colon="false">
+					<FormItem>
+						<Alert type="warning">{{ $t("userInfoTips") }}</Alert></FormItem
+					>
+					<FormItem :label="$t('oldPwd')" prop="oldPwd"><Input v-model="req.oldPwd" clearable /></FormItem>
+					<FormItem :label="$t('newPwd')" prop="newPwd"><Input v-model="req.newPwd" clearable /></FormItem>
+					<FormItem :label="$t('surePwd')" prop="surePwd"><Input v-model="req.surePwd" clearable /></FormItem>
+					<FormItem style="text-align: center">
 						<Button type="primary" size="default" @click="updateClick" style="margin-top: 10px">{{ updatePwd }}</Button>
-					</Form>
-				</Card>
+					</FormItem>
+				</Form>
 			</div>
-		</Split>
+		</Card>
 	</div>
 </template>
 
@@ -54,7 +61,7 @@ import { updatepasswordReq, modifyReq, uploadHeadIcon } from "@/api/organize-man
 import { mapActions, mapMutations } from "vuex";
 import { encryptDes, sha1_to_base64 } from "@/libs/des";
 import { localSave, localReadObject, sessionRead } from "@/libs/utils";
-import { errorType } from "@/libs/tools";
+import { errorType, formatDate } from "@/libs/tools";
 import UploadCustom from "@/components/upload-custom";
 import AvatarCustom from "@/components/avatar-custom";
 
@@ -63,10 +70,9 @@ export default {
 	components: { UploadCustom, AvatarCustom },
 	data() {
 		return {
-			split: 0.15,
 			isReadonly: true,
 			isUserInfo: 1,
-			cellSelected: 1,
+			formatDate: formatDate,
 			userInfo: this.$t("user-info"),
 			updatePwd: this.$t("updatePwd"),
 			uploadHeadIcon: uploadHeadIcon(), // 图片上传headers
@@ -78,10 +84,10 @@ export default {
 				headIcon: this.$store.state.avatarImgPath,
 				account: this.$store.state.account,
 				userName: this.$store.state.userName,
-				roleName: "",
-				organizeName: "",
 				phone: this.$store.state.phone,
 				email: this.$store.state.email,
+				lastPasswordChangeTime: this.$store.state.lastPasswordChangeTime,
+				superAdmin: this.$store.state.superAdmin,
 				oldPwd: "",
 				newPwd: "",
 				surePwd: "",
@@ -96,10 +102,6 @@ export default {
 	methods: {
 		...mapActions(["handleLogOut"]),
 		...mapMutations(["updateAvatarImgPath", "setUserInfo"]),
-		// 点击索引条选择触发
-		cellClick(name) {
-			this.cellSelected = this.isUserInfo = name;
-		},
 		// 点击修改密码按钮触发
 		updateClick() {
 			this.$refs.req.validate((validate) => {
@@ -165,51 +167,55 @@ export default {
 </script>
 
 <style>
-.user-info .ivu-cell-title {
+.user-info .ivu-form-item-content {
 	font-size: 14px;
 }
-.user-info .ivu-form .ivu-FormItem-label {
+.user-info .ivu-form .ivu-form-item-label {
 	font-size: 14px;
-}
-.user-info .ivu-FormItem-content {
-	font-size: 14px;
+	font-weight: bold;
 }
 .user-info .ivu-card-head {
-	border: none;
-	padding: 10px 40px;
+	padding: 14px 30px;
+	font-size: 16px;
 }
 </style>
 <style scoped lang="less">
 .user-info {
-	.user-head {
-		position: absolute;
-		left: 40%;
-		transform: translateX(-50%);
+	background: #f5f7f9;
+	.info-card {
+		height: 50%;
+		.info-head {
+			margin-right: 50px;
+			display: inline-block;
+			.upload-custom {
+				display: block;
+			}
+		}
 		.upload-head {
-			position: absolute;
-			bottom: -42px;
-			left: 43%;
-			transform: translateX(-50%);
-			cursor: pointer;
+			color: #27ce88;
+			text-align: center;
+			margin-left: 0;
+			i {
+				font-size: 32px;
+				vertical-align: middle;
+			}
 		}
 	}
-	.ivu-cell {
-		margin-bottom: 10px;
+	.pwd-card {
+		height: calc(50% - 20px);
+		margin-top: 20px;
 	}
-	.ivu-cell-selected {
-		border-right: 3px solid;
-		font-weight: bold;
+	:deep(.ivu-card-head:before) {
+		content: " ";
+		display: block;
+		left: 10px;
+		top: 15px;
+		bottom: 10px;
+		width: 12px;
+		height: 12px;
+		background: #27ce88;
+		position: absolute;
+		border-radius: 50%;
 	}
-	.split-pane {
-		padding: 20px 0;
-	}
-	.ivu-card-head p,
-	.ivu-card-head-inner {
-		font-size: 20px;
-	}
-}
-.pwd-form {
-	width: 30%;
-	padding-left: 40px;
 }
 </style>
