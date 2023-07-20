@@ -188,7 +188,7 @@
 									<div class="mark">
 										<div class="title">标记</div>
 										<!-- 手风琴 -->
-										<Collapse accordion v-model="collapse" style="max-height: calc(100% - 30px); overflow: hidden">
+										<Collapse accordion v-model="collapse" style="max-height: calc(100% - 30px)">
 											<Panel
 												v-for="(item, markIndex) in markData"
 												:key="markIndex"
@@ -249,7 +249,7 @@
 															:id="`mark-box,${markIndex}`"
 															ghost-class="ghost"
 															@end="(e) => dragEnd(e, 'mark-box', markIndex)"
-															style="width: 100%; max-height: 200px; overflow: auto"
+															style="width: 100%; max-height: 200px"
 														>
 															<div v-for="(item, index) in markData[markIndex].data" :key="index" style="display: flex; align-items: center">
 																<!-- 图标 -->
@@ -278,7 +278,14 @@
 																		class="rename-input"
 																	/>
 																	<!-- 下拉选 -->
-																	<DropdownFields type="mark" :data="item" :index="index" :markIndex="markIndex" @dropDownClick="dropDownClick" />
+																	<DropdownFields
+																		type="mark"
+																		:data="item"
+																		:index="index"
+																		:markIndex="markIndex"
+																		@dropDownClick="dropDownClick"
+																		transfer
+																	/>
 																</div>
 															</div>
 														</draggable>
