@@ -433,7 +433,7 @@ export default {
 				}
 				&:hover :deep(.ivu-avatar-small > img) {
 					display: inline-block;
-					transform: scale(-1) rotate(180deg);
+					transform: scale(2);
 				}
 				/*&:hover .ivu-head {
 					display: inline-block;
