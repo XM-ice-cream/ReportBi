@@ -539,11 +539,10 @@ export default {
 						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
-
 					yAxis.push({
 						...this.axisString[0],
 						name: this.axisToField(`y${index}`),
-						nameLocation: "start",
+						nameLocation: this.type === "componentHeatMap" ? "end" : "start",
 						data: item,
 						axisLabel: {
 							show: true,
@@ -562,7 +561,7 @@ export default {
 						splitArea: {
 							show: isAllNumber,
 						},
-						inverse: true, //反向坐标
+						inverse: !(this.type === "componentHeatMap"), //反向坐标
 						position: "left",
 						offset: gridWidth - labelWidth,
 					});
@@ -611,7 +610,7 @@ export default {
 					...this.axisString[0],
 					data: objKeys,
 					show: false,
-					inverse: true, //反向坐标
+					inverse: !(this.type === "componentHeatMap"), //反向坐标
 					splitArea: {
 						show: isAllNumber,
 					},
