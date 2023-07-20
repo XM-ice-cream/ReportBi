@@ -414,8 +414,10 @@ export default {
 				if (!rcSummary.x.string.length && !rcSummary.y.string.length) {
 					//行
 					axisConstX.forEach((item, index) => {
-						const min = Math.min.apply(null, item);
-						const max = Math.max.apply(null, item);
+						const remark = JSON.parse(this.row[index].remark);
+						const min = remark ? remark.min : Math.min.apply(null, item);
+						const max = remark ? remark.max : Math.max.apply(null, item);
+
 						let resultObj = {};
 						let resultArray = [];
 						for (let i = min; i <= max; i++) {
@@ -427,8 +429,9 @@ export default {
 					});
 					//列
 					axisConst.forEach((item, index) => {
-						const min = Math.min.apply(null, item);
-						const max = Math.max.apply(null, item);
+						const remark = JSON.parse(this.column[index].remark);
+						const min = remark ? remark.min : Math.min.apply(null, item);
+						const max = remark ? remark.max : Math.max.apply(null, item);
 						let resultObj = {};
 						let resultArray = [];
 						for (let i = min; i <= max; i++) {

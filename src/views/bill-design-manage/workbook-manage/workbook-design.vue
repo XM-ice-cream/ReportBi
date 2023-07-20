@@ -372,6 +372,8 @@
 			<MarkFields ref="markField" :selectObj="selectObj" :filterData="filterData" :isAdd="isAdd" @updateMark="updateMark" />
 			<!-- 排序属性设定 -->
 			<SortbyFields ref="sortbyField" :selectObj="selectObj" :filterData="filterData" @updateSort="updateSort" />
+			<!-- 行列边界值设定 -->
+			<Fields ref="field" :selectObj="selectObj" @updateRowColumn="updateRowColumn" />
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
@@ -402,10 +404,11 @@ import MarkFields from "./mark-fields.vue";
 import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import SortbyFields from "./sortby-fields.vue";
 import DropdownFields from "./dropdown-fields.vue";
+import Fields from "./fields.vue";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields, DropdownFields },
+	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields, DropdownFields, Fields },
 	props: {
 		modelFlag: {
 			type: Boolean,
@@ -702,6 +705,14 @@ export default {
 						this.isAdd = false;
 						this.$refs.markField.modelFlag = true;
 					}
+					if (type == "column") {
+						this.$refs.field.modelFlag = true;
+						this.$refs.field.modelTitle = "列边界值设定";
+					}
+					if (type == "row") {
+						this.$refs.field.modelFlag = true;
+						this.$refs.field.modelTitle = "行边界值设定";
+					}
 					break;
 				case "sortby":
 					if (type == "row") this.selectObj.sortType = "row";
@@ -922,6 +933,12 @@ export default {
 		updateFilter(newIndex, obj) {
 			this.filterData[newIndex] = { ...obj };
 			this.filterData = JSON.parse(JSON.stringify(this.filterData));
+		},
+		//更新行、列
+		updateRowColumn(newIndex, obj) {
+			if (obj.axis == "y") this.columnData[newIndex] = { ...obj, remark: JSON.stringify(obj.remark) };
+			if (obj.axis == "x") this.rowData[newIndex] = { ...obj, remark: JSON.stringify(obj.remark) };
+			// this.rowData
 		},
 		//更新排序数据
 		updateSort(newIndex, data, markIndex) {
