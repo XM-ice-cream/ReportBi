@@ -10,9 +10,9 @@
 			</Card>
 		</div>
 		<div class="footer">
-			<span>Luxshare-ICT BU22数据分析应用课</span>
+			<span>Hostar</span>
 			<span>UI版本标识:{{ projectVersion }}</span>
-			<span @click="handleSpeak('白泽 Development Team Very New B Class')"> © 2022 Baize Development Team </span>
+			<span @click="handleSpeak('鸿仕达开发团队真的帅，各个都是帅哥美女，恰似天仙坠人间，不惹人间片尘埃')"> @BI开发团队 </span>
 		</div>
 		<ResetPassword ref="resetPassword" @update-pwd-success="autoLogin" />
 	</div>

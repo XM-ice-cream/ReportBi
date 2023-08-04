@@ -5,7 +5,7 @@ import {
 // 获取用户信息
 export const getcurrentuserReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/getcurrentuser',
+    url: '/user/getcurrentuser',
     method: 'post',
     data
   })
@@ -14,7 +14,7 @@ export const getcurrentuserReq = data => {
 // 用户退出登录
 export const userofflineReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/useroffline',
+    url: '/user/useroffline',
     method: 'post',
     data
   })
@@ -23,7 +23,7 @@ export const userofflineReq = data => {
 // 查询用户
 export const getpagelistReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/getpagelist',
+    url: '/user/getpagelist',
     method: 'post',
     data
   })
@@ -35,7 +35,7 @@ export const userPageListUrl =()=> `${window.localStorage.getItem("configip")}/a
 // 获取角色用户信息
 export const getrolerbyuserlistReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/getrolerbyuserlist',
+    url: '/user/getrolerbyuserlist',
     method: 'post',
     data
   })
@@ -45,7 +45,7 @@ export const getrolerbyuserlistReq = data => {
 export const addReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/usercenter/v1/user/add',
+    url: '/user/add',
     method: 'post',
     data
   })
@@ -55,7 +55,7 @@ export const addReq = data => {
 export const modifyReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/usercenter/v1/user/modify',
+    url: '/user/modify',
     method: 'put',
     data
   })
@@ -65,7 +65,7 @@ export const modifyReq = data => {
 export const neverexpReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/usercenter/v1/user/neverexp',
+    url: '/user/neverexp',
     method: 'put',
     data
   })
@@ -75,7 +75,7 @@ export const neverexpReq = data => {
 export const resetpasswordReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/usercenter/v1/user/resetpassword',
+    url: '/user/resetpassword',
     method: 'put',
     data
   })
@@ -85,7 +85,7 @@ export const resetpasswordReq = data => {
 export const updatepasswordReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/usercenter/v1/user/updatepassword',
+    url: '/user/updatepassword',
     method: 'put',
     data
   })
@@ -94,7 +94,7 @@ export const updatepasswordReq = data => {
 // 上传用户头像 (没用引用)
 export const uploadheadiconReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/uploadheadicon',
+    url: '/user/uploadheadicon',
     method: 'post',
     data
   })
@@ -103,7 +103,7 @@ export const uploadheadiconReq = data => {
 // 上传用户头像
 export const getheadiconReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/getheadicon',
+    url: '/user/getheadicon',
     responseType: 'arraybuffer',
     method: 'get',
     params: {
@@ -115,7 +115,7 @@ export const getheadiconReq = data => {
 // 获取首页信息
 export const getindexjsonReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/getindexjson',
+    url: '/user/getindexjson',
     method: 'get',
     params: {
       ...data
@@ -126,7 +126,7 @@ export const getindexjsonReq = data => {
 // 获取用户IP地址
 export const getReq = data => {
   return requestCenter({
-    url: '/api/systemcenter/anonymous/v1/ip/get',
+    url: '/user/getip',
     method: 'get',
     params: {
       ...data
@@ -140,7 +140,7 @@ export const uploadHeadIcon =()=> `${window.localStorage.getItem("configip")}/ap
 // 通讯授权新增
 export const chatauthorizationAddReq = data => {
   return requestCenter({
-    url: '/api/systemcenter/v1/chatauthorization/add',
+    url: '/chatauthorization/add',
     method: 'post',
     data
   })
@@ -149,7 +149,7 @@ export const chatauthorizationAddReq = data => {
 // 通讯授权查询
 export const chatauthorizationGetReq = data => {
   return requestCenter({
-    url: '/api/systemcenter/v1/chatauthorization/get',
+    url: '/chatauthorization/get',
     method: 'get',
     params: data
   })
@@ -158,7 +158,7 @@ export const chatauthorizationGetReq = data => {
 // 获取单个角色用户信息
 export const getUserReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/user/getuser',
+    url: '/user/getuser',
     method: 'post',
     data
   })

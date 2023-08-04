@@ -40,11 +40,11 @@ export default {
     password
   }) {
     const obj = {
-      client_id: "baize",
+      client_id: "BI",
       client_secret: "secret",
       grant_type: "password",
       username: userName.trim(),
-      password: sha1_to_base64(encryptDes(password.trim(), "baize#66", "lxeP@ssx")),
+      password: sha1_to_base64(encryptDes(password.trim(), "bi", "password")),
       scope: "api offline_access",
       source: 1,
     };

@@ -1,5 +1,6 @@
 import Viewer from "v-viewer";
-import "viewerjs/dist/viewer.css";
+import ".store/viewerjs@1.11.4/node_modules/viewerjs/dist/viewer.css";
+//import "viewerjs/dist/viewer.css";
 import video from "./video";
 // import signalr from './singnalr'
 import ButtonCustom from "@/components/button-custom";

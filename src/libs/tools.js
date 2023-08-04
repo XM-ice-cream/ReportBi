@@ -164,14 +164,14 @@ export const getButtonBoolean = (that, btnArr) => {
  */
 export const watermarkFn = (name = "") => {
   watermark.load({
-    watermark_txt: name || "精益生产", // 水印的内容
+    watermark_txt: name || "Hostar", // 水印的内容
     watermark_x: 140, // 水印起始位置x轴坐标
     watermark_y: 80, // 水印起始位置Y轴坐标
     watermark_rows: 5, // 水印行数
     watermark_cols: 5, // 水印列数
     watermark_x_space: 190, // 水印x轴间隔
     watermark_y_space: 75, // 水印y轴间隔
-    watermark_font: "华文彩云", // 水印字体
+    watermark_font: "宋体", // 水印字体
     watermark_color: "black", // 水印字体颜色
     watermark_fontsize: "25px", // 水印字体大小
     watermark_alpha: 0.1, // 水印透明度，要求设置在大于等于0.005

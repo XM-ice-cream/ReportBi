@@ -2,10 +2,10 @@
 	{
 		"id": 1,
 		"name": "报表设计_测试",
-		"value": "http://10.32.44.33:8088",
+		"value": "http://localhost:8700",
 		"reportIp": "http://localhost:8081",
 		"reportip": "http://10.171.11.114:5700",
-		"reportDesignIp": "http://10.32.44.36:8700",
+		"reportDesignIp": "http://localhost:8700",
 		"eapIp": "http://10.32.36.130:8000"
 	}
 ]

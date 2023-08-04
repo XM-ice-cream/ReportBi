@@ -3,7 +3,7 @@ import { requestCenter } from '@/libs/request'
 // 获取导航菜单
 export const getlisttreecurrentuserReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/menubutton/getlisttreecurrentuser',
+    url: '/menubutton/getlisttreecurrentuser',
     method: 'post',
     data
   })
@@ -12,7 +12,7 @@ export const getlisttreecurrentuserReq = data => {
 // 获取左侧菜单
 export const getlisttreeauthReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/menubutton/getlisttreeauth',
+    url: '/menubutton/getlisttreeauth',
     method: 'post',
     data
   })
@@ -21,7 +21,7 @@ export const getlisttreeauthReq = data => {
 // 获取分页菜单、按钮
 export const getpagelisttreeReq = data => {
   return requestCenter({
-    url: '/api/usercenter/v1/menubutton/getpagelisttree',
+    url: '/menubutton/getpagelisttree',
     method: 'post',
     data
   })
@@ -31,7 +31,7 @@ export const getpagelisttreeReq = data => {
 export const addReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/usercenter/v1/menubutton/add',
+    url: '/menubutton/add',
     method: 'post',
     data
   })
@@ -41,7 +41,7 @@ export const addReq = data => {
 export const modifyReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/usercenter/v1/menubutton/modify',
+    url: '/menubutton/modify',
     method: 'put',
     data
   })
@@ -51,7 +51,7 @@ export const modifyReq = data => {
 export const uploadFileReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/systemcenter/v1/assets/upload',
+    url: '/assets/upload',
     method: 'post',
     data
   })
