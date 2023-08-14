@@ -52,7 +52,9 @@
     },
     methods: {
       validator() {
-        let localObj = userLocalInfo()
+        let localObj = userLocalInfo();
+        console.log(localObj);
+        console.log(this.password);
         if (this.password === localObj.locking) {
           // 你可以在这里写密码验证方式，如发起ajax请求将用户输入的密码this.password与数据库用户密码对比
           localObj.locked = 0

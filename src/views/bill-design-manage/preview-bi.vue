@@ -114,6 +114,7 @@ export default {
 			getpagelisttreeReq(obj).then((res) => {
 				if (res.code === 200) {
 					const data = res.result.data;
+					console.log(data);
 					data.forEach((item, index) => {
 						const { name, remark } = item;
 						const intRemark = parseInt(remark);

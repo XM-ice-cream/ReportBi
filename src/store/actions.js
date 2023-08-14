@@ -116,7 +116,127 @@ export default {
   }) {
     return new Promise((resolve => {
       getlisttreecurrentuserReq().then(res => {
-        let menuList = initNode(res.result.filter(o => o.name === 'bill-design-manage'));
+        const data = [{
+          "id": "D64702FF72B04CF29DC202CCD402FCEC",
+          "parentId": "0",
+          "category": 1,
+          "source": 1,
+          "name": "bill-design-manage",
+          "title": "报表设计",
+          "href": "/bill-design-manage",
+          "component": "Main",
+          "icon": "iconfont icon-menu",
+          "sortCode": 100,
+          "apis": null,
+          "remark": null,
+          "children": [{
+              "id": "B0195E68C53F4C1CB7AEFA411AE700A7",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCEC",
+              "category": 1,
+              "source": 1,
+              "name": "datasource",
+              "title": "数据源",
+              "href": "datasource",
+              "component": "bill-design-manage/data-source.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 1,
+              "apis": null,
+              "remark": null,
+              "children": []
+            },
+            {
+              "id": "0248C5A7E13A4E128AB74A1DCFCF68E7",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCEC",
+              "category": 1,
+              "source": 1,
+              "name": "report-bi",
+              "title": "Report BI",
+              "href": "/report-bi",
+              "component": "Main",
+              "icon": "iconfont icon-menu",
+              "sortCode": 1,
+              "apis": null,
+              "remark": null,
+              "children": [{
+                  "id": "B8061605B7D64A32844AF3A82A8C9F25",
+                  "parentId": "0248C5A7E13A4E128AB74A1DCFCF68E7",
+                  "category": 1,
+                  "source": 1,
+                  "name": "dateset-config",
+                  "title": "数据集配置",
+                  "href": "dateset-config",
+                  "component": "bill-design-manage/data-set-config.vue",
+                  "icon": "iconfont icon-menu",
+                  "sortCode": 3,
+                  "apis": null,
+                  "remark": null,
+                  "children": []
+                },
+                {
+                  "id": "433599FB0E9542969DB2745268C5A290",
+                  "parentId": "0248C5A7E13A4E128AB74A1DCFCF68E7",
+                  "category": 1,
+                  "source": 1,
+                  "name": "preview-bi",
+                  "title": "BI",
+                  "href": "preview-bi",
+                  "component": "bill-design-manage/preview-bi.vue",
+                  "icon": "iconfont icon-menu",
+                  "sortCode": 8,
+                  "apis": null,
+                  "remark": null,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "0E78529EC9AF4487A1BC21FA871A6740",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCEC",
+              "category": 1,
+              "source": 1,
+              "name": "dataset",
+              "title": "数据集",
+              "href": "dataset",
+              "component": "bill-design-manage/data-set.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 2,
+              "apis": null,
+              "remark": null,
+              "children": []
+            },
+            {
+              "id": "49875C11E64E457E91AA4D14CF066E38",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCEC",
+              "category": 1,
+              "source": 1,
+              "name": "design-report-manage",
+              "title": "报表设计管理",
+              "href": "design-report-manage",
+              "component": "bill-design-manage/design-report-manage.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 3,
+              "apis": null,
+              "remark": null,
+              "children": []
+            },
+            {
+              "id": "3664875E390145FFA8422B80E8AE744B",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCEC",
+              "category": 1,
+              "source": 1,
+              "name": "preview-excel",
+              "title": "报表Summary",
+              "href": "preview-excel",
+              "component": "bill-design-manage/preview-excel.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 4,
+              "apis": null,
+              "remark": null,
+              "children": []
+            }
+          ]
+        }]
+        let menuList = initNode(data.filter(o => o.name === 'bill-design-manage'));
         menuList.push(...errorRouter);
         commit('updateAppRouter', menuList)
         commit('updateHasGetMenuInfo', true)

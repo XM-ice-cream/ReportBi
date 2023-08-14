@@ -41,7 +41,7 @@ export const modifyReq = data => {
 // 获取数据字典明细数据
 export const getlistReq = data => {
   return requestCenter({
-    url: '/api/systemcenter/anonymous/v1/dataitemdetail/getlist',
+    url: '/dataitemdetail/getlist',
     method: 'post',
     data: {orderBy: 'sortCode', ...data}
   })

@@ -12,7 +12,7 @@
 		<div class="footer">
 			<span>Hostar</span>
 			<span>UI版本标识:{{ projectVersion }}</span>
-			<span @click="handleSpeak('鸿仕达开发团队真的帅，各个都是帅哥美女，恰似天仙坠人间，不惹人间片尘埃')"> @BI开发团队 </span>
+			<span @click="handleSpeak('鸿仕达开发团队真牛逼，各个都是帅哥美女，颜值报表，技术精湛，学富五车，能说会道，前能提刀上马，后能运筹帷幄，恰似天仙坠人间，不惹人间片尘埃')"> @BI开发团队[点击查看详情] </span>
 		</div>
 		<ResetPassword ref="resetPassword" @update-pwd-success="autoLogin" />
 	</div>

@@ -1070,6 +1070,7 @@ export default {
 	width: 15rem;
 	z-index: 999;
 	overflow: hidden;
+	display: block;
 	.field-drag {
 		height: 99%;
 		background: #000d18b8;

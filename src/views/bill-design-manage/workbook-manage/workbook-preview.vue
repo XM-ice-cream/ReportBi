@@ -17,17 +17,17 @@
 												<FormItem :label="item.columnRename">
 													<!-- 数组 -->
 													<Input
-														v-if="getFieldsType('STRING', item.columnType)"
+														v-if="getFieldsType('STRING', item.columnType.toUpperCase())"
 														type="textarea"
 														:autosize="{ minRows: 5, maxRows: 10 }"
 														v-model.trim="item.filterValue"
 														clearable
 													/>
 													<!-- 数字 -->
-													<InputNumber v-if="getFieldsType('NUMBER', item.columnType)" v-model.trim="item.filterValue" clearable />
+													<InputNumber v-if="getFieldsType('NUMBER', item.columnType.toUpperCase())" v-model.trim="item.filterValue" clearable />
 													<!-- 时间 -->
 													<DatePicker
-														v-else-if="getFieldsType('DATE', item.columnType)"
+														v-else-if="getFieldsType('DATE', item.columnType.toUpperCase())"
 														v-model="item.filterValue"
 														transfer
 														type="datetimerange"
@@ -141,10 +141,11 @@ export default {
 					this.filterData = filterItems.map((item) => {
 						let filterValue = item.filterValue;
 						//时间类型
-						if (this.getFieldsType("DATE", item.columnType)) filterValue = item.filterValue.split(",");
+						if (this.getFieldsType("DATE", item.columnType.toUpperCase())) filterValue = item.filterValue.split(",");
 
 						return { ...item, filterValue };
 					}); //过滤器
+					console.log(this.filterData);
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
 					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
 					this.markData = markStyle && markStyle !== "{}" ? JSON.parse(markStyle) : [{ name: "全部", chartType: "bar", data: [] }]; //标记
@@ -205,7 +206,7 @@ export default {
 			this.filterData.forEach((item) => {
 				let { filterValue, columnType } = item;
 				//时间类型
-				if (this.getFieldsType("DATE", columnType)) {
+				if (this.getFieldsType("DATE", columnType.toUpperCase())) {
 					//数组
 					filterValue = Array.isArray(filterValue) ? [formatDate(filterValue[0]), formatDate(filterValue[1])].toString() : filterValue.toString();
 				} else {

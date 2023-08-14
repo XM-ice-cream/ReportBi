@@ -316,6 +316,7 @@ export default {
 		},
 		// 点击编辑按钮触发
 		editClick() {
+			console.log('处罚编辑');
 			if (this.selectObj) {
 				// let { sourceCode, sourceConnect, sourceDesc, sourceName, sourceType } = this.selectObj;
 				this.isConnectSuccess = false;
