@@ -5,7 +5,6 @@
 		"value": "http://localhost:8700",
 		"reportIp": "http://localhost:8081",
 		"reportip": "http://10.171.11.114:5700",
-		"reportDesignIp": "http://localhost:8700",
-		"eapIp": "http://10.32.36.130:8000"
+		"reportDesignIp": "http://localhost:8700"
 	}
 ]

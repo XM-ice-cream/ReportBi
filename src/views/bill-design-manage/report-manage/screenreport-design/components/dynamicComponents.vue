@@ -155,6 +155,7 @@ export default {
 	},
 	mounted() {
 		this.echoDataSet(this.formData);
+
 	},
 	methods: {
 		//参数下拉
@@ -210,7 +211,7 @@ export default {
 				contextData[this.userNameList[i].paramName] = sampleItem;
 			}
 			let data = { rows: [], columns: [] };
-			//行
+			//行 列
 			[this.rowParamList, this.columnsParamList].forEach((paramList, paramIndex) => {
 				const key = paramIndex === 0 ? "rows" : "columns";
 				paramList.forEach((item, index) => {
@@ -236,7 +237,10 @@ export default {
 		},
 		// 数据集回显
 		async echoDataSet(val) {
-			if (!val) return;
+			if (!val) {
+				await this.loadDataSet(); //加载全部数据集
+				return;
+			}
 			this.dataSetValue = val.setCode;
 			await this.loadDataSet(); //加载全部数据集
 

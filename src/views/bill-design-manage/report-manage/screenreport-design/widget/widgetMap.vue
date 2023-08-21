@@ -4,11 +4,12 @@
 	</div>
 </template>
 <script>
+import "../../../../../api/bill-design-manage/china.min.js"
 // import "../../../../../../node_modules/echarts/map/js/china.js";
 let GZData = [
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "福州",
@@ -17,7 +18,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "太原",
@@ -26,7 +27,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "长春",
@@ -35,7 +36,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "重庆",
@@ -44,7 +45,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "西安",
@@ -53,7 +54,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "成都",
@@ -62,7 +63,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "常州",
@@ -71,7 +72,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "北京",
@@ -80,7 +81,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "北海",
@@ -89,7 +90,7 @@ let GZData = [
 	],
 	[
 		{
-			name: "广州",
+			name: "苏州",
 		},
 		{
 			name: "海口",
@@ -213,9 +214,9 @@ let geoCoordMap = {
 	青岛: [120.4651, 36.3373],
 	韶关: [113.7964, 24.7028],
 };
-let type = "流出";
+let type = "业务输出";
 let color = ["#a6c84c", "#ffa022", "#46bee9"];
-let tempData = ["广州", GZData];
+let tempData = ["苏州", GZData];
 let planePath =
 	"path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z";
 export default {
@@ -228,7 +229,7 @@ export default {
 		return {
 			options: {
 				title: {
-					text: "模拟迁徙",
+					text: "业务输出",
 					subtext: "数据纯属虚构",
 					left: "center",
 					textStyle: {
@@ -239,13 +240,13 @@ export default {
 					trigger: "item",
 					formatter: function (params) {
 						if (params.seriesType == "effectScatter") {
-							if ("流入" == type) {
+							if ("输入" == type) {
 								return type + "<br>" + params.data.name + " ---> " + params.seriesName + "<br />人数：" + params.data.value[2] + "人";
 							} else {
-								return "流出<br>" + params.seriesName + " ---> " + params.data.name + "<br />人数：" + params.data.value[2] + "人";
+								return "输出<br>" + params.seriesName + " ---> " + params.data.name + "<br />人数：" + params.data.value[2] + "人";
 							}
 						} else if (params.seriesType == "lines") {
-							if ("流入" == type) {
+							if ("输入" == type) {
 								return type + "<br>" + params.data.toName + " ---> " + params.data.fromName + "<br />人数：" + params.data.value + "人";
 							} else {
 								return type + "<br>" + params.data.fromName + " ---> " + params.data.toName + "<br />人数：" + params.data.value + "人";

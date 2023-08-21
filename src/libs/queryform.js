@@ -42,6 +42,7 @@ let queryform = {
     },
     // 查询echarts 数据
     queryEchartsData(params) {
+      //console.log(params);
       return new Promise(async (resolve) => {
         let {
           code,
@@ -54,6 +55,8 @@ let queryform = {
     },
     // 解析不同图标的数据
     analysisChartsData(params, data) {
+      //console.log(params);
+      //console.log(data);
       // widget-barchart 柱线图、widget-linechart 折线图、 widget-barlinechart 柱线图
       // widget-piechart 饼图、widget-funnel 漏斗图
       // widget-text 文本框
@@ -70,7 +73,7 @@ let queryform = {
         chartType == "widget-piechart" ||
         chartType == "widget-funnel"
       ) {
-        return this.piechartFn(params.chartProperties, data);
+        return this.piechartFn(data.chartProperties, data.data);
       } else if (chartType == "widget-text") {
         return this.widgettext(params.chartProperties, data)
       } else if (chartType == "widget-stackchart") {
@@ -149,17 +152,34 @@ let queryform = {
     },
     // 饼图、漏斗图
     piechartFn(chartProperties, data) {
+      //console.log(data);
       const ananysicData = [];
       for (let i = 0; i < data.length; i++) {
         const obj = {};
+        let keyword = '';
+        let valueFlag = true;
         for (const key in chartProperties) {
-          const value = chartProperties[key];
-          if (value === "name") {
-            obj["name"] = data[i][key];
-          } else {
-            obj["value"] = data[i][key];
+          for(const iitem in chartProperties[key]){
+            // 行代表的是指
+            if (valueFlag && key === "rows") {
+              obj['value'] =  data[i][chartProperties[key][iitem]];
+              valueFlag = false;
+            }
+            // 列代表的是维度
+            if (key === "columns") {
+              keyword += data[i][chartProperties[key][iitem]];
+            }
           }
         }
+        obj['name'] = keyword;
+        // for (const key in chartProperties) {
+        //   const value = chartProperties[key];
+        //   if (value === "name") {
+        //     obj["name"] = data[i][key];
+        //   } else {
+        //     obj["value"] = data[i][key];
+        //   }
+        // }
         ananysicData.push(obj);
       }
       return ananysicData;

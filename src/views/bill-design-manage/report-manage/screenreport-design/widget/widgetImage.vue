@@ -25,7 +25,6 @@ export default {
     styleColor () {
       return {
         position: this.ispreview ? "absolute" : "static",
-        background: this.transStyle.background,
         "text-align": this.transStyle.textAlign,
         width: this.transStyle.width + "px",
         height: this.transStyle.height + "px",

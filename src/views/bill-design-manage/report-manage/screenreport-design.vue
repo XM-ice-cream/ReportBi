@@ -459,6 +459,7 @@ export default {
 				},
 				widgets: this.widgets,
 			};
+			console.log(screenData);
 			const { code, data } = await addScreenReq(screenData);
 			if (code == 200) {
 				this.$Msg.success("保存成功！");
@@ -1070,7 +1071,6 @@ export default {
 	width: 15rem;
 	z-index: 999;
 	overflow: hidden;
-	display: block;
 	.field-drag {
 		height: 99%;
 		background: #000d18b8;

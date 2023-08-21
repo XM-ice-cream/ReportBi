@@ -45,31 +45,50 @@ export default {
 		},
 
 		upload(file) {
-			//获取图片地址
-			getUploadImageUrl(file).then((imageUrl) => {
-				//将图片进行压缩
-				compress(imageUrl).then((res) => {
-					let formData = new FormData();
-					formData.append("data", base64ToFile(res));
-					//   formData.append("fileName", file.name);
-					for (let item in this.extraData) {
-						formData.append(item, this.extraData[item]);
-					}
-					uploadImageReq(formData).then((res) => {
-						if (res.code === 200) {
-							this.uploadImgUrl = res.result.url;
-							this.$emit("input", this.uploadImgUrl);
-							this.$emit("change", this.uploadImgUrl);
-						} else {
-							let content = `${errorType(this, res)}<br> ${res.message}`;
-							this.$Modal.error({
-								title: this.$t("uploadAttachment") + this.$t("fail"),
-								content: content,
-							});
-						}
+			let formData = new FormData();
+			formData.append("data", file);
+			for (let item in this.extraData) {
+	 			formData.append(item, this.extraData[item]);
+	 		}
+			uploadImageReq(formData).then((res) => {
+				if (res.code === 200) {
+					this.uploadImgUrl = res.result.url;
+					this.$emit("input", this.uploadImgUrl);
+					this.$emit("change", this.uploadImgUrl);
+				} else {
+					let content = `${errorType(this, res)}<br> ${res.message}`;
+					this.$Modal.error({
+						title: this.$t("uploadAttachment") + this.$t("fail"),
+						content: content,
 					});
-				});
+				}
 			});
+			// console.log("图片上传");
+			// //获取图片地址
+			// getUploadImageUrl(file).then((imageUrl) => {
+			// 	//将图片进行压缩
+			// 	compress(imageUrl).then((res) => {
+			// 		let formData = new FormData();
+			// 		formData.append("data", base64ToFile(res));
+			// 		//   formData.append("fileName", file.name);
+			// 		for (let item in this.extraData) {
+			// 			formData.append(item, this.extraData[item]);
+			// 		}
+			// 		uploadImageReq(formData).then((res) => {
+			// 			if (res.code === 200) {
+			// 				this.uploadImgUrl = res.result.url;
+			// 				this.$emit("input", this.uploadImgUrl);
+			// 				this.$emit("change", this.uploadImgUrl);
+			// 			} else {
+			// 				let content = `${errorType(this, res)}<br> ${res.message}`;
+			// 				this.$Modal.error({
+			// 					title: this.$t("uploadAttachment") + this.$t("fail"),
+			// 					content: content,
+			// 				});
+			// 			}
+			// 		});
+			// 	});
+			// });
 		},
 		changeInput(e) {
 			if (e) {
