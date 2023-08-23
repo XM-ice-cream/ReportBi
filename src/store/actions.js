@@ -116,7 +116,38 @@ export default {
   }) {
     return new Promise((resolve => {
       getlisttreecurrentuserReq().then(res => {
-        const data = [{
+        console.log(res);
+        const data = [
+          {
+            "id": "D64702FF72B04CF29DC202CCD402FCBC",
+            "parentId": "0",
+            "category": 1,
+            "source": 1,
+            "name": "bill-user-manage",
+            "title": "系统中心",
+            "href": "/bill-user-manage",
+            "component": "Main",
+            "icon": "iconfont icon-menu",
+            "sortCode": 101,
+            "apis": null,
+            "remark": null,
+            "children": [{
+              "id": "D64702FF72B04CF29DC202CCD402FBBC",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCBC",
+              "category": 1,
+              "source": 1,
+              "name": "usermanage",
+              "title": "用户管理",
+              "href": "usermanage",
+              "component": "bill-design-manage/data-source.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 1,
+              "apis": null,
+              "remark": null,
+              "children": []
+            }]
+          },
+          {
           "id": "D64702FF72B04CF29DC202CCD402FCEC",
           "parentId": "0",
           "category": 1,
@@ -236,7 +267,8 @@ export default {
             }
           ]
         }]
-        let menuList = initNode(data.filter(o => o.name === 'bill-design-manage'));
+        //let menuList = initNode(data.filter(o => o.name === 'bill-design-manage'));
+        let menuList = initNode(data);
         menuList.push(...errorRouter);
         commit('updateAppRouter', menuList)
         commit('updateHasGetMenuInfo', true)

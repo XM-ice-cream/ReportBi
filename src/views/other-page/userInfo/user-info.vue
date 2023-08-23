@@ -12,6 +12,7 @@
 						class="upload-head"
 						title="更换头像"
 						uploadIcon="md-cloud-upload"
+						name="data"
 						:uploadUrl="uploadHeadIcon"
 						:uploadHeight="33"
 						:multiple="uploadMultiple"
@@ -111,8 +112,8 @@ export default {
 					} else {
 						const obj = {
 							id: this.req.id,
-							oldPassword: sha1_to_base64(encryptDes(this.req.oldPwd.trim(), "baize#66", "lxeP@ssx")),
-							newPassword: sha1_to_base64(encryptDes(this.req.newPwd.trim(), "baize#66", "lxeP@ssx")),
+							oldPassword: sha1_to_base64(encryptDes(this.req.oldPwd.trim(), "bi", "lxeP@ssx")),
+							newPassword: sha1_to_base64(encryptDes(this.req.newPwd.trim(), "bi", "lxeP@ssx")),
 						};
 						updatepasswordReq(obj).then((res) => {
 							if (res.code === 200) {

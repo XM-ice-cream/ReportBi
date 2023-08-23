@@ -124,8 +124,8 @@ export default {
             name: this.submitData.name,
             account: this.submitData.account,
             idCard: this.submitData.idCard,
-            password: sha1_to_base64(encryptDes(this.submitData.password, 'baize#66', 'lxeP@ssx')),
-            newpassword: sha1_to_base64(encryptDes(this.submitData.newpassword, 'baize#66', 'lxeP@ssx'))
+            password: sha1_to_base64(encryptDes(this.submitData.password, 'bi', 'lxeP@ssx')),
+            newpassword: sha1_to_base64(encryptDes(this.submitData.newpassword, 'bi', 'lxeP@ssx'))
           };
           if (this.submitData.password !== this.submitData.newpassword) {
             this.$Msg.error('两次输入的密码不一致,请重新输入。')

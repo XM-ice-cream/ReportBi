@@ -1,4 +1,4 @@
-# baize.ui
+# bi.ui
 
 ## Project setup
 ```

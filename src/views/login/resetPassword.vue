@@ -106,10 +106,10 @@ export default {
               id: this.req.id,
               tokenStr: this.req.token,
               oldPassword: sha1_to_base64(
-                  encryptDes(this.req.oldPwd.trim(), "baize#66", "lxeP@ssx")
+                  encryptDes(this.req.oldPwd.trim(), "bi", "lxeP@ssx")
               ),
               newPassword: sha1_to_base64(
-                  encryptDes(this.req.newPwd.trim(), "baize#66", "lxeP@ssx")
+                  encryptDes(this.req.newPwd.trim(), "bi", "lxeP@ssx")
               ),
             };
             updatepasswordReq(obj).then((res) => {

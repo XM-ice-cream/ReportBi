@@ -46,7 +46,7 @@ export default {
 					this.validationRules = this.monacoEditor;
 				} else {
 					this.validationRules =
-						'using System;\r\nusing Baize.Entities.AutoReportCenter.Response;\r\nusing System.Text;\r\nusing System.Linq;\r\nusing System.Data;\r\nusing System.Collections.Generic;\r\nusing Baize.Core.Extensions;\r\n\r\nnamespace RoslynCompileSample\r\n{\r\n    public class Writer\r\n    {\r\n        public string Write(List<CellItem> list)\r\n        {\r\n            try{\r\n                //此处编写代码\r\n                \r\n\r\n\r\n            }catch(Exception ex){\r\n                return ex.ToString();\r\n            }    \r\n            // 此处返回OK 代表程序正常执行，否则抛出异常\r\n            return "OK";\r\n        }\r\n    }\r\n}';
+						'using System;\r\nusing Bi.Entities.Response;\r\nusing System.Text;\r\nusing System.Linq;\r\nusing System.Data;\r\nusing System.Collections.Generic;\r\nusing Bi.Core.Extensions;\r\n\r\nnamespace RoslynCompileSample\r\n{\r\n    public class Writer\r\n    {\r\n        public string Write(List<CellItem> list)\r\n        {\r\n            try{\r\n                //此处编写代码\r\n                \r\n\r\n\r\n            }catch(Exception ex){\r\n                return ex.ToString();\r\n            }    \r\n            // 此处返回OK 代表程序正常执行，否则抛出异常\r\n            return "OK";\r\n        }\r\n    }\r\n}';
 				}
 			},
 			deep: true,

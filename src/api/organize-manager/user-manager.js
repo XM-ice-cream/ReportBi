@@ -135,7 +135,7 @@ export const getReq = data => {
 }
 
 // 上传用户头像
-export const uploadHeadIcon =()=> `${window.localStorage.getItem("configip")}/api/usercenter/v1/user/uploadheadicon`
+export const uploadHeadIcon =()=> `${window.localStorage.getItem("configip")}/ftpfile/uploadheadicon`
 
 // 通讯授权新增
 export const chatauthorizationAddReq = data => {

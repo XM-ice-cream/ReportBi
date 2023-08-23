@@ -6,7 +6,7 @@ export default {
   menuId: '',
   id: '',
   roleIds: '',
-  systemFlag: 'baize',
+  systemFlag: 'bi',
   account: '',
   userName: '',
   password: '',

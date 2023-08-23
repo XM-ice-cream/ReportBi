@@ -97,27 +97,27 @@ export default {
 		}
 	},
 	mounted() {
-		this.vantaEffect = RINGS({
-			el: this.$refs.vantaRef,
-			THREE: Three,
-		});
-		// 这里重新设置样式
-		this.vantaEffect.setOptions({
-			el: ".vanta-canvas",
-			mouseControls: true,
-			touchControls: true,
-			gyroControls: false,
-			minHeight: 200.0,
-			minWidth: 200.0,
-			backgroundColor: 0xffffff,
-			sunColor: 0xff9919,
-			skyColor: 0x68b8d7,
-			cloudColor: 0xcbd1e8,
-			cloudShadowColor: 0x183550,
-			sunGlareColor: 0xff6633,
-			sunlightColor: 0xff9933,
-			speed: 1,
-		});
+		// this.vantaEffect = RINGS({
+		// 	el: this.$refs.vantaRef,
+		// 	THREE: Three,
+		// });
+		// // 这里重新设置样式
+		// this.vantaEffect.setOptions({
+		// 	el: ".vanta-canvas",
+		// 	mouseControls: true,
+		// 	touchControls: true,
+		// 	gyroControls: false,
+		// 	minHeight: 200.0,
+		// 	minWidth: 200.0,
+		// 	backgroundColor: 0xffffff,
+		// 	sunColor: 0xff9919,
+		// 	skyColor: 0x68b8d7,
+		// 	cloudColor: 0xcbd1e8,
+		// 	cloudShadowColor: 0x183550,
+		// 	sunGlareColor: 0xff6633,
+		// 	sunlightColor: 0xff9933,
+		// 	speed: 1,
+		// });
 	},
 };
 </script>
