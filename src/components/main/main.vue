@@ -105,6 +105,7 @@ export default {
 			];
 			//解决优化缓存菜单只剩下首页时，下一个打开的菜单存在缓存问题
 			if (list.length === 1) list = [];
+			console.log(list);
 			return list;
 		},
 		menuList() {

@@ -58,7 +58,7 @@ export default {
     return new Promise((resolve, reject) => {
       getTokenReq(obj)
         .then((res) => {
-          console.log(res);
+          //console.log(res);
           if (res.code === 500) {
             Message.error({
               content: res.message,
@@ -116,30 +116,72 @@ export default {
   }) {
     return new Promise((resolve => {
       getlisttreecurrentuserReq().then(res => {
-        console.log(res);
+        //console.log(res);
         const data = [
           {
             "id": "D64702FF72B04CF29DC202CCD402FCBC",
             "parentId": "0",
             "category": 1,
             "source": 1,
-            "name": "bill-user-manage",
+            "name": "bill-sys-manage",
             "title": "系统中心",
-            "href": "/bill-user-manage",
+            "href": "/bill-sys-manage",
             "component": "Main",
             "icon": "iconfont icon-menu",
             "sortCode": 101,
             "apis": null,
             "remark": null,
             "children": [{
-              "id": "D64702FF72B04CF29DC202CCD402FBBC",
+              "id": "D64702FF72B04CF29DC202CCD442FBBC",
               "parentId": "D64702FF72B04CF29DC202CCD402FCBC",
               "category": 1,
               "source": 1,
               "name": "usermanage",
               "title": "用户管理",
               "href": "usermanage",
-              "component": "bill-design-manage/data-source.vue",
+              "component": "bill-design-manage/user-manage.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 1,
+              "apis": null,
+              "remark": null,
+              "children": []
+            },{
+              "id": "D64702FF72B04CF29DC202CCD432FBBC",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCBC",
+              "category": 1,
+              "source": 1,
+              "name": "rolemanage",
+              "title": "角色管理",
+              "href": "rolemanage",
+              "component": "bill-design-manage/user-manage.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 1,
+              "apis": null,
+              "remark": null,
+              "children": []
+            },{
+              "id": "D64702FF72B04CF29DC202CCD422FBBC",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCBC",
+              "category": 1,
+              "source": 1,
+              "name": "menumanage",
+              "title": "菜单管理",
+              "href": "menumanage",
+              "component": "bill-design-manage/user-manage.vue",
+              "icon": "iconfont icon-menu",
+              "sortCode": 1,
+              "apis": null,
+              "remark": null,
+              "children": []
+            },{
+              "id": "D64702FF72B04CF29DC202CCD411FBBC",
+              "parentId": "D64702FF72B04CF29DC202CCD402FCBC",
+              "category": 1,
+              "source": 1,
+              "name": "dictmanage",
+              "title": "字典信息",
+              "href": "dictmanage",
+              "component": "bill-design-manage/user-manage.vue",
               "icon": "iconfont icon-menu",
               "sortCode": 1,
               "apis": null,
