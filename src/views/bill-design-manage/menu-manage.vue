@@ -16,52 +16,61 @@
 			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
 				<Row :gutter="10">
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 账号 -->
-						<FormItem :label="$t('account')" prop="account">
-							<Input v-model.trim="submitData.account" :placeholder="$t('pleaseEnter') + $t('account')" v-if="this.isAdd" />
-							<span v-else>{{ submitData.account }}</span>
+						<!-- 父ID -->
+						<FormItem :label="$t('parentId')" prop="parentId">
+							<Select v-model="req.parentId" clearable :placeholder="$t('pleaseSelect') + $t('parentId')" transfer>
+								<Option v-for="(item, i) in menuList" :value="item.value" :key="i">
+									{{ item.key }}
+								</Option>
+							</Select>
+						</FormItem>
+					</Col>
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<!-- 分类 -->
+						<FormItem :label="$t('category')" prop="category">
+							<Input v-model.trim="submitData.category" :placeholder="$t('pleaseEnter') + $t('category')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 名称 -->
-						<FormItem :label="$t('userName')" prop="name">
-							<Input v-model.trim="submitData.name" :placeholder="$t('pleaseEnter') + $t('userName')" />
+						<FormItem :label="$t('name')" prop="name">
+							<Input v-model.trim="submitData.name" :placeholder="$t('pleaseEnter') + $t('name')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 简拼 -->
-						<FormItem :label="$t('simpleSpelling')" prop="simpleSpelling">
-							<Input v-model.trim="submitData.simpleSpelling" :placeholder="$t('pleaseEnter') + $t('simpleSpelling')" />
+						<!-- 标题 -->
+						<FormItem :label="$t('title')" prop="title">
+							<Input v-model.trim="submitData.title" :placeholder="$t('pleaseEnter') + $t('title')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 电话 -->
-						<FormItem :label="$t('phone')" prop="phone">
-							<Input v-model.trim="submitData.phone" :placeholder="$t('pleaseEnter') + $t('phone')" />
+						<!-- 路径 -->
+						<FormItem :label="$t('href')" prop="href">
+							<Input v-model.trim="submitData.href" :placeholder="$t('pleaseEnter') + $t('href')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 邮箱 -->
-						<FormItem :label="$t('email')" prop="email">
-							<Input v-model.trim="submitData.email" :placeholder="$t('pleaseEnter') + $t('email')" />
+						<!-- 前端组件 -->
+						<FormItem :label="$t('component')" prop="component">
+							<Input v-model.trim="submitData.component" :placeholder="$t('pleaseEnter') + $t('component')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 角色 -->
-						<FormItem :label="$t('roleIds')" prop="roleIds">
-							<Input v-model.trim="submitData.roleIds" :placeholder="$t('pleaseEnter') + $t('roleIds')" />
+						<!-- 图标 -->
+						<FormItem :label="$t('icon')" prop="icon">
+							<Input v-model.trim="submitData.icon" :placeholder="$t('pleaseEnter') + $t('icon')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 公司 -->
-						<FormItem :label="$t('company')" prop="companyIds">
-							<Input v-model.trim="submitData.companyIds" :placeholder="$t('pleaseEnter') + $t('company')" />
+						<!-- 排序码 -->
+						<FormItem :label="$t('sortCode')" prop="sortCode">
+							<Input v-model.trim="submitData.sortCode" :placeholder="$t('pleaseEnter') + $t('sortCode')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 部门 -->
-						<FormItem :label="$t('department')" prop="departmentIds">
-							<Input v-model.trim="submitData.departmentIds" :placeholder="$t('pleaseEnter') + $t('department')" />
+						<!-- api -->
+						<FormItem :label="$t('apis')" prop="apis">
+							<Input v-model.trim="submitData.apis" :placeholder="$t('pleaseEnter') + $t('apis')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -73,15 +82,6 @@
 				</Row>
 				<!-- 是否有效 -->
 				<Row>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 是否有效 -->
-						<FormItem :label="$t('isAdministrator')" prop="isAdministrator">
-							<i-switch size="large" v-model="submitData.isAdministrator" :true-value="1" :false-value="0">
-								<span slot="open">{{ $t("open") }}</span>
-								<span slot="close">{{ $t("close") }}</span>
-							</i-switch>
-						</FormItem>
-					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 是否有效 -->
 						<FormItem :label="$t('enabled')" prop="enabled">
@@ -111,13 +111,21 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
-										<!-- 账号（工号） -->
-										<FormItem :label="$t('account')" prop="account">
-											<Input v-model="req.account" :placeholder="$t('pleaseEnter') + $t('account')" @on-search="searchClick" />
+										<!-- 父ID -->
+										<FormItem :label="$t('parentId')" prop="parentId">
+											<Input v-model="req.parentId" :placeholder="$t('pleaseEnter') + $t('parentId')" @on-search="searchClick" />
 										</FormItem>
-										<!-- 用户名 -->
-										<FormItem :label="$t('userName')" prop="name">
+										<!-- 名称 -->
+										<FormItem :label="$t('name')" prop="name">
 											<Input v-model="req.name" :placeholder="$t('pleaseEnter') + $t('name')" @on-search="searchClick" />
+										</FormItem>
+										<!-- 菜单或者按钮 1 是菜单 2 是按钮-->
+										<FormItem :label="$t('categoryInfo')" prop="category">
+											<Select v-model="req.category" clearable :placeholder="$t('pleaseSelect') + $t('categoryInfo')" transfer>
+												<Option v-for="(item, i) in categoryList" :value="item" :key="i">
+													{{ item }}
+												</Option>
+											</Select>
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -159,9 +167,9 @@
 <script>
 import {
 	getpagelistReq,
-	insertUserReq,
-	deleteUserReq,
-	modifyUserReq
+	insertMenuButtonReq,
+	deleteMenuButtonReq,
+	modifyMenuButtonReq
 } from "@/api/bill-design-manage/menu-manage.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 // 获取数据字典
@@ -180,23 +188,26 @@ export default {
 			isAdd: true,
 			selectObj: null, //表格选中
 			selectArr: [], //表格多选
+			categoryList:[1,2],
+			menuList: [],
 			submitData: {
-				account: "",
+				parentId: "",
+				category: 0,
 				name: "",
-				simpleSpelling: "",
-				phone: "",
-				email: "",
-				roleIds: "",
-				companyIds: "",
-				departmentIds: "",
+				title: "",
+				href: "",
+				compont: "",
+				icon: "",
+				sortcode: 0,
+                apis:"",
                 remark:"",
-                isAdministrator:0,
 				enabled: 1
 			},
 			drawerFlag: false,
 			req: {
-				account: "",
+				parentId: "",
 				name: "",
+				category:1,
 				...this.$config.pageConfig
 			}, //查询数据
 			columns: [
@@ -213,27 +224,31 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: this.$t("account"), key: "account", align: "center", tooltip: true },
-				{ title: this.$t("userName"), key: "name", align: "center", tooltip: true },
-				{ title: this.$t("simpleSpelling"), key: "simpleSpelling", align: "center", tooltip: true },
-				{ title: this.$t("email"), key: "email", align: "center", tooltip: true },
-				{ title: this.$t("phone"), key: "phone", align: "center", tooltip: true },
-				{ title: this.$t("remark"), key: "remark", align: "center", tooltip: true },
+				{ title: this.$t("parentId"), key: "parentId", align: "center", tooltip: true },
+				{ title: this.$t("id"), key: "id", align: "center", tooltip: true },
+				{ title: this.$t("category"), key: "category", align: "center", tooltip: true },
+				{ title: this.$t("name"), key: "name", align: "center", tooltip: true },
+				{ title: this.$t("title"), key: "title", align: "center", tooltip: true },
+				{ title: this.$t("href"), key: "href", align: "center", tooltip: true },
+				{ title: this.$t("component"), key: "component", align: "center", tooltip: true },
+				{ title: this.$t("icon"), key: "icon", align: "center", tooltip: true },
+				{ title: this.$t("sortCode"), key: "sortCode", align: "center", tooltip: true },
+				{ title: this.$t("apis"), key: "apis", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled }
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
-				account: [
+				parentId: [
 					{
 						required: true,
-						message: this.$t("pleaseEnter") + this.$t("account"),
+						message: this.$t("pleaseEnter") + this.$t("parentId"),
 						trigger: "change",
 					},
 				],
 				name: [
 					{
 						required: true,
-						message: this.$t("pleaseEnter") + this.$t("userName"),
+						message: this.$t("pleaseEnter") + this.$t("name"),
 					},
 				]
 			},
@@ -261,16 +276,17 @@ export default {
 		pageLoad() {
 			this.data = [];
 			this.tableConfig.loading = true;
-			const { sourceCode, sourceName, sourceType } = this.req;
+			const { parentId, name, category } = this.req;
+			console.log(this.req);
 			let obj = {
-				orderField: "account", // 排序字段
+				orderField: "category", // 排序字段
 				ascending: true, // 是否升序
 				pageSize: this.req.pageSize, // 分页大小
 				pageIndex: this.req.pageIndex, // 当前页码
 				data: {
-					sourceCode,
-					sourceName,
-					sourceType,
+					parentId,
+					name,
+					category,
 				},
 			};
 			getpagelistReq(obj)
@@ -279,6 +295,13 @@ export default {
 					if (res.code === 200) {
 						let { data, pageSize, pageIndex, total, totalPage } = res.result;
 						this.data = data || [];
+						this.menuList = [{key:"main",value:"0"}];
+						data.foreach(item => {
+							menuList.push({
+								key:item.name,
+								value:item.id
+							})
+						});
 						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 					}
 				})
@@ -306,7 +329,7 @@ export default {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
 					let obj = { ...this.submitData };
-					let request = this.isAdd ? insertUserReq(obj) : modifyUserReq(obj);
+					let request = this.isAdd ? insertMenuButtonReq(obj) : modifyMenuButtonReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
 							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
@@ -336,7 +359,7 @@ export default {
 				title: "确认要删除该数据吗?",
 				onOk: () => {
 					const deleteArr = deleteData.map((o) => o.id);
-					deleteUserReq({ multiId: deleteArr }).then((res) => {
+					deleteMenuButtonReq({ multiId: deleteArr }).then((res) => {
 						if (res.code === 200) {
 							this.$Msg.success("删除成功");
 							this.pageLoad();

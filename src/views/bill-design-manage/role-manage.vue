@@ -16,52 +16,22 @@
 			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
 				<Row :gutter="10">
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 账号 -->
-						<FormItem :label="$t('account')" prop="account">
-							<Input v-model.trim="submitData.account" :placeholder="$t('pleaseEnter') + $t('account')" v-if="this.isAdd" />
+						<!-- 角色ID -->
+						<FormItem :label="$t('roleId')" prop="roleId">
+							<Input v-model.trim="submitData.roleId" :placeholder="$t('pleaseEnter') + $t('roleId')" v-if="this.isAdd" />
 							<span v-else>{{ submitData.account }}</span>
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 名称 -->
-						<FormItem :label="$t('userName')" prop="name">
-							<Input v-model.trim="submitData.name" :placeholder="$t('pleaseEnter') + $t('userName')" />
+						<!-- 角色名称 -->
+						<FormItem :label="$t('roleName')" prop="roleName">
+							<Input v-model.trim="submitData.roleName" :placeholder="$t('pleaseEnter') + $t('roleName')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 简拼 -->
-						<FormItem :label="$t('simpleSpelling')" prop="simpleSpelling">
-							<Input v-model.trim="submitData.simpleSpelling" :placeholder="$t('pleaseEnter') + $t('simpleSpelling')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 电话 -->
-						<FormItem :label="$t('phone')" prop="phone">
-							<Input v-model.trim="submitData.phone" :placeholder="$t('pleaseEnter') + $t('phone')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 邮箱 -->
-						<FormItem :label="$t('email')" prop="email">
-							<Input v-model.trim="submitData.email" :placeholder="$t('pleaseEnter') + $t('email')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 角色 -->
-						<FormItem :label="$t('roleIds')" prop="roleIds">
-							<Input v-model.trim="submitData.roleIds" :placeholder="$t('pleaseEnter') + $t('roleIds')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 公司 -->
-						<FormItem :label="$t('company')" prop="companyIds">
-							<Input v-model.trim="submitData.companyIds" :placeholder="$t('pleaseEnter') + $t('company')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 部门 -->
-						<FormItem :label="$t('department')" prop="departmentIds">
-							<Input v-model.trim="submitData.departmentIds" :placeholder="$t('pleaseEnter') + $t('department')" />
+						<!-- 菜单/按钮id -->
+						<FormItem :label="$t('menu')" prop="simpleSpelling">
+							<Input v-model.trim="submitData.simpleSpelling" :placeholder="$t('pleaseEnter') + $t('menu')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -73,15 +43,6 @@
 				</Row>
 				<!-- 是否有效 -->
 				<Row>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 是否有效 -->
-						<FormItem :label="$t('isAdministrator')" prop="isAdministrator">
-							<i-switch size="large" v-model="submitData.isAdministrator" :true-value="1" :false-value="0">
-								<span slot="open">{{ $t("open") }}</span>
-								<span slot="close">{{ $t("close") }}</span>
-							</i-switch>
-						</FormItem>
-					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 是否有效 -->
 						<FormItem :label="$t('enabled')" prop="enabled">
@@ -111,13 +72,13 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
-										<!-- 账号（工号） -->
-										<FormItem :label="$t('account')" prop="account">
-											<Input v-model="req.account" :placeholder="$t('pleaseEnter') + $t('account')" @on-search="searchClick" />
+										<!-- 觉得ID -->
+										<FormItem :label="$t('roleId')" prop="roleId">
+											<Input v-model="req.roleId" :placeholder="$t('pleaseEnter') + $t('roleId')" @on-search="searchClick" />
 										</FormItem>
-										<!-- 用户名 -->
-										<FormItem :label="$t('userName')" prop="name">
-											<Input v-model="req.name" :placeholder="$t('pleaseEnter') + $t('name')" @on-search="searchClick" />
+										<!-- 角色名称 -->
+										<FormItem :label="$t('roleName')" prop="roleName">
+											<Input v-model="req.roleName" :placeholder="$t('pleaseEnter') + $t('roleName')" @on-search="searchClick" />
 										</FormItem>
 									</Form>
 									<div class="poptip-style-button">
@@ -168,7 +129,7 @@ import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 //import { getlistReq } from "@/api/system-manager/data-item";
 
 export default {
-	name: "usermanage",
+	name: "rolemanage",
 	data() {
 		return {
 			searchPoptipModal: false,
@@ -181,22 +142,16 @@ export default {
 			selectObj: null, //表格选中
 			selectArr: [], //表格多选
 			submitData: {
-				account: "",
-				name: "",
-				simpleSpelling: "",
-				phone: "",
-				email: "",
-				roleIds: "",
-				companyIds: "",
-				departmentIds: "",
-                remark:"",
-                isAdministrator:0,
+				roleId: "",
+				roleName: "",
+				menuButtonId: "",
+				remark: "",
 				enabled: 1
 			},
 			drawerFlag: false,
 			req: {
-				account: "",
-				name: "",
+				roleId: "",
+				roleName: "",
 				...this.$config.pageConfig
 			}, //查询数据
 			columns: [
@@ -215,25 +170,23 @@ export default {
 				},
 				{ title: this.$t("roleId"), key: "roleId", align: "center", tooltip: true },
 				{ title: this.$t("roleName"), key: "roleName", align: "center", tooltip: true },
-				{ title: this.$t("simpleSpelling"), key: "simpleSpelling", align: "center", tooltip: true },
-				{ title: this.$t("email"), key: "email", align: "center", tooltip: true },
-				{ title: this.$t("phone"), key: "phone", align: "center", tooltip: true },
+				{ title: this.$t("menu"), key: "menuButtonId", align: "center", tooltip: true },
 				{ title: this.$t("remark"), key: "remark", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled }
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
-				account: [
+				roleId: [
 					{
 						required: true,
-						message: this.$t("pleaseEnter") + this.$t("account"),
+						message: this.$t("pleaseEnter") + this.$t("roleId"),
 						trigger: "change",
 					},
 				],
-				name: [
+				roleName: [
 					{
 						required: true,
-						message: this.$t("pleaseEnter") + this.$t("userName"),
+						message: this.$t("pleaseEnter") + this.$t("roleName"),
 					},
 				]
 			},
