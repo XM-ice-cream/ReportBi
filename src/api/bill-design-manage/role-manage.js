@@ -2,6 +2,15 @@ import {
     requestCenter
   } from '@/libs/request'
   
+    // 获取树状菜单
+    export const getMenuTree = () => {
+        return requestCenter({
+            timeout: 0,
+            baseUrl:  window.localStorage.getItem("reportDesignIp"),
+            url: '/menubutton/getmenutree',
+            method: 'post'
+        })
+      }
   // 查询
   export const getpagelistReq = data => {
     return requestCenter({

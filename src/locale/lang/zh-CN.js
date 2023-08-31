@@ -1606,10 +1606,11 @@ export default {
   title: '标题',
   href:'路径',
   component: '页面地址',
-  api: '接口地址',
+  apis: '接口地址',
   sortCode: '排序码',
 
   // 数据字典
+  dictmanage:'数据字典',
   itemName: '项目名',
   itemCode: '项目值',
   parent: '所属上级',
@@ -1619,6 +1620,7 @@ export default {
   // <!--------------------------------Menu Name----------------------------------------->
   'bill-sys-manage':"系统中心",
   'error-404': '找不到页面',
+  'dictmanage':'数据字典',
   'authorize-manager': '权限管理',
   'role-manager': '角色管理2',
   'rolemanage':'角色管理',

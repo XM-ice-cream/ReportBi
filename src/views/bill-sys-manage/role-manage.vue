@@ -19,7 +19,7 @@
 						<!-- 角色ID -->
 						<FormItem :label="$t('roleId')" prop="roleId">
 							<Input v-model.trim="submitData.roleId" :placeholder="$t('pleaseEnter') + $t('roleId')" v-if="this.isAdd" />
-							<span v-else>{{ submitData.account }}</span>
+							<span v-else>{{ submitData.roleId }}</span>
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -31,7 +31,7 @@
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 菜单/按钮id -->
 						<FormItem :label="$t('menu')" prop="simpleSpelling">
-							<Input v-model.trim="submitData.simpleSpelling" :placeholder="$t('pleaseEnter') + $t('menu')" />
+							<Tree :data="treeData" show-checkbox></Tree>
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -122,7 +122,8 @@ import {
 	getpagelistReq,
 	insertRoleReq,
 	deleteRoleReq,
-	modifyRoleReq
+	modifyRoleReq,
+	getMenuTree
 } from "@/api/bill-design-manage/role-manage.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 // 获取数据字典
@@ -141,6 +142,7 @@ export default {
 			isAdd: true,
 			selectObj: null, //表格选中
 			selectArr: [], //表格多选
+			treeData: [],
 			submitData: {
 				roleId: "",
 				roleName: "",
@@ -194,6 +196,7 @@ export default {
 	},
 	activated() {
         console.log("初始化查询数据！");
+		this.getTree();
 		this.pageLoad();
 		this.autoSize(); 
 		window.addEventListener("resize", () => this.autoSize());
@@ -209,6 +212,17 @@ export default {
 		searchClick() {
 			this.req.pageIndex = 1;
 			this.pageLoad();
+		},
+		getTree(){
+			getMenuTree()
+				.then((res)=>{
+						if(res.code === 200){
+							this.treeData = res.result;
+						}else{
+							this.$Msg.error("获取菜单信息失败");
+						}
+					}
+				).catch(() => (this.$Msg.error("获取菜单信息失败")));
 		},
 		// 获取分页列表数据
 		pageLoad() {
@@ -240,6 +254,7 @@ export default {
 		},
 		// 点击新增按钮触发
 		addClick() {
+			console.log(this.treeData);
 			this.drawerFlag = true;
 			this.isAdd = true;
 			this.drawerTitle = this.$t("add");
@@ -249,6 +264,40 @@ export default {
 			console.log('处罚编辑');
 			if (this.selectObj) {
 				this.submitData = { ...this.selectObj };
+				// 权限回显
+				let authArr = this.submitData.menuButtonId.split(',');
+				var children = this.treeData;
+				while(children.length > 0){
+					let child = [];//不用用var 他会提升变量为全局变量 用let
+					children.forEach(item => {
+							let index = authArr.indexOf(item.id);
+							//hasOwnProperty 这是啥 获取key吗
+							//百度结果：hasOwnProperty(propertyName)方法 是用来检测属性是否为对象的自有属性，如果是，返回true，否者false; 参数propertyName指要检测的属性名我明白的 有这个key 就为false,没有key 就过 明白了
+							item.indeterminate = !item.hasOwnProperty('indetermnshinate'); //这句话啥意思 我这里的逻辑是重置树节点的选中状态，全部改为未选中，因为节点的这两个参数可能没有，所以我就判断是否包含这两个参数，如果有就
+							item.checked = !item.hasOwnProperty('checked');
+							// if(item.hasOwnProperty('indeterminate')){
+							// 	item.indeterminate == false;
+							// }
+							// if(item.hasOwnProperty('checked')){
+							// 	item.checked == false;
+							// } 好像有点bug 这里的逻辑感觉有点奇怪 代码写的有些乱
+							if(index != -1){
+								if(authArr[index+1] == '0'){
+									item.indeterminate == true;
+								}else{
+									item.indeterminate == false;
+									item.checked = true;
+								}
+							}
+							if(item.children.length>0){
+								child = [...child,...item.children];
+							} 
+						}
+					)
+					children = child;
+				}
+				console.log(this.treeData);
+
 				this.drawerFlag = true;
 				this.isAdd = false;
 				this.drawerTitle = this.$t("edit");
@@ -256,17 +305,39 @@ export default {
 		},
 		//提交
 		submitClick() {
+			// 获取tree中的节点checked  和   indeterminate  
+			this.submitData.menuButtonId = '';
+			var children = this.treeData;
+			while(children.length > 0){
+				var child = [];
+				children.forEach(item => {
+						if(item.hasOwnProperty('indeterminate') && item.indeterminate  || item.checked ){
+							const menuButtonId = this.submitData.menuButtonId;
+							this.submitData.menuButtonId += `${menuButtonId},${item.id},${item.indeterminate?'0':'1'}`;
+							item.children.length?child = [...item.children]:"";
+							// this.submitData.menuButtonId += ',';
+							// this.submitData.menuButtonId += item.id;
+							// this.submitData.menuButtonId += ',';
+							// this.submitData.menuButtonId += item.indeterminate?'0':'1';//
+							// if(item.children.length>0){
+							// 	child = [...item.children];
+							// } 
+						}
+					}
+				)
+				children = child;
+			}
+			this.submitData.menuButtonId = this.submitData.menuButtonId.substring(1);
+			console.log(this.submitData.menuButtonId);
+
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
 					let obj = { ...this.submitData };
+					console.log(obj);
 					let request = this.isAdd ? insertRoleReq(obj) : modifyRoleReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
 							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
-							//跳转至数据集
-							// if (isSkip) {
-							// 	this.$router.push({ name: "dataset", query: { sourceCode: this.submitData.sourceCode } });
-							// }
 							this.pageLoad(); //刷新表格
 							this.cancelClick();
 						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + res.message);

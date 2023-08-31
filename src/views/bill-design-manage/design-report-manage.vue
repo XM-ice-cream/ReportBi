@@ -21,7 +21,7 @@
 					<Col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
 						<!-- 报表类型 -->
 						<FormItem :label="$t('reportType')" prop="reportType">
-							<Select v-model="submitData.reportType" clearable :placeholder="$t('pleaseSelect') + $t('status')" cleabler transfer v-if="this.isAdd">
+							<Select v-model="submitData.reportType" clearable :placeholder="$t('pleaseSelect') + $t('reportType')" cleabler transfer v-if="this.isAdd">
 								<Option v-for="(item, i) in reportTypeList" :value="item.detailValue" :key="i">
 									{{ item.detailName }}
 								</Option>

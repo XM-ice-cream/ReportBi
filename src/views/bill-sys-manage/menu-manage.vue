@@ -18,8 +18,8 @@
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 父ID -->
 						<FormItem :label="$t('parentId')" prop="parentId">
-							<Select v-model="req.parentId" clearable :placeholder="$t('pleaseSelect') + $t('parentId')" transfer>
-								<Option v-for="(item, i) in menuList" :value="item.value" :key="i">
+							<Select v-model="submitData.parentId" clearable :placeholder="$t('pleaseSelect') + $t('parentId')" transfer>
+								<Option v-for="(item, i) in menuList" :value="item.value" :key="i" >
 									{{ item.key }}
 								</Option>
 							</Select>
@@ -28,7 +28,11 @@
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 分类 -->
 						<FormItem :label="$t('category')" prop="category">
-							<Input v-model.trim="submitData.category" :placeholder="$t('pleaseEnter') + $t('category')" />
+							<Select v-model="submitData.category" clearable :placeholder="$t('pleaseSelect') + $t('category')" transfer>
+								<Option v-for="(item, i) in categoryList" :value="item" :key="i">
+									{{ item }}
+								</Option>
+							</Select>
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -111,17 +115,13 @@
 								</Button>
 								<div class="poptip-style-content" slot="content">
 									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
-										<!-- 父ID -->
-										<FormItem :label="$t('parentId')" prop="parentId">
-											<Input v-model="req.parentId" :placeholder="$t('pleaseEnter') + $t('parentId')" @on-search="searchClick" />
-										</FormItem>
 										<!-- 名称 -->
 										<FormItem :label="$t('name')" prop="name">
 											<Input v-model="req.name" :placeholder="$t('pleaseEnter') + $t('name')" @on-search="searchClick" />
 										</FormItem>
-										<!-- 菜单或者按钮 1 是菜单 2 是按钮-->
+										<!-- 菜单或者按钮 0是所有 1 是菜单 2 是按钮-->
 										<FormItem :label="$t('categoryInfo')" prop="category">
-											<Select v-model="req.category" clearable :placeholder="$t('pleaseSelect') + $t('categoryInfo')" transfer>
+											<Select v-model="req.category" clearable :placeholder="$t('pleaseSelect') + $t('categoryInfo')" transfer @on-change="changeMsg()">
 												<Option v-for="(item, i) in categoryList" :value="item" :key="i">
 													{{ item }}
 												</Option>
@@ -149,7 +149,16 @@
 					:data="data"
 					@on-current-change="currentClick"
 					@on-selection-change="selectClick"
-				></Table>
+				>
+				<template slot="operator" slot-scope="{ row }">
+					<div class="operator">
+						<p @click="viewChil(row)">子项</p>
+						<span></span>
+						<p @click="viewFather(row)">返回</p>
+					</div>
+				</template>
+			
+				</Table>
 				<page-custom
 					:elapsedMilliseconds="req.elapsedMilliseconds"
 					:total="req.total"
@@ -188,26 +197,27 @@ export default {
 			isAdd: true,
 			selectObj: null, //表格选中
 			selectArr: [], //表格多选
-			categoryList:[1,2],
-			menuList: [],
+			categoryList:[0,1,2],
+			menuList: [{key:"main",value:"0"}],
+			crumb:["0"],
 			submitData: {
 				parentId: "",
-				category: 0,
+				category: 1,
 				name: "",
 				title: "",
 				href: "",
 				compont: "",
 				icon: "",
-				sortcode: 0,
+				sortcode: 1,
                 apis:"",
                 remark:"",
 				enabled: 1
 			},
 			drawerFlag: false,
 			req: {
-				parentId: "",
+				parentId: "0",
 				name: "",
-				category:1,
+				category:0,
 				...this.$config.pageConfig
 			}, //查询数据
 			columns: [
@@ -224,8 +234,6 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: this.$t("parentId"), key: "parentId", align: "center", tooltip: true },
-				{ title: this.$t("id"), key: "id", align: "center", tooltip: true },
 				{ title: this.$t("category"), key: "category", align: "center", tooltip: true },
 				{ title: this.$t("name"), key: "name", align: "center", tooltip: true },
 				{ title: this.$t("title"), key: "title", align: "center", tooltip: true },
@@ -234,7 +242,8 @@ export default {
 				{ title: this.$t("icon"), key: "icon", align: "center", tooltip: true },
 				{ title: this.$t("sortCode"), key: "sortCode", align: "center", tooltip: true },
 				{ title: this.$t("apis"), key: "apis", align: "center", tooltip: true },
-				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled }
+				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled },
+				{ title: this.$t("operator"), slot: "operator", align: "center", width: 100 }
 			], // 表格数据
 			// 验证实体
 			ruleValidate: {
@@ -242,7 +251,6 @@ export default {
 					{
 						required: true,
 						message: this.$t("pleaseEnter") + this.$t("parentId"),
-						trigger: "change",
 					},
 				],
 				name: [
@@ -255,7 +263,6 @@ export default {
 		};
 	},
 	activated() {
-        console.log("初始化查询数据！");
 		this.pageLoad();
 		this.autoSize(); 
 		window.addEventListener("resize", () => this.autoSize());
@@ -267,8 +274,35 @@ export default {
 		next();
 	},
 	methods: {
+		//提醒
+		changeMsg(){
+			this.$Msg.warning("0是所有 1 是菜单 2 是按钮");
+		},
 		// 点击搜索按钮触发
 		searchClick() {
+			console.log(this.menuList);
+			this.req.pageIndex = 1;
+			this.req.parentId = this.crumb[this.crumb.length-1]
+			this.pageLoad();
+		},
+		//点击预览子项
+		viewChil(row){
+			this.req.parentId = row.id;
+			this.crumb.push(row.id);
+			this.menuList.push({key:row.name,value:row.id});
+			this.req.pageIndex = 1;
+			this.pageLoad();
+		},
+		//点击返回父项
+		viewFather(row){
+			let length = this.crumb.length;
+			if(length === 1){
+				this.req.parentId = '0';
+			}else{
+				this.req.parentId = this.crumb[length-2];
+			}
+			this.menuList.splice(length-1,1);
+			this.crumb.splice(length-1,1);
 			this.req.pageIndex = 1;
 			this.pageLoad();
 		},
@@ -277,7 +311,6 @@ export default {
 			this.data = [];
 			this.tableConfig.loading = true;
 			const { parentId, name, category } = this.req;
-			console.log(this.req);
 			let obj = {
 				orderField: "category", // 排序字段
 				ascending: true, // 是否升序
@@ -295,13 +328,17 @@ export default {
 					if (res.code === 200) {
 						let { data, pageSize, pageIndex, total, totalPage } = res.result;
 						this.data = data || [];
-						this.menuList = [{key:"main",value:"0"}];
-						data.foreach(item => {
-							menuList.push({
-								key:item.name,
-								value:item.id
-							})
-						});
+						// if(this.req.parentId === '0'){
+						// 	this.menuList = [{key:"main",value:"0"}];
+						// 	this.data.forEach(item => {
+						// 		if(item.parentId === '0'){
+						// 			this.menuList.push({
+						// 				key:item.name,
+						// 				value:item.id
+						// 			})
+						// 		}
+						// 	});
+						// }
 						this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 					}
 				})
@@ -316,7 +353,6 @@ export default {
 		},
 		// 点击编辑按钮触发
 		editClick() {
-			console.log('处罚编辑');
 			if (this.selectObj) {
 				this.submitData = { ...this.selectObj };
 				this.drawerFlag = true;
@@ -380,6 +416,8 @@ export default {
 		},
 		// 点击重置按钮触发
 		resetClick() {
+			this.menuList = [{key:"main",value:"0"}];
+			this.crumb = ['0'];
 			this.$refs.searchReq.resetFields();
 		},
 		// 自动改变表格高度
