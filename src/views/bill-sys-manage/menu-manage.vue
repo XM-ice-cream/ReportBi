@@ -237,11 +237,11 @@ export default {
 				{ title: this.$t("category"), key: "category", align: "center", tooltip: true },
 				{ title: this.$t("name"), key: "name", align: "center", tooltip: true },
 				{ title: this.$t("title"), key: "title", align: "center", tooltip: true },
-				{ title: this.$t("href"), key: "href", align: "center", tooltip: true },
 				{ title: this.$t("component"), key: "component", align: "center", tooltip: true },
 				{ title: this.$t("icon"), key: "icon", align: "center", tooltip: true },
 				{ title: this.$t("sortCode"), key: "sortCode", align: "center", tooltip: true },
 				{ title: this.$t("apis"), key: "apis", align: "center", tooltip: true },
+				{ title: this.$t("remark"), key: "remark", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled },
 				{ title: this.$t("operator"), slot: "operator", align: "center", width: 100 }
 			], // 表格数据

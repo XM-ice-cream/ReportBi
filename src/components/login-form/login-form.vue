@@ -21,14 +21,14 @@
 					</span>
 				</i-input>
 			</FormItem>
-			<FormItem prop="db">
+			<!-- <FormItem prop="db">
 				<Select class="query_more_select" v-model="form.db" @on-change="dbChange">
 					<div slot="prefix" style="width: 20px; text-align: center">
 						<i class="iconfont icon-net" />
 					</div>
 					<Option v-for="(item, index) in dbList" :value="item.id" :key="index">{{ item.name }} </Option>
 				</Select>
-			</FormItem>
+			</FormItem> -->
 			<FormItem>
 				<Button @click="handleSubmit" size="default" type="primary" long class="login-button">
 					<a href="#" class="price-btn">
@@ -37,10 +37,7 @@
 				</Button>
 				<Row class="button-style">
 					<i-col span="12">
-						<span type="text" @click="addClick" style="float: left">注册账号</span>
-					</i-col>
-					<i-col span="12">
-						<span type="text" @click="forgetClick" style="float: right">忘记密码</span>
+						<span type="text" @click="addClick" style="float: left">注册账号：直接使用OA密码登录即可</span>
 					</i-col>
 				</Row>
 			</FormItem>

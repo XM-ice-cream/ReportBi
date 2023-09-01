@@ -254,7 +254,24 @@ export default {
 		},
 		// 点击新增按钮触发
 		addClick() {
-			console.log(this.treeData);
+			var children = this.treeData;
+			while(children.length > 0){
+				let child = [];
+				children.forEach(item => {
+						if(item.hasOwnProperty('indeterminate')){
+							item.indeterminate = false;
+						}
+						if(item.hasOwnProperty('checked')){
+							item.checked = false;
+						}
+						if(item.children.length>0){
+							child = [...child,...item.children];
+						} 
+					}
+				)
+				children = child;
+			}
+
 			this.drawerFlag = true;
 			this.isAdd = true;
 			this.drawerTitle = this.$t("add");
@@ -273,20 +290,32 @@ export default {
 							let index = authArr.indexOf(item.id);
 							//hasOwnProperty 这是啥 获取key吗
 							//百度结果：hasOwnProperty(propertyName)方法 是用来检测属性是否为对象的自有属性，如果是，返回true，否者false; 参数propertyName指要检测的属性名我明白的 有这个key 就为false,没有key 就过 明白了
-							item.indeterminate = !item.hasOwnProperty('indetermnshinate'); //这句话啥意思 我这里的逻辑是重置树节点的选中状态，全部改为未选中，因为节点的这两个参数可能没有，所以我就判断是否包含这两个参数，如果有就
-							item.checked = !item.hasOwnProperty('checked');
-							// if(item.hasOwnProperty('indeterminate')){
-							// 	item.indeterminate == false;
-							// }
-							// if(item.hasOwnProperty('checked')){
-							// 	item.checked == false;
-							// } 好像有点bug 这里的逻辑感觉有点奇怪 代码写的有些乱
+							// item.indeterminate = !item.hasOwnProperty('indetermnshinate'); //这句话啥意思 我这里的逻辑是重置树节点的选中状态，全部改为未选中，因为节点的这两个参数可能没有，所以我就判断是否包含这两个参数，如果有就
+							// item.checked = !item.hasOwnProperty('checked');
+							if(item.hasOwnProperty('indeterminate')){
+								item.indeterminate = false;
+							}
+							if(item.hasOwnProperty('checked')){
+								item.checked = false;
+							} //好像有点bug 这里的逻辑感觉有点奇怪 代码写的有些乱
 							if(index != -1){
 								if(authArr[index+1] == '0'){
-									item.indeterminate == true;
+									if(item.hasOwnProperty('indeterminate')){
+										item.indeterminate = true;
+									}else{
+										Vue.set(item, 'indeterminate', true);
+									}
 								}else{
-									item.indeterminate == false;
-									item.checked = true;
+									if(item.hasOwnProperty('indeterminate')){
+										item.indeterminate = false;
+									}else{
+										Vue.set(item, 'indeterminate', false);
+									}
+									if(item.hasOwnProperty('checked')){
+										item.checked = true;
+									}else{
+										Vue.set(item, 'checked', true);
+									}
 								}
 							}
 							if(item.children.length>0){
@@ -294,10 +323,10 @@ export default {
 							} 
 						}
 					)
-					children = child;
+					children = child;	
 				}
-				console.log(this.treeData);
-
+				this.$forceUpdate();//这个没用吗
+this.treeData = JSON.parse(JSON.stringify(this.treeData))
 				this.drawerFlag = true;
 				this.isAdd = false;
 				this.drawerTitle = this.$t("edit");
@@ -313,8 +342,8 @@ export default {
 				children.forEach(item => {
 						if(item.hasOwnProperty('indeterminate') && item.indeterminate  || item.checked ){
 							const menuButtonId = this.submitData.menuButtonId;
-							this.submitData.menuButtonId += `${menuButtonId},${item.id},${item.indeterminate?'0':'1'}`;
-							item.children.length?child = [...item.children]:"";
+							this.submitData.menuButtonId = `${menuButtonId},${item.id},${item.indeterminate?'0':'1'}`;
+							item.children.length?child = [...child,...item.children]:"";
 							// this.submitData.menuButtonId += ',';
 							// this.submitData.menuButtonId += item.id;
 							// this.submitData.menuButtonId += ',';

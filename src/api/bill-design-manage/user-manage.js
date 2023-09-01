@@ -3,6 +3,15 @@ import {
 } from '@/libs/request'
 
 // 查询
+export const getRoleList = () => {
+  return requestCenter({
+      timeout: 0,
+      baseUrl:  window.localStorage.getItem("reportDesignIp"),
+      url: '/user/getRoleList',
+      method: 'get',
+  })
+}
+// 查询
 export const getpagelistReq = data => {
   return requestCenter({
       timeout: 0,

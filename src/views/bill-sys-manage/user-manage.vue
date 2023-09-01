@@ -49,7 +49,9 @@
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 角色 -->
 						<FormItem :label="$t('roleIds')" prop="roleIds">
-							<Input v-model.trim="submitData.roleIds" :placeholder="$t('pleaseEnter') + $t('roleIds')" />
+							<CheckboxGroup v-model="submitData.roleList">
+								<checkbox v-for="item in roles" :key="item.roleId" :label="item.roleId">{{ item.roleName }}</checkbox>
+							</CheckboxGroup>
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -73,15 +75,6 @@
 				</Row>
 				<!-- 是否有效 -->
 				<Row>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 是否有效 -->
-						<FormItem :label="$t('isAdministrator')" prop="isAdministrator">
-							<i-switch size="large" v-model="submitData.isAdministrator" :true-value="1" :false-value="0">
-								<span slot="open">{{ $t("open") }}</span>
-								<span slot="close">{{ $t("close") }}</span>
-							</i-switch>
-						</FormItem>
-					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 是否有效 -->
 						<FormItem :label="$t('enabled')" prop="enabled">
@@ -161,7 +154,8 @@ import {
 	getpagelistReq,
 	insertUserReq,
 	deleteUserReq,
-	modifyUserReq
+	modifyUserReq,
+	getRoleList,
 } from "@/api/bill-design-manage/user-manage.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 // 获取数据字典
@@ -180,13 +174,15 @@ export default {
 			isAdd: true,
 			selectObj: null, //表格选中
 			selectArr: [], //表格多选
+			roles:[],
 			submitData: {
 				account: "",
 				name: "",
 				simpleSpelling: "",
 				phone: "",
 				email: "",
-				roleIds: "",
+				roleList: [],
+				roleIds:"",
 				companyIds: "",
 				departmentIds: "",
                 remark:"",
@@ -241,6 +237,7 @@ export default {
 	},
 	activated() {
         console.log("初始化查询数据！");
+		this.getRoles();
 		this.pageLoad();
 		this.autoSize(); 
 		window.addEventListener("resize", () => this.autoSize());
@@ -252,6 +249,16 @@ export default {
 		next();
 	},
 	methods: {
+		getRoles(){
+			getRoleList()
+			.then((res) => {
+				if(res.code === 200){
+					this.roles = res.result;
+				}else{
+					this.$Msg.error("获取角色信息失败");
+				}
+			}).catch(() => (this.$Msg.error("获取角色信息失败")));
+		},
 		// 点击搜索按钮触发
 		searchClick() {
 			this.req.pageIndex = 1;
@@ -287,15 +294,19 @@ export default {
 		},
 		// 点击新增按钮触发
 		addClick() {
+			console.log(this.submitData.roleList);
+			this.submitData.roleList = [];
 			this.drawerFlag = true;
 			this.isAdd = true;
 			this.drawerTitle = this.$t("add");
 		},
 		// 点击编辑按钮触发
 		editClick() {
+			console.log(this.submitData.roleList);
 			console.log('处罚编辑');
 			if (this.selectObj) {
 				this.submitData = { ...this.selectObj };
+				this.submitData.roleList = this.submitData.roleIds.split(',');
 				this.drawerFlag = true;
 				this.isAdd = false;
 				this.drawerTitle = this.$t("edit");
@@ -303,9 +314,12 @@ export default {
 		},
 		//提交
 		submitClick() {
+			// 将数组转化为字符串
+
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
 					let obj = { ...this.submitData };
+					obj.roleIds = obj.roleList.join(',');
 					let request = this.isAdd ? insertUserReq(obj) : modifyUserReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
