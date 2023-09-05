@@ -1610,7 +1610,7 @@ export default {
   sortCode: '排序码',
 
   // 数据字典
-  dictmanage:'数据字典',
+  dictmanage:'字典信息',
   itemName: '项目名',
   itemCode: '项目值',
   parent: '所属上级',
@@ -1620,7 +1620,7 @@ export default {
   // <!--------------------------------Menu Name----------------------------------------->
   'bill-sys-manage':"系统中心",
   'error-404': '找不到页面',
-  'dictmanage':'数据字典',
+  'dictmanage':'字典信息',
   'authorize-manager': '权限管理',
   'role-manager': '角色管理2',
   'rolemanage':'角色管理',

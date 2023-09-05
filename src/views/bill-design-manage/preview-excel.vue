@@ -7,12 +7,12 @@
 				<div slot="title">
 					<Form ref="searchReq" :model="req" inline :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
 						<!-- 类型 -->
-						<!-- <FormItem :label="$t('reportType')" prop="reportType">
-              <RadioGroup v-model="req.reportType" type="button" button-style="solid" @on-change='searchClick'>
-                <Radio label="excel">Excel</Radio>
-                <Radio label="largescreen">大屏</Radio>
-              </RadioGroup>
-            </FormItem> -->
+						<FormItem :label="$t('reportType')" prop="reportType">
+							<RadioGroup v-model="req.reportType" type="button" button-style="solid" @on-change='searchClick'>
+							<Radio label="excel">Excel</Radio>
+							<Radio label="largescreen">大屏</Radio>
+							</RadioGroup>
+						</FormItem>
 						<!-- 报表分类 -->
 						<FormItem label="报表分类" prop="remark">
 							<Select
@@ -48,7 +48,7 @@
 				<!-- 预览Card -->
 				<div class="previewExcelCard">
 					<template v-for="item in data">
-						<div class="cardCell" title="点击查看" @click="preview(item.reportCode, item.reportName)">
+						<div class="cardCell" title="点击查看" @click="preview(item.reportType,item.reportCode, item.reportName)">
 							<span class="title">
 								<span class="circle">
 									<Icon type="ios-albums" />
@@ -144,7 +144,7 @@ export default {
 			req: {
 				reportName: "",
 				reportCode: "",
-				reportType: "excel",
+				reportType: "",
 				remark: "",
 				...this.$config.pageConfig,
 			}, //查询数据
@@ -201,8 +201,10 @@ export default {
 			window.open(href, "_blank");
 		},
 		// 预览
-		preview(reportCode, reportName) {
-			const href = this.skipUrl(this.req.reportType + "Preview", reportCode, reportName);
+		preview(reportType,reportCode, reportName) {
+			console.log("点击预览");
+			const href = this.skipUrl(reportType + "Preview", reportCode, reportName);
+			console.log(href);
 			window.open(href, "_blank");
 		},
 		//跳转路径

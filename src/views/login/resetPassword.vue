@@ -1,4 +1,3 @@
-/* 强制重置密码 */
 <template>
   <Modal class="reset-form" draggable v-model="modal" title="修改密码" footer-hide>
     <Form ref="req" :model="req" :rules="ruleValidate" :label-width="100" :label-colon="false">

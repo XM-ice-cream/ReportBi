@@ -100,58 +100,73 @@
 			</div>
 		</Modal>
 		<!-- 页面表格 -->
+		
 		<div class="comment">
-			<Card :bordered="false" dis-hover class="card-style">
-				<div slot="title">
-					<Row>
-						<i-col span="6">
-							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
-									<Icon type="ios-funnel" />
-								</Button>
-								<div class="poptip-style-content" slot="content">
-									<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
-										<!-- 账号（工号） -->
-										<FormItem :label="$t('account')" prop="account">
-											<Input v-model="req.account" :placeholder="$t('pleaseEnter') + $t('account')" @on-search="searchClick" />
-										</FormItem>
-										<!-- 用户名 -->
-										<FormItem :label="$t('userName')" prop="name">
-											<Input v-model="req.name" :placeholder="$t('pleaseEnter') + $t('name')" @on-search="searchClick" />
-										</FormItem>
-									</Form>
-									<div class="poptip-style-button">
-										<Button @click="resetClick()">{{ $t("reset") }}</Button>
-										<Button type="primary" @click="searchClick()">{{ $t("query") }}</Button>
-									</div>
-								</div>
-							</Poptip>
-						</i-col>
-						<i-col span="18">
-							<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
-						</i-col>
-					</Row>
-				</div>
-				<Table
-					:border="tableConfig.border"
-					:highlight-row="tableConfig.highlightRow"
-					:height="tableConfig.height"
-					:loading="tableConfig.loading"
-					:columns="columns"
-					:data="data"
-					@on-current-change="currentClick"
-					@on-selection-change="selectClick"
-				></Table>
-				<page-custom
-					:elapsedMilliseconds="req.elapsedMilliseconds"
-					:total="req.total"
-					:totalPage="req.totalPage"
-					:pageIndex="req.pageIndex"
-					:page-size="req.pageSize"
-					@on-change="pageChange"
-					@on-page-size-change="pageSizeChange"
-				/>
-			</Card>
+			<Row>
+				<Col class="leftTree" :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
+					<Card :bordered="true" dis-hover class="card-style" overflow = auto>
+						<Tree :data="treedata" @on-contextmenu="handleContextMenu">
+							<template #contextMenu>
+								<DropdownItem @click="handleContextMenuEdit">编辑</DropdownItem>
+								<DropdownItem @click="handleContextMenuDelete" style="color: #ed4014">删除</DropdownItem>
+							</template>
+						</Tree>
+					</Card>
+				</Col>
+				<Col :xs="19" :sm="19" :md="19" :lg="19" :xl="19">
+					<Card :bordered="false" dis-hover class="card-style">
+						<div slot="title">
+							<Row>
+								<i-col span="6">
+									<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
+										<Button @click.stop="searchPoptipModal = !searchPoptipModal">
+											<Icon type="ios-funnel" />
+										</Button>
+										<div class="poptip-style-content" slot="content">
+											<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
+												<!-- 账号（工号） -->
+												<FormItem :label="$t('account')" prop="account">
+													<Input v-model="req.account" :placeholder="$t('pleaseEnter') + $t('account')" @on-search="searchClick" />
+												</FormItem>
+												<!-- 用户名 -->
+												<FormItem :label="$t('userName')" prop="name">
+													<Input v-model="req.name" :placeholder="$t('pleaseEnter') + $t('name')" @on-search="searchClick" />
+												</FormItem>
+											</Form>
+											<div class="poptip-style-button">
+												<Button @click="resetClick()">{{ $t("reset") }}</Button>
+												<Button type="primary" @click="searchClick()">{{ $t("query") }}</Button>
+											</div>
+										</div>
+									</Poptip>
+								</i-col>
+								<i-col span="18">
+									<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
+								</i-col>
+							</Row>
+						</div>
+						<Table
+							:border="tableConfig.border"
+							:highlight-row="tableConfig.highlightRow"
+							:height="tableConfig.height"
+							:loading="tableConfig.loading"
+							:columns="columns"
+							:data="data"
+							@on-current-change="currentClick"
+							@on-selection-change="selectClick"
+						></Table>
+						<page-custom
+							:elapsedMilliseconds="req.elapsedMilliseconds"
+							:total="req.total"
+							:totalPage="req.totalPage"
+							:pageIndex="req.pageIndex"
+							:page-size="req.pageSize"
+							@on-change="pageChange"
+							@on-page-size-change="pageSizeChange"
+						/>
+					</Card>
+				</Col>
+			</Row>
 		</div>
 	</div>
 </template>
@@ -180,6 +195,196 @@ export default {
 			isAdd: true,
 			selectObj: null, //表格选中
 			selectArr: [], //表格多选
+			treedata:[
+				{
+					title: 'parent 1',
+					expand: true,
+					contextmenu: true,
+					children: [
+						{
+							title: 'parent 1-1',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-1-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-1-2',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						},
+						{
+							title: 'parent 1-2',
+							expand: true,
+							contextmenu: true,
+							children: [
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								},
+								{
+									title: 'leaf 1-2-1',
+									contextmenu: true
+								}
+							]
+						}
+					]
+				}
+			],
+			contextData: null,		
 			submitData: {
 				account: "",
 				name: "",
@@ -252,6 +457,15 @@ export default {
 		next();
 	},
 	methods: {
+		handleContextMenu (data) {
+                this.contextData = data;
+		},
+		handleContextMenuEdit () {
+			this.$Message.info('Click edit of' + this.contextData.title);
+		},
+		handleContextMenuDelete () {
+			this.$Message.info('Click delete of' + this.contextData.title);
+		},
 		// 点击搜索按钮触发
 		searchClick() {
 			this.req.pageIndex = 1;
@@ -298,7 +512,7 @@ export default {
 				this.submitData = { ...this.selectObj };
 				this.drawerFlag = true;
 				this.isAdd = false;
-				this.drawerTitle = this.$t("edit");
+			this.drawerTitle = this.$t("edit");
 			} else this.$Msg.warning(this.$t("oneData"));
 		},
 		//提交
@@ -384,6 +598,9 @@ export default {
 	background: #f7a428;
 	border: 1px solid #f7a428;
 	border-radius: 0;
+}
+.leftTree {
+	padding: 5px 5px;
 }
 .testBtn:hover {
 	padding: 5px 16px;
