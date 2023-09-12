@@ -1615,6 +1615,9 @@ export default {
   itemCode: '项目值',
   parent: '所属上级',
   parentArea: '所属区段',
+  addTree:'新增树',
+  ontTree:'请选择一个树节点',
+  editTree:'修改树',
   icon:'图标',
 
   // <!--------------------------------Menu Name----------------------------------------->

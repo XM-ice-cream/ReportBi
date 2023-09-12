@@ -3,6 +3,59 @@
 	<div class="page-style">
 		<!-- 左侧抽屉 -->
 		<Modal
+			v-model="treeFlag"
+			draggable
+			scrollable
+			width="800"
+			:title="drawerTitle"
+			:mask-closable="false"
+			:closable="true"
+			:before-close="cancelClick"
+			:reset-drag-position="true"
+		>
+			<Form ref="submitTreeReq" :model="treesubmitData" :rules="ruleValidate" :label-width="100">
+				
+				<!-- 父节点 -->
+				<Row>
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<FormItem :label="$t('parentId')" prop="parentId">
+							<!-- 选择父节点 -->
+							<Select v-model="treesubmitData.parentId" clearable :placeholder="$t('pleaseSelect') + $t('parentId')" transfer>
+								<Option v-for="(item, i) in parentList" :value="item.value" :key="i" >
+									{{ item.key }}
+								</Option>
+							</Select>
+						</FormItem>
+					</Col>
+				</Row>
+				<Row :gutter="10">
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<!-- 项目名 -->
+						<FormItem :label="$t('itemName')" prop="itemName">
+							<Input v-model.trim="treesubmitData.itemName" :placeholder="$t('pleaseEnter') + $t('itemName')" />
+						</FormItem>
+					</Col>
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<!-- 项目值 -->
+						<FormItem :label="$t('itemCode')" prop="itemCode">
+							<Input v-model.trim="treesubmitData.itemCode" :placeholder="$t('pleaseEnter') + $t('itemCode')" />
+						</FormItem>
+					</Col>
+					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<!-- 排序吗 -->
+						<FormItem :label="$t('sortCode')" prop="sortCode">
+							<Input v-model.trim="treesubmitData.sortCode" :placeholder="$t('pleaseEnter') + $t('sortCode')" />
+						</FormItem>
+					</Col>
+				</Row>
+			</Form>
+			<!-- 按钮 -->
+			<div slot="footer">
+				<Button size="small" @click="cancelTreeClick">取消</Button>
+				<Button size="small" @click="submitTreeClick">保存</Button>
+			</div>
+		</Modal>
+		<Modal
 			v-model="drawerFlag"
 			draggable
 			scrollable
@@ -16,52 +69,21 @@
 			<Form ref="submitReq" :model="submitData" :rules="ruleValidate" :label-width="100">
 				<Row :gutter="10">
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 账号 -->
-						<FormItem :label="$t('account')" prop="account">
-							<Input v-model.trim="submitData.account" :placeholder="$t('pleaseEnter') + $t('account')" v-if="this.isAdd" />
-							<span v-else>{{ submitData.account }}</span>
+						<!-- 项目名 -->
+						<FormItem :label="$t('itemName')" prop="detailName">
+							<Input v-model.trim="submitData.detailName" :placeholder="$t('pleaseEnter') + $t('itemName')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 名称 -->
-						<FormItem :label="$t('userName')" prop="name">
-							<Input v-model.trim="submitData.name" :placeholder="$t('pleaseEnter') + $t('userName')" />
+						<!-- 项目值 -->
+						<FormItem :label="$t('itemCode')" prop="detailCode">
+							<Input v-model.trim="submitData.detailCode" :placeholder="$t('pleaseEnter') + $t('itemCode')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 简拼 -->
-						<FormItem :label="$t('simpleSpelling')" prop="simpleSpelling">
-							<Input v-model.trim="submitData.simpleSpelling" :placeholder="$t('pleaseEnter') + $t('simpleSpelling')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 电话 -->
-						<FormItem :label="$t('phone')" prop="phone">
-							<Input v-model.trim="submitData.phone" :placeholder="$t('pleaseEnter') + $t('phone')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 邮箱 -->
-						<FormItem :label="$t('email')" prop="email">
-							<Input v-model.trim="submitData.email" :placeholder="$t('pleaseEnter') + $t('email')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 角色 -->
-						<FormItem :label="$t('roleIds')" prop="roleIds">
-							<Input v-model.trim="submitData.roleIds" :placeholder="$t('pleaseEnter') + $t('roleIds')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 公司 -->
-						<FormItem :label="$t('company')" prop="companyIds">
-							<Input v-model.trim="submitData.companyIds" :placeholder="$t('pleaseEnter') + $t('company')" />
-						</FormItem>
-					</Col>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 部门 -->
-						<FormItem :label="$t('department')" prop="departmentIds">
-							<Input v-model.trim="submitData.departmentIds" :placeholder="$t('pleaseEnter') + $t('department')" />
+						<!-- 排序吗 -->
+						<FormItem :label="$t('sortCode')" prop="sortCode">
+							<Input v-model.trim="submitData.sortCode" :placeholder="$t('pleaseEnter') + $t('sortCode')" />
 						</FormItem>
 					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -73,15 +95,6 @@
 				</Row>
 				<!-- 是否有效 -->
 				<Row>
-					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<!-- 是否有效 -->
-						<FormItem :label="$t('isAdministrator')" prop="isAdministrator">
-							<i-switch size="large" v-model="submitData.isAdministrator" :true-value="1" :false-value="0">
-								<span slot="open">{{ $t("open") }}</span>
-								<span slot="close">{{ $t("close") }}</span>
-							</i-switch>
-						</FormItem>
-					</Col>
 					<Col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<!-- 是否有效 -->
 						<FormItem :label="$t('enabled')" prop="enabled">
@@ -100,48 +113,30 @@
 			</div>
 		</Modal>
 		<!-- 页面表格 -->
-		
 		<div class="comment">
 			<Row>
 				<Col class="leftTree" :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
 					<Card :bordered="true" dis-hover class="card-style" overflow = auto>
-						<Tree :data="treedata" @on-contextmenu="handleContextMenu">
-							<template #contextMenu>
-								<DropdownItem @click="handleContextMenuEdit">编辑</DropdownItem>
-								<DropdownItem @click="handleContextMenuDelete" style="color: #ed4014">删除</DropdownItem>
-							</template>
-						</Tree>
+						<template>
+							<Tree :data="treedata" @on-contextmenu="handleContextMenu" @on-select-change="nodeClick">
+								<template #contextMenu>
+									<DropdownItem @click.native="handleContextMenuAdd">新增</DropdownItem>
+									<DropdownItem @click.native="handleContextMenuEdit">编辑</DropdownItem>
+									<DropdownItem @click.native="handleContextMenuDelete" style="color: #ed4014">删除</DropdownItem>
+								</template>
+							</Tree>
+						</template>
 					</Card>
 				</Col>
 				<Col :xs="19" :sm="19" :md="19" :lg="19" :xl="19">
 					<Card :bordered="false" dis-hover class="card-style">
 						<div slot="title">
 							<Row>
-								<i-col span="6">
-									<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
-										<Button @click.stop="searchPoptipModal = !searchPoptipModal">
-											<Icon type="ios-funnel" />
-										</Button>
-										<div class="poptip-style-content" slot="content">
-											<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent @keyup.native.enter="searchClick">
-												<!-- 账号（工号） -->
-												<FormItem :label="$t('account')" prop="account">
-													<Input v-model="req.account" :placeholder="$t('pleaseEnter') + $t('account')" @on-search="searchClick" />
-												</FormItem>
-												<!-- 用户名 -->
-												<FormItem :label="$t('userName')" prop="name">
-													<Input v-model="req.name" :placeholder="$t('pleaseEnter') + $t('name')" @on-search="searchClick" />
-												</FormItem>
-											</Form>
-											<div class="poptip-style-button">
-												<Button @click="resetClick()">{{ $t("reset") }}</Button>
-												<Button type="primary" @click="searchClick()">{{ $t("query") }}</Button>
-											</div>
-										</div>
-									</Poptip>
+								<i-col span="4">
+									<label>{{this.req.currentTitle}} / {{this.req.currentCode}}</label>
 								</i-col>
-								<i-col span="18">
-									<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
+								<i-col span="20">
+									<button-custom :btnData="btnData"  @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
 								</i-col>
 							</Row>
 						</div>
@@ -174,9 +169,12 @@
 <script>
 import {
 	getpagelistReq,
-	insertUserReq,
-	deleteUserReq,
-	modifyUserReq
+	insertDictDetailReq,
+	deleteDictDetailReq,
+	modifyDictDetailReq,
+	insertDictReq,
+	modifyDictReq,
+	getTreeData
 } from "@/api/bill-design-manage/dict-manage.js";
 import { getButtonBoolean, renderIsEnabled } from "@/libs/tools";
 // 获取数据字典
@@ -195,213 +193,29 @@ export default {
 			isAdd: true,
 			selectObj: null, //表格选中
 			selectArr: [], //表格多选
-			treedata:[
-				{
-					title: 'parent 1',
-					expand: true,
-					contextmenu: true,
-					children: [
-						{
-							title: 'parent 1-1',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-1-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-1-2',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						},
-						{
-							title: 'parent 1-2',
-							expand: true,
-							contextmenu: true,
-							children: [
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								},
-								{
-									title: 'leaf 1-2-1',
-									contextmenu: true
-								}
-							]
-						}
-					]
-				}
-			],
+			treedata:[],
+			parentList:[{key:'根节点',value:'0'}],
 			contextData: null,		
 			submitData: {
-				account: "",
-				name: "",
-				simpleSpelling: "",
-				phone: "",
-				email: "",
-				roleIds: "",
-				companyIds: "",
-				departmentIds: "",
+				detailCode: "",
+				detailName: "",
+				sortCode: 1,
                 remark:"",
-                isAdministrator:0,
 				enabled: 1
 			},
+			treesubmitData :{
+				parentId:"",
+				itemCode: "",
+				itemName: "",
+				sortCode: 1,
+                remark:""
+			},
 			drawerFlag: false,
+			treeFlag:false,
 			req: {
-				account: "",
-				name: "",
+				currentTitle:"根节点",
+				currentCode:"0",
+				currentId:"0",
 				...this.$config.pageConfig
 			}, //查询数据
 			columns: [
@@ -418,11 +232,9 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: this.$t("account"), key: "account", align: "center", tooltip: true },
-				{ title: this.$t("userName"), key: "name", align: "center", tooltip: true },
-				{ title: this.$t("simpleSpelling"), key: "simpleSpelling", align: "center", tooltip: true },
-				{ title: this.$t("email"), key: "email", align: "center", tooltip: true },
-				{ title: this.$t("phone"), key: "phone", align: "center", tooltip: true },
+				{ title: this.$t("itemName"), key: "detailName", align: "center", tooltip: true },
+				{ title: this.$t("itemCode"), key: "detailCode", align: "center", tooltip: true },
+				{ title: this.$t("sortCode"), key: "sortCode", align: "center", tooltip: true },
 				{ title: this.$t("remark"), key: "remark", align: "center", tooltip: true },
 				{ title: this.$t("enabled"), key: "enabled", align: "center", tooltip: true, render: renderIsEnabled }
 			], // 表格数据
@@ -446,6 +258,7 @@ export default {
 	},
 	activated() {
         console.log("初始化查询数据！");
+		this.getTree();
 		this.pageLoad();
 		this.autoSize(); 
 		window.addEventListener("resize", () => this.autoSize());
@@ -457,14 +270,48 @@ export default {
 		next();
 	},
 	methods: {
+		getTree(){
+			getTreeData()
+			.then(res=>{
+				//请规范写法
+				if(res.code==200){
+					this.treedata = res?.result||[];
+				}
+				
+			}).catch(()=>(this.$Msg.warning("获取左侧树节点数据失败")));
+		},
+		nodeClick(data,node){
+			this.req.currentId = node.id;
+			this.req.currentCode = node.code;
+			this.req.currentTitle = node.title;
+			this.contextData = node;
+			this.pageLoad();
+		},
 		handleContextMenu (data) {
-                this.contextData = data;
+			this.parentList.splice(1,this.parentList.length-1)
+			this.parentList.push({key:'当前父节点',value:data.parentId});
+			this.parentList.push({key:'当前节点',value:data.id});
+			this.contextData = data;
+		},
+		handleContextMenuAdd () {
+			this.treeFlag = true;
+			this.isAdd = true;
+			this.drawerTitle = this.$t("addTree");
 		},
 		handleContextMenuEdit () {
-			this.$Message.info('Click edit of' + this.contextData.title);
+			console.log(this.contextData);
+			if (this.contextData != null ) {
+				this.treesubmitData = this.contextData;
+				this.treesubmitData.itemCode = this.contextData.code;
+				this.treesubmitData.itemName = this.contextData.title;
+				
+				this.treeFlag = true;
+				this.isAdd = false;
+			this.drawerTitle = this.$t("editTree");
+			} else this.$Msg.warning(this.$t("ontTree"));
 		},
 		handleContextMenuDelete () {
-			this.$Message.info('Click delete of' + this.contextData.title);
+			this.$Msg.warning('请联系超级管理员删除！');
 		},
 		// 点击搜索按钮触发
 		searchClick() {
@@ -475,16 +322,13 @@ export default {
 		pageLoad() {
 			this.data = [];
 			this.tableConfig.loading = true;
-			const { sourceCode, sourceName, sourceType } = this.req;
 			let obj = {
-				orderField: "account", // 排序字段
+				orderField: "sortcode", // 排序字段
 				ascending: true, // 是否升序
 				pageSize: this.req.pageSize, // 分页大小
 				pageIndex: this.req.pageIndex, // 当前页码
 				data: {
-					sourceCode,
-					sourceName,
-					sourceType,
+					itemId:this.req.currentId
 				},
 			};
 			getpagelistReq(obj)
@@ -520,7 +364,7 @@ export default {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
 					let obj = { ...this.submitData };
-					let request = this.isAdd ? insertUserReq(obj) : modifyUserReq(obj);
+					let request = this.isAdd ? insertDictDetailReq(obj) : modifyDictDetailReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
 							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
@@ -535,9 +379,34 @@ export default {
 				}
 			});
 		},
+		//提交
+		submitTreeClick() {
+			this.$refs.submitTreeReq.validate((validate) => {
+				if (validate) {
+					let obj = { ...this.treesubmitData };
+					let request = this.isAdd ? insertDictReq(obj) : modifyDictReq(obj);
+					request.then((res) => {
+						if (res.code === 200) {
+							this.$Msg.success(`${this.drawerTitle}${this.$t("success")}`);
+							//跳转至数据集
+							// if (isSkip) {
+							// 	this.$router.push({ name: "dataset", query: { sourceCode: this.submitData.sourceCode } });
+							// }
+							this.getTree(); //刷新表格
+							this.cancelTreeClick();
+						} else this.$Msg.error(`${this.drawerTitle}${this.$t("fail")}` + res.message);
+					});
+				}
+			});
+		},
 		cancelClick() {
 			this.drawerFlag = false;
 			this.$refs.submitReq.resetFields(); //清除表单红色提示
+		},
+		cancelTreeClick() {
+			console.log(this.treesubmitData);
+			this.treeFlag = false;
+			this.$refs.submitTreeReq.resetFields(); //清除表单红色提示
 		},
 		//删除
 		deleteClick() {
@@ -550,7 +419,7 @@ export default {
 				title: "确认要删除该数据吗?",
 				onOk: () => {
 					const deleteArr = deleteData.map((o) => o.id);
-					deleteUserReq({ multiId: deleteArr }).then((res) => {
+					deleteDictDetailReq({ multiId: deleteArr }).then((res) => {
 						if (res.code === 200) {
 							this.$Msg.success("删除成功");
 							this.pageLoad();

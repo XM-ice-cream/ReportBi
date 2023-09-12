@@ -5,7 +5,7 @@ import { requestCenter } from '@/libs/request'
 export const addReq = data => {
   return requestCenter({
     loading: true,
-    url: '/api/systemcenter/v1/errorrecord/add',
+    url: '/errorrecord/add',
     method: 'post',
     data
   })
