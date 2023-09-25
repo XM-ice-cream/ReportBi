@@ -77,7 +77,9 @@ router.beforeEach((to, form, next) => {
   else if (!userLocalInfo().token) {
     // 未登录
     if (to.name !== LOGIN_PAGE_NAME) {
+      console.log(to);
       // 要跳转的页面不是登录页面
+      sessionSave("fullPath",to.fullPath);
       next({
         replace: true,
         name: LOGIN_PAGE_NAME

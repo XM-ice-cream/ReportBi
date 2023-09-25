@@ -1,6 +1,6 @@
 <template>
   <div class="imagebox" :style="styleColor">
-    <img :class="transStyle.startRotate ? 'startImg' : ''" :style="imgStyle" :src="imgStyle.imageAdress" alt="" />
+    <img :class="classStyle" :style="imgStyle" :src="imgStyle.imageAdress" alt="" />
   </div>
 </template>
 <script>
@@ -33,8 +33,15 @@ export default {
         right: this.transStyle.right + "px"
       };
     },
+    classStyle(){
+      if(this.transStyle.startRotate){
+        return this.transStyle.anticlockwise?'endImg @keyframes anticlockwise':'startImg @keyframes clockwise'
+      }
+      return '';
+    },
     imgStyle () {
       return {
+        '--customerRotate': this.transStyle.rotate+'s',
         imageAdress: this.transStyle.imageAdress,
         "border-radius": this.transStyle.borderRadius + "px",
         opacity: this.transStyle.transparency / 100
@@ -68,9 +75,9 @@ export default {
   height: 100%;
 }
 .startImg {
-  animation: turn 1s linear infinite;
+  animation: clockwise var(--customerRotate) linear infinite;
 }
-@keyframes turn {
+@keyframes clockwise {
   0% {
     -webkit-transform: rotate(0deg);
   }
@@ -85,6 +92,26 @@ export default {
   }
   100% {
     -webkit-transform: rotate(360deg);
+  }
+}
+.endImg {
+  animation: anticlockwise var(--customerRotate) linear infinite;
+}
+@keyframes anticlockwise {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  25% {
+    -webkit-transform: rotate(-90deg);
+  }
+  50% {
+    -webkit-transform: rotate(-180deg);
+  }
+  75% {
+    -webkit-transform: rotate(-270deg);
+  }
+  100% {
+    -webkit-transform: rotate(-360deg);
   }
 }
 </style>

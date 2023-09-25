@@ -58,6 +58,13 @@ export const sessionSave = (key, value = null) => {
 /**
  * @description 读取sessionStorage缓存信息
  */
+export const sessionRemove = (key) => {
+    return sessionStorage.removeItem(key) || ''
+}
+
+/**
+ * @description 读取sessionStorage缓存信息
+ */
 export const sessionRead = (key) => {
     return sessionStorage.getItem(key) || ''
 }

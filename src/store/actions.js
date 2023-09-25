@@ -54,7 +54,7 @@ export default {
       source: 1,
     };
     sessionSave("userName", obj.username);
-    sessionSave("password", obj.password);
+    sessionSave("password", sha1_to_base64(encryptDes(password.trim(), "bi", "password")));
     localStorage.setItem('currentUser', obj.username);
     let localObj = {
       userName: obj.username,
@@ -74,7 +74,7 @@ export default {
             localObj.token = res.access_token;
             localObj.refreshToken = res.refresh_token;
             localObj.locking = obj.username;
-            localObj.password = obj.password;
+            localObj.password = sha1_to_base64(encryptDes(password.trim(), "bi", "password"));
             userLocalInfo(localObj);
             getcurrentuserReq()
               .then((resp) => {

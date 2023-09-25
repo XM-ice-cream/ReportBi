@@ -25,6 +25,22 @@ export const widgetImage = {
                 value: false,
             },
             {
+                type: 'i-switch',
+                label: '逆时针',
+                name: 'anticlockwise',
+                required: false,
+                placeholder: '',
+                value: false,
+            },
+            {
+                type: 'InputNumber',
+                label: '转速',
+                name: 'rotate',
+                required: false,
+                placeholder: '',
+                value: 12
+            },
+            {
                 type: 'Slider',
                 label: '透明度',
                 name: 'transparency',

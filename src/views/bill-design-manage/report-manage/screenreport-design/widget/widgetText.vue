@@ -73,15 +73,16 @@ export default {
     dynamicDataFn (val, refreshTime) {
       if (!val) return;
       if (this.ispreview) {
-        this.getEchartData(val);
+        this.getTextData(val);
         this.flagInter = setInterval(() => {
-          this.getEchartData(val);
+          this.getTextData(val);
         }, refreshTime);
       } else {
-        this.getEchartData(val);
+        this.getTextData(val);
       }
     },
-    getEchartData (val) {
+    getTextData (val) {
+      console.log(val);
       const data = this.queryEchartsData(val);
       data.then(res => {
         this.styleColor.text = res[0].value;

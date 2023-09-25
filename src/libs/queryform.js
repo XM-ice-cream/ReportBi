@@ -1,6 +1,7 @@
 import {
   getDataReq
 } from '@/api/bill-design-manage/report-manage.js'
+import { Column } from 'vxe-table'
 let queryform = {
   data() {
     return {
@@ -42,7 +43,7 @@ let queryform = {
     },
     // 查询echarts 数据
     queryEchartsData(params) {
-      //console.log(params);
+      console.log(params);
       return new Promise(async (resolve) => {
         let {
           code,
@@ -57,6 +58,7 @@ let queryform = {
     analysisChartsData(params, data) {
       //console.log(params);
       //console.log(data);
+      // widgetLineCompareChart 折线对比图
       // widget-barchart 柱线图、widget-linechart 折线图、 widget-barlinechart 柱线图
       // widget-piechart 饼图、widget-funnel 漏斗图
       // widget-text 文本框
@@ -69,18 +71,64 @@ let queryform = {
         chartType == "widget-barlinechart"
       ) {
         return this.barOrLineChartFn(data.chartProperties, data.data);
-      } else if (
+      } else if(chartType == "widgetLineCompareChart"){
+        return this.LineCompareChartFn(data.chartProperties, data.data);
+      }
+      else if (
         chartType == "widget-piechart" ||
         chartType == "widget-funnel"
       ) {
         return this.piechartFn(data.chartProperties, data.data);
       } else if (chartType == "widget-text") {
-        return this.widgettext(params.chartProperties, data)
+        return this.widgettext(data.chartProperties, data.data)
       } else if (chartType == "widget-stackchart") {
-        return this.stackChartFn(params.chartProperties, data)
+        return this.stackChartFn(data.chartProperties, data)
       } else {
         return data
       }
+    },
+    LineCompareChartFn(chartProperties, data){
+      const ananysicData = {};
+      const xAxisList = []; //x轴
+      const series = [];
+      let legend = [];
+      let obj = {}; //临时存储series
+      let columnIndex = 0;
+      Object.keys(chartProperties).forEach((key) => {
+        chartProperties[key].forEach((iitem, iIndex) => {
+          if (key === "columns") {
+            if(columnIndex === 0){
+              columnIndex++;
+              legend = data.map(item => item[chartProperties[key][iIndex]]);
+              legend = Array.from(new Set(legend));
+              return;
+            }
+            legend.forEach(litem =>{
+              obj = {};
+              obj.name = litem;
+              obj.type = "line";
+              data.forEach((item, index) => {
+                if (!obj["data"]) obj["data"] = []
+                if(litem === item[chartProperties[key][0]])
+                  obj["data"].push(item[iitem]);
+              });
+              series.push(obj);
+            })
+          };
+          data.forEach((item, index) => {
+            //行
+            if (key === "rows") {
+              if (!xAxisList[iIndex]) xAxisList[iIndex] = [];
+              xAxisList[iIndex].includes(item[iitem]) ? '' : xAxisList[iIndex].push(item[iitem]);
+            }
+          })
+        })
+
+      })
+      ananysicData["xAxis"] = xAxisList;
+      ananysicData["series"] = series;
+      ananysicData["legend"] = legend;
+      return ananysicData;
     },
     // 柱状图、折线图、柱线图
     barOrLineChartFn(chartProperties, data) {
@@ -185,13 +233,15 @@ let queryform = {
       return ananysicData;
     },
     widgettext(chartProperties, data) {
+      console.log('文本框动态');
       const ananysicData = [];
       for (let i = 0; i < data.length; i++) {
         const obj = {};
         for (const key in chartProperties) {
-          const value = chartProperties[key];
-          if (value === "name") {} else {
-            obj["value"] = data[i][key];
+          const arr = chartProperties[key];
+          if(arr.length>0){
+            obj["value"] = data[i][arr[0]];
+            break;
           }
         }
         ananysicData.push(obj);

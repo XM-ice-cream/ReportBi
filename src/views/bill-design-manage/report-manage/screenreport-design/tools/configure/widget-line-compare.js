@@ -812,7 +812,7 @@ export const widgetLineCompare = {
                 placeholder: '',
                 relactiveDom: 'dataType',
                 relactiveDomValue: 'dynamicData',
-                chartType: 'widget-stackchart',
+                chartType: 'widgetLineCompareChart',
                 dictKey: 'STACK_PROPERTIES',
                 value: '',
             },

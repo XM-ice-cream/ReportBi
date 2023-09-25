@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: "WidgetBarCompareChart",
+  name: "widgetLineCompareChart",
   //参考 https://www.makeapie.com/editor.html?c=xOjLyozu2W
   components: {},
   props: {
@@ -668,9 +668,10 @@ export default {
       });
     },
     renderingFn (optionsSetup, val) {
+      console.log("lineCompareChart");
       const legendName = [];
-      this.options.xAxis[0]['data'] = val.xAxis;
-      this.options.xAxis[1]['data'] = val.xAxis;
+      this.options.xAxis[0]['data'] = val.xAxis[0];
+      this.options.xAxis[1]['data'] = val.xAxis[0];
       if (val.series[0].type == "line") {
         this.options.series[0]['name'] = val.series[0].name;
         this.options.series[0]['data'] = val.series[0].data;

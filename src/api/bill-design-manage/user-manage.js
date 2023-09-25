@@ -47,7 +47,7 @@ export const modifyUserReq = data => {
       timeout: 0,
       baseUrl:  window.localStorage.getItem("reportDesignIp"),
       url: '/user/modify',
-      method: 'post',
+      method: 'put',
       data
   })
 }

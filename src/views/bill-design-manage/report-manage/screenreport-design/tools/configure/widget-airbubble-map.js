@@ -256,14 +256,14 @@ export const widgetAirbubbleMap = {
                             placeholder: '',
                             value: 100,
                         },
-                        /*{
-                          type: 'vue-color',
-                          label: '气泡颜色',
-                          name: 'fontPieColor',
-                          required: false,
-                          placeholder: '',
-                          value: ''
-                        },*/
+                        // {
+                        //   type: 'vue-color',
+                        //   label: '气泡颜色',
+                        //   name: 'fontPieColor',
+                        //   required: false,
+                        //   placeholder: '',
+                        //   value: ''
+                        // }
                     ],
                 },
                 {

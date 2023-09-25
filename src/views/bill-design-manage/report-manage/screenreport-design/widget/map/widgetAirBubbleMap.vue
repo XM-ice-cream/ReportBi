@@ -396,7 +396,7 @@ export default {
 				height: this.optionsStyle.height + "px",
 				left: this.optionsStyle.left + "px",
 				top: this.optionsStyle.top + "px",
-				background: this.optionsSetup.background,
+				background: this.optionsSetup.background
 			};
 		},
 	},
@@ -418,6 +418,7 @@ export default {
 		},
 	},
 	mounted() {
+		console.log('开始执行');
 		this.optionsStyle = this.value.position;
 		this.optionsData = this.value.data;
 		this.optionsCollapse = this.value.setup;

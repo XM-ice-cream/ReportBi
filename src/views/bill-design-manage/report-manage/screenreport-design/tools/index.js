@@ -71,6 +71,7 @@ const getToolByCode = function (code) {
     }
     // 获取组件
     let item = widgetTools.find(function (item, index, arrs) {
+        console.log('查找的属性：'+code);
         return item.code === code
     })
     return item

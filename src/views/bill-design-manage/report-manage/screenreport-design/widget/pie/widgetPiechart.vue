@@ -232,22 +232,6 @@ export default {
       for (const key in this.options.series) {
         if (this.options.series[key].type == "pie") {
           this.options.series[key].data = val;
-          // 示例值 [{
-          //           "value": 1048,
-          //           "name": "张三"
-          //       }, {
-          //           "value": 735,
-          //           "name": "李四"
-          //       }, { 
-          //           "value": 580,
-          //           "name": "王五"
-          //       }, {
-          //           "value": 484,
-          //           "name": "赵六"
-          //       }, {
-          //           "value": 300,
-          //           "name": "麻子"
-          //       }]
         }
       }
     }

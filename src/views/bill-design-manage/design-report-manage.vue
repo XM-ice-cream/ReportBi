@@ -393,6 +393,7 @@ export default {
 			this.selectObj = { ...data };
 			const { reportCode, reportName } = data;
 			const href = this.skipUrl(data.reportType + "Preview", reportCode, reportName);
+			//console.log(href);
 			window.open(href, "_blank");
 		},
 		// 获取业务数据

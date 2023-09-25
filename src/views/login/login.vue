@@ -24,6 +24,7 @@ import { mapActions } from "vuex";
 import { userLocalInfo } from "@/libs/utils";
 import { errorType, speak } from "@/libs/tools";
 import ResetPassword from "./resetPassword";
+import {sessionRead ,sessionRemove} from '@/libs/utils'
 import * as Three from "three";
 import RINGS from "vanta/src/vanta.clouds";
 
@@ -56,6 +57,14 @@ export default {
 						this.$refs.resetPassword.modal = true; //改密码
 						this.$refs.resetPassword.req.oldPwd = password; //旧密码
 					} else {
+						// 此处判断是否为跳转，如果是跳转判断是否拥有权限，如果不是默认界面
+						let uri = sessionRead("fullPath");
+						if(uri !== undefined || uri !== ""){
+							//这里判断权限
+							window.open("#"+uri, "_blank");
+						}
+						//console.log(uri);
+						sessionRemove("fullPath");
 						this.$router.push({ name: this.$config.homeName }, () => {});
 					}
 				})

@@ -295,6 +295,7 @@ export default {
 
 		// 拖动一个组件放到工作区中去，在拖动结束时，放到工作区对应的坐标点上去
 		widgetOnDragged(evt, widgetCode) {
+			console.log(widgetCode);
 			let widgetType = widgetCode;
 
 			// 获取结束坐标和列名
@@ -335,6 +336,7 @@ export default {
 		},
 		//通过监听widgets 获取图层参数
 		handlerLayerWidget(val) {
+			// console.log(val);
 			const layerWidgetArr = [];
 			for (let i = 0; i < val.length; i++) {
 				const obj = {};
@@ -364,6 +366,7 @@ export default {
 		},
 		// 获取大屏参数--宽高，背景颜色，图片
 		handleBigScreen(data) {
+			console.log('screen')
 			const optionScreen = getToolByCode("screen").options;
 			const setup = optionScreen.setup;
 			for (const key in data) {
@@ -385,6 +388,7 @@ export default {
 		// 大屏 图表
 		handleInitEchartsData(data) {
 			const widgets = data.dashboard ? data.dashboard.widgets : [];
+			console.log(widgets);
 			const widgetsData = [];
 			for (let i = 0; i < widgets.length; i++) {
 				let obj = {};
@@ -394,6 +398,7 @@ export default {
 					data: widgets[i].value.data,
 					position: widgets[i].value.position,
 				};
+				console.log('init');
 				const tool = deepClone(getToolByCode(widgets[i].type));
 				const option = tool.options;
 
@@ -535,6 +540,7 @@ export default {
 			this.screenCode = "screen";
 			// 选中不同的组件 右侧都显示第一栏
 			this.activeName = "first";
+			console.log('加载option');
 			this.widgetOptions = getToolByCode("screen")["options"];
 		},
 
