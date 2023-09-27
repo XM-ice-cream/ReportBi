@@ -59,7 +59,7 @@ export default {
 					} else {
 						// 此处判断是否为跳转，如果是跳转判断是否拥有权限，如果不是默认界面
 						let uri = sessionRead("fullPath");
-						if(uri !== undefined || uri !== ""){
+						if(uri !== undefined && uri !== "" &&  uri !== null){
 							//这里判断权限
 							window.open("#"+uri, "_blank");
 						}

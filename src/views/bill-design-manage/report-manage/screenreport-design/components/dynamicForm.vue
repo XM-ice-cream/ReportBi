@@ -178,6 +178,12 @@
 										v-model="formData[itemChildList.name]"
 										@change="changed($event, itemChildList.name)"
 									/>
+									<customParamComponents
+										v-if="itemChildList.type == 'customParam'"
+										:key="'b-' + idx"
+										v-model="formData[itemChildList.name]"
+										@change="changed($event, itemChildList.name)"
+									/>
 								</template>
 							</p>
 						</Panel>
@@ -200,6 +206,7 @@ import "codemirror/mode/sql/sql.js";
 import "codemirror/mode/shell/shell.js";
 import dynamicComponents from "./dynamicComponents.vue";
 import customColorComponents from "./customColorComponents";
+import customParamComponents from "./customParamComponents";
 import dynamicAddTable from "./dynamicAddTable.vue";
 import customUpload from "./customUpload.vue";
 import { deepClone } from "@/libs/tools.js";
@@ -210,6 +217,7 @@ export default {
 		vueJsonEditor,
 		dynamicComponents,
 		customColorComponents,
+		customParamComponents,
 		dynamicAddTable,
 		customUpload,
 	},

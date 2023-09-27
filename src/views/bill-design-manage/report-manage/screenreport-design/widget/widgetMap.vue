@@ -188,6 +188,7 @@ var geoCoordMap = {
     '肇庆': [112.1265, 23.5822],
     '舟山': [122.2559, 30.2234],
     '苏州': [120.6519, 31.3989],
+    '昆山': [120.7019, 31.1589],
     '莱芜': [117.6526, 36.2714],
     '菏泽': [115.6201, 35.2057],
     '营口': [122.4316, 40.4297],
@@ -455,7 +456,10 @@ export default {
 						},
 					},
 					symbolSize: function (val) {
-						return val[2] / 8;
+						if(val)
+							return val[2] / 8;
+						else 0
+						
 					},
 					itemStyle: {
 						normal: {
@@ -463,6 +467,9 @@ export default {
 						},
 					},
 					data: tempData[1].map(function (dataItem) {
+						console.log(dataItem);
+						if(!geoCoordMap.hasOwnProperty(dataItem[1].name))
+							return null;
 						return {
 							name: dataItem[1].name,
 							value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value]),

@@ -82,7 +82,7 @@ let queryform = {
       } else if (chartType == "widget-text") {
         return this.widgettext(data.chartProperties, data.data)
       } else if (chartType == "widget-stackchart") {
-        return this.stackChartFn(data.chartProperties, data)
+        return this.stackChartFn(data.chartProperties, data.data)
       } else {
         return data
       }
@@ -169,31 +169,29 @@ let queryform = {
     stackChartFn(chartProperties, data) {
       const ananysicData = {};
       const series = [];
-      //全部字段字典值
-      const types = Object.values(chartProperties)
       //x轴字段、y轴字段名
-      const xAxisField = Object.keys(chartProperties)[types.indexOf('xAxis')]
-      const yAxisField = Object.keys(chartProperties)[types.indexOf('yAxis')]
-      const dataField = Object.keys(chartProperties)[types.indexOf('bar')]
+      const xAxisField =chartProperties.rows[0];
+      const yAxisField = chartProperties.columns[0]
+      const dataField = chartProperties.columns[1]
       //x轴数值去重，y轴去重
       const xAxisList = this.setUnique(data.map(item => item[xAxisField]))
       const yAxisList = this.setUnique(data.map(item => item[yAxisField]))
       const dataGroup = this.setGroupBy(data, yAxisField)
-      for (const key in chartProperties) {
-        if (chartProperties[key] !== 'yAxis' && !chartProperties[key].startsWith('xAxis')) {
-          Object.keys(dataGroup).forEach(item => {
-            const data = new Array(yAxisList.length).fill(0)
-            dataGroup[item].forEach(res => {
-              data[xAxisList.indexOf(res[xAxisField])] = res[key]
-            })
-            series.push({
-              name: yAxisList[item],
-              type: chartProperties[key],
-              data: data,
-            })
-          })
-        }
-      }
+
+      dataGroup.forEach( (item,index) => {
+        // 填充data 默认为0
+        const seriesData = new Array(yAxisList.length).fill(0)
+        dataGroup[index].forEach(res=> {
+          seriesData[xAxisList.indexOf(res[xAxisField])] = res[dataField]
+        })
+
+        series.push({
+          name: yAxisList[index],
+          type: 'line',
+          data: seriesData,
+        })
+      })
+
       ananysicData["xAxis"] = xAxisList;
       ananysicData["series"] = series;
       return ananysicData;

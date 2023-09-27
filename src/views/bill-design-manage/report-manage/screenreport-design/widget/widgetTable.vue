@@ -81,7 +81,7 @@ export default {
 				"background-color": headStyle.headBackColor,
 				height: "20px",
 				"line-height": "20px",
-				"border-radius": "10px 10px 0px 0px",
+				"border-radius": "0px 0px 0px 0px",
 				margin: "0px 3px",
 			};
 		},
@@ -141,22 +141,19 @@ export default {
 			this.options = options;
 			this.hackResetFun();
 		},
-		//修改title
-		handlerHead() {
-			const head = this.optionsSetUp.dynamicAddTable;
-			this.header = head;
-		},
 		//初始化title
 		setHead() {
 			if (this.list.length > 0) {
 				// const head = this.optionsSetUp.dynamicAddTable;
-
+				let customParam = this.optionsSetUp.customParam;
 				let head = [];
-				Object.keys(this.list[0]).forEach((item) => {
+				Object.keys(this.list[0]).forEach((item,index) => {
+					console.log(index);
+					let width = customParam[index] === undefined ? '25%':customParam[index].param+'%';
 					head.push({
 						key: item,
 						name: item,
-						width: "200",
+						width: width,
 					});
 				});
 				// const head = this.header;
@@ -174,8 +171,8 @@ export default {
 		},
 		//静态数据
 		handlerStaticData(data) {
-			this.handlerHead();
 			this.list = data;
+			this.setHead();
 		},
 		// 动态数据
 		handlerDynamicData(data, refreshTime) {

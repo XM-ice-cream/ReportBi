@@ -194,6 +194,24 @@ export const widgetTable = {
                         }
                     ],
                 },
+                {
+                    name: '列宽[%]',
+                    list: [{
+                        type: 'customParam',
+                        label: '',
+                        name: 'customParam',
+                        required: false,
+                        value: [{
+                            param: 25
+                        },{
+                            param: 25
+                        },{
+                            param: 25
+                        },{
+                            param: 25
+                        }],
+                    }, ],
+                }
             ],
             {
                 type: 'dynamic-add-table',

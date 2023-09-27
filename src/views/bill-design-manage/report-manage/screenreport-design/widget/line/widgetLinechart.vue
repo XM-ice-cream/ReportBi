@@ -120,6 +120,7 @@ export default {
 			this.setOptionsMargin();
 			this.setOptionsLegend();
 			this.setOptionsColor();
+			this.setOptionsTop();
 			this.$nextTick(() => {
 				this.isShow = true;
 			});
