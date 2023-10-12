@@ -98,6 +98,24 @@ export default {
 				],
 				series: [
 					{
+						name: "调解成功率",
+						type: "line",
+						yAxisIndex: 1, //使用的 y 轴的 index，在单个图表实例中存在多个 y轴的时候有用
+						smooth: false, //平滑曲线显示
+						symbol: "circle", //标记的图形为实心圆
+						symbolSize: 8, //标记的大小
+						itemStyle: {
+							normal: {
+								color: "#ffa43a",
+								borderColor: "rgba(255, 234, 0, 0.5)", //圆点透明 边框
+								borderWidth: 5,
+							},
+						},
+						lineStyle: {
+							color: "#ffa43a",
+						},
+						data: [],
+					},{
 						name: "调解成功",
 						type: "bar",
 						itemStyle: {
@@ -156,26 +174,7 @@ export default {
 							},
 						},
 						data: [],
-					},
-					{
-						name: "调解成功率",
-						type: "line",
-						yAxisIndex: 1, //使用的 y 轴的 index，在单个图表实例中存在多个 y轴的时候有用
-						smooth: false, //平滑曲线显示
-						symbol: "circle", //标记的图形为实心圆
-						symbolSize: 8, //标记的大小
-						itemStyle: {
-							normal: {
-								color: "#ffa43a",
-								borderColor: "rgba(255, 234, 0, 0.5)", //圆点透明 边框
-								borderWidth: 5,
-							},
-						},
-						lineStyle: {
-							color: "#ffa43a",
-						},
-						data: [],
-					},
+					}
 				],
 			},
 		};
@@ -486,15 +485,15 @@ export default {
 					};
 				}
 			}
-			series[0].data = bar1;
+			series[0].data = line;
 			series[1].data = bar2;
 			series[2].data = bar3;
-			series[3].data = line;
+			series[3].data = bar1;
 			const legendName = [];
+			legendName.push("调解成功率");
 			legendName.push("调解成功");
 			legendName.push("调解失败");
 			legendName.push("调解终止");
-			legendName.push("调解成功率");
 			this.options.legend["data"] = legendName;
 			this.setOptionsLegendName(legendName);
 		},

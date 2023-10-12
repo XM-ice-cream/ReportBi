@@ -148,7 +148,6 @@ export default {
 				let customParam = this.optionsSetUp.customParam;
 				let head = [];
 				Object.keys(this.list[0]).forEach((item,index) => {
-					console.log(index);
 					let width = customParam[index] === undefined ? '25%':customParam[index].param+'%';
 					head.push({
 						key: item,

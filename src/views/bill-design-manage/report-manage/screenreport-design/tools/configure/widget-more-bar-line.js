@@ -813,7 +813,7 @@ export const widgetMoreBarLine = {
                 required: false,
                 placeholder: '',
                 relactiveDom: 'dataType',
-                chartType: 'widget-barlinechart',
+                chartType: 'widget-morebarlinechart',
                 dictKey: 'BAR_LINE_PROPERTIES',
                 relactiveDomValue: 'dynamicData',
             },

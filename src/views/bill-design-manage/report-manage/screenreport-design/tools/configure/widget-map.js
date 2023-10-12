@@ -342,7 +342,7 @@ export const widgetMap = {
                 required: false,
                 placeholder: '',
                 relactiveDom: 'dataType',
-                chartType: 'widget-piechart',
+                chartType: 'widget-plantmap',
                 dictKey: 'MAP_PROPERTIES',
                 relactiveDomValue: 'dynamicData',
                 value: '',

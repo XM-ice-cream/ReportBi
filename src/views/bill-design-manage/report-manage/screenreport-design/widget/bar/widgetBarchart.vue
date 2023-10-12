@@ -386,6 +386,7 @@ export default {
 			}
 		},
 		getEchartData(val, optionsSetup) {
+			console.log('加载数据');
 			const data = this.queryEchartsData(val);
 			data.then((res) => {
 				this.renderingFn(optionsSetup, res);
@@ -401,6 +402,8 @@ export default {
 		},
 		//X轴数据设定
 		setXData(val, optionsSetup) {
+			
+			console.log('X轴数据设定');
 			// 动态列
 			this.setOptionsY(val.xAxis);
 
@@ -411,9 +414,19 @@ export default {
 			//series 数据
 			this.options.series = val.series;
 
+			this.options.series.forEach((item,index) =>{
+				let style = {
+					normal:{
+						barBorderRadius : optionsSetup.radius
+					}
+				}
+				item["itemStyle"] = style;
+			})
+
 			// 设定滚动条
 			this.options.dataZoom = [
 				{
+					show:optionsSetup.dataZoomEndFlag,
 					type: "slider",
 					yAxisIndex: this.options.yAxis.map((item, index) => index),
 					filterMode: "none",
@@ -426,6 +439,7 @@ export default {
 		},
 		//Y轴数据设定
 		setYData(val, optionsSetup) {
+			console.log('Y轴数据设定');
 			// 动态列
 			this.setOptionsX(val.xAxis);
 
@@ -435,10 +449,19 @@ export default {
 			});
 			//series 数据
 			this.options.series = val.series;
+			this.options.series.forEach((item,index) =>{
+				let style = {
+					normal:{
+						barBorderRadius : optionsSetup.radius
+					}
+				}
+				item["itemStyle"] = style;
+			})
 
 			// 设定滚动条
 			this.options.dataZoom = [
 				{
+					show:optionsSetup.dataZoomEndFlag,
 					type: "slider",
 					xAxisIndex: this.options.xAxis.map((item, index) => index),
 					filterMode: "none",

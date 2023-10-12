@@ -69,9 +69,11 @@ let queryform = {
         chartType == "widget-barchart" ||
         chartType == "widget-linechart" ||
         chartType == "widget-barlinechart"
-      ) {
+      ){
         return this.barOrLineChartFn(data.chartProperties, data.data);
-      } else if(chartType == "widgetLineCompareChart"){
+      } else if( chartType == "widget-morebarlinechart"){
+        return this.morebarOrLineChartFn(data.chartProperties, data.data);
+      }  else if(chartType == "widgetLineCompareChart"){
         return this.LineCompareChartFn(data.chartProperties, data.data);
       }
       else if (
@@ -81,11 +83,62 @@ let queryform = {
         return this.piechartFn(data.chartProperties, data.data);
       } else if (chartType == "widget-text") {
         return this.widgettext(data.chartProperties, data.data)
+      } else if (chartType == "widget-plantmap") {
+        return this.widgetplantmap(data.chartProperties, data.data)
       } else if (chartType == "widget-stackchart") {
         return this.stackChartFn(data.chartProperties, data.data)
       } else {
         return data
       }
+    },
+    morebarOrLineChartFn(chartProperties, data) {
+      const ananysicData = {};
+      let xAxisList = []; //x轴
+      const series = [];
+      let legend = [];
+      let obj = {};
+      let dataGroup = [];
+      Object.keys(chartProperties).forEach((key) => {
+        chartProperties[key].forEach((iitem, iIndex) => {
+          if(key === "rows"){
+            let arr = data.map(item => item[iitem]);
+            xAxisList = this.setUnique(arr);
+          } else if (key === "columns" && iIndex === 0) {
+            legend = this.setUnique(data.map(item => item[iitem]));
+            dataGroup = this.setGroupBy(data, iitem)
+          }else {
+            dataGroup.forEach((item,index) =>{
+              obj = {};
+              obj["type"] = "bar";
+              obj["name"] = legend[index];
+              obj["data"] = this.setUnique(item.map(it => it[iitem]));
+              series.push(obj);
+            })
+          }
+        })
+
+      })
+      ananysicData["xAxis"] = xAxisList;
+      ananysicData["series"] = series;
+      ananysicData["legend"] = legend;
+      return ananysicData;
+    },
+    widgetplantmap(chartProperties, data){
+      let result = [];
+      let plantArr = [];
+      let fromField = chartProperties.rows[0];
+      let toField = chartProperties.columns[0];
+      let dataField = chartProperties.columns[1];
+      
+      data.forEach(item=>{
+        let strArr = [];
+        strArr.push({name:item[fromField]});
+        strArr.push({name:item[toField],value:item[dataField]});
+        plantArr.push(strArr);
+      })
+      result.push(data[0][fromField]);
+      result.push(plantArr);
+      return result;
     },
     LineCompareChartFn(chartProperties, data){
       const ananysicData = {};
@@ -171,8 +224,8 @@ let queryform = {
       const series = [];
       //x轴字段、y轴字段名
       const xAxisField =chartProperties.rows[0];
-      const yAxisField = chartProperties.columns[0]
-      const dataField = chartProperties.columns[1]
+      const yAxisField = chartProperties.columns[0];
+      const dataField = chartProperties.columns[1];
       //x轴数值去重，y轴去重
       const xAxisList = this.setUnique(data.map(item => item[xAxisField]))
       const yAxisList = this.setUnique(data.map(item => item[yAxisField]))

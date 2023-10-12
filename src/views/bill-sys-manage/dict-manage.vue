@@ -1,4 +1,3 @@
-/* 数据源 */
 <template>
 	<div class="page-style">
 		<!-- 左侧抽屉 -->
@@ -364,6 +363,7 @@ export default {
 			this.$refs.submitReq.validate((validate) => {
 				if (validate) {
 					let obj = { ...this.submitData };
+					obj['itemId'] = this.req.currentId;
 					let request = this.isAdd ? insertDictDetailReq(obj) : modifyDictDetailReq(obj);
 					request.then((res) => {
 						if (res.code === 200) {
