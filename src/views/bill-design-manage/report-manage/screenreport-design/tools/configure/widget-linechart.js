@@ -20,7 +20,16 @@ export const widgetLinechart = {
                 required: false,
                 placeholder: '',
                 value: ''
-            }, {
+            }, 
+            {
+                type: 'i-switch',
+                label: '显示进度条',
+                name: 'dataZoomEndFlag',
+                require: false,
+                placeholder: '',
+                value: false,
+            }, 
+            {
                 type: 'Slider',
                 label: '滚动条显示百分比',
                 name: 'dataZoomEnd',

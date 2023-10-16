@@ -404,6 +404,7 @@ export default {
 			// 设定滚动条
 			this.options.dataZoom = [
 				{
+					show: this.optionsSetup.dataZoomEndFlag,
 					type: "slider",
 					xAxisIndex: this.options.xAxis.map((item, index) => index),
 					filterMode: "none",

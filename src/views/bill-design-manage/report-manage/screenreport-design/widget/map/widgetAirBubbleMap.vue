@@ -219,7 +219,7 @@ export default {
 						if (params.value.length > 1) {
 							return "&nbsp;&nbsp;" + params.name + "&nbsp;&nbsp;&nbsp;" + params.value[2] + "&nbsp;&nbsp;";
 						} else {
-							return "&nbsp;&nbsp;" + params.name + "&nbsp;&nbsp;&nbsp;" + params.value + "&nbsp;&nbsp;";
+							return "&nbsp;&nbsp;" + params.name;
 						}
 					},
 				},

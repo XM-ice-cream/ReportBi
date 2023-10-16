@@ -545,6 +545,7 @@ export default {
 			//设定滚动条
 			this.options.dataZoom = [
 				{
+					show:optionsSetup.dataZoomEndFlag,
 					type: "slider",
 					yAxisIndex: this.options.yAxis.map((item, index) => index),
 					filterMode: "none",
@@ -568,6 +569,7 @@ export default {
 			// 滚动条
 			this.options.dataZoom = [
 				{
+					show:optionsSetup.dataZoomEndFlag,
 					type: "slider",
 					xAxisIndex: this.options.xAxis.map((item, index) => index),
 					filterMode: "none",

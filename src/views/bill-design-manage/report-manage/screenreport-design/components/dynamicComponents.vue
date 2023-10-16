@@ -204,6 +204,7 @@ export default {
 		},
 		//刷新
 		async saveDataBtn() {
+			//console.log('大屏点击刷新按钮');
 			const contextData = {};
 			for (let i = 0; i < this.userNameList.length; i++) {
 				let sampleItem = this.userNameList[i].sampleItem;

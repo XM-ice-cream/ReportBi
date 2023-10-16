@@ -1,6 +1,6 @@
 <template>
   <div :style="styleObj">
-    <v-chart :options="options" autoresize />
+    <v-chart :options="options" autoresize ref="pieEchart"/>
   </div>
 </template>
 
@@ -97,6 +97,7 @@ export default {
       this.setOptionsColor();
       this.setOptionsData();
       this.setOptionsPiechartStyle();
+      this.chartEvent();
     },
     // 饼图样式
     setOptionsPiechartStyle () {
@@ -234,7 +235,16 @@ export default {
           this.options.series[key].data = val;
         }
       }
-    }
+    },
+    chartEvent() {
+        var myChart = this.$refs.pieEchart
+        let selectedIndex = ''
+        let hoveredIndex = ''
+        const _this = this
+        myChart.chart.on('mouseover', function (params) {
+          console.log('饼图点击事件');
+          console.log(params);
+        })}
   }
 };
 </script>

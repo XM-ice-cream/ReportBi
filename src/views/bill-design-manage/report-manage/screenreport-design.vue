@@ -35,7 +35,7 @@
 						</TabPane>
 					</Tabs>
 				</Sider>
-				<!-- 中间内容excel -->
+				<!-- 中间看板设计 -->
 				<Content class="layout-middle content" style="width: calc(100% - 400px); height: 100%">
 					<div class="push_btn">
 						<Tooltip class="item" effect="dark" content="保存" placement="bottom-start">
