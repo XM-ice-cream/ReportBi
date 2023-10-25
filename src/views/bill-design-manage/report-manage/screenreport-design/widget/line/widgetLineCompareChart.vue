@@ -1,6 +1,6 @@
 <template>
   <div :style="styleObj">
-    <v-chart :options="options" autoresize />
+    <v-chart :options="options" autoresize @click="chartClick" />
   </div>
 </template>
 
@@ -285,6 +285,26 @@ export default {
       this.setOptionsLegend();
       this.setOptionsColor();
       this.setOptionsData();
+    },
+    chartClick(chartObj){
+      const optionsSetup = this.optionsSetup;
+      if(optionsSetup.clickuri === ''){
+        return;
+      }else{
+        //let uri = optionsSetup.clickuri.replace('http://localhost:8080/#','');
+        console.log(optionsSetup.clickuri);
+        if(optionsSetup.currentPage){
+          let a = document.createElement('a');
+          document.body.appendChild(a);
+          a.href = optionsSetup.clickuri;
+          a.click();
+          document.body.removeChild(a);
+          location.reload();
+        }
+        else
+          window.open(optionsSetup.clickuri, "_blank");
+      }
+
     },
     // 标题修改
     setOptionsTitle () {

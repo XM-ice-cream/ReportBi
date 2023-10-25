@@ -1,6 +1,6 @@
 
 <template>
-  <a :href="styleColor.linkAdress" :style="styleColor" :target="styleColor.jumpMode">{{ styleColor.text }}</a>
+  <a  :href="styleColor.linkAdress" :style="styleColor" :target="styleColor.jumpMode">{{ styleColor.text }}</a>
 </template>
 
 <script>

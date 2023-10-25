@@ -620,7 +620,7 @@ export const widgetBarCompare = {
                 name: 'refreshTime',
                 relactiveDom: 'dataType',
                 relactiveDomValue: 'dynamicData',
-                value: 5000
+                value: 3600000
             },
             {
                 type: 'Button',

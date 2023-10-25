@@ -1,6 +1,6 @@
 <template>
   <div :style="styleObj">
-    <v-chart :options="options" autoresize ref="pieEchart"/>
+    <v-chart :options="options" autoresize @click="chartClick"/>
   </div>
 </template>
 
@@ -97,7 +97,25 @@ export default {
       this.setOptionsColor();
       this.setOptionsData();
       this.setOptionsPiechartStyle();
-      this.chartEvent();
+    },
+    chartClick(chartObj){
+      const optionsSetup = this.optionsSetup;
+      if(optionsSetup.clickuri === ''){
+        return;
+      }else{
+        console.log(optionsSetup.clickuri);
+        if(optionsSetup.currentPage){
+          let a = document.createElement('a');
+          document.body.appendChild(a);
+          a.href = optionsSetup.clickuri;
+          a.click();
+          document.body.removeChild(a);
+          location.reload();
+        }
+        else
+          window.open(optionsSetup.clickuri, "_blank");
+      }
+
     },
     // 饼图样式
     setOptionsPiechartStyle () {
@@ -235,16 +253,7 @@ export default {
           this.options.series[key].data = val;
         }
       }
-    },
-    chartEvent() {
-        var myChart = this.$refs.pieEchart
-        let selectedIndex = ''
-        let hoveredIndex = ''
-        const _this = this
-        myChart.chart.on('mouseover', function (params) {
-          console.log('饼图点击事件');
-          console.log(params);
-        })}
+    }
   }
 };
 </script>

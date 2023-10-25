@@ -59,11 +59,11 @@ export default {
 					} else {
 						// 此处判断是否为跳转，如果是跳转判断是否拥有权限，如果不是默认界面
 						let uri = sessionRead("fullPath");
-						if(uri !== undefined && uri !== "" &&  uri !== null){
+						console.log(uri);
+						if(uri !== undefined && uri !== "" &&  uri !== null && uri.indexOf('screenreport-preview') > 0 && uri.indexOf('reportCode=screenChina') > 0){
 							//这里判断权限
 							window.open("#"+uri, "_blank");
 						}
-						//console.log(uri);
 						sessionRemove("fullPath");
 						this.$router.push({ name: this.$config.homeName }, () => {});
 					}

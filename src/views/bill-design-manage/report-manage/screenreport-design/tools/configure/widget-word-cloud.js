@@ -217,7 +217,7 @@ export const widgetWordCloud = {
         name: 'refreshTime',
         relactiveDom: 'dataType',
         relactiveDomValue: 'dynamicData',
-        value: 60000
+        value: 3600000
       },
       {
         type: 'Button',

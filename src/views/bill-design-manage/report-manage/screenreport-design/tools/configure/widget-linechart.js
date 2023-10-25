@@ -37,7 +37,46 @@ export const widgetLinechart = {
                 placeholder: '',
                 value: 100,
             },
-            [{
+            [
+                {
+                    name:'链接跳转',
+                    list:
+                    [
+                        {
+                            type: 'Input',
+                            label: '点击跳转',
+                            name: 'clickuri',
+                            required: false,
+                            placeholder: '请输入跳转路径',
+                            value: ''
+                        },
+                        {
+                            type: 'i-switch',
+                            label: '当前页',
+                            name: 'currentPage',
+                            required: false,
+                            placeholder: '',
+                            value: true
+                        },
+                        {
+                            type: 'i-switch',
+                            label: '附带参数',
+                            name: 'clickuriparam',
+                            required: false,
+                            placeholder: '',
+                            value: false
+                        },
+                        {
+                            type: 'Input',
+                            label: '参数名称',
+                            name: 'clickuriparamName',
+                            required: false,
+                            placeholder: '',
+                            value: ''
+                        }
+                    ]
+                },
+                {
                     name: '折线设置',
                     list: [{
                             type: 'i-switch',
@@ -682,7 +721,7 @@ export const widgetLinechart = {
                 name: 'refreshTime',
                 relactiveDom: 'dataType',
                 relactiveDomValue: 'dynamicData',
-                value: 5000
+                value: 3600000
             },
             {
                 type: 'Button',

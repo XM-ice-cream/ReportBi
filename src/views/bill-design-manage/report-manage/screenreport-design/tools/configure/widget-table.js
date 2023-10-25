@@ -261,7 +261,7 @@ export const widgetTable = {
                 name: 'refreshTime',
                 relactiveDom: 'dataType',
                 relactiveDomValue: 'dynamicData',
-                value: 30000
+                value: 3600000
             },
             {
                 type: 'Button',
