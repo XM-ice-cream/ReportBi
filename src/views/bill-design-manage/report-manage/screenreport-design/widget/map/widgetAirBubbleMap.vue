@@ -418,7 +418,7 @@ export default {
 		},
 	},
 	mounted() {
-		console.log('开始执行');
+		//console.log('开始执行');
 		this.optionsStyle = this.value.position;
 		this.optionsData = this.value.data;
 		this.optionsCollapse = this.value.setup;

@@ -127,21 +127,30 @@ export default {
 		},
 		chartClick(chartObj){
 			const optionsSetup = this.optionsSetup;
-			if(optionsSetup.clickuri === ''){
+			if(optionsSetup.clickuri === '' || optionsSetup.clickuri === undefined){
 				return;
 			}else{
+				let uri = optionsSetup.clickuri;
+				// 添加url 参数 ，限定只能添加一个参数
+				if(optionsSetup.clickuriparam){
+					if(uri.includes('?')){
+						uri = uri + '&clickuriparamName='+optionsSetup.clickuriparamName+'&clickuriparamValue='+chartObj.name;
+					}else{
+						uri = uri + '?clickuriparamName='+optionsSetup.clickuriparamName+'&clickuriparamValue='+chartObj.name;
+					}
+				}
 				//let uri = optionsSetup.clickuri.replace('http://localhost:8080/#','');
-				console.log(optionsSetup.clickuri);
+				console.log(uri);
 				if(optionsSetup.currentPage){
 				let a = document.createElement('a');
 				document.body.appendChild(a);
-				a.href = optionsSetup.clickuri;
+				a.href = uri;
 				a.click();
 				document.body.removeChild(a);
 				location.reload();
 				}
 				else
-				window.open(optionsSetup.clickuri, "_blank");
+				window.open(uri, "_blank");
 			}
 
 		},

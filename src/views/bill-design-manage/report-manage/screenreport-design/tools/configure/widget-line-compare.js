@@ -27,10 +27,18 @@ export const widgetLineCompare = {
                 [
                     {
                         type: 'Input',
-                        label: '点击跳转',
-                        name: 'clickuri',
+                        label: '上半轴跳转路径',
+                        name: 'clickuriUp',
                         required: false,
-                        placeholder: '请输入跳转路径',
+                        placeholder: '请输入上半轴跳转路径',
+                        value: ''
+                    },
+                    {
+                        type: 'Input',
+                        label: '下半轴跳转路',
+                        name: 'clickuriDown',
+                        required: false,
+                        placeholder: '请输入下半轴跳转路径',
                         value: ''
                     },
                     {

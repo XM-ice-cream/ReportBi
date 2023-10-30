@@ -100,7 +100,7 @@ export default {
     },
     chartClick(chartObj){
       const optionsSetup = this.optionsSetup;
-      if(optionsSetup.clickuri === ''){
+      if(optionsSetup.clickuri === '' || optionsSetup.clickuri === undefined){
         return;
       }else{
         console.log(optionsSetup.clickuri);

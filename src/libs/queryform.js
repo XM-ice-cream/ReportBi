@@ -21,7 +21,7 @@ let queryform = {
     // 把selectInput中的值赋到params查询对象中
     parseParamsBySelectInput(keyname, keyword) {
       if (this.params === undefined || this.params === null) {
-        console.warn('query form must bind to params object in vue data')
+        //console.warn('query form must bind to params object in vue data')
         return
       }
       // if (!this.params.hasOwnProperty(keyname)) {
@@ -43,7 +43,7 @@ let queryform = {
     },
     // 查询echarts 数据
     queryEchartsData(params) {
-      console.log(params);
+      //console.log(params);
       return new Promise(async (resolve) => {
         let {
           code,
@@ -284,7 +284,7 @@ let queryform = {
       return ananysicData;
     },
     widgettext(chartProperties, data) {
-      console.log('文本框动态');
+      //console.log('文本框动态');
       const ananysicData = [];
       for (let i = 0; i < data.length; i++) {
         const obj = {};

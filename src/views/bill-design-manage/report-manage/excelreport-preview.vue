@@ -202,6 +202,10 @@ export default {
 			loading: false, //加载总页数 总条数信息
 			isLoading: false, //是否加载过，加载过就不执行[默认不显示 查询过后再显示]
 			getValueBySetcodePageListUrl: getValueBySetcodePageListUrl(),
+			uriParam:{
+				clickuriparamName : '',
+				clickuriparamValue: ''
+			},
 			req: {
 				reportCode: "",
 				setParam: "",
@@ -237,8 +241,11 @@ export default {
 					const setNames = res.result.setNames.split("|");
 					// 渲染查询表单
 					this.tableData2 = this.getParamsList(setParam, setCodes, setNames);
+					console.log(this.tableData2);
 					//清空数据
-					this.resetClick();
+					//this.resetClick();
+					if(this.uriParam.clickuriparamName !== undefined && this.uriParam.clickuriparamName !== '')
+						this.searchClick();
 				}
 			});
 		},
@@ -425,14 +432,16 @@ export default {
 				const children = [];
 				for (const y in extendObj[i]) {
 					if (!y.endsWith("required") && !y.endsWith("type") && !y.endsWith("paramAstrict") && !y.endsWith("paramDesc")) {
-						children.push({
+						let chil = {
 							name: y,
-							value: extendObj[i][y],
+							value: this.uriParam.clickuriparamName !== undefined && this.uriParam.clickuriparamName == y?this.uriParam.clickuriparamValue:'',
 							type: extendObj[i][y + "type"],
 							required: extendObj[i][y + "required"],
 							paramAstrict: extendObj[i][y + "paramAstrict"],
 							paramDesc: extendObj[i][y + "paramDesc"],
-						});
+						};
+						console.log(this.uriParam.clickuriparamName);
+						children.push(chil);
 						this.ruleValidate[i + y] = [{ required: true, message: "The name cannot be empty", trigger: "blur" }];
 					}
 				}
@@ -625,6 +634,8 @@ export default {
 	},
 	mounted() {
 		this.$nextTick(() => {
+			this.uriParam.clickuriparamName = this.$route.query.clickuriparamName;
+			this.uriParam.clickuriparamValue = this.$route.query.clickuriparamValue;
 			this.req.reportCode = this.$route.query.reportCode;
 			document.title = this.$route.query.reportName;
 			this.tableData2 = [];

@@ -288,21 +288,32 @@ export default {
     },
     chartClick(chartObj){
       const optionsSetup = this.optionsSetup;
-      if(optionsSetup.clickuri === ''){
-        return;
+      
+
+      if(chartObj.seriesIndex == 0 && (optionsSetup.clickuriUp === '' || optionsSetup.clickuriUp === undefined)
+          || chartObj.seriesIndex == 0 && (optionsSetup.clickuriDown === '' || optionsSetup.clickuriDown === undefined)){
+            return;
       }else{
-        //let uri = optionsSetup.clickuri.replace('http://localhost:8080/#','');
-        console.log(optionsSetup.clickuri);
+        
+        let uri = chartObj.seriesIndex == 0 ? optionsSetup.clickuriUp : optionsSetup.clickuriDown;
+        // 添加url 参数 ，限定只能添加一个参数
+        if(optionsSetup.clickuriparam){
+					if(uri.includes('?')){
+						uri = uri + '&clickuriparamName='+optionsSetup.clickuriparamName+'&clickuriparamValue='+chartObj.name;
+					}else{
+						uri = uri + '?clickuriparamName='+optionsSetup.clickuriparamName+'&clickuriparamValue='+chartObj.name;
+					}
+				}
         if(optionsSetup.currentPage){
           let a = document.createElement('a');
           document.body.appendChild(a);
-          a.href = optionsSetup.clickuri;
+          a.href = uri;
           a.click();
           document.body.removeChild(a);
           location.reload();
         }
         else
-          window.open(optionsSetup.clickuri, "_blank");
+          window.open(uri, "_blank");
       }
 
     },
@@ -688,7 +699,7 @@ export default {
       });
     },
     renderingFn (optionsSetup, val) {
-      console.log("lineCompareChart");
+      //console.log("lineCompareChart");
       const legendName = [];
       this.options.xAxis[0]['data'] = val.xAxis[0];
       this.options.xAxis[1]['data'] = val.xAxis[0];
