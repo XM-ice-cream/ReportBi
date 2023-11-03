@@ -37,9 +37,9 @@ export default {
 			//series 根据颜色类别 分类
 			let temp = {};
 			series.forEach((item) => {
-				const { stack, type } = item;
+				const { stack, type, isStack } = item;
 				//散点图不要堆叠
-				if (type === "scatter") delete item.stack;
+				if (type === "scatter" && isStack === "N") delete item.stack;
 				//name存在 说明有分类
 				if (item.data[0].name) {
 					item.data.forEach((data) => {
@@ -73,7 +73,7 @@ export default {
 					confine: true,
 				},
 				// type: "scroll" 图例滚动的关键
-				legend: { type: "scroll", width: "50%", itemWidth: 14, data: legend },
+				legend: { type: "scroll", width: "50%", itemWidth: 14, data: legend.length > 0 ? legend : "" },
 				dataZoom: dataZoom,
 				grid: grid,
 				xAxis: xAxis,

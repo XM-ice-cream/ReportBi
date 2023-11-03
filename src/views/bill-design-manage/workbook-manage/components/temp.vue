@@ -104,6 +104,8 @@ export default {
 			domCanvas: null,
 			pdf: "",
 			canvasTemp: null,
+			//维度对应的字段名称
+			fileName: {},
 		};
 	},
 	methods: {
@@ -305,6 +307,16 @@ export default {
 			else this.chartData = this.dataLogic();
 			this.$nextTick(() => {
 				this.$refs.componentRef.pageLoad();
+				this.$nextTick(() => {
+					// 当滚动条从没有到有时，不加setTimeout滚动条将不会滚动到底部
+					setTimeout(() => {
+						let overflowY = this.$el.getElementsByClassName("workbook-temp")[0];
+						if (!overflowY) {
+							return;
+						}
+						overflowY.scrollTop = overflowY.scrollHeight;
+					}, 1);
+				});
 			});
 		},
 		//饼图
@@ -344,12 +356,13 @@ export default {
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
-				const { axis, orderBy } = item;
+				const { axis, orderBy, columnRename } = item;
+				rcSummary[`${axis}${orderBy}`] = columnRename;
 				//指标
 				if (this.numberType(item)) rcSummary[axis].number.push(`${axis}${orderBy}`);
 				else rcSummary[axis].string.push(`${axis}${orderBy}`);
 			});
-
+			this.fileName = rcSummary;
 			//有指标
 			result = this.numberFunction(rcSummary);
 
@@ -675,7 +688,7 @@ export default {
 			groupByNumber.forEach((item, index) => {
 				const markValue = markObj[item] ? markObj[item] : markObj[undefined];
 				//颜色、标签
-				const { color: markObjColor, mark: markArray, type } = markValue;
+				const { color: markObjColor, mark: markArray, type, isStack } = markValue;
 				//legend 设定
 				if (JSON.stringify(markObjColor) !== "{}" && !Object.values(markObjColor)[0].startRange) {
 					Object.keys(Object.values(markObjColor)[0]).forEach((item) => {
@@ -721,7 +734,9 @@ export default {
 							series[index][itemIndex].data.push(data);
 						} else {
 							let seriesObj = {
+								name: this.fileName[item],
 								type,
+								isStack,
 								stack: item,
 								xAxisIndex: yNumber.length ? groupByString.length : 0,
 								yAxisIndex: !yNumber.length ? groupByString.length : 0,
@@ -905,7 +920,7 @@ export default {
 			let markObj = {};
 			//标记
 			this.mark.forEach((item) => {
-				markObj[item.stack] = { color: {}, mark: [], angle: [], type: item.chartType };
+				markObj[item.stack] = { color: {}, mark: [], angle: [], type: item.chartType, isStack: item.isStack || "N" };
 				item.data.forEach((markItem) => {
 					const { innerText, markValue, axis, orderBy } = markItem;
 					//颜色

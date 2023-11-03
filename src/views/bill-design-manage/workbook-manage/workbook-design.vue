@@ -203,6 +203,20 @@
 													<Select v-model="markData[markIndex].chartType" clearable placeholder="请选择图表" @on-change="changeMarks(markIndex)">
 														<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 													</Select>
+													<!-- <i-switch
+														size="large"
+														v-model="markData[markIndex].isStack"
+														true-value="Y"
+														false-value="N"
+														v-if="markData[markIndex].chartType === 'scatter'"
+													>
+														<template #open>
+															<span>堆叠</span>
+														</template>
+														<template #close>
+															<span>散落</span>
+														</template>
+													</i-switch> -->
 													<div class="mark-box">
 														<draggable
 															group="site"
@@ -1167,7 +1181,7 @@ export default {
 				const itemId = nodeId + name; //标记唯一id:nodeid+name
 
 				if (!markIds.includes(itemId)) {
-					this.markData.push({ ...this.markData[0], name, markId: itemId, stack: `${axis}${orderBy}` });
+					this.markData.push({ ...this.markData[0], name, markId: itemId, stack: `${axis}${orderBy}`, isStack: "N" });
 				} else {
 					const index = markIds.findIndex((item) => item === itemId);
 					this.markData[index].stack = `${axis}${orderBy}`;

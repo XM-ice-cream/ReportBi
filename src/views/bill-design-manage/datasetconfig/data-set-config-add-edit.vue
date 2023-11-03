@@ -32,7 +32,18 @@
 						<Form ref="submitRef" :model="submitData" :label-width="60" :rules="rulesValidate">
 							<!-- 数据源 -->
 							<FormItem label="数据源" prop="sourceCode">
-								<Select v-model.trim="submitData.sourceCode" size="small" placeholder="请选择数据源" @on-change="getUserList" clearable>
+								<Select
+									v-model.trim="submitData.sourceCode"
+									size="small"
+									placeholder="请选择数据源"
+									@on-change="
+										() => {
+											submitData.user = '';
+											getUserList();
+										}
+									"
+									clearable
+								>
 									<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
 								</Select>
 							</FormItem>
@@ -191,7 +202,7 @@ export default {
 					if (res.code === 200) {
 						this.userList = res?.result || [];
 						this.treeData = [];
-						this.submitData.user = "";
+						this.getTableList();
 						this.filterData(); //过滤值
 					} else {
 						this.$Msg.error(`获取用户失败, ${res.message}`);
@@ -204,7 +215,7 @@ export default {
 			const { sourceCode, user } = this.submitData;
 			const obj = {
 				sourceCode: sourceCode,
-				user: user,
+				user,
 			};
 			if (obj.sourceCode && obj.user) {
 				getTableListReq(obj).then((res) => {
