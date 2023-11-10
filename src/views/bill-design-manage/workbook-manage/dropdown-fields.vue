@@ -29,6 +29,8 @@
 					<DropdownItem name="MM" :class="selectClassType(['MM'])">月</DropdownItem>
 					<DropdownItem name="DD" :class="selectClassType(['DD'])">日</DropdownItem>
 					<DropdownItem name="HH" :class="selectClassType(['HH'])">时</DropdownItem>
+					<DropdownItem name="HM" :class="selectClassType(['HM'])">分</DropdownItem>
+					<DropdownItem name="HMS" :class="selectClassType(['HMS'])">秒</DropdownItem>
 					<DropdownItem name="Q" :class="selectClassType(['Q'])">季</DropdownItem>
 					<DropdownItem name="WK" :class="selectClassType(['WK'])">周</DropdownItem>
 				</template>

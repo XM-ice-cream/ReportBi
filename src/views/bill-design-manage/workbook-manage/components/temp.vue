@@ -979,6 +979,8 @@ export default {
 				MM: "月",
 				DD: "日",
 				HH: "时",
+				HM: "分",
+				HMS: "秒",
 				Q: "季",
 				WK: "周",
 				undefined: "",
