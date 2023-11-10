@@ -22,6 +22,7 @@
 						<RadioGroup v-model="submitData.timeType">
 							<Radio label="year">年</Radio>
 							<Radio label="month">年-月</Radio>
+							<Radio label="date">年-月-日</Radio>
 							<Radio label="datetime">年-月-日 时:分:秒</Radio>
 						</RadioGroup>
 					</FormItem>
