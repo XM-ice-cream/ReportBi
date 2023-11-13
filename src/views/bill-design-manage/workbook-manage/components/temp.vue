@@ -505,7 +505,9 @@ export default {
 					//文本宽度
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
-							return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnRename;
+							return (
+								markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`)?.trim()
+							);
 						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
@@ -548,7 +550,7 @@ export default {
 					// 文本宽度;
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
-							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === markItem.columnRename;
+							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`);
 						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
@@ -585,7 +587,9 @@ export default {
 						// 文本宽度;
 						const labelWidth =
 							this.mark[0].data.filter((markItem) => {
-								return markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === markItem.columnRename;
+								return (
+									markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`)?.trim()
+								);
 							})[0]?.markValue || 90;
 
 						bottomWidth += bottomWidth == 0 ? labelWidth : labelWidth + 10;
