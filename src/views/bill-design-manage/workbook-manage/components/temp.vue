@@ -550,7 +550,9 @@ export default {
 					// 文本宽度;
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
-							return markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`);
+							return (
+								markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`)?.trim()
+							);
 						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
