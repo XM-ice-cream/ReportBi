@@ -49,6 +49,15 @@ export const getTabelColumnReq = data => {
     data
   })
 }
+// 获取数据集对应的条件
+export const getConditions = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/biworkbookdata/getconditions',
+    method: 'get',
+    params: data
+  })
+}
 //新增自定义字段
 export const addCustomerFieldReq = data => {
   return requestCenter({

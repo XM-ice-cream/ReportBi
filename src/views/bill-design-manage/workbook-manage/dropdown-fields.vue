@@ -43,12 +43,10 @@
 				</template>
 				<!-- 排序 -->
 				<DropdownItem name="sortby" :class="data.sortBy && data.sortBy !== 0 ? [data.sortBy, 'dropdown-sortby-selected'] : ''">排序</DropdownItem>
-				<template v-if="numberType(data)">
-					<!-- 连续 -->
-					<DropdownItem name="continuous" :class="[[1].includes(data.isContinue) ? 'dropdown-selected' : '']">连续</DropdownItem>
-					<!-- 离散 -->
-					<DropdownItem name="discrete" :class="[[0].includes(data.isContinue) ? 'dropdown-selected' : '']">离散</DropdownItem>
-				</template>
+				<!-- 连续 -->
+				<DropdownItem name="continuous" :class="[[1].includes(data.isContinue) ? 'dropdown-selected' : '']">连续</DropdownItem>
+				<!-- 离散 -->
+				<DropdownItem name="discrete" :class="[[0].includes(data.isContinue) ? 'dropdown-selected' : '']">离散</DropdownItem>
 
 				<!-- 删除 -->
 				<DropdownItem name="delete">移除</DropdownItem>
@@ -74,11 +72,6 @@ export default {
 		dropDownClick(name) {
 			console.log("this.data", this.data);
 			this.$emit("dropDownClick", name, this.data, this.index, this.markIndex, this.type);
-		},
-		//数字类型
-		numberType(item) {
-			const numberFunction = ["count", "countDistinct"];
-			return item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
 		},
 		//是否选中样式返回类
 		selectClassType(item) {
