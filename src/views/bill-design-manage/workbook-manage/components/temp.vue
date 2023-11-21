@@ -655,6 +655,7 @@ export default {
 			if (axisConstX.length) {
 				this.dimension = 5;
 				const { mark: markArray, type, color } = markObj[undefined];
+				console.log(markArray, markObj[undefined]);
 				objKeys.forEach((key) => {
 					obj[key].forEach((item) => {
 						let name = "";
@@ -665,7 +666,9 @@ export default {
 							name += item[xkey];
 						});
 						markArray.forEach((mkey) => {
-							labels.push(item[mkey]);
+							const { columnRename, axisOrder } = mkey;
+							//热力图显示 "重命名名称：值" 其余的图表类型只显示 "值"
+							this.type === "componentHeatMap" ? labels.push(`${columnRename}: ${item[axisOrder]}`) : labels.push(`${item[axisOrder]}`);
 						});
 						//数组 最后一个是数值
 						stringData.push([name, key, "", labels.toString(), item, value.toString()]);
@@ -755,9 +758,10 @@ export default {
 									show: true,
 									position: yNumber.length ? "top" : "right",
 									formatter: function (val) {
+										console.log("123");
 										let result = [];
 										markArray.forEach((item) => {
-											result.push(val.value[2][item]);
+											result.push(val.value[2][item.axisOrder]);
 										});
 										return result.join("\n");
 									},
@@ -788,80 +792,6 @@ export default {
 			const yLength = height / 16 < yAxis[0]?.data?.length ? `${yAxis[0].data.length * 16}px` : `${height}px`;
 			this.tempStyle.width = xLength;
 			this.tempStyle.height = yLength;
-			// return [
-			// 	{
-			// 		//区域缩放组件的类型为滑块，默认作用在x轴上
-			// 		type: "slider",
-			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-			// 		filterMode: "none",
-			// 		showDataShadow: false,
-			// 		bottom: 22,
-			// 		height: 10,
-			// 		//区域缩放组件边框颜色
-			// 		borderColor: "transparent",
-			// 		//区域缩放组件边框背景
-			// 		backgroundColor: "#e1eaf3",
-			// 		//区域缩放组件上的手柄的样式
-			// 		handleIcon:
-			// 			"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
-			// 		//手柄大小
-			// 		handleSize: 18,
-			// 		...xAxisEnd,
-			// 		//为手柄设置阴影效果
-			// 		handleStyle: {
-			// 			shadowBlur: 6,
-			// 			shadowOffsetX: 1,
-			// 			shadowOffsetY: 2,
-			// 			shadowColor: "#e1eaf3",
-			// 		},
-			// 		labelFormatter: "",
-			// 		moveHandleSize: 12,
-			// 		xAxisIndex: xAxisIndex,
-			// 	},
-			// 	{
-			// 		//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
-			// 		type: "inside",
-			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-			// 		filterMode: "none",
-			// 		xAxisIndex: xAxisIndex,
-			// 	},
-			// 	{
-			// 		//区域缩放组件的类型为滑块，默认作用在x轴上
-			// 		type: "slider",
-			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-			// 		filterMode: "none",
-			// 		showDataShadow: false,
-			// 		right: 22,
-			// 		width: 10,
-			// 		//区域缩放组件边框颜色
-			// 		borderColor: "transparent",
-			// 		//区域缩放组件边框背景
-			// 		backgroundColor: "#e1eaf3",
-			// 		//区域缩放组件上的手柄的样式
-			// 		handleIcon:
-			// 			"M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
-			// 		//手柄大小
-			// 		handleSize: 18,
-			// 		...yAxisEnd,
-			// 		//为手柄设置阴影效果
-			// 		handleStyle: {
-			// 			shadowBlur: 6,
-			// 			shadowOffsetX: 1,
-			// 			shadowOffsetY: 2,
-			// 			shadowColor: "#e1eaf3",
-			// 		},
-			// 		labelFormatter: "",
-			// 		yAxisIndex: yAxisIndex,
-			// 		moveHandleSize: 12,
-			// 	},
-			// 	{
-			// 		//区域缩放组件的类型为内置在坐标系中，默认作用在x轴的坐标系中
-			// 		type: "inside",
-			// 		//区域缩放组件的过滤模式，none：不过滤数据，只改变数轴范围。
-			// 		filterMode: "none",
-			// 		yAxisIndex: yAxisIndex,
-			// 	},
-			// ];
 		},
 		//获取颜色
 		getVisualMap(markObj) {
@@ -929,6 +859,7 @@ export default {
 				markObj[item.stack] = { color: {}, mark: [], angle: [], type: item.chartType, isStack: item.isStack || "N" };
 				item.data.forEach((markItem) => {
 					const { innerText, markValue, axis, orderBy } = markItem;
+					console.log(markItem);
 					//颜色
 					if (innerText === "color") {
 						//数组类型
@@ -944,7 +875,8 @@ export default {
 					}
 					//标签
 					if (innerText === "mark") {
-						markObj[item.stack].mark.push(`${axis}${orderBy}`);
+						// markObj[item.stack].mark.push(`${axis}${orderBy}`);
+						markObj[item.stack].mark.push({ ...markItem, axisOrder: `${axis}${orderBy}` });
 					}
 					//角度
 					if (innerText === "angle") {
@@ -958,7 +890,7 @@ export default {
 		numberType(item) {
 			const numberFunction = ["count", "countDistinct"];
 			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
-			return item.isContinue === "1" ? true : item.isContinue === "0" ? false : isNotContinue;
+			return item.isContinue === 1 ? true : item.isContinue === 0 ? false : isNotContinue;
 		},
 
 		//轴名 对应 字段名称

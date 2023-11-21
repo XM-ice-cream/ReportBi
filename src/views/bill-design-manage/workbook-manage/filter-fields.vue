@@ -50,7 +50,7 @@
 				<template v-else>
 					<!-- 筛选信息 -->
 					<FormItem label="筛选信息" prop="filterValue">
-						<Input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model="submitData.filterValue" clearabled />
+						<Input type="textarea" :autosize="{ minRows: 2, maxRows: 15 }" v-model="submitData.filterValue" clearabled />
 					</FormItem>
 				</template>
 			</Form>
@@ -64,15 +64,6 @@
 					:data="data"
 					@on-selection-change="selectClick"
 				></Table>
-				<!-- <page-custom
-					:elapsedMilliseconds="req.elapsedMilliseconds"
-					:total="req.total"
-					:totalPage="req.totalPage"
-					:pageIndex="req.pageIndex"
-					:page-size="req.pageSize"
-					@on-change="pageChange"
-					@on-page-size-change="pageSizeChange"
-				/> -->
 			</template>
 		</div>
 
@@ -102,7 +93,7 @@ export default {
 		modelFlag(newVal) {
 			if (newVal) {
 				this.submitData = { ...this.selectObj, showData: 0 };
-
+				console.log(this.submitData);
 				if (this.selectObj.columnType == "DATE") {
 					const time = this.selectObj.filterValue.split(",");
 					if (time.length == 2) this.submitData = { ...this.submitData, timeType: "datetime", startTime: time[0], endTime: time[1] };
@@ -202,10 +193,11 @@ export default {
 				this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
 				this.submitData.startTime = formatDate(startTime);
 				this.submitData.endTime = formatDate(endTime);
-			} else {
-				this.submitData.filterValue = commaSplitReturnString(filterValue).join();
 			}
-
+			//  else {
+			// 	this.submitData.filterValue = commaSplitReturnString(filterValue).join();
+			// }
+			console.log(this.submitData);
 			this.$emit("updateFilter", newIndex, this.submitData); //取消后 删除拖拽的cell
 			this.$refs.submitReq.resetFields();
 			this.modelFlag = false;

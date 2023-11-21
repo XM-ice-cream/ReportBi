@@ -240,7 +240,7 @@ export default {
 		numberType(item) {
 			const numberFunction = ["count", "countDistinct"];
 			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
-			return item.isContinue === "1" ? true : item.isContinue === "0" ? false : isNotContinue;
+			return item.isContinue === 1 ? true : item.isContinue === 0 ? false : isNotContinue;
 		},
 		//新增字段
 		addClick() {

@@ -156,7 +156,7 @@ export default {
 	overflow-x: hidden;
 	align-content: flex-start;
 	background-color: #f5f7f9;
-	padding-bottom: 1rem;
+	padding-bottom: 100px;
 	.cardCell {
 		width: 23.8%;
 		/* background: #ccc; */
@@ -214,7 +214,7 @@ export default {
 				width: 100%;
 				display: block;
 				text-overflow: ellipsis;
-				font-size: 0.14rem;
+				font-size: 14px;
 				padding: 10px 0;
 			}
 		}

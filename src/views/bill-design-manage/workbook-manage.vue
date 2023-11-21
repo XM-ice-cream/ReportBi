@@ -146,19 +146,19 @@ export default {
 						return (this.req.pageIndex - 1) * this.req.pageSize + row._index + 1;
 					},
 				},
-				{ title: "类别", slot: "opt2", align: "center", tooltip: true, width: 120 },
-				{ title: "厂区", slot: "opt1", align: "center", tooltip: true, minWidth: 80 },
-				{ title: this.$t("workBookName"), key: "workBookName", align: "center", tooltip: true, minWidth: 80 },
-				{ title: this.$t("workBookCode"), key: "workBookCode", align: "center", tooltip: true, minWidth: 80 },
-				{ title: this.$t("setName"), slot: "datasetId", align: "center", tooltip: true, minWidth: 80 },
+				{ title: "类别", slot: "opt2", align: "center", tooltip: true, width: 150 },
+				{ title: "厂区", slot: "opt1", align: "center", tooltip: true, width: 80 },
+				{ title: this.$t("workBookName"), key: "workBookName", align: "center", minWidth: 80 },
+				{ title: this.$t("workBookCode"), key: "workBookCode", align: "center", minWidth: 80 },
+				{ title: this.$t("setName"), slot: "datasetId", align: "center", minWidth: 80 },
 
-				{ title: this.$t("createUser"), key: "createUserName", minWidth: 80, align: "center", tooltip: true },
-				{ title: this.$t("createDate"), key: "createDate", minWidth: 125, render: renderDate, align: "center", tooltip: true },
-				{ title: this.$t("modifyUser"), key: "modifyUserName", minWidth: 80, align: "center", tooltip: true },
+				{ title: this.$t("createUser"), key: "createUserName", width: 80, align: "center", tooltip: true },
+				{ title: this.$t("createDate"), key: "createDate", width: 125, render: renderDate, align: "center", tooltip: true },
+				{ title: this.$t("modifyUser"), key: "modifyUserName", width: 80, align: "center", tooltip: true },
 				{
 					title: this.$t("modifyDate"),
 					key: "modifyDate",
-					minWidth: 125,
+					width: 125,
 					align: "center",
 					render: renderDate,
 					tooltip: true,
@@ -416,7 +416,6 @@ export default {
 </script>
 <style>
 .workbook-manage .ivu-table .ivu-tag-dot {
-	width: 100px;
 	position: relative;
 }
 .workbook-manage .ivu-table .ivu-tag-dot-inner {

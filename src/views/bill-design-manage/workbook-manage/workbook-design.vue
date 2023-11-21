@@ -170,7 +170,7 @@
 												</div>
 												<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
 												<!-- 下拉框 -->
-												<Dropdown style="float: right" @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
+												<Dropdown style="float: right" transfer @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
 													<Icon type="ios-arrow-down"></Icon>
 													<template #list>
 														<DropdownMenu>
@@ -263,7 +263,7 @@
 															:id="`mark-box,${markIndex}`"
 															ghost-class="ghost"
 															@end="(e) => dragEnd(e, 'mark-box', markIndex)"
-															style="width: 100%; max-height: 200px"
+															style="width: 100%; max-height: 100px; overflow: auto"
 														>
 															<div v-for="(item, index) in markData[markIndex].data" :key="index" style="display: flex; align-items: center">
 																<!-- 图标 -->
@@ -512,7 +512,7 @@ export default {
 				maxNumber: 2000,
 				opt1: "jx",
 				opt2: "comonTemplate",
-				opt3: "1", //是否为公共
+				opt3: "0", //是否为公共
 			},
 			columnList: [],
 			columnTypeList: [],
@@ -611,16 +611,23 @@ export default {
 			});
 			this.$Spin.show();
 			this.visib = false;
+
 			const obj = {
 				maxNumber: parseInt(maxNumber),
 				datasetId,
-				filterItems: this.filterData,
+				filterItems: this.filterData.map((item) => {
+					let temp = item.filterValue;
+					if (temp?.indexOf("\n") > -1) {
+						temp = temp.replaceAll("\n", ",");
+					}
+					return { ...item, filterValue: temp };
+				}),
 				calcItems: this.rowData.concat(this.columnData),
 				markItems: markData.flat().map((item) => {
 					return { ...item, markValue: "" };
 				}),
 			};
-
+			console.log("this.filterData", this.filterData, obj.filterItems);
 			getChartsInfoReq(obj)
 				.then((res) => {
 					//存在有数据返回 但code=-1(数据超过最大范围)
@@ -687,6 +694,7 @@ export default {
 				newIndex: index,
 				markIndex,
 			};
+			console.log("标记下拉", this.selectObj, row);
 
 			switch (name) {
 				case "create":
@@ -736,15 +744,15 @@ export default {
 					break;
 				//连续
 				case "continuous":
-					if (type == "row") this.rowData[index].isContinue = "1";
-					if (type == "column") this.columnData[index].isContinue = "1";
-					if (type == "mark") this.markData[markIndex].data[index].isContinue = "1";
+					if (type == "row") this.rowData[index].isContinue = 1;
+					if (type == "column") this.columnData[index].isContinue = 1;
+					if (type == "mark") this.markData[markIndex].data[index].isContinue = 1;
 					break;
 				//离散
 				case "discrete":
-					if (type == "row") this.rowData[index].isContinue = "0";
-					if (type == "column") this.columnData[index].isContinue = "0";
-					if (type == "mark") this.markData[markIndex].data[index].isContinue = "0";
+					if (type == "row") this.rowData[index].isContinue = 0;
+					if (type == "column") this.columnData[index].isContinue = 0;
+					if (type == "mark") this.markData[markIndex].data[index].isContinue = 0;
 					break;
 
 				//转换为指标
@@ -1220,8 +1228,8 @@ export default {
 				MM: "月",
 				DD: "日",
 				HH: "时",
-        HM: "分",
-        HMS: "秒",
+				HM: "分",
+				HMS: "秒",
 				Q: "季",
 				WK: "周",
 				undefined: "",
@@ -1237,13 +1245,13 @@ export default {
 			//未设置是否连续
 			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction) ? "drag-number" : "drag-cell";
 			//1:连续->数字类型；0：离散->字符串；其余的按照原有类型
-			return item.isContinue === "1" ? "drag-number" : item.isContinue === "0" ? "drag-cell" : isNotContinue;
+			return item.isContinue === 1 ? "drag-number" : item.isContinue === 0 ? "drag-cell" : isNotContinue;
 		},
 		//数字类型
 		numberType(item) {
 			const numberFunction = ["count", "countDistinct"];
 			const isNotContinue = item.dataType === "Number" || numberFunction.includes(item.calculatorFunction);
-			return item.isContinue === "1" ? true : item.isContinue === "0" ? false : isNotContinue;
+			return item.isContinue === 1 ? true : item.isContinue === 0 ? false : isNotContinue;
 		},
 	},
 };
@@ -1476,7 +1484,7 @@ export default {
 
 	.drag-cell {
 		width: calc(100% - 23px);
-		padding: 2px 20px 2px 10px;
+		padding: 2px 10px 2px 10px;
 		text-align: center;
 		background: #ecedff;
 		color: #5f6779;

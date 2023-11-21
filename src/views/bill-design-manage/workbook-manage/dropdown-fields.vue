@@ -1,13 +1,20 @@
 /**下拉框 */
 <template>
-	<Dropdown style="float: right" @on-click="(name) => dropDownClick(name)">
+	<Dropdown
+		style="float: right"
+		placement="right-end"
+		trigger="click"
+		@on-click="(name) => dropDownClick(name)"
+		transfer
+		transfer-class-name="workbook-dropdownTrs"
+	>
 		<Icon type="ios-arrow-down"></Icon>
 		<template #list>
 			<DropdownMenu>
 				<!-- 编辑 -->
 				<DropdownItem name="edit">编辑</DropdownItem>
 				<DropdownItem name="" :class="selectClassType([''])">维度</DropdownItem>
-				<Dropdown placement="right-start">
+				<Dropdown placement="right-end" transfer transfer-class-name="workbook-dropdownTrs-dropdown">
 					<DropdownItem :class="selectClassType(['sum', 'avg', 'count', 'countDistinct', 'max', 'min', 'stdev'])">
 						指标
 						<Icon type="ios-arrow-forward"></Icon>
@@ -38,9 +45,9 @@
 				<DropdownItem name="sortby" :class="data.sortBy && data.sortBy !== 0 ? [data.sortBy, 'dropdown-sortby-selected'] : ''">排序</DropdownItem>
 				<template v-if="numberType(data)">
 					<!-- 连续 -->
-					<DropdownItem name="continuous" :class="[['1'].includes(data.isContinue) ? 'dropdown-selected' : '']">连续</DropdownItem>
+					<DropdownItem name="continuous" :class="[[1].includes(data.isContinue) ? 'dropdown-selected' : '']">连续</DropdownItem>
 					<!-- 离散 -->
-					<DropdownItem name="discrete" :class="[['0'].includes(data.isContinue) ? 'dropdown-selected' : '']">离散</DropdownItem>
+					<DropdownItem name="discrete" :class="[[0].includes(data.isContinue) ? 'dropdown-selected' : '']">离散</DropdownItem>
 				</template>
 
 				<!-- 删除 -->
@@ -80,6 +87,17 @@ export default {
 	},
 };
 </script>
+<style>
+.workbook-dropdownTrs .ivu-dropdown-menu .ivu-dropdown,
+.workbook-dropdownTrs-dropdown .ivu-dropdown-menu .ivu-dropdown {
+	width: 100%;
+}
+.workbook-dropdownTrs .ivu-dropdown-item,
+.workbook-dropdownTrs-dropdown .ivu-dropdown-item {
+	padding: 7px 16px 7px 32px;
+}
+</style>
+
 <style lang="less" scoped>
 .dropdown-selected {
 	position: relative;

@@ -130,6 +130,7 @@ export default {
 			};
 
 			this.myChart[this.id].setOption(option, true);
+			console.log(option);
 			// 存缓存
 			this.$nextTick(() => {
 				//如果id存在 则存入缓存
