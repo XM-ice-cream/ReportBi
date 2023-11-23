@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3548106 */
-  src: url('iconfont.woff2?t=1688622375335') format('woff2'),
-       url('iconfont.woff?t=1688622375335') format('woff'),
-       url('iconfont.ttf?t=1688622375335') format('truetype');
+  src: url('iconfont.woff2?t=1700703736410') format('woff2'),
+       url('iconfont.woff?t=1700703736410') format('woff'),
+       url('iconfont.ttf?t=1700703736410') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,46 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-zhankai:before {
+  content: "\e840";
+}
+
+.icon-shousuo:before {
+  content: "\e631";
+}
+
+.icon-back:before {
+  content: "\e6f4";
+}
+
+.icon-yangqi:before {
+  content: "\e8be";
+}
+
+.icon-timefill:before {
+  content: "\e65e";
+}
+
+.icon-juli:before {
+  content: "\e677";
+}
+
+.icon-speed_fill:before {
+  content: "\e71c";
+}
+
+.icon-xitongrizhi:before {
+  content: "\e782";
+}
+
+.icon-chuanganqi:before {
+  content: "\e674";
+}
+
+.icon-a-28tongfengfengshan:before {
+  content: "\e62f";
 }
 
 .icon-moban:before {

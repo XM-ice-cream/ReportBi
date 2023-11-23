@@ -53,7 +53,10 @@
 													filterable
 													clearable
 													:placeholder="$t('pleaseSelect') + $t('setName')"
-													@on-change="getColumnList"
+													@on-change="
+														getColumnList();
+														getDataSetFilter();
+													"
 												>
 													<Option v-for="(item, index) in datasetList" :value="item.id" :key="index">{{ item.datasetName }}</Option>
 												</Select>
@@ -75,14 +78,11 @@
 								</Panel>
 							</Collapse>
 							<div class="left-tree" :style="baseInfoPanel == 'base' ? 'height: calc(100% - 410px)' : ''">
-								<Input
-									v-model="submitData.columnName"
-									placeholder="请筛选信息"
-									clearable
-									suffix="ios-search"
-									@on-change="getColumnList"
-									style="margin-bottom: 10px"
-								/>
+								<div class="shrink-unfold">
+									<Input v-model="submitData.columnName" placeholder="请筛选信息" clearable suffix="ios-search" @on-change="getColumnList" />
+									<i class="iconfont icon-shousuo" title="收缩" style="font-size: 26px" v-if="!isShrink" @click="shrinkUnfoldClick" />
+									<i class="iconfont icon-zhankai" title="展开" v-else @click="shrinkUnfoldClick" />
+								</div>
 								<ul class="tree">
 									<li v-for="(item, index) in data" :key="index" class="tree-father">
 										<div @click="item.isShow = !item.isShow" class="textOverhidden">
@@ -151,38 +151,60 @@
 					<template #right>
 						<Split v-model="split2">
 							<template #left>
-								<!-- 筛选器、标记 -->
+								<!-- 数据集筛选器、筛选器、标记 -->
 								<div class="center-box">
 									<!-- 筛选器 -->
 									<div class="filter">
-										<div class="title">筛选器</div>
-										<draggable
-											group="site"
-											v-model="filterData"
-											id="filter"
-											ghost-class="ghost"
-											style="height: calc(100% - 50px); overflow: auto"
-											@end="(e) => dragEnd(e, 'filter')"
-										>
-											<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
-												<div class="textOverhidden" style="width: 80%" @dblclick="item.isEdit = true" v-if="!item.isEdit">
-													{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
-												</div>
-												<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
-												<!-- 下拉框 -->
-												<Dropdown style="float: right" transfer @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
-													<Icon type="ios-arrow-down"></Icon>
-													<template #list>
-														<DropdownMenu>
-															<!-- 编辑 -->
-															<DropdownItem name="edit">编辑筛选器</DropdownItem>
-															<!-- 删除 -->
-															<DropdownItem name="delete">删除筛选器</DropdownItem>
-														</DropdownMenu>
-													</template>
-												</Dropdown>
-											</span>
-										</draggable>
+										<div class="filter-dataset">
+											<div class="title">数据集筛选器</div>
+											<div style="height: calc(100% - 40px); overflow: auto">
+												<span v-for="(item, index) in andData" :key="index" v-if="!item.hide" class="drag-static">
+													<div class="textOverhidden" style="width: 80%">
+														{{ item.columnRename }}
+													</div>
+													<!-- 下拉框 -->
+													<Dropdown style="float: right" transfer @on-click="(name) => dropDownClick(name, item, index, 0, 'filter-dataSet')">
+														<Icon type="ios-arrow-down"></Icon>
+														<template #list>
+															<DropdownMenu>
+																<!-- 编辑 -->
+																<DropdownItem name="edit">编辑筛选器</DropdownItem>
+															</DropdownMenu>
+														</template>
+													</Dropdown>
+												</span>
+											</div>
+										</div>
+										<div class="filter-workbook">
+											<div class="title">筛选器</div>
+											<draggable
+												group="site"
+												v-model="filterData"
+												id="filter"
+												ghost-class="ghost"
+												style="height: calc(100% - 40px); overflow: auto"
+												@end="(e) => dragEnd(e, 'filter')"
+											>
+												<span v-for="(item, index) in filterData" :key="index" :class="isNumberCell(item)">
+													<div class="textOverhidden" style="width: 80%" @dblclick="item.isEdit = true" v-if="!item.isEdit">
+														{{ calculatorObj(item.calculatorFunction, item.columnRename) }}
+													</div>
+													<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
+													<!-- 下拉框 -->
+													<Dropdown style="float: right" transfer @on-click="(name) => dropDownClick(name, item, index, 0, 'filter')">
+														<Icon type="ios-arrow-down"></Icon>
+														<template #list>
+															<DropdownMenu>
+																<!-- 编辑 -->
+																<DropdownItem name="edit">编辑筛选器</DropdownItem>
+																<!-- 删除 -->
+																<DropdownItem name="delete">删除筛选器</DropdownItem>
+															</DropdownMenu>
+														</template>
+													</Dropdown>
+												</span>
+											</draggable>
+										</div>
 									</div>
 									<!-- 标记 -->
 									<div class="mark">
@@ -203,20 +225,6 @@
 													<Select v-model="markData[markIndex].chartType" clearable placeholder="请选择图表" @on-change="changeMarks(markIndex)">
 														<Option v-for="item in chartList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 													</Select>
-													<!-- <i-switch
-														size="large"
-														v-model="markData[markIndex].isStack"
-														true-value="Y"
-														false-value="N"
-														v-if="markData[markIndex].chartType === 'scatter'"
-													>
-														<template #open>
-															<span>堆叠</span>
-														</template>
-														<template #close>
-															<span>散落</span>
-														</template>
-													</i-switch> -->
 													<div class="mark-box">
 														<draggable
 															group="site"
@@ -362,6 +370,7 @@
 										<componentsTemp
 											v-if="modelFlag"
 											ref="tempRef"
+                      :isPreview="false"
 											:id="submitData.id"
 											:title="submitData.workBookName"
 											:type="markData[0]?.chartType || 'bar'"
@@ -388,6 +397,8 @@
 			<SortbyFields ref="sortbyField" :selectObj="selectObj" :filterData="filterData" @updateSort="updateSort" />
 			<!-- 行列边界值设定 -->
 			<Fields ref="field" :selectObj="selectObj" @updateRowColumn="updateRowColumn" />
+			<!-- 数据集筛选器 -->
+			<FilterDatasetFields ref="filterDataSetField" :selectObj="selectObj" :isAdd="isAdd" @updateDataSetFilter="updateDataSetFilter" />
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
@@ -408,6 +419,7 @@ import {
 	addCustomerFieldReq,
 	modifyCustomerFieldReq,
 	getChartsInfoReq,
+	getConditions,
 } from "@/api/bill-design-manage/workbook-manage.js";
 import { getlistReq } from "@/api/system-manager/data-item";
 
@@ -419,10 +431,11 @@ import { getDataSetListReq } from "@/api/bill-design-manage/data-set-config.js";
 import SortbyFields from "./sortby-fields.vue";
 import DropdownFields from "./dropdown-fields.vue";
 import Fields from "./fields.vue";
+import FilterDatasetFields from "./filter-dataset-fields.vue";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields, DropdownFields, Fields },
+	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields, DropdownFields, Fields, FilterDatasetFields },
 	props: {
 		modelFlag: {
 			type: Boolean,
@@ -453,6 +466,7 @@ export default {
 						}
 						this.pageLoad(); //查询信息
 						this.getColumnList(); //获取左侧列
+						this.getDataSetFilter(); //数据集对应筛选信息
 					}
 					this.getDataSetList();
 					this.getDataItemData(); //数据字典
@@ -488,6 +502,7 @@ export default {
 			visib: false,
 			baseInfoPanel: "base",
 			btnDistabled: true,
+			isShrink: true, //默认是展开
 			isAdd: true,
 			tabValue: "data",
 			drawerTitle: this.$t("add"),
@@ -522,6 +537,7 @@ export default {
 			columnData: [], //列值
 			rowData: [], //行值
 			markData: [{ name: "全部", chartType: "bar", data: [] }],
+			andData: [], //数据集过滤值
 			defaultMarkValue: { startRange: "red", endRange: "green", colorType: 1, pieces: [], outOfRange: "#999" },
 			chartList: [
 				{ label: "文本", value: "componentText" },
@@ -626,6 +642,7 @@ export default {
 				markItems: markData.flat().map((item) => {
 					return { ...item, markValue: "" };
 				}),
+				andItems: this.andData,
 			};
 			console.log("this.filterData", this.filterData, obj.filterItems);
 			getChartsInfoReq(obj)
@@ -673,11 +690,22 @@ export default {
 							}
 							return { ...item, index, columnRename: item.columnName, isEdit: false };
 						});
-						return { labelName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || true };
+						return { labelName: item, children: this.$XEUtils.orderBy(children, "index"), isShow: this.data[index]?.isShow || false };
 					});
 				} else {
 					this.$Msg.error(res.message);
 				}
+			});
+		},
+
+		//获取数据集对应表的筛选信息
+		getDataSetFilter() {
+			const { datasetId } = this.submitData;
+			const obj = {
+				dataSetCode: datasetId,
+			};
+			getConditions(obj).then((res) => {
+				this.andData = res.result;
 			});
 		},
 
@@ -719,6 +747,7 @@ export default {
 					break;
 				case "edit":
 					if (type == "filter") this.$refs.filterField.modelFlag = true;
+					if (type == "filter-dataSet") this.$refs.filterDataSetField.modelFlag = true;
 					if (type == "create-fileds") {
 						this.isAdd = false;
 						this.$refs.createField.modelFlag = true;
@@ -956,6 +985,11 @@ export default {
 			this.filterData[newIndex] = { ...obj };
 			this.filterData = JSON.parse(JSON.stringify(this.filterData));
 		},
+		//更新数据集筛选器数据
+		updateDataSetFilter(newIndex, obj) {
+			this.andData[newIndex] = { ...obj };
+			this.andData = JSON.parse(JSON.stringify(this.andData));
+		},
 		//更新行、列
 		updateRowColumn(newIndex, obj) {
 			if (obj.axis == "y") this.columnData[newIndex] = { ...obj, remark: JSON.stringify(obj.remark) };
@@ -1134,6 +1168,14 @@ export default {
 				}
 			});
 		},
+
+		//展开或者收缩
+		shrinkUnfoldClick() {
+			this.isShrink = !this.isShrink;
+			this.data = this.data.map((item) => {
+				return { ...item, isShow: !this.isShrink };
+			});
+		},
 		//预览界面跳转
 		previewClick() {
 			const { id } = this.submitData;
@@ -1305,8 +1347,23 @@ export default {
 			}
 			.left-tree {
 				height: calc(100% - 50px);
-				padding: 10px;
-				margin-top: 5px;
+				padding: 0 10px 10px 10px;
+				.shrink-unfold {
+					height: 30px;
+					line-height: 30px;
+					text-align: right;
+					margin-bottom: 10px;
+					position: relative;
+					i {
+						font-size: 22px;
+					}
+					.ivu-input-wrapper {
+						width: 90%;
+						position: absolute;
+						left: 0px;
+						top: 3px;
+					}
+				}
 				.tree {
 					height: calc(100% - 40px);
 					overflow: auto;
@@ -1375,6 +1432,12 @@ export default {
 				height: 40%;
 				padding: 10px;
 				border-bottom: 1px dashed #e4e4e4;
+				.filter-dataset {
+					height: 110px;
+				}
+				.filter-workbook {
+					height: calc(100% - 110px);
+				}
 			}
 			.mark {
 				width: 100%;
@@ -1488,7 +1551,7 @@ export default {
 		text-align: center;
 		background: #ecedff;
 		color: #5f6779;
-		border-radius: 10px;
+		border-radius: 2px;
 		margin: 4px;
 		display: inline-block;
 		position: relative;
@@ -1502,17 +1565,23 @@ export default {
 		width: calc(100% - 23px);
 		padding: 2px 10px 2px 10px;
 		text-align: center;
-		background: #e7f5e6;
+		background: #d3f3d1;
 		color: #5f6779;
-		border-radius: 10px;
+		border-radius: 2px;
 		margin: 4px;
 		display: inline-block;
 		position: relative;
-		/* i {
-			position: absolute;
-			left: 5px;
-			top: 5px;
-		} */
+	}
+	.drag-static {
+		width: calc(100% - 23px);
+		padding: 2px 10px 2px 10px;
+		text-align: center;
+		background: #79787821;
+		color: #5f6779;
+		border-radius: 2px;
+		margin: 4px;
+		display: inline-block;
+		position: relative;
 	}
 	.ghost {
 		background: #ecedff !important;

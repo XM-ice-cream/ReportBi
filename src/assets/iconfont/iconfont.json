@@ -6,6 +6,76 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "1425911",
+      "name": "展开",
+      "font_class": "zhankai",
+      "unicode": "e840",
+      "unicode_decimal": 59456
+    },
+    {
+      "icon_id": "5485658",
+      "name": "收缩",
+      "font_class": "shousuo",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "5379859",
+      "name": "back",
+      "font_class": "back",
+      "unicode": "e6f4",
+      "unicode_decimal": 59124
+    },
+    {
+      "icon_id": "21548543",
+      "name": "氧气",
+      "font_class": "yangqi",
+      "unicode": "e8be",
+      "unicode_decimal": 59582
+    },
+    {
+      "icon_id": "29949",
+      "name": "time_fill",
+      "font_class": "timefill",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "3216565",
+      "name": "距离",
+      "font_class": "juli",
+      "unicode": "e677",
+      "unicode_decimal": 58999
+    },
+    {
+      "icon_id": "9906516",
+      "name": "速度_fill",
+      "font_class": "speed_fill",
+      "unicode": "e71c",
+      "unicode_decimal": 59164
+    },
+    {
+      "icon_id": "15668892",
+      "name": "系统日志",
+      "font_class": "xitongrizhi",
+      "unicode": "e782",
+      "unicode_decimal": 59266
+    },
+    {
+      "icon_id": "21053689",
+      "name": "传感器",
+      "font_class": "chuanganqi",
+      "unicode": "e674",
+      "unicode_decimal": 58996
+    },
+    {
+      "icon_id": "22898788",
+      "name": "2.8通风风扇",
+      "font_class": "a-28tongfengfengshan",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    },
+    {
       "icon_id": "3851366",
       "name": "模板",
       "font_class": "moban",

@@ -53,7 +53,7 @@ export const getTabelColumnReq = data => {
 export const getConditions = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/biworkbookdata/getconditions',
+    url: '/biworkbookdata/getconditiondtos',
     method: 'get',
     params: data
   })

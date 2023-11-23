@@ -16,6 +16,10 @@
 						</Option>
 					</Select>
 				</template>
+				<!-- 中文名称 -->
+				<template #columnRename="{ row, index }">
+					<Input type="text" v-model="data[index].columnRename" clearable />
+				</template>
 				<!-- 逻辑符号 -->
 				<template #operator="{ row, index }">
 					<Select v-model="data[index].operator" size="small" style="border: none" transfer>
@@ -37,7 +41,34 @@
 				</template>
 				<!-- 操作区 -->
 				<template #operarea="{ row, index }">
-					<Button type="error" ghost size="small" @click="deleteClick(index, data)" custom-icon="iconfont icon-delete"></Button>
+					<Button
+						type="error"
+						ghost
+						size="small"
+						@click="deleteClick(index, data)"
+						custom-icon="iconfont icon-delete"
+						style="margin-right: 10px"
+					></Button>
+					<Button
+						type="success"
+						ghost
+						size="small"
+						@click="hideRowClick(index, data, true)"
+						icon="md-eye"
+						v-if="!row.hide"
+						title="显示此查询参数"
+						style="font-size: 18px"
+					></Button>
+					<Button
+						type="success"
+						ghost
+						size="small"
+						@click="hideRowClick(index, data, false)"
+						icon="md-eye-off"
+						v-else
+						title="隐藏此查询参数"
+						style="font-size: 18px"
+					></Button>
 				</template>
 			</Table>
 		</div>
@@ -90,6 +121,10 @@ export default {
 					slot: "columnname",
 				},
 				{
+					title: "中文名称",
+					slot: "columnRename",
+				},
+				{
 					title: "运算符",
 					slot: "operator",
 				},
@@ -100,7 +135,7 @@ export default {
 				{
 					title: "#",
 					slot: "operarea",
-					width: 60,
+					width: 120,
 					align: "center",
 				},
 			],
@@ -164,11 +199,17 @@ export default {
 
 		//添加字段
 		addClick() {
-			this.data.push({ columnname: "", operator: "=", value: "" });
+			this.data.push({ columnname: "", columnRename: "", operator: "=", value: "", hide: false });
 		},
 		//删除字段
 		deleteClick(index, rows) {
 			rows.splice(index, 1);
+		},
+		//隐藏此行
+		hideRowClick(index, row, hide) {
+			console.log("hideRowClick");
+			row[index].hide = hide;
+			console.log(this.data);
 		},
 		// 获取数据字典数据
 		async getDataItemData() {

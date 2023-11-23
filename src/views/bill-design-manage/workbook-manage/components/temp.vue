@@ -1,5 +1,5 @@
 <template>
-	<div class="temp" v-if="visib">
+	<div class="temp" :class="isPreview ? 'temp-preview' : ''" v-if="visib">
 		<div class="title">{{ title }}</div>
 
 		<Dropdown class="download" @on-click="exportPDF">
@@ -52,6 +52,7 @@ export default {
 		event: "input",
 	},
 	props: {
+		isPreview: Boolean, //是否是预览
 		id: String,
 		type: String,
 		visib: Boolean,
@@ -540,7 +541,7 @@ export default {
 					data: objKeys,
 					show: false,
 				});
-				grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 50, right: 200 }];
+				grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 70, right: 200 }];
 			} else {
 				//行中有指标，列均为维度
 				xAxis = isAllNumber ? [] : this.axisNumber;
@@ -638,7 +639,7 @@ export default {
 					{
 						left: gridWidth + groupByString.length * 10,
 						bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90,
-						top: 50,
+						top: 70,
 						right: 200,
 					},
 				];
@@ -933,6 +934,9 @@ export default {
 </script>
 <style></style>
 <style scoped lang="less">
+.temp-preview {
+	padding-top: 10px !important;
+}
 .temp {
 	height: 100%;
 	padding-top: 40px;
@@ -950,6 +954,7 @@ export default {
 		position: absolute;
 		top: 2%;
 		left: 50%;
+		transform: translate(-50%, -2%);
 	}
 	.download {
 		position: absolute;

@@ -13,6 +13,32 @@
 								<div class="poptip-style-content" slot="content">
 									<div class="submitForm">
 										<Form ref="submitReq" :label-width="80">
+											<!-- 数据集筛选器 -->
+											<template v-for="item in andData">
+												<FormItem :label="item.columnname">
+													<!-- 数组 -->
+													<Input
+														v-if="item.columnType.toUpperCase() === 'STRING'"
+														type="textarea"
+														:autosize="{ minRows: 5, maxRows: 10 }"
+														v-model.trim="item.value"
+														clearable
+													/>
+													<!-- 数字 -->
+													<InputNumber v-else-if="item.columnType.toUpperCase() === 'NUMBER'" v-model.trim.number="item.value" clearable />
+													<!-- 时间 -->
+													<DatePicker
+														v-else-if="item.columnType.toUpperCase() === 'DATETIME'"
+														v-model="item.value"
+														transfer
+														type="datetime"
+														format="yyyy-MM-dd HH:mm:ss"
+														clearable
+													></DatePicker>
+												</FormItem>
+											</template>
+											<div style="width: 100%; height: 20px"></div>
+											<!-- 工作簿筛选器 -->
 											<template v-for="item in filterData">
 												<FormItem :label="item.columnRename">
 													<!-- 数组 -->
@@ -75,6 +101,7 @@
 				<componentsTemp
 					ref="tempRef"
 					:id="submitData.id"
+					:isPreview="true"
 					:type="markData[0]?.chartType || 'bar'"
 					:title="submitData.workBookName"
 					:visib="visib"
@@ -89,7 +116,7 @@
 </template>
 <script>
 import componentsTemp from "./components/temp.vue";
-import { getChartsInfoReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { getChartsInfoReq, getConditions } from "@/api/bill-design-manage/workbook-manage.js";
 import { getEchoReq, deleteImageReq } from "@/api/bill-design-manage/workbook-design";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { formatDate, commaSplitReturnString } from "@/libs/tools";
@@ -110,6 +137,7 @@ export default {
 			columnData: [],
 			markData: [],
 			chartsData: [],
+			andData: [],
 			columnTypeList: [],
 			refreshObj: { isRefresh: false, refeshRate: 1 },
 			interval: null,
@@ -130,7 +158,7 @@ export default {
 	methods: {
 		//加载信息
 		pageLoad() {
-			getEchoReq({ id: this.submitData.id }).then((res) => {
+			getEchoReq({ id: this.submitData.id }).then(async (res) => {
 				if (res.code == 200) {
 					const { calcItems, filterItems, markStyle, datasetId, workBookName, workBookCode, maxNumber } = res.result;
 					//修改浏览器titile
@@ -142,12 +170,14 @@ export default {
 						let filterValue = item.filterValue;
 						//时间类型
 						if (this.getFieldsType("DATE", item.columnType)) filterValue = item.filterValue.split(",");
-
 						return { ...item, filterValue };
 					}); //过滤器
+
 					this.rowData = calcItems.filter((item) => item.axis == "x"); //行
 					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
 					this.markData = markStyle && markStyle !== "{}" ? JSON.parse(markStyle) : [{ name: "全部", chartType: "bar", data: [] }]; //标记
+					await this.getDataSetFilter();
+
 					this.$nextTick(() => {
 						this.searchClick();
 					});
@@ -169,6 +199,7 @@ export default {
 				filterItems,
 				calcItems: this.rowData.concat(this.columnData),
 				markItems: this.markData.map((item) => item.data).flat(),
+				andItems: this.andData,
 			};
 			getChartsInfoReq(obj)
 				.then((res) => {
@@ -189,6 +220,16 @@ export default {
 					this.visib = true;
 				});
 		},
+		//获取数据集对应表的筛选信息
+		async getDataSetFilter() {
+			const { datasetId } = this.submitData;
+			const obj = {
+				dataSetCode: datasetId,
+			};
+			await getConditions(obj).then((res) => {
+				this.andData = res.result;
+			});
+		},
 		//获取字段类型
 		getFieldsType(type, columnType) {
 			const obj = {
@@ -198,6 +239,7 @@ export default {
 			};
 			return obj[type];
 		},
+
 		// 至少有一个查询条件
 		searchCondition() {
 			let flag = false;
@@ -284,9 +326,13 @@ export default {
 	},
 };
 </script>
-<style></style>
+<style>
+.workbook-preview-content .comment .ivu-card-head {
+	padding: 15px 13px 0px 13px !important;
+}
+</style>
 <style scoped lang="less">
 .close-btn {
-	border-radius: 50%;
+	border-radius: 4px;
 }
 </style>
