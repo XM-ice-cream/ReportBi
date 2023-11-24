@@ -14,8 +14,8 @@
 									<div class="submitForm">
 										<Form ref="submitReq" :label-width="80">
 											<!-- 数据集筛选器 -->
-											<template v-for="item in andData">
-												<FormItem :label="item.columnname">
+											<template v-for="item in andData" v-if="!item.hide">
+												<FormItem :label="item.columnRename">
 													<!-- 数组 -->
 													<Input
 														v-if="item.columnType.toUpperCase() === 'STRING'"
@@ -186,7 +186,7 @@ export default {
 		},
 		//查询
 		searchClick() {
-			const { flag, filterItems } = this.searchCondition(); //查询条件处理
+			const { flag, filterItems, andItems } = this.searchCondition(); //查询条件处理
 			if (!flag) {
 				this.$Msg.error("操作失败，至少要有一个查询条件！");
 				return;
@@ -199,7 +199,7 @@ export default {
 				filterItems,
 				calcItems: this.rowData.concat(this.columnData),
 				markItems: this.markData.map((item) => item.data).flat(),
-				andItems: this.andData,
+				andItems,
 			};
 			getChartsInfoReq(obj)
 				.then((res) => {
@@ -256,7 +256,17 @@ export default {
 				if (filterValue && filterValue !== ",") flag = true;
 				filterItems.push({ ...item, filterValue });
 			});
-			return { flag, filterItems };
+
+			//数据集筛选判断
+			let flagDataSet = false;
+			let andItems = [];
+			this.andData.forEach((item) => {
+				let { columnType, value } = item;
+				if (columnType === "DateTime") value = formatDate(value);
+				else value = value ? commaSplitReturnString(value).join() : "";
+				andItems.push({ ...item, value });
+			});
+			return { flag, filterItems, andItems };
 		},
 		// 设置定时器
 		settingTime(isRefresh, refeshRate) {
