@@ -92,6 +92,7 @@ export default {
 					},
 					nameTextStyle: {
 						align: "right",
+						padding: [0, 8, 0, 0],
 					},
 				},
 			],
@@ -789,8 +790,8 @@ export default {
 			const { offsetWidth, offsetHeight } = this.$refs.workbookTempRef;
 			const width = offsetWidth - 20;
 			const height = offsetHeight - 20;
-			const xLength = width / 16 < xAxis[0]?.data?.length ? `${xAxis[0].data.length * 16}px` : `${width}px`;
-			const yLength = height / 16 < yAxis[0]?.data?.length ? `${yAxis[0].data.length * 16}px` : `${height}px`;
+			const xLength = width / 16 < xAxis[0]?.data?.length ? `${xAxis[0].data.length * 50}px` : `${width}px`;
+			const yLength = height / 16 < yAxis[0]?.data?.length ? `${yAxis[0].data.length * 50}px` : `${height}px`;
 			this.tempStyle.width = xLength;
 			this.tempStyle.height = yLength;
 		},

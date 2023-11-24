@@ -169,7 +169,7 @@ export default {
 					this.filterData = filterItems.map((item) => {
 						let filterValue = item.filterValue;
 						//时间类型
-						if (this.getFieldsType("DATE", item.columnType)) filterValue = item.filterValue.split(",");
+						if (this.getFieldsType("DATE", item.columnType)) filterValue = item.filterValue?.split(",") || "";
 						return { ...item, filterValue };
 					}); //过滤器
 
