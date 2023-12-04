@@ -1,15 +1,7 @@
 /**过滤字段 */
 <template>
 	<!-- 函数管理 -->
-	<Modal
-		:title="isAdd ? '筛选器' : '筛选器'"
-		v-model="modelFlag"
-		width="800"
-		draggable
-		:mask-closable="false"
-		:mask="true"
-		:before-close="cancelClick"
-	>
+	<Modal :title="modelTitle" v-model="modelFlag" width="800" draggable :mask-closable="false" :mask="true" :before-close="cancelClick">
 		<div class="filter-fields">
 			<Form ref="submitReq" :model="submitData" :label-width="100">
 				<!-- 显示数据 -->
@@ -78,7 +70,6 @@ import { formatDate, commaSplitReturnString } from "@/libs/tools";
 import { getselectvalueReq } from "@/api/bill-design-manage/workbook-design.js";
 export default {
 	name: "filter-fields",
-	components: {},
 	props: {
 		selectObj: {
 			type: Object,
@@ -118,6 +109,7 @@ export default {
 	},
 	data() {
 		return {
+			modelTitle: "筛选器",
 			submitData: {},
 			modelFlag: false,
 			tableConfig: { ...this.$config.tableConfig }, // table配置

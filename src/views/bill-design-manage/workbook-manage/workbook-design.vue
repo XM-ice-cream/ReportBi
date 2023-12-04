@@ -370,7 +370,7 @@
 										<componentsTemp
 											v-if="modelFlag"
 											ref="tempRef"
-                      :isPreview="false"
+											:isPreview="false"
 											:id="submitData.id"
 											:title="submitData.workBookName"
 											:type="markData[0]?.chartType || 'bar'"
@@ -746,8 +746,14 @@ export default {
 					}
 					break;
 				case "edit":
-					if (type == "filter") this.$refs.filterField.modelFlag = true;
-					if (type == "filter-dataSet") this.$refs.filterDataSetField.modelFlag = true;
+					if (type == "filter") {
+						this.$refs.filterField.modelFlag = true;
+						this.$refs.filterField.modelTitle = `筛选器【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
+					}
+					if (type == "filter-dataSet") {
+						this.$refs.filterDataSetField.modelFlag = true;
+						this.$refs.filterDataSetField.modelTitle = `数据集筛选器【${this.selectObj.columnname} ( ${this.selectObj.tableName} ) 】`;
+					}
 					if (type == "create-fileds") {
 						this.isAdd = false;
 						this.$refs.createField.modelFlag = true;
@@ -755,14 +761,15 @@ export default {
 					if (type == "mark") {
 						this.isAdd = false;
 						this.$refs.markField.modelFlag = true;
+						this.$refs.markField.modelTitle = `标记【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
 					}
 					if (type == "column") {
 						this.$refs.field.modelFlag = true;
-						this.$refs.field.modelTitle = "列边界值设定";
+						this.$refs.field.modelTitle = `列边界值设定【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
 					}
 					if (type == "row") {
 						this.$refs.field.modelFlag = true;
-						this.$refs.field.modelTitle = "行边界值设定";
+						this.$refs.field.modelTitle = `行边界值设定【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
 					}
 					break;
 				case "sortby":

@@ -1,7 +1,7 @@
 /**标记 */
 <template>
 	<!-- 函数管理 -->
-	<Modal :title="isAdd ? '标记' : '标记'" v-model="modelFlag" width="800" draggable :mask-closable="false" :mask="true" :before-close="cancelClick">
+	<Modal :title="modelTitle" v-model="modelFlag" width="800" draggable :mask-closable="false" :mask="true" :before-close="cancelClick">
 		<div class="mark-fields">
 			<Form ref="submitReq" :model="submitData" :label-width="100">
 				<!-- 文本宽度 -->
@@ -85,7 +85,6 @@ import { formatDate } from "@/libs/tools";
 
 export default {
 	name: "mark-fields",
-	components: {},
 	props: {
 		selectObj: {
 			type: Object,
@@ -122,6 +121,7 @@ export default {
 	},
 	data() {
 		return {
+			modelTitle: "标记",
 			submitData: {},
 			tableConfig: { ...this.$config.tableConfig }, // table配置
 			colorSelect: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],

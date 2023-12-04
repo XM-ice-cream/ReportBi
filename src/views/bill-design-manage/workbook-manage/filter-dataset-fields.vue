@@ -1,15 +1,7 @@
 /**数据集筛选过滤字段 */
 <template>
 	<!-- 函数管理 -->
-	<Modal
-		:title="isAdd ? '数据集筛选器' : '数据集筛选器'"
-		v-model="modelFlag"
-		width="800"
-		draggable
-		:mask-closable="false"
-		:mask="true"
-		:before-close="cancelClick"
-	>
+	<Modal :title="modelTitle" v-model="modelFlag" width="800" draggable :mask-closable="false" :mask="true" :before-close="cancelClick">
 		<div class="filter-fields">
 			<Form ref="submitReq" :model="submitData" :label-width="100">
 				<!-- 筛选信息 -->
@@ -39,7 +31,6 @@
 import { formatDate } from "@/libs/tools";
 export default {
 	name: "filter-dataset-fields",
-	components: {},
 	props: {
 		selectObj: {
 			type: Object,
@@ -59,6 +50,7 @@ export default {
 	},
 	data() {
 		return {
+			modelTitle: "数据集筛选器",
 			submitData: {},
 			modelFlag: false,
 		};

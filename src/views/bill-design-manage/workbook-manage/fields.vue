@@ -23,7 +23,6 @@
 <script>
 export default {
 	name: "fields",
-	components: {},
 	props: {
 		selectObj: {
 			type: Object,

@@ -71,10 +71,11 @@ import { getlistReq as getDataItemReq, getlisttreeReq } from "@/api/system-manag
 import { addCustomerFieldReq, getCustomerFieldReq, modifyCustomerFieldReq, checkCustomerFieldReq } from "@/api/bill-design-manage/workbook-manage.js";
 import draggable from "vuedraggable";
 import MonacoEditor from "@/components/monaco-editor/monaco-editor.vue";
+import BaseInfo from "./base-info.vue";
 
 export default {
 	name: "create-fields",
-	components: { draggable, MonacoEditor },
+	components: { draggable, MonacoEditor, BaseInfo },
 	props: {
 		selectObj: {
 			type: Object,
