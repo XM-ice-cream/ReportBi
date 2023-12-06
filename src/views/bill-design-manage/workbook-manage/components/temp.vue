@@ -37,7 +37,8 @@ import componentPie from "./component-pie.vue"; //饼图
 import componentBoxplot from "./component-boxplot.vue"; //箱线图
 import componentHeatMap from "./component-heatmap.vue"; //热力图
 import componentText from "./component-text.vue"; //热力图
-import { addImageReq, updateImageReq, getImageReq, deleteImageReq } from "@/api/bill-design-manage/workbook-design";
+import componentTable from "./component-table.vue"; //表格
+import { getImageReq } from "@/api/bill-design-manage/workbook-design";
 import { formatDate } from "@/libs/tools";
 import html2Canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -46,7 +47,7 @@ import "@/assets/js/simhei-normal.js";
 
 export default {
 	name: "componentsTemp",
-	components: { barLineScatter, componentPie, componentBoxplot, componentHeatMap, componentText },
+	components: { barLineScatter, componentPie, componentBoxplot, componentHeatMap, componentText, componentTable },
 	model: {
 		prop: "value",
 		event: "input",
@@ -305,7 +306,8 @@ export default {
 
 		//加载图表
 		pageLoad() {
-			if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
+			if (this.type === "componentTable") this.chartData = { row: this.row, column: this.column, mark: this.mark, value: this.value };
+			else if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
 			else this.chartData = this.dataLogic();
 			this.$nextTick(() => {
 				this.$refs.componentRef.pageLoad();

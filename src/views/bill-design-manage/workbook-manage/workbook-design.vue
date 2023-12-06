@@ -547,6 +547,7 @@ export default {
 				{ label: "盒须图", value: "componentBoxplot" },
 				{ label: "饼图", value: "componentPie" },
 				{ label: "热力图", value: "componentHeatMap" },
+				{ label: "表格", value: "componentTable" },
 			],
 
 			// 验证实体
