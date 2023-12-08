@@ -1,0 +1,38 @@
+.component-table table {
+	padding: 0;
+	margin: 0 auto;
+	float: left;
+	border-collapse: collapse; /*去除表格缝隙*/
+	height: 100%;
+	display: block;
+	overflow: auto;
+	width: 100%;
+	table-layout: fixed;
+	color: #333333;
+}
+.component-table {
+	display: inline-block; /*宽高由内容撑开*/
+	width: 100%;
+	position: relative;
+}
+/*#efefef*/
+.component-table th {
+	text-align: center;
+	padding: 6px 6px 6px 12px;
+	color: #333333;
+	font-weight: inherit;
+	border-right: 1px solid #e6e6e6;
+	white-space: nowrap; /*内容不换行*/
+}
+
+.component-table td {
+	font-size: 12px;
+	padding: 6px 6px 6px 12px;
+	table-layout: fixed;
+	text-align: center;
+	border-right: 1px solid #e6e6e6;
+	white-space: nowrap; /*内容不换行*/
+}
+.component-table tbody {
+	border-bottom: 1px solid #e6e6e6;
+}

@@ -2,7 +2,10 @@
 	<div class="temp" :class="isPreview ? 'temp-preview' : ''" v-if="visib">
 		<div class="title">{{ title }}</div>
 
-		<Dropdown class="download" @on-click="exportPDF">
+		<Button type="text" class="download" @click="exportExcel" v-if="type === 'componentTable'" title="导出excel">
+			<icon custom="iconfont icon-excel" />
+		</Button>
+		<Dropdown class="download" @on-click="exportPDF" v-else title="导出PDF">
 			<icon custom="iconfont icon-pdfdayin" />
 			<template #list>
 				<DropdownMenu>
@@ -303,10 +306,24 @@ export default {
 				return ctx;
 			});
 		},
+		//导出表格
+		exportExcel() {
+			const fileName = `${this.title}` + "-" + `${formatDate(new Date())}.xls`;
+			// 前端自己导出表格
+			$("#myTable").table2excel({
+				exclude: ".hidden-cell", // 排除包含 .hidden-cell 类的单元格
+				filename: fileName, //文件名称
+			});
+		},
 
 		//加载图表
 		pageLoad() {
-			if (this.type === "componentTable") this.chartData = { row: this.row, column: this.column, mark: this.mark, value: this.value };
+			//表格
+			if (this.type === "componentTable") {
+				this.tempStyle = { width: "100%", height: "100%" };
+				this.chartData = { row: this.row, column: this.column, mark: this.mark, value: this.value, renameObj: this.axisToField() };
+			}
+			//饼图
 			else if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
 			else this.chartData = this.dataLogic();
 			this.$nextTick(() => {
@@ -510,7 +527,7 @@ export default {
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
 							return (
-								markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`)?.trim()
+								markItem.innerText === "labelWidth" && this.axisToField()[`x${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
 							);
 						})[0]?.markValue || 90;
 
@@ -555,14 +572,14 @@ export default {
 					const labelWidth =
 						this.mark[0].data.filter((markItem) => {
 							return (
-								markItem.innerText === "labelWidth" && this.axisToField(`y${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`)?.trim()
+								markItem.innerText === "labelWidth" && this.axisToField()[`y${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
 							);
 						})[0]?.markValue || 90;
 
 					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
 					yAxis.push({
 						...this.axisString[0],
-						name: this.axisToField(`y${index}`),
+						name: this.axisToField()[`y${index}`],
 						nameLocation: this.type === "componentHeatMap" ? "end" : "start",
 						data: item,
 						axisLabel: {
@@ -594,7 +611,8 @@ export default {
 						const labelWidth =
 							this.mark[0].data.filter((markItem) => {
 								return (
-									markItem.innerText === "labelWidth" && this.axisToField(`x${index}`)?.trim() === this.axisToField(`z${markItem.orderBy}`)?.trim()
+									markItem.innerText === "labelWidth" &&
+									this.axisToField()[`x${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
 								);
 							})[0]?.markValue || 90;
 
@@ -839,7 +857,7 @@ export default {
 					aa.splice(
 						groupByString.findIndex((item) => item === dataitem),
 						0,
-						this.axisToField(dataitem) + `:  ${tooltipValue[dataitem]}`
+						this.axisToField()[dataitem] + `:  ${tooltipValue[dataitem]}`
 					);
 				}
 
@@ -847,8 +865,8 @@ export default {
 					!groupByString.includes(dataitem) &&
 					(value[3] === dataitem || typeof tooltipValue[dataitem] === "string" || dataitem.indexOf("z") > -1)
 				) {
-					if (value[3] === dataitem) aa.push(marker + " " + this.axisToField(dataitem) + `:  ${tooltipValue[dataitem]}`);
-					else aa.push(this.axisToField(dataitem) + `:  ${tooltipValue[dataitem]}`);
+					if (value[3] === dataitem) aa.push(marker + " " + this.axisToField()[dataitem] + `:  ${tooltipValue[dataitem]}`);
+					else aa.push(this.axisToField()[dataitem] + `:  ${tooltipValue[dataitem]}`);
 				}
 			});
 			//饼图增加百分比
@@ -898,14 +916,14 @@ export default {
 		},
 
 		//轴名 对应 字段名称
-		axisToField(name) {
+		axisToField() {
 			let obj = {};
 			this.row.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnRename)));
 			this.column.map((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnRename)));
 			this.mark.forEach((markItem) => {
 				markItem.data.forEach((item) => (obj[`${item.axis}${item.orderBy}`] = this.calculatorObj(item.calculatorFunction, item.columnRename)));
 			});
-			return obj[name];
+			return obj;
 		},
 		//计算属性对应中文
 		calculatorObj(name, columnName) {

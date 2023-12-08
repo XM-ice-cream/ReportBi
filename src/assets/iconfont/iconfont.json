@@ -6,6 +6,13 @@
   "description": "白泽项目图标库",
   "glyphs": [
     {
+      "icon_id": "24816508",
+      "name": "excel",
+      "font_class": "excel",
+      "unicode": "e634",
+      "unicode_decimal": 58932
+    },
+    {
       "icon_id": "1425911",
       "name": "展开",
       "font_class": "zhankai",

@@ -18,7 +18,7 @@
       exclude_img: true,
       exclude_links: true,
       exclude_inputs: true,
-      preserveColors: true
+      preserveColors: true,
     };
 
   // The actual plugin constructor
@@ -90,6 +90,7 @@
             // Preserve background and text colors on the row
             if (e.settings.preserveColors) {
               compStyle = getComputedStyle(q);
+              //背景颜色
               additionalStyles += (compStyle && compStyle.backgroundColor ? "background-color: " + compStyle.backgroundColor + ";" : "");
               additionalStyles += (compStyle && compStyle.color ? "color: " + compStyle.color + ";" : "");
               // 字体粗细
@@ -102,6 +103,13 @@
               additionalStyles += (compStyle && compStyle.justifyContent ? "justify-content: " + compStyle.justifyContent + ";" : "");
               // 垂直居中
               additionalStyles += (compStyle && compStyle.alignItems ? "align-items: " + compStyle.alignItems + ";" : "");
+              //隐藏/显示
+              additionalStyles += (compStyle && compStyle.display ? "display: " + compStyle.display + ";" : "");
+              //文字居中
+              additionalStyles += (compStyle && compStyle.textAlign ? "text-align: " + compStyle['text-align'] + ";" : "");
+              //右边框
+              additionalStyles += (compStyle && compStyle.borderRight ? "border-right: " + compStyle['border-right'] + ";" : "");
+
             }
 
             var rc = {
@@ -109,7 +117,6 @@
               cols: $(this).attr("colspan"),
               flag: $(q).find(e.settings.exclude)
             };
-
             if (rc.flag.length > 0) {
               tempRows += "<td> </td>"; // exclude it!!
             } else {
