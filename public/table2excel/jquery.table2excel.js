@@ -18,6 +18,7 @@
       exclude_img: true,
       exclude_links: true,
       exclude_inputs: true,
+      exclude_bg_color: true, //背景颜色
       preserveColors: true,
     };
 
@@ -72,7 +73,7 @@
           if (e.settings.preserveColors) {
             compStyle = getComputedStyle(p);
             // 背景颜色
-            additionalStyles += (compStyle && compStyle.backgroundColor ? "background-color: " + compStyle.backgroundColor + ";" : "");
+            additionalStyles += (compStyle && compStyle.backgroundColor && e.settings.exclude_bg_color ? "background-color: " + compStyle.backgroundColor + ";" : "");
             // 字体颜色
             additionalStyles += (compStyle && compStyle.color ? "color: " + compStyle.color + ";" : "");
 
@@ -109,6 +110,8 @@
               additionalStyles += (compStyle && compStyle.textAlign ? "text-align: " + compStyle['text-align'] + ";" : "");
               //右边框
               additionalStyles += (compStyle && compStyle.borderRight ? "border-right: " + compStyle['border-right'] + ";" : "");
+              //下边框
+              additionalStyles += (compStyle && compStyle.borderBottom ? "border-bottom: " + compStyle['border-bottom'] + ";" : "");
 
             }
 

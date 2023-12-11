@@ -312,7 +312,8 @@ export default {
 			// 前端自己导出表格
 			$("#myTable").table2excel({
 				exclude: ".hidden-cell", // 排除包含 .hidden-cell 类的单元格
-				filename: fileName, //文件名称
+				filename: fileName, //文件名称,
+        exclude_bg_color:false,//是否显示背景颜色
 			});
 		},
 
