@@ -78,7 +78,7 @@ export default {
 				const borderBottom = i === columns.length - 1 ? "style='border-bottom:1px solid #e6e6e6;'" : "";
 				tablHtml += `<tr ${borderBottom}>`;
 				if (i === columns.length - 1)
-					rowInfo[0].split(",").forEach((item, index) => (tablHtml += `<td style='color:#000;font-weight:bold'>${renameObj["x" + `${index}`]}</td>`));
+					rowInfo[0].split(",").forEach((item, index) => (tablHtml += `<th style='color:#000;font-weight:bold'>${renameObj["x" + `${index}`]}</th>`));
 				else tablHtml += `<th colspan='${rowTempLength}'></th>`;
 				for (let j = 0; j < columnInfo.length; j++) {
 					const columnItem = columnInfo[j].split(",")[i];
@@ -133,10 +133,10 @@ export default {
 
 				let prevCell = null;
 				let cellSpan = 1;
-
 				for (let colIndex = 0; colIndex < cols.length; colIndex++) {
 					const cell = cols[colIndex];
 					const topcell = topCols ? topCols[colIndex] : "";
+					const topcellpre = topCols && colIndex ? topCols[colIndex - 1] : "";
 					//为了上一行的当前列是合并单元格再去合并,否则就不合并
 					if (prevCell && cell.textContent === prevCell.textContent && (!topcell || topcell.style?.colspan || topcell.style?.display)) {
 						cellSpan++;
@@ -166,7 +166,6 @@ export default {
 						if (spanCount > 1 && i - spanCount > columns.length) {
 							table.rows[i - spanCount].cells[j].rowSpan = spanCount;
 							table.rows[i - spanCount].cells[j].style.background = "#fff";
-							console.log("currentValue", currentValue);
 						}
 						prevValue = currentValue;
 						spanCount = 1;
