@@ -79,7 +79,11 @@ export default {
 				tablHtml += `<tr ${borderBottom}>`;
 				if (i === columns.length - 1)
 					rowInfo[0].split(",").forEach((item, index) => (tablHtml += `<th style='color:#000;font-weight:bold'>${renameObj["x" + `${index}`]}</th>`));
-				else tablHtml += `<th colspan='${rowTempLength}'></th>`;
+				else
+					rowInfo[0].split(",").forEach((item, index) => {
+						if (index === 0) tablHtml += `<th colspan='${rowTempLength}'></th>`;
+						else tablHtml += `<th style='display:none' class='hidden-cell'></th>`;
+					});
 				for (let j = 0; j < columnInfo.length; j++) {
 					const columnItem = columnInfo[j].split(",")[i];
 					tablHtml += `<th>${columnItem || ""}</th>`;
