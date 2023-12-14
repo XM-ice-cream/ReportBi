@@ -75,3 +75,5 @@ export const getDataSetListReq = data => {
     data
   })
 }
+// 导入
+export const uploadUrl = () => `${window.localStorage.getItem("reportDesignIp")}/bidataset/upload`

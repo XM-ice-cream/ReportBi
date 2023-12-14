@@ -30,7 +30,13 @@
 							</Poptip>
 						</i-col>
 						<i-col span="18" style="text-align: right">
-							<button-custom :btnData="btnData" @on-add-click="addClick" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
+							<button-custom
+								:btnData="btnData"
+								@on-upload-click="uploadClick"
+								@on-add-click="addClick"
+								@on-edit-click="editClick"
+								@on-delete-click="deleteClick"
+							></button-custom>
 						</i-col>
 					</Row>
 				</div>
@@ -59,16 +65,20 @@
 		</div>
 		<!-- 数据集配置 新增与编辑 -->
 		<DataSetConfigAddEdit ref="datasetconfigaddedit" :modalFlag.sync="modalFlag" :isAdd="isAdd" />
+		<!-- 数据集上传excel -->
+		<DataSetConfigUpload ref="datasetconfigupload" :modalFlag.sync="modalFlagUpload" />
 	</div>
 </template>
 
 <script>
 import { getButtonBoolean, renderIsEnabled, renderDate } from "@/libs/tools";
 import DataSetConfigAddEdit from "./datasetconfig/data-set-config-add-edit.vue";
+import DataSetConfigUpload from "./datasetconfig/data-set-config-upload.vue";
+
 import { getpagelistReq, deleteReq } from "@/api/bill-design-manage/data-set-config.js";
 
 export default {
-	components: { DataSetConfigAddEdit },
+	components: { DataSetConfigAddEdit, DataSetConfigUpload },
 	name: "dateset-config",
 	data() {
 		return {
@@ -76,6 +86,7 @@ export default {
 			isAdd: true, //新增编辑
 			modalFlag: false,
 			searchPoptipModal: false,
+			modalFlagUpload: false,
 			submitData: {},
 			selectObj: {}, //选中值
 			noRepeatRefresh: true, //刷新数据的时候不重复刷新pageLoad
@@ -226,6 +237,9 @@ export default {
 			this.req.pageIndex = 1;
 			this.req.pageSize = index;
 			this.pageLoad();
+		},
+		uploadClick() {
+			this.modalFlagUpload = true;
 		},
 	},
 };
