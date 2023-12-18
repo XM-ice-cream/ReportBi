@@ -54,8 +54,8 @@ export default {
 			uploadUrl: uploadUrl(),
 			dialogFormVisibleTitle: "导入外部数据源",
 			file: null,
-			uploadFormat: ["xlsx"],
-			maxSize: 2048,
+			uploadFormat: ["xlsx", "csv"],
+			maxSize: 1024 * 1024, //文件最大为1024M
 			isShowTips: false, //是否显示上传文件的基础信息
 			req: {
 				isSuccess: true, //是否上传成功
@@ -115,10 +115,12 @@ export default {
 		},
 		//返回是否 是上传的文件类型
 		isAssetTypeAnImage(ext) {
+			if (!this.uploadFormat.includes(ext.toLowerCase())) this.file = null; //报错 关闭loading
 			return this.uploadFormat.includes(ext.toLowerCase());
 		},
 		//上传超出限制触发
 		handleMaxSize(file) {
+			this.file = null; //报错 关闭loading
 			this.$Msg.warning(`${file.name}. ${this.$t("uploadMaxSize")}${this.maxSize / 1024}M`);
 		},
 		// 关闭模态框
