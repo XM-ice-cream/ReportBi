@@ -3,8 +3,8 @@ import { requestCenter } from '@/libs/request'
 // 获取数据字典树数据
 export const getlisttreeReq = data => {
   return requestCenter({
-    url: '/api/systemcenter/v1/detaitem/getlisttree',
-    method: 'post',
+    url: '/dataitemdetail/getDataDictTree',
+    method: 'get',
     data
   })
 }

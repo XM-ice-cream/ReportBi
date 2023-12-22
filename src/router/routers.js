@@ -29,6 +29,15 @@ const otherRouter = [{
     },
     component: () => import( /* webpackChunkName: "excelreport-design" */ '@/views/bill-design-manage/report-manage/excelreport-design.vue')
   }, {
+    path: '/bill-article-manage/article-preview',
+    name: 'article-preview',
+    meta: {
+      title: '文章 - 预览',
+      hideInMenu: true,
+      notCache: true
+    },
+    component: () => import( /* webpackChunkName: "article-manage" */ '@/views/bill-article-manage/article-preview.vue')
+  }, {
     path: '/bill-design-manage/screenreport-preview',
     name: 'screen-preview',
     meta: {

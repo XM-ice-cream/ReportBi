@@ -90,19 +90,25 @@ export default {
 		},
 		// 获取业务数据
 		async getDataItemData() {
+			console.log('获取数据字典！');
 			this.dataItemList = [];
-			await getlisttreeReq({ id: "", parentId: "0", itemCode: "", itemName: "", enabled: -1 }).then((res) => {
+			// { id: "", parentId: "0", itemCode: "", itemName: "", enabled: -1 }
+			await getlisttreeReq().then((res) => {
 				if (res.code === 200) {
 					res.result.forEach((item) => {
-						if (item.itemCode === "reportDesign") {
+						if (item.code === "bi") {
 							item?.children.forEach((citem) => {
-								if (citem.itemCode === "designFuncion") {
+								if (citem.code === "excel_design") {
 									citem?.children.forEach((ccitem) => {
-										const { itemCode, itemName } = ccitem;
-										this.getDataItemDetailList(itemCode, itemName);
+										if (ccitem.code === "designFuncion") {
+											ccitem?.children.forEach((cc2item) => {
+												const { code, title } = cc2item;
+												this.getDataItemDetailList(code, title);
+											});
+										}
 									});
 								}
-							});
+							});;
 						}
 					});
 				}
@@ -111,13 +117,11 @@ export default {
 
 		// 获取数据字典数据
 		async getDataItemDetailList(itemCode, itemName) {
-			let arr = [];
 			await getDataItemReq({ itemCode, enabled: 1 }).then((res) => {
 				if (res.code === 200) {
 					this.dataItemList.push({ itemCode, itemName, children: res.result || [] });
 				}
 			});
-			return arr;
 		},
 		//取消
 		cancelClick() {

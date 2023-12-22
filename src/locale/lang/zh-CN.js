@@ -1619,9 +1619,13 @@ export default {
   ontTree:'请选择一个树节点',
   editTree:'修改树',
   icon:'图标',
+  // 文章管理
+
+  articlepreview:'文章预览',
 
   // <!--------------------------------Menu Name----------------------------------------->
   'bill-sys-manage':"系统中心",
+  'articlepreview':'文章预览',
   'error-404': '找不到页面',
   'dictmanage':'字典信息',
   'authorize-manager': '权限管理',
