@@ -28,7 +28,8 @@
 				</template>
 				<!-- 值 -->
 				<template #value="{ row, index }">
-					<Input type="text" v-model="data[index].value" clearable v-if="row.columnType !== 'DateTime' || row.operator === '<=(day)'" />
+					<Input type="textarea"
+          :autosize="{ minRows: 2, maxRows: 5 }" v-model="data[index].value" clearable v-if="row.columnType !== 'DateTime' || row.operator === '<=(day)'" />
 					<DatePicker
 						transfer
 						type="datetime"

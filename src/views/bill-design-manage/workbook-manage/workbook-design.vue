@@ -323,9 +323,25 @@
 								<div class="right-box">
 									<!-- 行列拖拽 -->
 									<div class="row-column">
+										<!-- 列 -->
+										<div class="column" :class="isDisabledCell()">
+											<span class="title">列</span>
+											<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
+												<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
+													<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
+														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
+															calculatorObj(item.calculatorFunction, item.columnRename)
+														}}
+													</span>
+													<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
+													<!-- 下拉选 -->
+													<DropdownFields type="row" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
+												</span>
+											</draggable>
+										</div>
 										<!-- 行 -->
 										<div class="row" :class="isDisabledCell()">
-											<span class="title">列</span>
+											<span class="title">行</span>
 											<draggable
 												group="site"
 												v-model="columnData"
@@ -346,22 +362,7 @@
 												</span>
 											</draggable>
 										</div>
-										<!-- 列 -->
-										<div class="column" :class="isDisabledCell()">
-											<span class="title">行</span>
-											<draggable group="site" v-model="rowData" class="drag-right" ghost-class="ghost" id="row" @end="(e) => dragEnd(e, 'row')">
-												<span v-for="(item, index) in rowData" :key="index" :class="isNumberCell(item)" style="width: fit-content">
-													<span @dblclick="item.isEdit = true" v-if="!item.isEdit">
-														<icon custom="iconfont icon-paixu" :class="item.sortBy" v-if="item.sortBy && item.sortBy !== '0'" />{{
-															calculatorObj(item.calculatorFunction, item.columnRename)
-														}}
-													</span>
-													<Input type="text" v-model="item.columnRename" v-if="item.isEdit" @on-blur="item.isEdit = false" class="rename-input" />
-													<!-- 下拉选 -->
-													<DropdownFields type="row" :data="item" :index="index" markIndex="" @dropDownClick="dropDownClick" />
-												</span>
-											</draggable>
-										</div>
+
 										<!-- 查询按钮 -->
 										<Button type="primary" @click="searchClick" class="search-btn">{{ $t("search") }}</Button>
 									</div>
@@ -588,10 +589,11 @@ export default {
 					this.columnData = calcItems.filter((item) => item.axis == "y"); //列
 
 					this.markData = markStyle && markStyle !== "{}" ? JSON.parse(markStyle) : [{ name: "全部", chartType: "bar", data: [] }]; //标记
-					this.$nextTick(() => {
-						//加载图表数据
-						this.searchClick();
-					});
+					//不默认加载图表
+					// this.$nextTick(() => {
+					// 	//加载图表数据
+					// 	this.searchClick();
+					// });
 				}
 			});
 		},
