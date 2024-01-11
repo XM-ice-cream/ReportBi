@@ -182,7 +182,8 @@ export default {
 		submitClick() {
 			const { newIndex, startTime, endTime, columnType, showData, filterValue } = this.submitData;
 			if (columnType === "DATE" && !showData) {
-				this.submitData.filterValue = `${formatDate(startTime)},${formatDate(endTime)}`;
+				const isTime = startTime && endTime;
+				this.submitData.filterValue = isTime && `${formatDate(startTime)},${formatDate(endTime)}`;
 				this.submitData.startTime = formatDate(startTime);
 				this.submitData.endTime = formatDate(endTime);
 			}
