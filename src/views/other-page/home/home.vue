@@ -1,103 +1,137 @@
 <template>
 	<div class="page-style overflowY home-style">
 		<div class="home-content">
-			<div class="content-left">
-				<div class="home-header">
-					<!-- <div class="header-left"> -->
+			<div class="home-form">
+				<RadioGroup v-model="req.dateType" size="small" type="button" button-style="solid" class="content-radio" @on-change="pageLoad('')">
+					<Radio label="day">日</Radio>
+					<Radio label="month">月</Radio>
+					<Radio label="week">周</Radio>
+				</RadioGroup>
+				<DatePicker type="daterange" v-model="req.time" size="small" style="width: 200px" />
 
-					<!-- </div> -->
-					<div class="header-box home-card">
-						<avatar-custom :imgUrl="headIcon" v-if="headIcon" class="home-icon" shape="square"></avatar-custom>
-						<template v-else>
-							<div class="avatar-custom home-icon">
-								<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small ivu-head">
-									<img class="head-portrait" src="../../../assets/images/default-head.png" />
-								</span>
-							</div>
-						</template>
-						<span class="num" style="font-size: 24px">{{ account }}</span>
-						<span class="title">{{ userName }}</span>
-					</div>
-					<div class="header-box home-card">
-						<div class="avatar-custom home-icon">
-							<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small" style="background: #eeca38">
-								<i class="iconfont icon-moban"></i>
-							</span>
-						</div>
-						<span class="title">模板数量</span>
-						<span class="num">{{ data.workbookCount }}</span>
-					</div>
-					<div class="header-box home-card">
-						<div class="avatar-custom home-icon">
-							<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small" style="background: #ef8d60">
-								<i class="iconfont icon-fangwenmingxi"></i>
-							</span>
-						</div>
-						<span class="title">访问次数</span>
-						<span class="num">{{ data.clickCount }}</span>
-					</div>
-					<div class="header-box home-card">
-						<div class="avatar-custom home-icon">
-							<span class="ivu-avatar ivu-avatar-circle ivu-avatar-image ivu-avatar-small" style="background: #52bce3">
-								<i class="iconfont icon-xinzeng"></i>
-							</span>
-						</div>
-						<span class="title">新增数</span>
-						<span class="num">{{ data.addCount }}</span>
+				<RadioGroup v-model="req.type" size="small" type="button" button-style="solid" class="content-radio" @on-change="pageLoad('')">
+					<Radio label="BI">BI</Radio>
+					<Radio label="Report">Report</Radio>
+				</RadioGroup>
+			</div>
+			<div class="content-top">
+				<div class="header-box user-info">
+					<img class="head-portrait" src="../../../assets/images/home/headIcon.png" />
+					<div class="base-info">
+						<div class="title">你好，{{ userName }} !</div>
+						<div class="num">{{ account }}</div>
 					</div>
 				</div>
-				<div class="content">
-					<RadioGroup v-model="req.dateType" type="button" button-style="solid" size="default" class="content-radio" @on-change="pageLoad('')">
-						<Radio label="month">月</Radio>
-						<Radio label="week">周</Radio>
-						<Radio label="day">天</Radio>
-					</RadioGroup>
-					<!-- 收藏表单 -->
-					<Tabs type="card" v-model="req.type" @on-click="pageLoad('')">
-						<TabPane label="BI" name="BI">
-							<div class="left-collect">
-								<div class="title">收藏模板</div>
-								<div class="content">
-									<div class="box" v-for="item in data.modelList" @click="preview(item)">
-										<div class="name textOverhidden">{{ item.name }}</div>
-									</div>
+				<div class="header-box model-info">
+					<div class="model-base">
+						<div class="sub-title">新增模型</div>
+						<div class="title">164</div>
+						<div class="sub-title">总模型数量: 500</div>
+					</div>
+					<div class="model-line">
+						<LineNewModel />
+					</div>
+				</div>
+				<div class="header-box model-info">
+					<div class="model-base">
+						<div class="sub-title">新增模板</div>
+						<div class="title">{{ data.addCount }}</div>
+						<div class="sub-title">总模板数量: {{ data.workbookCount }}</div>
+					</div>
+					<div class="model-line">
+						<LineNewExample />
+					</div>
+				</div>
+				<div class="header-box model-info">
+					<div class="model-base">
+						<div class="sub-title">访问次数</div>
+						<div class="title">{{ data.clickCount }}</div>
+						<div class="sub-title">
+							较上月 +23
+							<Icon type="ios-undo" />
+							<!-- <Icon type="md-share-alt" /> -->
+						</div>
+					</div>
+					<div class="model-line">
+						<BarViewTimes />
+					</div>
+				</div>
+			</div>
+			<div class="content-center">
+				<div class="center-box">
+					<div class="box-title">
+						<span>已收藏BI模板</span>
+						<span>/ Collect BI Templates</span>
+						<span>查看更多 > </span>
+					</div>
+					<div class="box">
+						<div class="box-cell" v-for="item in data.modelList" @click="preview(item)">
+							<img src="../../../assets/images/home/bi.png" />
+							<div class="collect">
+								<span>{{ item.name }}</span>
+								<span>snbyconfig</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="center-box">
+					<div class="box-title">
+						<span>已收藏Report模板</span>
+						<span>/ Collect Report Templates</span>
+						<span>查看更多 > </span>
+					</div>
+					<div class="box">
+						<div class="box-cell" v-for="item in data.modelList" @click="preview(item)">
+							<img src="../../../assets/images/home/report.png" />
+							<div class="collect">
+								<span>{{ item.name }}</span>
+								<span>snbyconfig</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="right-box">
+					<div class="box-title">
+						<span>访问模板排名</span>
+						<span> / Visit Model Ranking</span>
+					</div>
+					<div class="box">
+						<div class="box-cell" v-for="(item, index) in data.top5Data" @click="getTopChartRecord(item.workBooId, index)">
+							<div class="example-info">
+								<span class="order">{{ index + 1 }}</span>
+								<!-- <span class="model-type">{{ templateList[item.modelName] }}模型</span> -->
+								<span class="model-name">{{ item.workBookName }}</span>
+								<div style="display: inline-block; float: right">
+									<span class="num"
+										><span style="font-weight: bold">{{ item.clickCount }}</span
+										>次</span
+									>
+									<span class="taketime"><Icon type="md-time" /> 平均耗时：5 ms</span>
 								</div>
 							</div>
-						</TabPane>
-						<TabPane label="Report" name="Report">
-							<div class="left-collect">
-								<div class="title">收藏模板</div>
-								<div class="content">
-									<div class="box" v-for="item in data.modelList" @click="preview(item)">
-										<div class="name textOverhidden">{{ item.name }}</div>
-									</div>
-								</div>
-							</div>
-						</TabPane>
-					</Tabs>
-					<!-- 访问次数折线图 -->
-					<div class="line-chart">
-						<div class="title">{{ lineChartTitle }}</div>
-						<LineRecord index="0" ref="lineRecordChartRef" v-if="isShow" :data="data.lineRecordData" style="height: calc(100% - 70px)" />
+							<Progress :stroke-width="4" :percent="50" hide-info :stroke-color="['rgba(39,206,136,0)', '#27CE88']" />
+						</div>
 					</div>
 				</div>
 			</div>
 			<!-- top5 -->
-			<div class="content-right">
-				<div class="content-top">
-					<div class="title">访问次数Top5</div>
-					<div class="content">
-						<div class="box" v-for="(item, index) in data.top5Data" @click="getTopChartRecord(item.workBooId, index)">
-							<span class="order">NO.{{ index + 1 }}</span>
-							<span class="model-type textOverhidden">{{ templateList[item.modelName] }}模型</span>
-							<span class="model-name textOverhidden">{{ item.workBookName }}</span>
-							<span class="num">{{ item.clickCount }}</span>
-						</div>
+			<div class="content-bottom">
+				<div class="bottom-left">
+					<div class="box-title">
+						<span>访问次数统计</span>
+						<span>/ Visit Statistics</span>
+					</div>
+					<!-- 访问次数折线图 -->
+					<div class="box">
+						<LineRecord index="0" ref="lineRecordChartRef" v-if="isShow" :data="data.lineRecordData" />
 					</div>
 				</div>
-				<div class="content-bottom">
-					<div class="title">模型占比</div>
-					<div class="content">
+				<div class="bottom-right">
+					<div class="box-title">
+						<span>模型占比统计</span>
+						<span>/ Model Proportion Statistics</span>
+					</div>
+					<div class="box">
 						<PieModel index="0" ref="pieModelRef" v-if="isShow" :data="data.modelRecordData" />
 					</div>
 				</div>
@@ -113,11 +147,15 @@ import { getlistReq } from "@/api/system-manager/data-item";
 import { formatDate } from "@/libs/tools";
 import AvatarCustom from "@/components/avatar-custom";
 import LineRecord from "@/components/echarts/line-record";
+import LineNewExample from "@/components/echarts/line-new-example";
+import LineNewModel from "@/components/echarts/line-new-model";
+
 import PieModel from "@/components/echarts/pie-model";
+import BarViewTimes from "@/components/echarts/bar-view-times.vue";
 
 export default {
 	name: "home",
-	components: { AvatarCustom, LineRecord, PieModel },
+	components: { AvatarCustom, LineRecord, PieModel, LineNewModel, LineNewExample, BarViewTimes },
 	data() {
 		return {
 			isShow: false,
@@ -128,6 +166,7 @@ export default {
 			req: {
 				type: "BI",
 				dateType: "day",
+				time: ["2024-01-01", "2024-01-08"],
 			},
 			data: {
 				top5Data: [],
@@ -142,44 +181,6 @@ export default {
 			email: this.$store.state.email,
 			phone: this.$store.state.phone,
 			vipLevel: this.$store.state.vipLevel,
-			selectPageVal: "",
-			hoursTip: "",
-			textTip: "祝你开心每一天！",
-			textList: [
-				"不能改变世界，那你试过改变自己吗?",
-				"祝你开心每一天！",
-				"云破日出，你是那道光束。",
-				"未来还长，梦想还远，余生的路，不在敷衍。",
-				"活出生命辽阔，拥有选择的权利。",
-				"此刻想举重若轻，之前必要负重前行。",
-				"这一生，你唯一要完成的KPI，就是做自己。",
-				"不管有多少沮丧，别对自己失望好吗，好春光不必趁早，那些辜负你的总会奔赴而来。",
-				"人生的可能，就是选择相信。",
-				"在江湖上想要被看见，要学会亮剑，我已经出招，你呢?",
-				"逆风的方向，更适合飞翔。",
-				"总有一天，光会为你而来。",
-				"青春是不计后果的勇敢，成长是看清真相后的坚持。",
-				"未来还长，梦想还远，余生的路不再敷衍。",
-				"生活是自己的，创造自己的答案，我要我觉得，不要你觉得。",
-				"下一个夏天，要再勇敢一点。",
-				"你只要放下烦恼，且听风吟就好。",
-				"人生苦短要勇敢，翻一座山，追一个梦，爱一个人。",
-				"那个你想到达的地方，念念不忘，必有回响。",
-				"不管今年多少岁，只要你觉得每一天都值得，就是不负好年华。",
-				"苦心人，天不负，卧薪尝胆，三千越甲可吞吴。",
-				"仲夏，尝完这口甜，就去跟世界和解。",
-				"有韧性，更任性。",
-				"那些不期而会的遇到，才是无招胜有招。",
-				"生活很苦，偶尔要学会加一点甜。",
-				"生活从来不平等，你有多努力，才能有多特殊。",
-				"等云开雾散的那天，去见你想见的那个人吧。跑着去~",
-				"交出一部分自己的青春，来换谁也偷不走的阅历。",
-				"和生活单挑时，每刺出致胜一剑，你就有资格为自己加冕。",
-				"努力的意义，就是给爸妈花钱的时候可以毫不犹豫。",
-				"你未必光芒万丈，但你的一点温暖，却能照亮远方。",
-				"若想胜券在握，就得关关难过，关关过。",
-				"你若要纵情撒野，今生我把酒奉陪。",
-			],
 		};
 	},
 	mounted() {
@@ -349,96 +350,101 @@ export default {
 
 .home-content {
 	height: 100%;
-	display: flex;
-	.title {
-		height: 50px;
-		line-height: 50px;
-		padding: 0 20px;
-		font-size: 16px;
-		font-weight: bold;
-		color: #333;
+	.home-form {
+		margin-bottom: 15px;
+		div {
+			margin-right: 10px;
+		}
 	}
-	.content-left {
-		width: 70%;
-		height: 100%;
-		margin: 0 10px;
-		position: relative;
-		.home-header {
-			height: 200px;
-			width: 100%;
-			margin-bottom: 10px;
+	.box-title {
+		height: 30px;
+		background: url("../../../assets/images/home/title.png");
+		background-repeat: no-repeat;
+		background-position: bottom left;
+		padding-left: 15px;
+		line-height: 30px;
+		span:nth-child(1) {
+			color: #333333;
+			font-weight: bold;
+			font-size: 14px;
+			margin-right: 5px;
+		}
+		span:nth-child(2) {
+			color: #333333;
+			font-weight: lighter;
+		}
+		span:nth-child(3) {
+			color: #05995b;
+			display: inline-block;
+			float: right;
+			cursor: pointer;
+		}
+	}
+	.content-top {
+		width: 100%;
+		height: 140px;
+		background: #fff;
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
+		.header-box {
+			width: calc(100% / 4 - 15px);
+			height: 70%;
+			background: rgba(126, 231, 201, 0.27);
+			margin: 10px 0;
+			padding: 15px 30px;
 			display: flex;
-			position: relative;
 			justify-content: space-between;
-			align-items: flex-end;
-			.header-box {
-				width: calc(100% / 4 - 20px);
-				height: 70%;
-				background: #fff;
-				position: relative;
-				margin: 10px 0;
-				.title {
-					color: #778290;
-					position: absolute;
-					top: 80%;
-					left: 50%;
-					font-size: 15px;
-					transform: translate(-50%, -50%);
-					padding: 0px;
+			align-items: center;
+			.title {
+				font-size: 18px;
+				padding: 0;
+				font-weight: bold;
+				color: #09090c;
+			}
+
+			&.user-info {
+				background: linear-gradient(180deg, rgba(126, 231, 201, 0.27), rgba(39, 206, 136, 0.06));
+				img {
+					width: 48px;
+					height: auto;
 				}
-				.num {
-					position: absolute;
-					top: 50%;
-					left: 50%;
-					transform: translate(-50%, -50%);
-					font-size: 38px;
-					font-weight: bold;
-				}
-				.avatar-custom {
-					width: 100px;
-					height: 100px;
-					display: inline-block;
-					position: absolute;
-					top: 0;
-					left: 50%;
-					transform: translate(-50%, -50%);
-					:deep(.ivu-avatar-small) {
-						margin: 14px;
-						width: calc(100% - 28px);
-						height: calc(100% - 28px);
-						border-radius: 10px;
-						/*	box-shadow: 10px 10px 10px #ccc, -10px -10px -10px #ccc;
-						box-shadow: 7px 0px 18px #53f2816e, -7px -7px 16px #6cdceb;*/
-						background: #13c2c2;
-						transition: 0.6s;
-						-webkit-transition: 0.6s;
-						-moz-transition: 0.6s;
-						img {
-							transition: 0.6s;
-							-webkit-transition: 0.6s;
-							-moz-transition: 0.6s;
-						}
+				.base-info {
+					width: calc(100% - 68px);
+					margin-left: 20px;
+
+					.num {
+						color: #3d3d3d;
+						font-size: 14px;
+						margin-top: 10px;
 					}
+				}
+			}
+			&.model-info {
+				background: #eef4ff;
+				.model-base,
+				.model-line {
+					width: 50%;
+					height: 100%;
+				}
+				.sub-title {
+					color: rgba(0, 0, 0, 0.53);
+					font-size: 12px;
+					margin: 8px 0;
 					i {
-						font-size: 34px;
-						line-height: 70px;
-						transition: 0.6s;
-						-webkit-transition: 0.6s;
-						-moz-transition: 0.6s;
+						color: #fb574b;
+						transform: rotate(90deg);
+					}
+					&:first-child {
+						color: #555555;
 					}
 				}
-				&:hover .ivu-avatar-small > i {
-					display: inline-block;
-					transform: scale(-1) rotate(180deg);
+				&:nth-child(3) {
+					background: #fff1ee;
 				}
-				&:hover :deep(.ivu-avatar-small > img) {
-					display: inline-block;
-					transform: scale(2);
+				&:nth-child(4) {
+					background: #f5f0ff;
 				}
-				/*&:hover .ivu-head {
-					display: inline-block;
-					transform: scale(-1) rotate(180deg);
-				}*/
 			}
 		}
 		.content {
@@ -507,99 +513,155 @@ export default {
 			}
 		}
 	}
-	.content-right {
-		height: 100%;
-		width: calc(30% - 40px);
-		background: #fff;
-		margin: 0 10px;
-		.content-top,
-		.content-bottom {
-			height: 50%;
-			margin-bottom: 20px;
-			.content {
-				height: calc(100% - 70px);
-				display: flex;
-				flex-wrap: wrap;
-				align-content: space-around;
-				width: 100%;
-				.box {
-					width: 100%;
-					padding: 0 20px;
-					font-size: 16px;
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
-					align-items: center;
-					align-content: center;
-					/*	box-shadow: 3px 4px 10px #cec9c936;*/
-					position: relative;
+	.content-center {
+		height: calc(60% - 37px - 140px - 15px);
+		width: 100%;
+		margin-top: 15px;
+		.center-box {
+			padding: 5px 15px;
+			width: 30%;
+			height: 100%;
+			background: #fff;
+			float: left;
+			margin-right: 15px;
 
-					&:before {
-						/*	box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.16);*/
-						position: absolute;
-						top: 0;
-						bottom: 0;
-						left: -2px;
-						z-index: 2;
-						width: 30px;
-						transition: box-shadow 0.3s;
-						content: "";
-						pointer-events: none;
+			.box {
+				height: calc(100% - 50px);
+				margin-top: 15px;
+				overflow: auto;
+
+				.box-cell {
+					height: 44px;
+					line-height: 44px;
+					border-bottom: 1px solid #f3f3f3;
+					display: flex;
+					align-items: center;
+					margin-bottom: 8px;
+					padding-bottom: 8px;
+
+					img {
+						vertical-align: middle;
 					}
-					span {
-						padding: 0 10px;
-						display: inline-block;
-						/*排序*/
-						&.order {
-							font-weight: bold;
-							color: #fff;
-							/*	height: 30px;*/
-							background: #406196;
-							border: 1px solid #4c6a9d;
-							display: inline-block;
-							padding: 7px;
+					.collect {
+						margin-left: 10px;
+						span {
+							color: #939393;
+							font-size: 12px;
+							display: block;
+							line-height: 1.5;
 						}
-						&.model-type,
-						&.model-name {
-							width: 200px;
-							text-align: center;
+						span:nth-child(1) {
+							color: #000000;
+							font-size: 14px;
 						}
-						&.num {
-							color: #30cbc0;
-							font-weight: bold;
-							cursor: pointer;
-							font-size: 18px;
-						}
-					}
-					&:nth-child(1) {
-						span.order {
-							background: #c45550;
-							border: 1px solid #a95b61;
-						}
-					}
-					&:nth-child(2) {
-						span.order {
-							background: #c48c63;
-							border: 1px solid #e6a355;
-						}
-					}
-					&:nth-child(3) {
-						span.order {
-							background: #166fd5;
-							border: 1px solid #26649e;
-						}
-					}
-					&:hover {
-						background: #cccccc17;
-						font-weight: bold;
-						cursor: pointer;
 					}
 				}
 			}
 		}
-		.content-bottom {
-			height: calc(50% - 20px);
-			margin-bottom: 0;
+		.right-box {
+			width: calc(40% - 30px);
+			padding: 5px 15px;
+			height: 100%;
+			background: #fff;
+			float: left;
+			.box {
+				height: calc(100% - 50px);
+				margin-top: 15px;
+				overflow: auto;
+				.box-cell {
+					height: 44px;
+					margin-bottom: 4px;
+					.example-info {
+						line-height: 2;
+						.order {
+							display: inline-block;
+							width: 27px;
+							height: 27px;
+							text-align: center;
+							line-height: 1.5;
+							border: 1px solid rgba(149, 152, 206, 0.33);
+							box-shadow: 0px 0px 3px rgba(149, 152, 206, 0.34);
+							color: #9598ce;
+							border-radius: 4px;
+							font-size: 16px;
+							margin-right: 10px;
+						}
+						.num {
+							color: rgba(61, 61, 61, 0.87);
+							margin-right: 10px;
+						}
+						.taketime {
+							background: rgba(39, 206, 136, 0.12);
+							color: rgba(21, 120, 78, 0.96);
+							padding: 3px 10px;
+							border-radius: 3px;
+						}
+					}
+					&:nth-child(1) .example-info .order {
+						border: 1px solid rgba(255, 22, 6, 0.55);
+						box-shadow: 0px 0px 3px rgba(255, 22, 6, 0.27);
+						color: #f74413;
+						font-weight: bold;
+					}
+					&:nth-child(2) .example-info .order {
+						border: 1px solid rgba(239, 155, 87, 0.55);
+						box-shadow: 0px 0px 3px rgba(166, 168, 215, 0.6);
+						color: #f3ba63;
+						font-weight: bold;
+					}
+					&:nth-child(3) .example-info .order {
+						border: 1px solid rgba(149, 152, 206, 0.33);
+						box-shadow: 0px 0px 3px rgba(149, 152, 206, 0.36);
+						color: #9598ce;
+						font-weight: bold;
+					}
+				}
+			}
+
+			:deep(.ivu-progress-bg) {
+				background: linear-gradient(90deg, rgba(39, 206, 136, 0) 0%, rgb(39, 206, 136) 100%) !important;
+				position: relative;
+			}
+			:deep(.ivu-progress-bg:after) {
+				content: "";
+				position: absolute;
+				right: 0;
+				top: -1px;
+				width: 8px;
+				height: 6px;
+				background: #27ce88;
+			}
+		}
+	}
+	.content-bottom {
+		height: calc(40% - 15px - 2px);
+		margin-top: 15px;
+		width: 100%;
+
+		.bottom-left {
+			padding: 10px 15px;
+			width: calc(60% + 15px);
+			height: 100%;
+			background: #fff;
+			float: left;
+			margin-right: 15px;
+			.box {
+				height: calc(100% - 45px);
+				margin-top: 15px;
+				overflow: auto;
+			}
+		}
+		.bottom-right {
+			padding: 10px 15px;
+			width: calc(40% - 30px);
+			height: 100%;
+			background: #fff;
+			float: right;
+			.box {
+				height: calc(100% - 50px);
+				margin-top: 15px;
+				overflow: auto;
+			}
 		}
 	}
 }

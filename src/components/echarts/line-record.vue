@@ -65,9 +65,6 @@ export default {
 						name: "",
 						axisLabel: {
 							formatter: "{value}",
-							textStyle: {
-								fontFamily: "ShiShangZhongHeiJianTi",
-							},
 						},
 						axisLine: {
 							show: false,
@@ -77,6 +74,9 @@ export default {
 						},
 						splitLine: {
 							show: true,
+							lineStyle: {
+								color: "#f3f3f3",
+							},
 						},
 					},
 				],
@@ -85,13 +85,14 @@ export default {
 						name: "访问次数",
 						type: "line",
 						symbol: "circle",
+						smooth: true,
 						symbolSize: 0,
 						itemStyle: {
 							normal: {
 								color: "#27ce88",
 								lineStyle: {
-									color: "#27ce88",
-									width: 2,
+									color: "#cee2ec",
+									width: 1,
 								},
 							},
 						},
@@ -105,11 +106,11 @@ export default {
 									[
 										{
 											offset: 0,
-											color: "rgba(39, 206, 136,0.3)",
+											color: "#83e6d0",
 										},
 										{
-											offset: 0.9,
-											color: "rgba(39, 206, 136,0)",
+											offset: 1,
+											color: "#58f4a1",
 										},
 									],
 									false
@@ -117,36 +118,6 @@ export default {
 							},
 						},
 						data: this.data.map((item) => item.clickCount),
-						markPoint: {
-							label: {
-								show: true,
-								position: "top",
-								distance: 10,
-								offset: [1, 1],
-								lineHeight: 20,
-								backgroundColor: "#27ce88",
-								borderRadius: 5,
-								borderColor: "#27ce88",
-								borderWidth: "1",
-								padding: [5, 15, 4],
-								color: "#fff",
-								fontSize: 14,
-								fontWeight: "normal",
-							},
-							symbol: "circle",
-							symbolSize: 10,
-							symbolOffset: [0, 0],
-							data: [
-								{
-									type: "max",
-									name: "最大值",
-								},
-								{
-									type: "min",
-									name: "最小值",
-								},
-							],
-						},
 					},
 				],
 			};
@@ -163,6 +134,6 @@ export default {
 <style lang="less" scoped>
 .recordLineChart {
 	width: 100%;
-	height: 100%;
+	height: 98%;
 }
 </style>
