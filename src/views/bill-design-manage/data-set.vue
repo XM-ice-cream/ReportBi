@@ -6,7 +6,7 @@
 			<Card :bordered="false" dis-hover class="card-style">
 				<div slot="title">
 					<Row>
-						<i-col span="6">
+						<i-col span="1">
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
 								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
 									<Icon type="ios-funnel" />
@@ -22,11 +22,11 @@
 											<Input v-model="req.setName" :placeholder="$t('pleaseEnter') + $t('setName')" @on-search="searchClick" />
 										</FormItem>
 										<!-- 数据源 -->
-										<FormItem :label="$t('dataSource')" prop="sourceCode">
+										<!-- <FormItem :label="$t('dataSource')" prop="sourceCode">
 											<Select v-model="req.sourceCode" clearable :placeholder="$t('pleaseSelect') + $t('dataSource')" transfer>
 												<Option v-for="item in sourceList" :key="item.sourceName" :label="item.sourceName" :value="item.sourceCode" />
 											</Select>
-										</FormItem>
+										</FormItem> -->
 									</Form>
 									<div class="poptip-style-button">
 										<Button @click="resetClick()">{{ $t("reset") }}</Button>
@@ -34,6 +34,12 @@
 									</div>
 								</div>
 							</Poptip>
+						</i-col>
+						<i-col span="5">
+							<RadioGroup v-model="req.type" size="default" type="button" button-style="solid">
+								<Radio label="Report"></Radio>
+								<Radio label="BI"></Radio>
+							</RadioGroup>
 						</i-col>
 						<i-col span="18" style="text-align: right">
 							<Dropdown size="small" @on-click="addClick">
@@ -46,7 +52,7 @@
 									<DropdownItem name="http">HTTP</DropdownItem>
 								</DropdownMenu>
 							</Dropdown>
-							<button-custom :btnData="btnData" @on-edit-click="editClick" @on-delete-click="deleteClick"></button-custom>
+							<button-custom :btnData="btnData" @on-report-edit-click="editClick" @on-report-delete-click="deleteClick"></button-custom>
 						</i-col>
 					</Row>
 				</div>
@@ -58,7 +64,7 @@
 					:columns="columns"
 					:data="data"
 					@on-current-change="currentClick"
-					@on-selection-change="selectClick"
+					@on-row-dblclick="editClick"
 				>
 					<template slot="setType" slot-scope="{ row }"
 						><Tag v-if="row.setType === 'http'" color="#00346c" type="dot" size="small">HTTP</Tag>
@@ -108,7 +114,6 @@ export default {
 			btnData: [],
 			categoryList: [], // 类别下拉框
 			selectObj: null, //表格选中
-			selectArr: [], //表格多选
 			sourceList: [],
 			dataSet: {},
 			isAdd: true, //新增编辑
@@ -117,14 +122,10 @@ export default {
 				setCode: "",
 				setName: "",
 				sourceCode: "",
+				type: "Report",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
-				{
-					type: "selection",
-					width: 60,
-					align: "center",
-				},
 				{
 					type: "index",
 					width: 50,
@@ -156,12 +157,16 @@ export default {
 	activated() {
 		if (this.$route.query.sourceCode) {
 			this.req.sourceCode = this.$route.query.sourceCode;
+			this.init();
 		}
-		this.pageLoad();
-		this.autoSize();
-		this.getDataSourceList();
-		window.addEventListener("resize", () => this.autoSize());
-		getButtonBoolean(this, this.btnData);
+	},
+	watch: {
+		"req.type": {
+			immediate: true,
+			handler() {
+				this.$emit("update:type", this.req.type);
+			},
+		},
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
@@ -169,6 +174,13 @@ export default {
 		next();
 	},
 	methods: {
+		init() {
+			this.pageLoad();
+			this.autoSize();
+			this.getDataSourceList();
+			window.addEventListener("resize", () => this.autoSize());
+			getButtonBoolean(this, this.btnData, "report");
+		},
 		// 点击搜索按钮触发
 		searchClick() {
 			this.req.pageIndex = 1;
@@ -269,7 +281,7 @@ export default {
 		},
 		//删除
 		deleteClick() {
-			const deleteData = this.selectArr.length > 0 ? this.selectArr : this.selectObj ? [{ ...this.selectObj }] : [];
+			const deleteData = this.selectObj ? [{ ...this.selectObj }] : [];
 			if (deleteData.length == 0) {
 				this.$Msg.error("无选中删除数据");
 				return;
@@ -292,10 +304,7 @@ export default {
 		currentClick(currentRow) {
 			this.selectObj = currentRow;
 		},
-		//删除选择的数据
-		selectClick(selection) {
-			this.selectArr = selection;
-		},
+
 		// 点击重置按钮触发
 		resetClick() {
 			this.$refs.searchReq.resetFields();

@@ -143,14 +143,21 @@ export const getNowToDate = (num = 0) => {
  * @param {Object} that 传入的Vue对象
  * @param {Array} btnArr 返回的数组
  */
-export const getButtonBoolean = (that, btnArr) => {
+export const getButtonBoolean = (that, btnArr, filterField) => {
   that.$store
     .dispatch("handleGetPageButtonList", that.$config)
     .then((res) => {
       let data = res.result.data ? res.result.data : [];
       btnArr.length = 0;
       data.forEach((item) => {
-        if (item.icon !== "null") btnArr.push(item);
+        if (item.icon !== "null") {
+          if (filterField) {
+            item.name.includes(filterField) ? btnArr.push(item) : '';
+          } else {
+            btnArr.push(item);
+          }
+
+        }
       });
     })
     .catch((err) => {

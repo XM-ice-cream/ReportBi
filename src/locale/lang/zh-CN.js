@@ -2011,6 +2011,7 @@ export default {
   'inventory-report': 'Inventory报表',
   'preview-bi': 'BI',
   'sip-trigger': 'SIP Trigger',
+  'data-set-summary': '数据集',
   // <!--------------------------------Button Name----------------------------------------->
   '/page': '条/页',
   add: '新增',

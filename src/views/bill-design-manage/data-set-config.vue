@@ -6,7 +6,7 @@
 			<Card :bordered="false" dis-hover class="card-style">
 				<div slot="title">
 					<Row>
-						<i-col span="6">
+						<i-col span="1">
 							<Poptip v-model="searchPoptipModal" class="poptip-style" placement="right-start" width="400" trigger="manual" transfer>
 								<Button @click.stop="searchPoptipModal = !searchPoptipModal">
 									<Icon type="ios-funnel" />
@@ -29,13 +29,19 @@
 								</div>
 							</Poptip>
 						</i-col>
+						<i-col span="5">
+							<RadioGroup v-model="req.type" size="default" type="button" button-style="solid">
+								<Radio label="Report"></Radio>
+								<Radio label="BI"></Radio>
+							</RadioGroup>
+						</i-col>
 						<i-col span="18" style="text-align: right">
 							<button-custom
 								:btnData="btnData"
-								@on-upload-click="uploadClick"
-								@on-add-click="addClick"
-								@on-edit-click="editClick"
-								@on-delete-click="deleteClick"
+								@on-bi-upload-click="uploadClick"
+								@on-bi-add-click="addClick"
+								@on-bi-edit-click="editClick"
+								@on-bi-delete-click="deleteClick"
 							></button-custom>
 						</i-col>
 					</Row>
@@ -96,6 +102,7 @@ export default {
 				setCode: "",
 				setName: "",
 				sourceCode: "",
+				type: "BI",
 				...this.$config.pageConfig,
 			}, //查询数据
 			columns: [
@@ -127,18 +134,30 @@ export default {
 		};
 	},
 	activated() {
-		this.tableConfig.loading = false;
-		this.pageLoad();
-		this.autoSize();
-		window.addEventListener("resize", () => this.autoSize());
-		getButtonBoolean(this, this.btnData);
+		this.init();
 	},
 	// 导航离开该组件的对应路由时调用
 	beforeRouteLeave(to, from, next) {
 		this.searchPoptipModal = false;
 		next();
 	},
+	watch: {
+		"req.type": {
+			immediate: true,
+			handler() {
+				this.$emit("update:type", this.req.type);
+				console.log("监听", this.req.type);
+			},
+		},
+	},
 	methods: {
+		init() {
+			this.tableConfig.loading = false;
+			this.pageLoad();
+			this.autoSize();
+			window.addEventListener("resize", () => this.autoSize());
+			getButtonBoolean(this, this.btnData, "bi");
+		},
 		// 点击搜索按钮触发
 		searchClick() {
 			this.req.pageIndex = 1;
