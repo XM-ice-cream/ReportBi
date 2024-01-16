@@ -75,12 +75,10 @@ export default {
 			chartData: {},
 			tempStyle: { width: "1287px", height: "649px" },
 			// 数字属性
-			axisNumber: [
-				{
-					type: "value",
-					boundaryGap: [0, 0.01],
-				},
-			],
+			axisNumber: {
+				type: "value",
+				boundaryGap: [0, 0.01],
+			},
 			//字符串属性
 			axisString: [
 				{
@@ -313,7 +311,7 @@ export default {
 			$("#myTable").table2excel({
 				exclude: ".hidden-cell", // 排除包含 .hidden-cell 类的单元格
 				filename: fileName, //文件名称,
-        exclude_bg_color:false,//是否显示背景颜色
+				exclude_bg_color: false, //是否显示背景颜色
 			});
 		},
 
@@ -486,10 +484,10 @@ export default {
 			// 行、列
 			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj);
 			//series
-			const { series, legend } = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString);
+			const { series, legend } = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst);
 
 			//dataZoom
-			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber);
+			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber, grid);
 
 			//visualMap
 			const visualMap = this.getVisualMap(markObj);
@@ -516,99 +514,25 @@ export default {
 			let axisLabelData = [];
 			let grid = [];
 			let isAllNumber = !xNumber.length && !yNumber.length; //均为维度
+			const { offsetWidth, offsetHeight } = this.$refs.workbookTempRef;
+			const width = offsetWidth - 20 - 20;
+			const height = offsetHeight - 20 - 50;
+			console.log(yNumber.length);
 			//列中有指标
 			if (yNumber.length) {
-				yAxis = this.axisNumber;
-
-				//行为指标?数字data:维度常量
-				this.$XEUtils.lastEach(axisConst, (item, index) => {
-					axisLabelData[index] = [];
-
-					//文本宽度
-					const labelWidth =
-						this.mark[0].data.filter((markItem) => {
-							return (
-								markItem.innerText === "labelWidth" && this.axisToField()[`x${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
-							);
-						})[0]?.markValue || 90;
-
-					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
-
-					xAxis.push({
-						...this.axisString[0],
-						data: item,
-						position: "bottom",
-						axisLabel: {
-							show: true,
-							interval: 0,
-							rotate: 90,
-							width: labelWidth,
-							overflow: "truncate",
-							formatter: function (value, valueIndex, data) {
-								axisLabelData[index][valueIndex] = value;
-								if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
-								if (value === axisLabelData[index][valueIndex - 1]) return "";
-								else return value;
-							},
-						},
-
-						position: "bottom",
-						offset: gridWidth - labelWidth,
-					});
-				});
-
-				xAxis.push({
-					...this.axisString[0],
-					data: objKeys,
-					show: false,
-				});
-				grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 70, right: 200 }];
-			} else {
-				//行中有指标，列均为维度
-				xAxis = isAllNumber ? [] : this.axisNumber;
-				this.$XEUtils.lastEach(axisConst, (item, index) => {
-					axisLabelData[index] = [];
-
-					// 文本宽度;
-					const labelWidth =
-						this.mark[0].data.filter((markItem) => {
-							return (
-								markItem.innerText === "labelWidth" && this.axisToField()[`y${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
-							);
-						})[0]?.markValue || 90;
-
-					gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+				//计算每个图表高度
+				for (let i = 0; i < yNumber.length; i++) {
+					gridWidth = 0;
+					grid.push({ right: 20, left: 100 });
 					yAxis.push({
-						...this.axisString[0],
-						name: this.axisToField()[`y${index}`],
-						nameLocation: this.type === "componentHeatMap" ? "end" : "start",
-						data: item,
-						axisLabel: {
-							show: true,
-							interval: 0,
-							rotate: 0,
-							width: labelWidth,
-							overflow: "truncate",
-							align: "right",
-							formatter: function (value, valueIndex, data) {
-								axisLabelData[index][valueIndex] = value;
-								if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
-								if (value === axisLabelData[index][valueIndex - 1]) return "";
-								else return value;
-							},
-						},
-						splitArea: {
-							show: isAllNumber,
-						},
-						inverse: !(this.type === "componentHeatMap"), //反向坐标
-						position: "left",
-						offset: gridWidth - labelWidth,
+						...this.axisNumber,
+						gridIndex: i,
 					});
-				});
-				//均为维度的逻辑
-				if (isAllNumber) {
-					axisConstX.forEach((item, index) => {
-						// 文本宽度;
+					//行为指标?数字data:维度常量
+					this.$XEUtils.lastEach(axisConst, (item, index) => {
+						axisLabelData[index] = [];
+
+						//文本宽度
 						const labelWidth =
 							this.mark[0].data.filter((markItem) => {
 								return (
@@ -617,59 +541,236 @@ export default {
 								);
 							})[0]?.markValue || 90;
 
-						bottomWidth += bottomWidth == 0 ? labelWidth : labelWidth + 10;
+						gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
 
 						xAxis.push({
 							...this.axisString[0],
 							data: item,
-							show: true,
 							position: "bottom",
 							axisLabel: {
 								show: true,
 								interval: 0,
 								rotate: 90,
-								width: 90,
+								width: labelWidth,
 								overflow: "truncate",
+								formatter: function (value, valueIndex, data) {
+									axisLabelData[index][valueIndex] = value;
+									if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+									if (value === axisLabelData[index][valueIndex - 1]) return "";
+									else return value;
+								},
 							},
-							splitArea: {
-								show: isAllNumber,
-							},
-							offset: bottomWidth - labelWidth,
+
+							position: "bottom",
+							offset: gridWidth - labelWidth,
+							gridIndex: i,
+							show: i === 0,
 						});
 					});
 					xAxis.push({
 						...this.axisString[0],
-						data: Object.keys(stringObj),
+						data: objKeys,
 						show: false,
-						position: "bottom",
+						gridIndex: i,
+					});
+					console.log("gridWidth", gridWidth);
+				}
+				const boxHeight = yNumber.length > 3 ? 150 : (height - gridWidth) / yNumber.length;
+				grid = grid.map((item, index) => {
+					if (index === grid.length - 1) {
+						item.top = 50;
+						item.height = "auto";
+					} else {
+						item.height = boxHeight - 20; //减20 让每一个grid上下有间距
+					}
+					return { ...item, bottom: boxHeight * index + gridWidth };
+				});
+
+				// grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 70, right: 200 }];
+			} else {
+				for (let i = 0; i < xNumber.length; i++) {
+					gridWidth = 0;
+					grid.push({
+						top: 50,
+						bottom: 90,
+					});
+					xAxis.push({
+						...this.axisNumber,
+						gridIndex: i,
+					});
+					this.$XEUtils.lastEach(axisConst, (item, index) => {
+						axisLabelData[index] = [];
+
+						// 文本宽度;
+						const labelWidth =
+							this.mark[0].data.filter((markItem) => {
+								return (
+									markItem.innerText === "labelWidth" &&
+									this.axisToField()[`y${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
+								);
+							})[0]?.markValue || 90;
+
+						gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+						yAxis.push({
+							...this.axisString[0],
+							name: this.axisToField()[`y${index}`],
+							nameLocation: this.type === "componentHeatMap" ? "end" : "start",
+							data: item,
+							axisLabel: {
+								show: true,
+								interval: 0,
+								rotate: 0,
+								width: labelWidth,
+								overflow: "truncate",
+								align: "right",
+								formatter: function (value, valueIndex, data) {
+									axisLabelData[index][valueIndex] = value;
+									if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+									if (value === axisLabelData[index][valueIndex - 1]) return "";
+									else return value;
+								},
+							},
+							splitArea: {
+								show: isAllNumber,
+							},
+							inverse: !(this.type === "componentHeatMap"), //反向坐标
+							position: "left",
+							offset: gridWidth - labelWidth,
+							gridIndex: i,
+							show: i === 0,
+						});
+					});
+					yAxis.push({
+						...this.axisString[0],
+						data: objKeys,
+						show: false,
+						inverse: !(this.type === "componentHeatMap"), //反向坐标
 						splitArea: {
 							show: isAllNumber,
 						},
+						show: false,
+						gridIndex: i,
 					});
 				}
+				const boxWidth = xNumber.length > 3 ? 400 : (width - gridWidth) / xNumber.length;
 
-				yAxis.push({
-					...this.axisString[0],
-					data: objKeys,
-					show: false,
-					inverse: !(this.type === "componentHeatMap"), //反向坐标
-					splitArea: {
-						show: isAllNumber,
-					},
+				grid = grid.map((item, index) => {
+					if (index === grid.length - 1) {
+						item.right = 20;
+						item.width = "auto";
+					} else {
+						item.width = boxWidth - 20; //减20 让每一个grid左右有间距
+					}
+					return { ...item, left: boxWidth * index + gridWidth };
 				});
-				grid = [
-					{
-						left: gridWidth + groupByString.length * 10,
-						bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90,
-						top: 70,
-						right: 200,
-					},
-				];
+
+				// //行中有指标，列均为维度
+				// xAxis = isAllNumber ? [] : [this.axisNumber];
+				// this.$XEUtils.lastEach(axisConst, (item, index) => {
+				// 	axisLabelData[index] = [];
+
+				// 	// 文本宽度;
+				// 	const labelWidth =
+				// 		this.mark[0].data.filter((markItem) => {
+				// 			return (
+				// 				markItem.innerText === "labelWidth" && this.axisToField()[`y${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
+				// 			);
+				// 		})[0]?.markValue || 90;
+
+				// 	gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+				// 	yAxis.push({
+				// 		...this.axisString[0],
+				// 		name: this.axisToField()[`y${index}`],
+				// 		nameLocation: this.type === "componentHeatMap" ? "end" : "start",
+				// 		data: item,
+				// 		axisLabel: {
+				// 			show: true,
+				// 			interval: 0,
+				// 			rotate: 0,
+				// 			width: labelWidth,
+				// 			overflow: "truncate",
+				// 			align: "right",
+				// 			formatter: function (value, valueIndex, data) {
+				// 				axisLabelData[index][valueIndex] = value;
+				// 				if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+				// 				if (value === axisLabelData[index][valueIndex - 1]) return "";
+				// 				else return value;
+				// 			},
+				// 		},
+				// 		splitArea: {
+				// 			show: isAllNumber,
+				// 		},
+				// 		inverse: !(this.type === "componentHeatMap"), //反向坐标
+				// 		position: "left",
+				// 		offset: gridWidth - labelWidth,
+				// 	});
+				// });
+				// //均为维度的逻辑
+				// if (isAllNumber) {
+				// 	axisConstX.forEach((item, index) => {
+				// 		// 文本宽度;
+				// 		const labelWidth =
+				// 			this.mark[0].data.filter((markItem) => {
+				// 				return (
+				// 					markItem.innerText === "labelWidth" &&
+				// 					this.axisToField()[`x${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
+				// 				);
+				// 			})[0]?.markValue || 90;
+
+				// 		bottomWidth += bottomWidth == 0 ? labelWidth : labelWidth + 10;
+
+				// 		xAxis.push({
+				// 			...this.axisString[0],
+				// 			data: item,
+				// 			show: true,
+				// 			position: "bottom",
+				// 			axisLabel: {
+				// 				show: true,
+				// 				interval: 0,
+				// 				rotate: 90,
+				// 				width: 90,
+				// 				overflow: "truncate",
+				// 			},
+				// 			splitArea: {
+				// 				show: isAllNumber,
+				// 			},
+				// 			offset: bottomWidth - labelWidth,
+				// 		});
+				// 	});
+				// 	xAxis.push({
+				// 		...this.axisString[0],
+				// 		data: Object.keys(stringObj),
+				// 		show: false,
+				// 		position: "bottom",
+				// 		splitArea: {
+				// 			show: isAllNumber,
+				// 		},
+				// 	});
+				// }
+
+				// yAxis.push({
+				// 	...this.axisString[0],
+				// 	data: objKeys,
+				// 	show: false,
+				// 	inverse: !(this.type === "componentHeatMap"), //反向坐标
+				// 	splitArea: {
+				// 		show: isAllNumber,
+				// 	},
+				// });
+				// grid = [
+				// 	{
+				// 		left: gridWidth + groupByString.length * 10,
+				// 		bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90,
+				// 		top: 70,
+				// 		right: 200,
+				// 	},
+				// ];
 			}
 			return { xAxis, yAxis, grid };
 		},
 		//获取series /legend
-		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString) {
+		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst) {
+			console.log(axisConst);
 			let series = [];
 			let legend = [];
 			let stringData = []; //维度汇总数据
@@ -770,8 +871,8 @@ export default {
 								type,
 								isStack,
 								stack: item,
-								xAxisIndex: yNumber.length ? groupByString.length : 0,
-								yAxisIndex: !yNumber.length ? groupByString.length : 0,
+								// xAxisIndex: yNumber.length ? groupByString.length : 0,
+								// yAxisIndex: !yNumber.length ? groupByString.length : 0,
 								data: [data],
 								labelLayout: {
 									hideOverlap: true,
@@ -789,9 +890,14 @@ export default {
 										return result.join("\n");
 									},
 								},
+								xAxisIndex: yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
+								yAxisIndex: !yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
+								barMaxWidth: 50,
 							};
+							console.log(axisConst.length + 1, series.length - 1);
 							series[index].push(seriesObj);
 						}
+						console.log(series);
 					});
 				});
 			});
@@ -799,7 +905,8 @@ export default {
 			return { series, legend };
 		},
 		//增减进度条
-		getDataZoom(xAxis, yAxis, groupByNumber) {
+		getDataZoom(xAxis, yAxis, groupByNumber, grid) {
+			console.log(xAxis, yAxis, groupByNumber);
 			// const showData = 15 / groupByNumber.length;
 			// const xAxisEnd = { end: xAxis[0]?.data ? (15 / xAxis[0].data.length) * 100 : 100 };
 			// const yAxisEnd = { end: yAxis[0]?.data ? (15 / yAxis[0].data.length) * 100 : 100 };
@@ -811,8 +918,27 @@ export default {
 			const { offsetWidth, offsetHeight } = this.$refs.workbookTempRef;
 			const width = offsetWidth - 20;
 			const height = offsetHeight - 20;
-			const xLength = width / 16 < xAxis[0]?.data?.length ? `${xAxis[0].data.length * 50}px` : `${width}px`;
-			const yLength = height / 16 < yAxis[0]?.data?.length ? `${yAxis[0].data.length * 50}px` : `${height}px`;
+			// const xLength = width / 16 < xAxis[0]?.data?.length ? `${xAxis[0].data.length * 50}px` : `${width}px`;
+			// const yLength = height / 16 < yAxis[0]?.data?.length ? `${yAxis[0].data.length * 50}px` : `${height}px`;
+			let boxWidthHeight = 0;
+			if (grid.length > 3) {
+				//说明是纵向
+				if (grid[grid.length - 1].height) {
+					console.log("纵向");
+					const { bottom, top } = grid[grid.length - 1];
+					const { height: gridHeight } = grid[grid.length - 2];
+					boxWidthHeight = bottom + top + gridHeight;
+				} else {
+					console.log("横向");
+					const { left, right } = grid[grid.length - 1];
+					const { width: gridWidth } = grid[grid.length - 2];
+					boxWidthHeight = left + right + gridWidth;
+					console.log(boxWidthHeight);
+				}
+			}
+
+			const xLength = xAxis[0]?.data ? `${width}px` : xAxis.length > 3 ? `${boxWidthHeight}px` : `${width}px`;
+			const yLength = yAxis[0]?.data ? `${height}px` : yAxis.length > 3 ? `${boxWidthHeight}px` : `${height}px`;
 			this.tempStyle.width = xLength;
 			this.tempStyle.height = yLength;
 		},
