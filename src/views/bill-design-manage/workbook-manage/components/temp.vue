@@ -507,6 +507,7 @@ export default {
 		},
 		//获取x,y轴 grid属性设定
 		getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj) {
+			// console.log(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj);
 			let gridWidth = 0;
 			let bottomWidth = 0;
 			let yAxis = [];
@@ -517,7 +518,6 @@ export default {
 			const { offsetWidth, offsetHeight } = this.$refs.workbookTempRef;
 			const width = offsetWidth - 20 - 20;
 			const height = offsetHeight - 20 - 50;
-			console.log(yNumber.length);
 			//列中有指标
 			if (yNumber.length) {
 				//计算每个图表高度
@@ -525,6 +525,13 @@ export default {
 					gridWidth = 0;
 					grid.push({ right: 20, left: 100 });
 					yAxis.push({
+						name: this.axisToField()[`${yNumber[i]}`]?.trim(),
+						nameTextStyle: {
+							fontStyle: "normal",
+							fontSize: 16,
+							padding: [14, 14, 14, 14],
+						},
+						nameLocation: "middle",
 						...this.axisNumber,
 						gridIndex: i,
 					});
@@ -573,7 +580,6 @@ export default {
 						show: false,
 						gridIndex: i,
 					});
-					console.log("gridWidth", gridWidth);
 				}
 				const boxHeight = yNumber.length > 3 ? 150 : (height - gridWidth) / yNumber.length;
 				grid = grid.map((item, index) => {
@@ -588,16 +594,9 @@ export default {
 
 				// grid = [{ bottom: gridWidth + groupByString.length * 10, left: 100, top: 70, right: 200 }];
 			} else {
-				for (let i = 0; i < xNumber.length; i++) {
-					gridWidth = 0;
-					grid.push({
-						top: 50,
-						bottom: 90,
-					});
-					xAxis.push({
-						...this.axisNumber,
-						gridIndex: i,
-					});
+				//均为维度的逻辑
+				if (isAllNumber) {
+					xAxis = [];
 					this.$XEUtils.lastEach(axisConst, (item, index) => {
 						axisLabelData[index] = [];
 
@@ -636,9 +635,46 @@ export default {
 							inverse: !(this.type === "componentHeatMap"), //反向坐标
 							position: "left",
 							offset: gridWidth - labelWidth,
-							gridIndex: i,
-							show: i === 0,
 						});
+					});
+					axisConstX.forEach((item, index) => {
+						// 文本宽度;
+						const labelWidth =
+							this.mark[0].data.filter((markItem) => {
+								return (
+									markItem.innerText === "labelWidth" &&
+									this.axisToField()[`x${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
+								);
+							})[0]?.markValue || 90;
+
+						bottomWidth += bottomWidth == 0 ? labelWidth : labelWidth + 10;
+
+						xAxis.push({
+							...this.axisString[0],
+							data: item,
+							show: true,
+							position: "bottom",
+							axisLabel: {
+								show: true,
+								interval: 0,
+								rotate: 90,
+								width: 90,
+								overflow: "truncate",
+							},
+							splitArea: {
+								show: isAllNumber,
+							},
+							offset: bottomWidth - labelWidth,
+						});
+					});
+					xAxis.push({
+						...this.axisString[0],
+						data: Object.keys(stringObj),
+						show: false,
+						position: "bottom",
+						splitArea: {
+							show: isAllNumber,
+						},
 					});
 					yAxis.push({
 						...this.axisString[0],
@@ -648,23 +684,102 @@ export default {
 						splitArea: {
 							show: isAllNumber,
 						},
-						show: false,
-						gridIndex: i,
+					});
+					grid = [
+						{
+							left: gridWidth + groupByString.length * 10,
+							bottom: isAllNumber ? bottomWidth + axisConstX.length * 10 : 90,
+							top: 70,
+							right: 200,
+						},
+					];
+				} else {
+					for (let i = 0; i < xNumber.length; i++) {
+						gridWidth = 0;
+						grid.push({
+							top: 50,
+							bottom: 90,
+						});
+						xAxis.push({
+							name: this.axisToField()[`${xNumber[i]}`]?.trim(),
+							nameTextStyle: {
+								fontStyle: "normal",
+								fontSize: 16,
+								padding: [14, 14, 14, 14],
+							},
+							nameLocation: "middle",
+							...this.axisNumber,
+							gridIndex: i,
+						});
+						this.$XEUtils.lastEach(axisConst, (item, index) => {
+							axisLabelData[index] = [];
+
+							// 文本宽度;
+							const labelWidth =
+								this.mark[0].data.filter((markItem) => {
+									return (
+										markItem.innerText === "labelWidth" &&
+										this.axisToField()[`y${index}`]?.trim() === this.axisToField()[`z${markItem.orderBy}`]?.trim()
+									);
+								})[0]?.markValue || 90;
+
+							gridWidth += gridWidth == 0 ? labelWidth : labelWidth + 10;
+							yAxis.push({
+								...this.axisString[0],
+								name: this.axisToField()[`y${index}`],
+								nameLocation: this.type === "componentHeatMap" ? "end" : "start",
+								data: item,
+								axisLabel: {
+									show: true,
+									interval: 0,
+									rotate: 0,
+									width: labelWidth,
+									overflow: "truncate",
+									align: "right",
+									formatter: function (value, valueIndex, data) {
+										axisLabelData[index][valueIndex] = value;
+										if (valueIndex === 0 || index === axisLabelData.length - 1) return value;
+										if (value === axisLabelData[index][valueIndex - 1]) return "";
+										else return value;
+									},
+								},
+								splitArea: {
+									show: isAllNumber,
+								},
+								inverse: !(this.type === "componentHeatMap"), //反向坐标
+								position: "left",
+								offset: gridWidth - labelWidth,
+								gridIndex: i,
+								show: i === 0,
+							});
+						});
+						yAxis.push({
+							...this.axisString[0],
+							data: objKeys,
+							show: false,
+							inverse: !(this.type === "componentHeatMap"), //反向坐标
+							splitArea: {
+								show: isAllNumber,
+							},
+							show: false,
+							gridIndex: i,
+						});
+					}
+					const boxWidth = xNumber.length > 3 ? 400 : (width - gridWidth) / xNumber.length;
+
+					grid = grid.map((item, index) => {
+						if (index === grid.length - 1) {
+							item.right = 20;
+							item.width = "auto";
+						} else {
+							item.width = boxWidth - 20; //减20 让每一个grid左右有间距
+						}
+						return { ...item, left: boxWidth * index + gridWidth };
 					});
 				}
-				const boxWidth = xNumber.length > 3 ? 400 : (width - gridWidth) / xNumber.length;
 
-				grid = grid.map((item, index) => {
-					if (index === grid.length - 1) {
-						item.right = 20;
-						item.width = "auto";
-					} else {
-						item.width = boxWidth - 20; //减20 让每一个grid左右有间距
-					}
-					return { ...item, left: boxWidth * index + gridWidth };
-				});
-
-				// //行中有指标，列均为维度
+				// console.log(isAllNumber, xNumber);
+				//行中有指标，列均为维度
 				// xAxis = isAllNumber ? [] : [this.axisNumber];
 				// this.$XEUtils.lastEach(axisConst, (item, index) => {
 				// 	axisLabelData[index] = [];
@@ -770,7 +885,6 @@ export default {
 		},
 		//获取series /legend
 		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst) {
-			console.log(axisConst);
 			let series = [];
 			let legend = [];
 			let stringData = []; //维度汇总数据
@@ -779,7 +893,6 @@ export default {
 			if (axisConstX.length) {
 				this.dimension = 5;
 				const { mark: markArray, type, color } = markObj[undefined];
-				console.log(markArray, markObj[undefined]);
 				objKeys.forEach((key) => {
 					obj[key].forEach((item) => {
 						let name = "";
@@ -882,7 +995,6 @@ export default {
 									show: true,
 									position: yNumber.length ? "top" : "right",
 									formatter: function (val) {
-										console.log("123");
 										let result = [];
 										markArray.forEach((item) => {
 											result.push(val.value[2][item.axisOrder]);
@@ -894,10 +1006,8 @@ export default {
 								yAxisIndex: !yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
 								barMaxWidth: 50,
 							};
-							console.log(axisConst.length + 1, series.length - 1);
 							series[index].push(seriesObj);
 						}
-						console.log(series);
 					});
 				});
 			});
@@ -906,7 +1016,7 @@ export default {
 		},
 		//增减进度条
 		getDataZoom(xAxis, yAxis, groupByNumber, grid) {
-			console.log(xAxis, yAxis, groupByNumber);
+			// console.log(xAxis, yAxis, groupByNumber, grid);
 			// const showData = 15 / groupByNumber.length;
 			// const xAxisEnd = { end: xAxis[0]?.data ? (15 / xAxis[0].data.length) * 100 : 100 };
 			// const yAxisEnd = { end: yAxis[0]?.data ? (15 / yAxis[0].data.length) * 100 : 100 };
@@ -924,23 +1034,57 @@ export default {
 			if (grid.length > 3) {
 				//说明是纵向
 				if (grid[grid.length - 1].height) {
-					console.log("纵向");
 					const { bottom, top } = grid[grid.length - 1];
 					const { height: gridHeight } = grid[grid.length - 2];
 					boxWidthHeight = bottom + top + gridHeight;
 				} else {
-					console.log("横向");
 					const { left, right } = grid[grid.length - 1];
 					const { width: gridWidth } = grid[grid.length - 2];
 					boxWidthHeight = left + right + gridWidth;
-					console.log(boxWidthHeight);
 				}
 			}
+			let xLength = 0;
+			if (xAxis[0]?.data) {
+				if (width / 16 < xAxis[0]?.data?.length) {
+					xLength = `${xAxis[0].data.length * 50}`;
+				} else {
+					xLength = `${width}`;
+				}
+			} else if (xAxis.length > 3) {
+				xLength = `${boxWidthHeight}`;
+			} else {
+				xLength = `${width}`;
+			}
 
-			const xLength = xAxis[0]?.data ? `${width}px` : xAxis.length > 3 ? `${boxWidthHeight}px` : `${width}px`;
-			const yLength = yAxis[0]?.data ? `${height}px` : yAxis.length > 3 ? `${boxWidthHeight}px` : `${height}px`;
-			this.tempStyle.width = xLength;
-			this.tempStyle.height = yLength;
+			let yLength = 0;
+			if (yAxis[0]?.data) {
+				if (height / 16 < yAxis[0]?.data?.length) {
+					yLength = `${yAxis[0].data.length * 50}`;
+				} else {
+					yLength = `${height}`;
+				}
+			} else if (yAxis.length > 3) {
+				yLength = `${boxWidthHeight}`;
+			} else {
+				yLength = `${height}`;
+			}
+			// const xLength = xAxis[0]?.data
+			// 	? width / 16 < xAxis[0]?.data?.length
+			// 		? `${xAxis[0].data.length * 50}px`
+			// 		: `${width}px`
+			// 	: xAxis.length > 3
+			// 	? `${boxWidthHeight}px`
+			// 	: `${width}px`;
+			// const yLength = yAxis[0]?.data
+			// 	? height / 16 < yAxis[0]?.data?.length
+			// 		? `${yAxis[0].data.length * 50}px`
+			// 		: `${height}px`
+			// 	: yAxis.length > 3
+			// 	? `${boxWidthHeight}px`
+			// 	: `${height}px`;
+			console.log(xLength, yLength);
+			this.tempStyle.width = xLength > 65535 ? "65567px" : `${xLength}px`;
+			this.tempStyle.height = yLength > 65567 ? "65567px" : `${yLength}px`;
 		},
 		//获取颜色
 		getVisualMap(markObj) {
@@ -1008,7 +1152,6 @@ export default {
 				markObj[item.stack] = { color: {}, mark: [], angle: [], type: item.chartType, isStack: item.isStack || "N" };
 				item.data.forEach((markItem) => {
 					const { innerText, markValue, axis, orderBy } = markItem;
-					console.log(markItem);
 					//颜色
 					if (innerText === "color") {
 						//数组类型
