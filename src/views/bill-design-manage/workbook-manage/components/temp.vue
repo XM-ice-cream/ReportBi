@@ -17,17 +17,34 @@
 
 		<div class="workbook-temp" ref="workbookTempRef">
 			<div :style="tempStyle" ref="exportContent">
-				<component
-					ref="componentRef"
-					:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
-					:id="id"
-					:title="title"
-					:ispreview="true"
-					:visib="visib"
-					:tempStyle="tempStyle"
-					:chartData="chartData"
-					:mark="mark"
-				/>
+				<template v-if="['bar', 'line', 'scatter'].includes(type)">
+					<component
+						ref="componentRef"
+						is="barLineScatter"
+						:id="id"
+						:title="title"
+						:ispreview="true"
+						:visib="visib"
+						:tempStyle="tempStyle"
+						:chartData="item"
+						:mark="mark"
+						v-for="(item, index) in chartData"
+						:key="index"
+					/>
+				</template>
+				<template v-else>
+					<component
+						ref="componentRef"
+						:is="['bar', 'line', 'scatter'].includes(type) ? 'barLineScatter' : type"
+						:id="id"
+						:title="title"
+						:ispreview="true"
+						:visib="visib"
+						:tempStyle="tempStyle"
+						:chartData="chartData"
+						:mark="mark"
+					/>
+				</template>
 			</div>
 		</div>
 		<canvas id="canvas-img" style="display: none" />
@@ -326,7 +343,8 @@ export default {
 			else if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
 			else this.chartData = this.dataLogic();
 			this.$nextTick(() => {
-				this.$refs.componentRef.pageLoad();
+				console.log(this.$refs);
+				this.$refs.componentRef.forEach((item) => item.pageLoad());
 				this.$nextTick(() => {
 					// 当滚动条从没有到有时，不加setTimeout滚动条将不会滚动到底部
 					setTimeout(() => {
@@ -371,13 +389,20 @@ export default {
 		},
 		//数据逻辑处理
 		dataLogic() {
-			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] } };
-			let result = {}; //结果集
+			debugger;
+			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] }, commonGrid: [] };
+			let result = []; //结果集
 
 			//指标、维度分类获取
 			this.row.concat(this.column).forEach((item) => {
+				console.log(item);
 				const { axis, orderBy, columnRename } = item;
+				if (item?.setGrid) {
+					const { isDesign } = item.setGrid;
+					isDesign ? rcSummary.commonGrid.push(`${axis}${orderBy}`) : "";
+				}
 				rcSummary[`${axis}${orderBy}`] = columnRename;
+
 				//指标
 				if (this.numberType(item)) rcSummary[axis].number.push(`${axis}${orderBy}`);
 				else rcSummary[axis].string.push(`${axis}${orderBy}`);
@@ -385,8 +410,8 @@ export default {
 			this.fileName = rcSummary;
 			//有指标
 			result = this.numberFunction(rcSummary);
-
-			return { ...result };
+			console.log("result", result);
+			return result;
 		},
 
 		// ====================================行.列中有指标===============================================
@@ -480,40 +505,87 @@ export default {
 
 			//标记
 			const markObj = this.markDataLogic();
-
+			const paramsObj = {
+				yNumber,
+				xNumber,
+				objKeys,
+				axisConst,
+				groupByString,
+				markObj,
+				axisConstX,
+				stringObj,
+				commonGrid: rcSummary.commonGrid,
+				groupByNumber,
+				yNumber,
+				obj,
+				xString,
+			};
 			// 行、列
-			const { xAxis, yAxis, grid } = this.getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj);
+			const { xAxis, yAxis, grid } = this.getxAxisyAxis(paramsObj);
 			//series
-			const { series, legend } = this.getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst);
-
+			const { series, legend } = this.getSeries(paramsObj);
 			//dataZoom
-			const dataZoom = this.getDataZoom(xAxis, yAxis, groupByNumber, grid);
+			const dataZoom = this.getDataZoom(paramsObj, grid);
 
 			//visualMap
 			const visualMap = this.getVisualMap(markObj);
 
-			return {
-				xAxis,
-				yAxis,
-				grid,
-				series: series.flat(),
-				groupByString,
-				groupByNumber,
-				dataZoom,
-				legend,
-				resultKeys: Object.keys(obj),
-				visualMap,
-			};
+			//把他变成分组 5000为一组
+			// const splitNum = 5000;
+			// const group = Math.ceil(series.flat()[0].data.length / splitNum);
+			// let groupArr = [];
+			// for (let i = 0; i < group; i++) {
+			// 	groupArr.push({
+			// 		xAxis: xAxis[0]?.data
+			// 			? xAxis.map((item) => {
+			// 					return { ...item, data: item.data.slice(i, (i + 1) * splitNum) };
+			// 			  })
+			// 			: xAxis,
+			// 		yAxis: yAxis[0]?.data
+			// 			? yAxis.map((item) => {
+			// 					return { ...item, data: item.data.slice(i, (i + 1) * splitNum) };
+			// 			  })
+			// 			: yAxis,
+			// 		grid,
+			// 		series: series.flat().map((item) => {
+			// 			return { ...item, data: item.data.slice(i, (i + 1) * splitNum), large: true, largeThreshold: 500, sampling: "lttb" };
+			// 		}),
+			// 		groupByString,
+			// 		groupByNumber,
+			// 		dataZoom,
+			// 		legend,
+			// 		resultKeys: Object.keys(obj),
+			// 		visualMap,
+			// 	});
+			// }
+			// console.log(groupArr);
+			return [
+				{
+					xAxis,
+					yAxis,
+					grid,
+					series: series.flat(),
+					groupByString,
+					groupByNumber,
+					dataZoom,
+					legend,
+					resultKeys: Object.keys(obj),
+					visualMap,
+				},
+			];
 		},
 		//获取x,y轴 grid属性设定
-		getxAxisyAxis(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj) {
-			// console.log(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj);
+		getxAxisyAxis(paramsObj) {
+			const { yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj, commonGrid } = paramsObj;
+			console.log(yNumber, xNumber, objKeys, axisConst, groupByString, markObj, axisConstX, stringObj);
 			let gridWidth = 0;
 			let bottomWidth = 0;
 			let yAxis = [];
 			let xAxis = [];
 			let axisLabelData = [];
 			let grid = [];
+			console.log(xNumber.length, yNumber.length);
+			debugger;
 			let isAllNumber = !xNumber.length && !yNumber.length; //均为维度
 			const { offsetWidth, offsetHeight } = this.$refs.workbookTempRef;
 			const width = offsetWidth - 20 - 20;
@@ -523,18 +595,24 @@ export default {
 				//计算每个图表高度
 				for (let i = 0; i < yNumber.length; i++) {
 					gridWidth = 0;
-					grid.push({ right: 20, left: 100 });
-					yAxis.push({
-						name: this.axisToField()[`${yNumber[i]}`]?.trim(),
-						nameTextStyle: {
-							fontStyle: "normal",
-							fontSize: 16,
-							padding: [14, 14, 14, 14],
-						},
-						nameLocation: "middle",
-						...this.axisNumber,
-						gridIndex: i,
-					});
+					console.log(commonGrid.includes(yNumber[i]), 1);
+					//如果不存在合并图表
+					if (!commonGrid.includes(yNumber[i])) {
+						console.log(3);
+						grid.push({ right: 20, left: 100 });
+						yAxis.push({
+							name: this.axisToField()[`${yNumber[i]}`]?.trim(),
+							nameTextStyle: {
+								fontStyle: "normal",
+								fontSize: 16,
+								padding: [14, 14, 14, 14],
+							},
+							nameLocation: "middle",
+							...this.axisNumber,
+							gridIndex: i,
+						});
+					}
+
 					//行为指标?数字data:维度常量
 					this.$XEUtils.lastEach(axisConst, (item, index) => {
 						axisLabelData[index] = [];
@@ -696,21 +774,24 @@ export default {
 				} else {
 					for (let i = 0; i < xNumber.length; i++) {
 						gridWidth = 0;
-						grid.push({
-							top: 50,
-							bottom: 90,
-						});
-						xAxis.push({
-							name: this.axisToField()[`${xNumber[i]}`]?.trim(),
-							nameTextStyle: {
-								fontStyle: "normal",
-								fontSize: 16,
-								padding: [14, 14, 14, 14],
-							},
-							nameLocation: "middle",
-							...this.axisNumber,
-							gridIndex: i,
-						});
+						//如果不存在合并图表
+						if (!commonGrid.includes(xNumber[i])) {
+							grid.push({
+								top: 50,
+								bottom: 90,
+							});
+							xAxis.push({
+								name: this.axisToField()[`${xNumber[i]}`]?.trim(),
+								nameTextStyle: {
+									fontStyle: "normal",
+									fontSize: 16,
+									padding: [14, 14, 14, 14],
+								},
+								nameLocation: "middle",
+								...this.axisNumber,
+								gridIndex: i,
+							});
+						}
 						this.$XEUtils.lastEach(axisConst, (item, index) => {
 							axisLabelData[index] = [];
 
@@ -881,10 +962,13 @@ export default {
 				// 	},
 				// ];
 			}
+			console.log("{ xAxis, yAxis, grid }", { xAxis, yAxis, grid });
 			return { xAxis, yAxis, grid };
 		},
 		//获取series /legend
-		getSeries(groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst) {
+		getSeries(paramsObj) {
+			const { groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst } = paramsObj;
+			console.log(paramsObj);
 			let series = [];
 			let legend = [];
 			let stringData = []; //维度汇总数据
@@ -1006,16 +1090,18 @@ export default {
 								yAxisIndex: !yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
 								barMaxWidth: 50,
 							};
+
 							series[index].push(seriesObj);
 						}
 					});
 				});
 			});
-
+console.log("{ series, legend }",{ series, legend })
 			return { series, legend };
 		},
 		//增减进度条
-		getDataZoom(xAxis, yAxis, groupByNumber, grid) {
+		getDataZoom(paramsObj, grid) {
+			const { xAxis, yAxis, groupByNumber } = paramsObj;
 			// console.log(xAxis, yAxis, groupByNumber, grid);
 			// const showData = 15 / groupByNumber.length;
 			// const xAxisEnd = { end: xAxis[0]?.data ? (15 / xAxis[0].data.length) * 100 : 100 };
@@ -1083,7 +1169,7 @@ export default {
 			// 	? `${boxWidthHeight}px`
 			// 	: `${height}px`;
 			console.log(xLength, yLength);
-			this.tempStyle.width = xLength > 65535 ? "65567px" : `${xLength}px`;
+			this.tempStyle.width = xLength > 65567 ? "65567px" : `${xLength}px`;
 			this.tempStyle.height = yLength > 65567 ? "65567px" : `${yLength}px`;
 		},
 		//获取颜色
@@ -1195,6 +1281,7 @@ export default {
 			});
 			return obj;
 		},
+
 		//计算属性对应中文
 		calculatorObj(name, columnName) {
 			const obj = {

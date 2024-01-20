@@ -400,6 +400,8 @@
 			<Fields ref="field" :selectObj="selectObj" @updateRowColumn="updateRowColumn" />
 			<!-- 数据集筛选器 -->
 			<FilterDatasetFields ref="filterDataSetField" :selectObj="selectObj" :isAdd="isAdd" @updateDataSetFilter="updateDataSetFilter" />
+			<!-- 设置轴值 -->
+			<designAxisindex ref="designAixsindexRef" :selectObj="selectObj" @updateRowColumn="updateRowColumn" />
 		</div>
 		<div slot="footer" style="text-align: center">
 			<Button @click="cancelClick">{{ $t("cancel") }}</Button>
@@ -433,10 +435,22 @@ import SortbyFields from "./sortby-fields.vue";
 import DropdownFields from "./dropdown-fields.vue";
 import Fields from "./fields.vue";
 import FilterDatasetFields from "./filter-dataset-fields.vue";
+import designAxisindex from "./design-axisindex.vue";
 
 export default {
 	name: "workbook-design",
-	components: { draggable, componentsTemp, CreateFields, FilterFields, MarkFields, SortbyFields, DropdownFields, Fields, FilterDatasetFields },
+	components: {
+		draggable,
+		componentsTemp,
+		CreateFields,
+		FilterFields,
+		MarkFields,
+		SortbyFields,
+		DropdownFields,
+		Fields,
+		FilterDatasetFields,
+		designAxisindex,
+	},
 	props: {
 		modelFlag: {
 			type: Boolean,
@@ -802,7 +816,10 @@ export default {
 				case "dimension":
 					this.changeToProperty(this.selectObj, 1);
 					break;
-
+				//设定轴属性
+				case "design-aixsindex":
+					this.$refs.designAixsindexRef.modelFlag = true;
+					break;
 				// 函数执行
 				default:
 					switch (type) {
@@ -1002,10 +1019,12 @@ export default {
 		},
 		//更新行、列
 		updateRowColumn(newIndex, obj) {
-			if (obj.axis == "y") this.columnData[newIndex] = { ...obj, remark: JSON.stringify(obj.remark) };
-			if (obj.axis == "x") this.rowData[newIndex] = { ...obj, remark: JSON.stringify(obj.remark) };
+			if (obj.axis == "y") this.columnData[newIndex] = { ...obj, remark: JSON.stringify(obj?.remark) };
+			if (obj.axis == "x") this.rowData[newIndex] = { ...obj, remark: JSON.stringify(obj?.remark) };
+			console.log(this.columnData[newIndex], this.rowData[newIndex]);
 			// this.rowData
 		},
+
 		//更新排序数据
 		updateSort(newIndex, data, markIndex) {
 			switch (data.sortType) {

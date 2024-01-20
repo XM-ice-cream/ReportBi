@@ -24,6 +24,7 @@ export default {
 
 	methods: {
 		pageLoad() {
+			console.log(this.chartData);
 			if (this.myChart[this.id] != null && this.myChart[this.id] != "" && this.myChart[this.id] != undefined) {
 				this.myChart[this.id].dispose();
 			}

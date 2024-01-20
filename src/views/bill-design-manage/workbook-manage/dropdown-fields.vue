@@ -31,6 +31,7 @@
 						</DropdownMenu>
 					</template>
 				</Dropdown>
+				<DropdownItem name="design-aixsindex">设置轴值</DropdownItem>
 				<template v-if="data.dataType === 'DateTime'">
 					<DropdownItem name="YYYY" :class="selectClassType(['YYYY'])">年</DropdownItem>
 					<DropdownItem name="MM" :class="selectClassType(['MM'])">月</DropdownItem>
