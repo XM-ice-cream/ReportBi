@@ -398,8 +398,8 @@ export default {
 				console.log(item);
 				const { axis, orderBy, columnRename } = item;
 				if (item?.setGrid) {
-					const { isDesign } = item.setGrid;
-					isDesign ? rcSummary.commonGrid.push(`${axis}${orderBy}`) : "";
+					const { isDesign, gridIndex, publicAxis } = JSON.parse(item.setGrid);
+					isDesign ? rcSummary.commonGrid.push({ field: `${axis}${orderBy}`, gridIndex, publicAxis }) : "";
 				}
 				rcSummary[`${axis}${orderBy}`] = columnRename;
 
@@ -523,9 +523,9 @@ export default {
 			// 行、列
 			const { xAxis, yAxis, grid } = this.getxAxisyAxis(paramsObj);
 			//series
-			const { series, legend } = this.getSeries(paramsObj);
+			const { series, legend } = this.getSeries(paramsObj, xAxis, yAxis);
 			//dataZoom
-			const dataZoom = this.getDataZoom(paramsObj, grid);
+			const dataZoom = this.getDataZoom(xAxis, yAxis, grid);
 
 			//visualMap
 			const visualMap = this.getVisualMap(markObj);
@@ -585,33 +585,50 @@ export default {
 			let axisLabelData = [];
 			let grid = [];
 			console.log(xNumber.length, yNumber.length);
-			debugger;
 			let isAllNumber = !xNumber.length && !yNumber.length; //均为维度
+
 			const { offsetWidth, offsetHeight } = this.$refs.workbookTempRef;
 			const width = offsetWidth - 20 - 20;
 			const height = offsetHeight - 20 - 50;
 			//列中有指标
 			if (yNumber.length) {
+				let commonGridIndex = 0;
 				//计算每个图表高度
 				for (let i = 0; i < yNumber.length; i++) {
 					gridWidth = 0;
-					console.log(commonGrid.includes(yNumber[i]), 1);
+					let commontGridInfo = commonGrid.filter((item) => item.field === yNumber[i]);
+					console.log("commontGridInfo", commontGridInfo);
 					//如果不存在合并图表
-					if (!commonGrid.includes(yNumber[i])) {
-						console.log(3);
-						grid.push({ right: 20, left: 100 });
+					//如果存在公用轴，则不新增
+					if (commontGridInfo.length == 0) {
+						grid.push({ right: 100, left: 100 });
+					}
+					if (commontGridInfo.length > 0 && commontGridInfo[0].publicAxis == "right") {
 						yAxis.push({
 							name: this.axisToField()[`${yNumber[i]}`]?.trim(),
 							nameTextStyle: {
 								fontStyle: "normal",
 								fontSize: 16,
-								padding: [14, 14, 14, 14],
 							},
 							nameLocation: "middle",
+							nameGap: 80,
 							...this.axisNumber,
-							gridIndex: i,
+							gridIndex: commontGridInfo[0].gridIndex,
+						});
+					} else if (commontGridInfo.length === 0) {
+						yAxis.push({
+							name: this.axisToField()[`${yNumber[i]}`]?.trim(),
+							nameTextStyle: {
+								fontStyle: "normal",
+								fontSize: 16,
+							},
+							nameLocation: "middle",
+							nameGap: 80,
+							...this.axisNumber,
+							gridIndex: i - commonGridIndex,
 						});
 					}
+					if (commontGridInfo.length > 0) commonGridIndex++;
 
 					//行为指标?数字data:维度常量
 					this.$XEUtils.lastEach(axisConst, (item, index) => {
@@ -659,7 +676,8 @@ export default {
 						gridIndex: i,
 					});
 				}
-				const boxHeight = yNumber.length > 3 ? 150 : (height - gridWidth) / yNumber.length;
+				const xAxisGridSum = yNumber.length - commonGridIndex;
+				const boxHeight = xAxisGridSum > 3 ? 150 : (height - gridWidth) / xAxisGridSum;
 				grid = grid.map((item, index) => {
 					if (index === grid.length - 1) {
 						item.top = 50;
@@ -772,26 +790,49 @@ export default {
 						},
 					];
 				} else {
+					let commonGridIndex = 0;
 					for (let i = 0; i < xNumber.length; i++) {
 						gridWidth = 0;
+						let commontGridInfo = commonGrid.filter((item) => item.field === xNumber[i]);
+						console.log("commontGridInfo", commontGridInfo);
+
 						//如果不存在合并图表
-						if (!commonGrid.includes(xNumber[i])) {
+						//如果存在公用轴，则不新增
+						if (commontGridInfo.length == 0) {
 							grid.push({
-								top: 50,
-								bottom: 90,
+								top: 80,
+								bottom: 50,
 							});
+						}
+						if (commontGridInfo.length > 0 && commontGridInfo[0].publicAxis == "right") {
 							xAxis.push({
 								name: this.axisToField()[`${xNumber[i]}`]?.trim(),
 								nameTextStyle: {
 									fontStyle: "normal",
 									fontSize: 16,
-									padding: [14, 14, 14, 14],
 								},
 								nameLocation: "middle",
+								nameGap: 30,
 								...this.axisNumber,
-								gridIndex: i,
+								gridIndex: commontGridInfo[0].gridIndex,
+							});
+						} else if (commontGridInfo.length === 0) {
+							xAxis.push({
+								name: this.axisToField()[`${xNumber[i]}`]?.trim(),
+								nameTextStyle: {
+									fontStyle: "normal",
+									fontSize: 16,
+								},
+								nameGap: 30,
+								nameLocation: "middle",
+								...this.axisNumber,
+								gridIndex: i - commonGridIndex,
 							});
 						}
+
+						if (commontGridInfo.length > 0) commonGridIndex++;
+
+						// }
 						this.$XEUtils.lastEach(axisConst, (item, index) => {
 							axisLabelData[index] = [];
 
@@ -846,7 +887,8 @@ export default {
 							gridIndex: i,
 						});
 					}
-					const boxWidth = xNumber.length > 3 ? 400 : (width - gridWidth) / xNumber.length;
+					const xAxisGridSum = xNumber.length - commonGridIndex;
+					const boxWidth = xAxisGridSum > 3 ? 400 : (width - gridWidth) / xAxisGridSum;
 
 					grid = grid.map((item, index) => {
 						if (index === grid.length - 1) {
@@ -966,9 +1008,8 @@ export default {
 			return { xAxis, yAxis, grid };
 		},
 		//获取series /legend
-		getSeries(paramsObj) {
-			const { groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst } = paramsObj;
-			console.log(paramsObj);
+		getSeries(paramsObj, xAxis, yAxis) {
+			const { groupByNumber, groupByString, yNumber, objKeys, obj, markObj, axisConstX, xString, axisConst, commonGrid } = paramsObj;
 			let series = [];
 			let legend = [];
 			let stringData = []; //维度汇总数据
@@ -1086,22 +1127,33 @@ export default {
 										return result.join("\n");
 									},
 								},
-								xAxisIndex: yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
-								yAxisIndex: !yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
+								// xAxisIndex: yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
+								// yAxisIndex: !yNumber.length ? (axisConst.length + 1) * series.length - 1 : series.length - 1,
 								barMaxWidth: 50,
 							};
+							let commontGridInfo = commonGrid.filter((gridItem) => gridItem.field === item);
+							if (yNumber.length) {
+								seriesObj.xAxisIndex = (axisConst.length + 1) * series.length - 1;
+								seriesObj.yAxisIndex = series.length - 1;
+							} else {
+								seriesObj.xAxisIndex = series.length - 1;
+								seriesObj.yAxisIndex = (axisConst.length + 1) * series.length - 1;
+							}
+							if (commontGridInfo.length > 0) {
+								seriesObj.xAxisIndex = xAxis.map((item) => item.gridIndex).lastIndexOf(commontGridInfo[0].gridIndex);
+								seriesObj.yAxisIndex = yAxis.map((item) => item.gridIndex).lastIndexOf(commontGridInfo[0].gridIndex);
+							}
 
 							series[index].push(seriesObj);
 						}
 					});
 				});
 			});
-console.log("{ series, legend }",{ series, legend })
+			console.log("{ series, legend }", { series, legend });
 			return { series, legend };
 		},
 		//增减进度条
-		getDataZoom(paramsObj, grid) {
-			const { xAxis, yAxis, groupByNumber } = paramsObj;
+		getDataZoom(xAxis, yAxis, grid) {
 			// console.log(xAxis, yAxis, groupByNumber, grid);
 			// const showData = 15 / groupByNumber.length;
 			// const xAxisEnd = { end: xAxis[0]?.data ? (15 / xAxis[0].data.length) * 100 : 100 };
@@ -1154,20 +1206,6 @@ console.log("{ series, legend }",{ series, legend })
 			} else {
 				yLength = `${height}`;
 			}
-			// const xLength = xAxis[0]?.data
-			// 	? width / 16 < xAxis[0]?.data?.length
-			// 		? `${xAxis[0].data.length * 50}px`
-			// 		: `${width}px`
-			// 	: xAxis.length > 3
-			// 	? `${boxWidthHeight}px`
-			// 	: `${width}px`;
-			// const yLength = yAxis[0]?.data
-			// 	? height / 16 < yAxis[0]?.data?.length
-			// 		? `${yAxis[0].data.length * 50}px`
-			// 		: `${height}px`
-			// 	: yAxis.length > 3
-			// 	? `${boxWidthHeight}px`
-			// 	: `${height}px`;
 			console.log(xLength, yLength);
 			this.tempStyle.width = xLength > 65567 ? "65567px" : `${xLength}px`;
 			this.tempStyle.height = yLength > 65567 ? "65567px" : `${yLength}px`;

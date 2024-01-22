@@ -41,8 +41,9 @@ export default {
 	watch: {
 		modelFlag(newVal) {
 			if (newVal) {
-				this.submitData = JSON.parse(JSON.stringify(this.selectObj))?.setGrid || { isDesign: 0, gridIndex: 0 }; //默认不共用值
-				console.log("this.selectObj", this.selectObj, this.submitData);
+				const temp = JSON.parse(JSON.stringify(this.selectObj));
+				this.submitData = JSON.parse(temp?.setGrid) || { isDesign: 0, gridIndex: 0, publicAxis: "right" }; //默认不共用值
+				console.log("this.submitData", this.submitData);
 			}
 		},
 	},
@@ -54,11 +55,11 @@ export default {
 			publicAxisList: [
 				{
 					value: "left",
-					label: "左值轴",
+					label: "同轴",
 				},
 				{
 					value: "right",
-					label: "右值轴",
+					label: "双轴",
 				},
 			],
 		};
@@ -71,7 +72,7 @@ export default {
 			const { newIndex, markIndex } = this.selectObj;
 			this.cancelClick(); //关闭弹框
 			this.$nextTick(() => {
-				this.$emit("updateRowColumn", newIndex, { ...this.selectObj, setGrid: { ...this.submitData } }, markIndex); //取消后 删除拖拽的cell
+				this.$emit("updateRowColumn", newIndex, { ...this.selectObj, setGrid: JSON.stringify({ ...this.submitData }) }, markIndex); //取消后 删除拖拽的cell
 				this.$refs.submitReq.resetFields();
 			});
 		},
