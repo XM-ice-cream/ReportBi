@@ -7,8 +7,8 @@
 				<!-- 是否默认轴值 -->
 				<FormItem label="是否默认轴值" prop="isDesign">
 					<i-switch size="large" v-model="submitData.isDesign" :true-value="1" :false-value="0">
-						<span slot="open">是</span>
-						<span slot="close">否</span>
+						<span slot="open">否</span>
+						<span slot="close">是</span>
 					</i-switch>
 				</FormItem>
 				<template v-if="submitData.isDesign === 1">
@@ -43,7 +43,7 @@ export default {
 			if (newVal) {
 				const temp = JSON.parse(JSON.stringify(this.selectObj));
 				this.submitData = JSON.parse(temp?.setGrid) || { isDesign: 0, gridIndex: 0, publicAxis: "right" }; //默认不共用值
-				console.log("this.submitData", this.submitData);
+				console.log("this.submitData", this.submitData, Boolean(JSON.parse(temp?.setGrid)));
 			}
 		},
 	},
@@ -72,7 +72,7 @@ export default {
 			const { newIndex, markIndex } = this.selectObj;
 			this.cancelClick(); //关闭弹框
 			this.$nextTick(() => {
-				this.$emit("updateRowColumn", newIndex, { ...this.selectObj, setGrid: JSON.stringify({ ...this.submitData }) }, markIndex); //取消后 删除拖拽的cell
+				this.$emit("updateRowColumn", newIndex, { ...this.selectObj, setGrid: { ...this.submitData } }, markIndex); //取消后 删除拖拽的cell
 				this.$refs.submitReq.resetFields();
 			});
 		},

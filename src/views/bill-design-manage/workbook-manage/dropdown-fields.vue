@@ -31,7 +31,9 @@
 						</DropdownMenu>
 					</template>
 				</Dropdown>
-				<DropdownItem name="design-aixsindex">设置轴值</DropdownItem>
+				<DropdownItem name="design-aixsindex" :class="data.setGrid && [1].includes(JSON.parse(data?.setGrid)?.isDesign) ? ['dropdown-selected'] : ''"
+					>设置轴值</DropdownItem
+				>
 				<template v-if="data.dataType === 'DateTime'">
 					<DropdownItem name="YYYY" :class="selectClassType(['YYYY'])">年</DropdownItem>
 					<DropdownItem name="MM" :class="selectClassType(['MM'])">月</DropdownItem>

@@ -1019,9 +1019,15 @@ export default {
 		},
 		//更新行、列
 		updateRowColumn(newIndex, obj) {
-			if (obj.axis == "y") this.columnData[newIndex] = { ...obj, remark: JSON.stringify(obj?.remark) };
-			if (obj.axis == "x") this.rowData[newIndex] = { ...obj, remark: JSON.stringify(obj?.remark) };
-			console.log(this.columnData[newIndex], this.rowData[newIndex]);
+			if (obj.axis == "y") {
+				this.columnData[newIndex] = { ...obj, remark: JSON.stringify(obj?.remark), setGrid: JSON.stringify(obj?.setGrid) };
+				this.columnData = JSON.parse(JSON.stringify(this.columnData));
+			}
+			if (obj.axis == "x") {
+				this.rowData[newIndex] = { ...obj, remark: JSON.stringify(obj?.remark), setGrid: JSON.stringify(obj?.setGrid) };
+				this.rowData = JSON.parse(JSON.stringify(this.rowData));
+			}
+			console.log("更新行、列", this.columnData[newIndex], this.rowData[newIndex]);
 			// this.rowData
 		},
 
