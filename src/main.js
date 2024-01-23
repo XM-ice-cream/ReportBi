@@ -25,6 +25,7 @@ import XEUtils from 'xe-utils';
 import VXETable from 'vxe-table'
 import 'vxe-table/lib/style.css'
 import Print from 'vue-print-nb'
+import myCom from './components/print-nb/index'
 
 // 引入elementui 部分组件
 import {
@@ -36,6 +37,7 @@ Vue.use(Avue);
 Vue.use(animate);
 Vue.use(VXETable);
 Vue.use(Print)
+Vue.use(myCom)
 Vue.component('v-chart', ECharts)
 
 // 注册全局组件
