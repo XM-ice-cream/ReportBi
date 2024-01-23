@@ -46,7 +46,7 @@ export default {
       username: userName.trim(),
       password: sha1_to_base64(encryptDes(password.trim(), "baize#66", "lxeP@ssx")),
       scope: "api offline_access",
-      source: 1,
+      source: 1, //5代表Report BI
     };
     sessionSave("userName", obj.username);
     sessionSave("password", obj.password);

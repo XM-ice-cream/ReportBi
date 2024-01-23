@@ -41,8 +41,10 @@
 						:ispreview="true"
 						:visib="visib"
 						:tempStyle="tempStyle"
-						:chartData="chartData"
+						:chartData="item"
 						:mark="mark"
+						v-for="(item, index) in chartData"
+						:key="index"
 					/>
 				</template>
 			</div>
@@ -142,20 +144,27 @@ export default {
 
 			//导出当前工作簿
 			if (!type) {
-				const dom = this.$refs.componentRef.myChart[this.id].getDom().getElementsByTagName("canvas")[0];
+				console.log(this.$refs);
+				for (let i = 0; i < this.$refs.componentRef.length; i++) {
+					const dom = this.$refs.componentRef[i].myChart[this.id].getDom().getElementsByTagName("canvas")[0];
+					console.log("dom", dom);
+					html2Canvas(dom, { allowTaint: true, useCORS: true,scale:1 }).then((canvas) => {
+						console.log("canvas", canvas);
 
-				html2Canvas(dom, { allowTaint: true, useCORS: true }).then((canvas) => {
-					let contentWidth = canvas.width;
-					let contentHeight = canvas.height;
-					let ctx = canvas.getContext("2d");
+						let contentWidth = canvas.width;
+						let contentHeight = canvas.height;
+						let ctx = canvas.getContext("2d");
 
-					ctx.canvas.willReadFrequently = true;
-					const direction = this.chartData.yAxis && this.chartData.yAxis[0]?.type == "value" ? "l" : "p";
-					filename = `${this.title}_`;
-					const title = this.title;
-					const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index: 1, indexLength: 1 };
-					this.domToPdf(obj);
-				});
+						ctx.canvas.willReadFrequently = true;
+						ctx.canvas.style.scale = 0.2;
+						const direction = this.chartData[i].yAxis && this.chartData[i].yAxis[0]?.type == "value" ? "l" : "p";
+						filename = `${this.title}_`;
+						const title = this.title;
+						const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index: 1, indexLength: 1 };
+						console.log(obj);
+						this.domToPdf(obj);
+					});
+				}
 			} else {
 				//获取对应人员 导出打开界面的所有工作簿
 				let pageTotalTemp = 1;
@@ -285,7 +294,8 @@ export default {
 			const context = this.canvasTemp.getContext("2d");
 
 			context.putImageData(imageData, 0, 0);
-			const base64Image = this.canvasTemp.toDataURL("image/png");
+			const base64Image = this.canvasTemp.toDataURL("image/png", 0.1);
+			console.log("base64Image", base64Image);
 			// this.createImage(base64Image, "ImageData");
 			//清空内容
 			context.clearRect(0, 0, 2000, 2000);
@@ -337,14 +347,18 @@ export default {
 			//表格
 			if (this.type === "componentTable") {
 				this.tempStyle = { width: "100%", height: "100%" };
-				this.chartData = { row: this.row, column: this.column, mark: this.mark, value: this.value, renameObj: this.axisToField() };
+				this.chartData = [{ row: this.row, column: this.column, mark: this.mark, value: this.value, renameObj: this.axisToField() }];
 			}
 			//饼图
 			else if (this.type === "componentPie") this.chartData = this.dataLogicByPie();
 			else this.chartData = this.dataLogic();
 			this.$nextTick(() => {
-				console.log(this.$refs);
-				this.$refs.componentRef.forEach((item) => item.pageLoad());
+				console.log(this.$refs, Array.isArray(this.$refs.componentRef), typeof this.$refs.componentRef);
+				if (Array.isArray(this.$refs.componentRef)) {
+					this.$refs.componentRef.forEach((item) => item.pageLoad());
+				} else {
+					this.$refs.componentRef.pageLoad();
+				}
 				this.$nextTick(() => {
 					// 当滚动条从没有到有时，不加setTimeout滚动条将不会滚动到底部
 					setTimeout(() => {
@@ -385,11 +399,10 @@ export default {
 					},
 				});
 			});
-			return { series };
+			return [{ series }];
 		},
 		//数据逻辑处理
 		dataLogic() {
-			debugger;
 			let rcSummary = { x: { string: [], number: [] }, y: { string: [], number: [] }, commonGrid: [] };
 			let result = []; //结果集
 

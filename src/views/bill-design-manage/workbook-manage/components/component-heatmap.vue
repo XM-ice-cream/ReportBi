@@ -30,6 +30,7 @@ export default {
 			let seriesResult = [];
 
 			const { xAxis, yAxis, grid, series, groupByString, dataZoom, legend, resultKeys, visualMap } = this.chartData;
+			console.log(xAxis, yAxis, grid, series, groupByString, dataZoom, legend, resultKeys, visualMap);
 			//series 根据颜色类别 分类
 			let temp = {};
 			series.forEach((item) => {

@@ -467,10 +467,8 @@ export default {
 	},
 	watch: {
 		modelFlag(newVal) {
-			console.log("监听：", newVal);
 			if (newVal) {
 				this.$nextTick(() => {
-					console.log(1);
 					//编辑 或 复制
 					if (this.workbookIsAdd !== true) {
 						this.submitData = { ...this.submitData, ...this.workbookSelectObj };
@@ -646,6 +644,7 @@ export default {
 			this.visib = false;
 
 			const obj = {
+				id: this.submitData?.id || "",
 				maxNumber: parseInt(maxNumber),
 				datasetId,
 				filterItems: this.filterData.map((item) => {
