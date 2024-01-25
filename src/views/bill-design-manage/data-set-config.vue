@@ -182,12 +182,10 @@ export default {
 			getpagelistReq(obj)
 				.then((res) => {
 					if (res.code === 200) {
-						if (res.code === 200) {
 							let { data, pageSize, pageIndex, total, totalPage } = res.result;
 							this.data = data || [];
 							this.req = { ...this.req, pageSize, pageIndex, total, totalPage, elapsedMilliseconds: res.elapsedMilliseconds };
 							this.searchPoptipModal = false;
-						}
 					}
 				})
 				.finally(() => (this.tableConfig.loading = false));

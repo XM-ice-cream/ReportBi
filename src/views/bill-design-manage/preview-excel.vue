@@ -59,7 +59,7 @@
 										<i
 											class="iconfont icon-menu-like-active menu-like"
 											title="取消收藏"
-											style="color: #ffb300"
+											style="color: #ffb300; font-size: 20px"
 											v-if="collectList.map((item) => item.collect).includes(item.reportCode)"
 											@click.stop="deleteCollectList(item.reportCode)"
 										></i>
@@ -67,7 +67,7 @@
 										<i
 											class="iconfont icon-menu-like menu-like"
 											title="加入收藏"
-											style="color: #ffb300"
+											style="color: #ffb300; font-size: 20px"
 											v-else
 											@click.stop="addCollectList(item)"
 										></i>
@@ -369,7 +369,6 @@ export default {
 				border-radius: 10px;
 				margin-right: 0.7rem;
 				position: relative;
-				box-shadow: 1px 2px 6px #cccc;
 				i {
 					font-size: 1.72rem;
 					color: #52d79f;

@@ -621,11 +621,11 @@ export default {
 			}
 			//饼图 并不需要拖拽行、列
 			if (!this.rowData.length && !(this.markData[0].chartType === "componentPie")) {
-				this.$Msg.error("请拖拽字段至行");
+				this.$Msg.error("请拖拽字段至列");
 				return;
 			}
 			if (!this.columnData.length && !(this.markData[0].chartType === "componentPie")) {
-				this.$Msg.error("请拖拽字段至列");
+				this.$Msg.error("请拖拽字段至行");
 				return;
 			}
 			//判断角度是否为指标类型
@@ -781,11 +781,11 @@ export default {
 					}
 					if (type == "column") {
 						this.$refs.field.modelFlag = true;
-						this.$refs.field.modelTitle = `列边界值设定【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
+						this.$refs.field.modelTitle = `行边界值设定【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
 					}
 					if (type == "row") {
 						this.$refs.field.modelFlag = true;
-						this.$refs.field.modelTitle = `行边界值设定【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
+						this.$refs.field.modelTitle = `列边界值设定【${this.selectObj.columnName} ( ${this.selectObj.labelName} ) 】`;
 					}
 					break;
 				case "sortby":
@@ -973,7 +973,7 @@ export default {
 				//如果标记为饼图 无法拖拽至行列中
 				if (this.markData[0].chartType == "componentPie") {
 					this.columnData.splice(newIndex, 1);
-					this.$Msg.warning("饼图无需拖拽字段到列中");
+					this.$Msg.warning("饼图无需拖拽字段到行中");
 					return;
 				}
 				const { columnType, dataType } = this.columnData[newIndex];

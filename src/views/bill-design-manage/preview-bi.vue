@@ -193,16 +193,19 @@ export default {
 			.name {
 				width: 100%;
 				/* font-weight: 600; */
-				display: block;
 				text-overflow: ellipsis;
-				padding: 5px 0;
 				font-size: 20px;
 				color: #222222;
 				position: relative;
 				height: 50px;
+				display: flex;
+				justify-content: flex-start;
+				align-content: center;
+				align-items: center;
 				i {
 					font-size: 24px;
 					color: #27ce88;
+					margin-right: 5px;
 				}
 				.icon-forward {
 					position: absolute;
@@ -216,6 +219,7 @@ export default {
 				text-overflow: ellipsis;
 				font-size: 14px;
 				padding: 10px 0;
+				margin-bottom: 16px;
 			}
 		}
 	}

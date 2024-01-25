@@ -66,6 +66,15 @@ const otherRouter = [{
       notCache: true
     },
     component: () => import( /* webpackChunkName: "workbook-preview" */ '@/views/bill-design-manage/workbook-manage/workbook-preview.vue')
+  }, {
+    path: '/bill-design-manage/dashboard-design',
+    name: 'dashboard-design',
+    meta: {
+      title: '仪表板 - 设计',
+      hideInMenu: true,
+      notCache: true
+    },
+    component: () => import( /* webpackChunkName: "dashboard-design" */ '@/views/bill-design-manage/dashboard-manage/dashboard-design.vue')
   },
   {
     path: '/',
