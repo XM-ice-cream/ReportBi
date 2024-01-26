@@ -1,3 +1,4 @@
+<!-- 利用vue 生成二维码 -->
 <template>
 	<vueQrcode :value="value"></vueQrcode>
 </template>

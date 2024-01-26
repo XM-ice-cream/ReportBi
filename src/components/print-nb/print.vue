@@ -1,6 +1,6 @@
 <template>
-	<Drawer title="打印预览" v-model="printDialogVisible" width="80%" class="printDialog" @closed="closePrintDialog">
-		<slot name="content"></slot>
+	<Drawer title="打印预览" v-model="printDialogVisible" width="80%" class="printDialog" @on-close="closePrintDialog">
+		<slot name="content">1111</slot>
 		<span slot="footer" class="dialog-footer">
 			<Button @click="closePrintDialog">取 消</Button>
 			<PrintButtonCom :id="printDivId" :title="printBtnTitle"></PrintButtonCom>
@@ -22,6 +22,11 @@ export default {
 		printBtnTitle: {
 			type: String,
 			default: "",
+		},
+	},
+	watch: {
+		printDialogVisible(newval) {
+			console.log("监听", newval);
 		},
 	},
 	methods: {

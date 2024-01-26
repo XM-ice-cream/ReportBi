@@ -14,7 +14,6 @@
 				</DropdownMenu>
 			</template>
 		</Dropdown>
-
 		<div class="workbook-temp" ref="workbookTempRef">
 			<div :style="tempStyle" ref="exportContent">
 				<template v-if="['bar', 'line', 'scatter'].includes(type)">
@@ -49,8 +48,23 @@
 				</template>
 			</div>
 		</div>
-		<canvas id="canvas-img" style="display: none" />
-		<canvas id="canvas-base64" style="display: none" />
+		<div id="temp-img">
+			<template v-for="item in imgArr">
+				<img :src="item" />
+				<p style="page-break-after: always"></p>
+			</template>
+		</div>
+		<Modal draggable v-model="modalFlag" width="800" title="导出PDF" :styles="{ top: '20px' }">
+			<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent>
+				<FormItem label="文件名称" prop="pdfName">
+					<Input v-model="req.pdfName" :placeholder="$t('pleaseEnter') + '文件名称'" />
+				</FormItem>
+			</Form>
+			<div slot="footer" style="text-align: right">
+				<Button @click="modalFlag = false">{{ $t("cancel") }}</Button>
+				<PrintButtonCom id="temp-img" title="导出PDF" :pdfName="req.pdfName"></PrintButtonCom>
+			</div>
+		</Modal>
 	</div>
 </template>
 <script>
@@ -90,6 +104,7 @@ export default {
 	},
 	data() {
 		return {
+			printDialogVisible2: false,
 			modalLoading: false,
 			chartData: {},
 			tempStyle: { width: "1287px", height: "649px" },
@@ -129,40 +144,25 @@ export default {
 			canvasTemp: null,
 			//维度对应的字段名称
 			fileName: {},
+			imgArr: [], //存储图表图片
+			modalFlag: false,
+			req: {
+				pdfName: document.title,
+			},
 		};
 	},
 	methods: {
 		//导出PDF
 		async exportPDF(type) {
-			//创建PDF
-			this.pdf = new jsPDF("landscape", "pt");
-			this.pdf.setFontSize(8);
-			this.pdf.setTextColor("#767676");
-			this.pdf.setFont("simhei");
-			//PDF名称
-			let filename = "";
-
+			this.imgArr = [];
 			//导出当前工作簿
 			if (!type) {
-				console.log(this.$refs);
 				for (let i = 0; i < this.$refs.componentRef.length; i++) {
 					const dom = this.$refs.componentRef[i].myChart[this.id].getDom().getElementsByTagName("canvas")[0];
-					console.log("dom", dom);
-					html2Canvas(dom, { allowTaint: true, useCORS: true,scale:1 }).then((canvas) => {
-						console.log("canvas", canvas);
-
-						let contentWidth = canvas.width;
-						let contentHeight = canvas.height;
-						let ctx = canvas.getContext("2d");
-
-						ctx.canvas.willReadFrequently = true;
-						ctx.canvas.style.scale = 0.2;
-						const direction = this.chartData[i].yAxis && this.chartData[i].yAxis[0]?.type == "value" ? "l" : "p";
-						filename = `${this.title}_`;
-						const title = this.title;
-						const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index: 1, indexLength: 1 };
-						console.log(obj);
-						this.domToPdf(obj);
+					html2Canvas(dom, { allowTaint: true, useCORS: true, scale: 1 }).then((canvas) => {
+						// 生成的ba64图片
+						this.imgArr.push(canvas.toDataURL("image/jpeg", 1));
+						if (i === this.$refs.componentRef.length) this.modalFlag = true; //显示弹框
 					});
 				}
 			} else {
@@ -170,12 +170,13 @@ export default {
 				let pageTotalTemp = 1;
 				let pageIndexTemp = 1;
 				this.$Spin.show();
+				this.imgArr = [];
 				for (let i = pageIndexTemp; i <= pageTotalTemp; i++) {
 					const obj = {
 						orderField: "id",
 						ascending: true,
 						pageSize: 1,
-						pageIndex: pageIndexTemp,
+						pageIndex: i,
 						total: 0,
 						data: {
 							id: window.localStorage.getItem("workBook"),
@@ -183,153 +184,18 @@ export default {
 					};
 					await getImageReq(obj).then(async (res) => {
 						const result = res?.result || [];
-						const { pageSize, pageIndex, totalPage, data } = result;
+						const { data, totalPage } = result;
 						const item = data[0];
-
 						pageTotalTemp = totalPage;
-
-						const { canvas, direction, title, tempStyle } = JSON.parse(item.imageJson);
-
-						const { width: contentWidth, height: contentHeight } = tempStyle;
-						const ctx = await this.drawImage(canvas, contentWidth, contentHeight);
-						filename += `${title}_`;
-
-						const obj = { ctx, direction, title, contentWidth, contentHeight, filename, index: pageIndexTemp, indexLength: pageTotalTemp };
-						await this.domToPdf(obj);
-						pageIndexTemp++;
-						// result?.forEach(async (item, index) => {
-
-						// });
+						const { canvas } = JSON.parse(item.imageJson);
+						this.imgArr.push(canvas);
+						if (i === pageTotalTemp) {
+							this.$Spin.hide(); //隐藏loading
+							this.modalFlag = true; //显示弹框
+						}
 					});
 				}
 			}
-		},
-		//导出pdf
-		async domToPdf(data) {
-			const { ctx, direction, title, contentWidth, contentHeight, filename, index, indexLength } = data;
-			document.documentElement.scrollTop = 0;
-			document.body.scrollTop = 0;
-
-			//pdf 的宽高
-			let pdfWidth = this.pdf.internal.pageSize.getWidth() - 20;
-			let pdfHeight = this.pdf.internal.pageSize.getHeight() - 30;
-
-			let bi = pdfHeight / pdfWidth;
-			let imgWidth = direction == "p" ? contentWidth : contentHeight / bi; // A4 页面宽度
-			let imgHeight = direction == "l" ? contentHeight : contentWidth * bi;
-
-			let contentRadio = Math.max(contentWidth / pdfWidth, contentHeight / pdfHeight);
-			if (contentRadio <= 1) {
-				imgWidth = contentWidth;
-				imgHeight = contentHeight;
-			}
-			const radioTmp = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-			// 页面偏移
-			let positionX = 0;
-			let positionY = 0;
-
-			let iLength = Math.ceil(contentHeight / imgHeight);
-			let jLength = Math.ceil(contentWidth / imgWidth);
-
-			for (let i = 0; i < iLength; i++) {
-				positionX = 0;
-				positionY = i * imgHeight;
-				for (let j = 0; j < jLength; j++) {
-					let imageData = ctx.getImageData(positionX, positionY, imgWidth, imgHeight);
-					// let imageData = ctx.getImageData(0, 0, contentWidth, contentHeight);
-					let base64Img = this.getImageDataDataURL(imageData);
-					// await this.createImage(base64Img, "截图");
-					// 添加页眉
-					this.pdf.text(`${title}`, this.pdf.internal.pageSize.width / 2, 10, "center");
-					//图片
-					this.pdf.addImage(base64Img, "JPEG", 10, 20, imgWidth * radioTmp, imgHeight * radioTmp);
-					//添加页尾
-					this.pdf.text(
-						"page " + (i * jLength + j + 1) + " of " + iLength * jLength,
-						this.pdf.internal.pageSize.width / 2,
-						this.pdf.internal.pageSize.height - 10,
-						"center"
-					);
-					if (!(i == iLength - 1 && j == jLength - 1 && index == indexLength)) {
-						this.pdf.addPage();
-					}
-					positionX = (j + 1) * imgWidth;
-				}
-			}
-
-			// 清空整个 Canvas
-			ctx.clearRect(0, 0, contentWidth, contentHeight);
-			// 下载操作(下载到最后一个生成pdf)
-			// await this.$nextTick();
-			if (index == indexLength) {
-				this.pdf.save(`${filename}${formatDate(new Date())}.pdf`);
-				this.$Spin.hide(); //隐藏loading
-			}
-		},
-		createImage(base64Img, type) {
-			const div = document.getElementsByClassName("workbook-temp")[0];
-			var im = document.createElement("img"); //创建图片
-			var p = document.createElement("p");
-			p.appendChild(document.createTextNode(`---------------,${type}`));
-			im.src = base64Img;
-			//图片设置成和div一样大小
-			im.style.width = 900;
-			im.style.height = 600;
-			div.appendChild(p);
-			div.appendChild(im);
-		},
-		// 将 ImageData 转换为 base64 格式的图片数据
-		getImageDataDataURL(imageData) {
-			// 从内存中清除 <canvas> 元素
-			if (this.canvasTemp?.width) {
-				this.canvasTemp.width = 0;
-				this.canvasTemp.height = 0;
-				this.canvasTemp = null;
-			}
-
-			this.canvasTemp = document.getElementById("canvas-base64");
-
-			this.canvasTemp.width = imageData.width;
-			this.canvasTemp.height = imageData.height;
-			const context = this.canvasTemp.getContext("2d");
-
-			context.putImageData(imageData, 0, 0);
-			const base64Image = this.canvasTemp.toDataURL("image/png", 0.1);
-			console.log("base64Image", base64Image);
-			// this.createImage(base64Image, "ImageData");
-			//清空内容
-			context.clearRect(0, 0, 2000, 2000);
-
-			return base64Image;
-		},
-		//base64码转成canvas
-		drawImage(base64Image, width, height) {
-			// 从内存中清除 <canvas> 元素
-			if (this.domCanvas?.width) {
-				this.domCanvas.width = 0;
-				this.domCanvas.height = 0;
-				this.domCanvas = null;
-			}
-			// 创建一个新的 canvas 元素
-			this.domCanvas = document.getElementById("canvas-img");
-			this.domCanvas.width = width;
-			this.domCanvas.height = height;
-
-			const ctx = this.domCanvas.getContext("2d");
-
-			const img = new Image();
-			const promise = new Promise((resolve) => {
-				img.onload = function () {
-					ctx.drawImage(img, 0, 0);
-					resolve();
-				};
-			});
-			img.src = base64Image;
-
-			return promise.then(() => {
-				// this.createImage(this.domCanvas.toDataURL(), "转成canvas");
-				return ctx;
-			});
 		},
 		//导出表格
 		exportExcel() {
