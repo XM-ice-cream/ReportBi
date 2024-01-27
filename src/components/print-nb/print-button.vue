@@ -73,7 +73,7 @@ export default {
 };
 </script>
 
-<style media="printContent">
+<style media="print">
 @page {
 	size: auto;
 	margin: 1mm;
@@ -88,6 +88,14 @@ export default {
 		margin: 10mm 15mm 10mm 15mm;
 		border: solid 1px #ffffff; /* margin: 10mm 15mm 10mm 15mm; */
 		height: auto;
+	}
+	::-webkit-scrollbar {
+		display: none; /* 隐藏滚动条 */
+	}
+	#temp-img {
+		display: block;
+		height: auto;
+		overflow: hidden;
 	}
 	/*打印内容的class*/
 	.print-container {

@@ -51,7 +51,7 @@
 		<div id="temp-img">
 			<template v-for="item in imgArr">
 				<div class="img-title">{{ item.title }}</div>
-				<img :src="item.canvas" />
+				<img :src="item.canvas" style="margin-top: 0" />
 				<p style="page-break-after: always"></p>
 			</template>
 		</div>
