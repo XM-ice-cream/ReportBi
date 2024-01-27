@@ -1363,7 +1363,9 @@ export default {
 	cursor: no-drop;
 }
 .workbook-container {
-	height: calc(100% - 20px);
+  height: 100%;
+  overflow: hidden;
+
 	.top-container {
 		display: flex;
 		height: 100%;

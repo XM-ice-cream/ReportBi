@@ -24,6 +24,7 @@ export default {
 		},
 		pdfName(newval) {
 			console.log("监听", newval);
+			this.print.pdfName = newval;
 		},
 	},
 	data() {
@@ -31,6 +32,7 @@ export default {
 			print: {
 				id: this.id,
 				pdfName: this.pdfName,
+				modalFlag: this.modalFlag,
 				popTitle: "打印", // 打印配置页上方标题
 				preview: false, // 是否启动预览模式，默认是false（开启预览模式，可以先预览后打印）
 				previewTitle: "打印", // 打印预览的标题（开启预览模式后出现）,
@@ -51,8 +53,11 @@ export default {
 					vue.printLoading = false;
 					console.log("执行了打印");
 				},
-				closeCallback() {
+				closeCallback(vue) {
 					console.log("关闭了打印工具");
+					vue.$parent.$parent.modalFlag = false;
+					document.title = window.localStorage.getItem("documentTitle");
+					// window.localStorage.setItem("documentTitle", this.$parent.submitData.workBookName);
 				},
 				clickMounted(vue) {
 					document.title = this.pdfName;

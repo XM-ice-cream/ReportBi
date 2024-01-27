@@ -50,7 +50,8 @@
 		</div>
 		<div id="temp-img">
 			<template v-for="item in imgArr">
-				<img :src="item" />
+				<div class="img-title">{{ item.title }}</div>
+				<img :src="item.canvas" />
 				<p style="page-break-after: always"></p>
 			</template>
 		</div>
@@ -62,7 +63,7 @@
 			</Form>
 			<div slot="footer" style="text-align: right">
 				<Button @click="modalFlag = false">{{ $t("cancel") }}</Button>
-				<PrintButtonCom id="temp-img" title="导出PDF" :pdfName="req.pdfName"></PrintButtonCom>
+				<PrintButtonCom id="temp-img" title="导出PDF" :pdfName="req.pdfName" :modalFlag.sync="modalFlag"></PrintButtonCom>
 			</div>
 		</Modal>
 	</div>
@@ -147,7 +148,7 @@ export default {
 			imgArr: [], //存储图表图片
 			modalFlag: false,
 			req: {
-				pdfName: document.title,
+				pdfName: "",
 			},
 		};
 	},
@@ -155,22 +156,28 @@ export default {
 		//导出PDF
 		async exportPDF(type) {
 			this.imgArr = [];
+			window.localStorage.setItem("documentTitle", this.title);
+			this.req.pdfName = this.title;
+			this.$Spin.show();
 			//导出当前工作簿
 			if (!type) {
 				for (let i = 0; i < this.$refs.componentRef.length; i++) {
 					const dom = this.$refs.componentRef[i].myChart[this.id].getDom().getElementsByTagName("canvas")[0];
 					html2Canvas(dom, { allowTaint: true, useCORS: true, scale: 1 }).then((canvas) => {
+						const canvasImg = canvas.toDataURL("image/jpeg", 1);
+						const title = this.title;
 						// 生成的ba64图片
-						this.imgArr.push(canvas.toDataURL("image/jpeg", 1));
-						if (i === this.$refs.componentRef.length) this.modalFlag = true; //显示弹框
+						this.imgArr.push({ canvas: canvasImg, title });
+						if (i + 1 === this.$refs.componentRef.length) {
+							this.$Spin.hide(); //隐藏loading
+							this.modalFlag = true; //显示弹框
+						}
 					});
 				}
 			} else {
 				//获取对应人员 导出打开界面的所有工作簿
 				let pageTotalTemp = 1;
 				let pageIndexTemp = 1;
-				this.$Spin.show();
-				this.imgArr = [];
 				for (let i = pageIndexTemp; i <= pageTotalTemp; i++) {
 					const obj = {
 						orderField: "id",
@@ -187,8 +194,8 @@ export default {
 						const { data, totalPage } = result;
 						const item = data[0];
 						pageTotalTemp = totalPage;
-						const { canvas } = JSON.parse(item.imageJson);
-						this.imgArr.push(canvas);
+						const { canvas: canvasImg, title } = JSON.parse(item.imageJson);
+						this.imgArr.push({ canvas: canvasImg, title });
 						if (i === pageTotalTemp) {
 							this.$Spin.hide(); //隐藏loading
 							this.modalFlag = true; //显示弹框
@@ -1222,13 +1229,16 @@ export default {
 <style scoped lang="less">
 .temp-preview {
 	padding-top: 10px !important;
+	.workbook-temp {
+		height: calc(100% - 30px) !important;
+	}
 }
 .temp {
 	height: 100%;
 	padding-top: 40px;
 	.workbook-temp {
 		width: calc(100% - 10px);
-		height: calc(100% - 40px);
+		height: calc(100% - 15px);
 		padding: 5px;
 		margin: 5px;
 		overflow: auto;
@@ -1242,9 +1252,10 @@ export default {
 		left: 50%;
 		transform: translate(-50%, -2%);
 	}
+
 	.download {
 		position: absolute;
-		top: 2%;
+		top: 1.7%;
 		right: 4%;
 		i {
 			font-size: 24px;
@@ -1253,5 +1264,12 @@ export default {
 			}
 		}
 	}
+}
+.img-title {
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	height: 40px;
+	line-height: 40px;
 }
 </style>
