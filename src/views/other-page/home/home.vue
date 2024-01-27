@@ -4,10 +4,9 @@
 			<div class="home-form">
 				<RadioGroup v-model="req.dateType" size="small" type="button" button-style="solid" class="content-radio" @on-change="pageLoad('')">
 					<Radio label="day">日</Radio>
-					<Radio label="month">月</Radio>
 					<Radio label="week">周</Radio>
+					<Radio label="month">月</Radio>
 				</RadioGroup>
-				<DatePicker type="daterange" v-model="req.time" size="small" style="width: 200px" />
 
 				<RadioGroup v-model="req.type" size="small" type="button" button-style="solid" class="content-radio" @on-change="pageLoad('')">
 					<Radio label="BI">BI</Radio>
@@ -25,35 +24,35 @@
 				<div class="header-box model-info">
 					<div class="model-base">
 						<div class="sub-title">新增模型</div>
-						<div class="title">164</div>
-						<div class="sub-title">总模型数量: 500</div>
+						<div class="title">{{ data.addModelCount }}</div>
+						<div class="sub-title">总模型数量: {{ data.modelCount }}</div>
 					</div>
 					<div class="model-line">
-						<LineNewModel />
+						<LineNewModel :data="datasetList" v-if="isShow" />
 					</div>
 				</div>
 				<div class="header-box model-info">
 					<div class="model-base">
 						<div class="sub-title">新增模板</div>
-						<div class="title">{{ data.addCount }}</div>
+						<div class="title">{{ data.addWorkbookCount }}</div>
 						<div class="sub-title">总模板数量: {{ data.workbookCount }}</div>
 					</div>
 					<div class="model-line">
-						<LineNewExample />
+						<LineNewExample :data="workbookList" v-if="isShow" />
 					</div>
 				</div>
 				<div class="header-box model-info">
 					<div class="model-base">
 						<div class="sub-title">访问次数</div>
-						<div class="title">{{ data.clickCount }}</div>
+						<div class="title">{{ data.addCount }}</div>
 						<div class="sub-title">
-							较上月 +23
-							<Icon type="ios-undo" />
-							<!-- <Icon type="md-share-alt" /> -->
+							较上月 {{ data.addCountPreRt }}
+							<Icon type="ios-undo" v-if="data.addCountPreRt > 0" />
+							<Icon type="md-share-alt" v-else />
 						</div>
 					</div>
 					<div class="model-line">
-						<BarViewTimes />
+						<BarViewTimes :data="clickList" v-if="isShow" />
 					</div>
 				</div>
 			</div>
@@ -65,11 +64,11 @@
 						<span>查看更多 > </span>
 					</div>
 					<div class="box">
-						<div class="box-cell" v-for="item in data.modelList" @click="preview(item)">
+						<div class="box-cell" v-for="item in data.biModelList.concat(data.dashboardModelList)" @click="preview(item)">
 							<img src="../../../assets/images/home/bi.png" />
 							<div class="collect">
 								<span>{{ item.name }}</span>
-								<span>snbyconfig</span>
+								<span>{{ item.code }}</span>
 							</div>
 						</div>
 					</div>
@@ -81,11 +80,11 @@
 						<span>查看更多 > </span>
 					</div>
 					<div class="box">
-						<div class="box-cell" v-for="item in data.modelList" @click="preview(item)">
+						<div class="box-cell" v-for="item in data.reportModelList" @click="preview(item)">
 							<img src="../../../assets/images/home/report.png" />
 							<div class="collect">
 								<span>{{ item.name }}</span>
-								<span>snbyconfig</span>
+								<span>{{ item.code }}</span>
 							</div>
 						</div>
 					</div>
@@ -106,10 +105,15 @@
 										><span style="font-weight: bold">{{ item.clickCount }}</span
 										>次</span
 									>
-									<span class="taketime"><Icon type="md-time" /> 平均耗时：5 ms</span>
+									<span class="taketime"><Icon type="md-time" /> 平均耗时：{{ item.pTimeConSum }} ms</span>
 								</div>
 							</div>
-							<Progress :stroke-width="4" :percent="50" hide-info :stroke-color="['rgba(39,206,136,0)', '#27CE88']" />
+							<Progress
+								:stroke-width="4"
+								:percent="(item.clickCount / data.addCount) * 100"
+								hide-info
+								:stroke-color="['rgba(39,206,136,0)', '#27CE88']"
+							/>
 						</div>
 					</div>
 				</div>
@@ -141,8 +145,7 @@
 </template>
 
 <script>
-import { getreportbirecordReq, gettopfiveReq, gettopchartrecordReq, getmodelrecordReq } from "@/api/other-page/home";
-import { getCollectReq } from "@/api/bill-design-manage/workbook-manage.js";
+import { getreportbirecordReq, gettopfiveReq, getmodelrecordReq, getCollectReq, getTopChartRecordReq } from "@/api/other-page/home";
 import { getlistReq } from "@/api/system-manager/data-item";
 import { formatDate } from "@/libs/tools";
 import AvatarCustom from "@/components/avatar-custom";
@@ -166,11 +169,12 @@ export default {
 			req: {
 				type: "BI",
 				dateType: "day",
-				time: ["2024-01-01", "2024-01-08"],
 			},
 			data: {
 				top5Data: [],
-				modelList: [],
+				biModelList: [],
+				dashboardModelList: [],
+				reportModelList: [],
 				lineRecordData: [],
 				modelRecordData: [],
 			},
@@ -181,24 +185,34 @@ export default {
 			email: this.$store.state.email,
 			phone: this.$store.state.phone,
 			vipLevel: this.$store.state.vipLevel,
+			datasetList: [],
+			workbookList: [],
+			clickList: [],
 		};
 	},
 	mounted() {
 		this.$Message.destroy();
 		this.pageLoad();
 		this.getDataItemData();
-		this.$nextTick(() => {
-			this.isShow = true;
-		});
 	},
 	methods: {
-		pageLoad() {
+		async pageLoad() {
 			this.lineChartTitle = "访问记录";
 			this.getNum();
 			this.getTopFive();
 			this.getTopChartRecord("");
 			this.getModelRecord();
-			this.getCollectList();
+
+			this.data.biModelList = await this.getCollectList("BI");
+			this.data.dashboardModelList = await this.getCollectList("Dashboard");
+			console.log(this.data.biModelList, this.data.dashboardModelList);
+			this.data.reportModelList = await this.getCollectList("Report");
+			this.datasetList = await this.getTopChartRecordTop("dataset");
+			this.workbookList = await this.getTopChartRecordTop("workbook");
+			this.clickList = await this.getTopChartRecordTop("");
+			await this.$nextTick(() => {
+				this.isShow = true;
+			});
 		},
 		//获取汇总数量
 		getNum() {
@@ -208,8 +222,7 @@ export default {
 			};
 			getreportbirecordReq(obj).then((res) => {
 				if (res.code == 200) {
-					const { workbookCount, clickCount, addCount } = res.result;
-					this.data = { ...this.data, workbookCount, clickCount, addCount };
+					this.data = { ...this.data, ...res.result };
 				}
 			});
 		},
@@ -234,7 +247,7 @@ export default {
 				dateType: this.req.dateType,
 				reportType: this.req.type,
 			};
-			gettopchartrecordReq(obj).then((res) => {
+			getTopChartRecordReq(obj).then((res) => {
 				if (res.code === 200) {
 					const data = res?.result || [];
 					this.data.lineRecordData = data;
@@ -259,14 +272,29 @@ export default {
 				}
 			});
 		},
-		//获取用户收藏
-		getCollectList() {
-			const obj = { type: this.req.type };
-			getCollectReq(obj).then((res) => {
+		//获取BI用户收藏
+		async getCollectList(dataType) {
+			let result = [];
+			const obj = { reportType: dataType };
+			await getCollectReq(obj).then((res) => {
 				if (res.code == 200) {
-					this.data.modelList = res.result || [];
+					result = res?.result || [];
 				}
 			});
+			return result;
+		},
+		//获取趋势图
+		async getTopChartRecordTop(dataType) {
+			let result = [];
+			const obj = {
+				dateType: this.req.dateType,
+				reportType: this.req.type,
+				dataType,
+			};
+			await getTopChartRecordReq(obj).then((res) => {
+				result = res?.result || [];
+			});
+			return result;
 		},
 		//跳转页面
 		preview(data) {

@@ -21,20 +21,29 @@ export const gettopfiveReq = data => {
     data
   })
 }
-// 获取单个工作簿的折线图
-export const gettopchartrecordReq = data => {
-  return requestCenter({
-    baseUrl: window.localStorage.getItem("reportDesignIp"),
-    url: '/index/getTopChartRecord',
-    method: 'post',
-    data
-  })
-}
 // 获取模型占比
 export const getmodelrecordReq = data => {
   return requestCenter({
     baseUrl: window.localStorage.getItem("reportDesignIp"),
     url: '/index/getModelRecord',
+    method: 'post',
+    data
+  })
+}
+// 获取收藏
+export const getCollectReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/index/getusercollect',
+    method: 'post',
+    data
+  })
+}
+// 获取趋势图
+export const getTopChartRecordReq = data => {
+  return requestCenter({
+    baseUrl: window.localStorage.getItem("reportDesignIp"),
+    url: '/index/gettopchartrecord',
     method: 'post',
     data
   })

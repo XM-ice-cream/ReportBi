@@ -30,14 +30,14 @@ export default {
 			let option = {
 				color: ["#f06161"],
 				grid: {
-					bottom: 0,
+					bottom: 1,
 					top: 10,
 					left: 0,
 					rigth: 0,
 				},
 				xAxis: {
 					type: "category",
-					data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+					data: this.data.map((item) => item.dateStr),
 					show: false,
 				},
 				yAxis: {
@@ -46,7 +46,7 @@ export default {
 				},
 				series: [
 					{
-						data: [1, 10, 8, 10, 5, 11, 15, 12],
+						data: this.data.map((item) => item.clickCount),
 						type: "line",
 						showSymbol: false,
 						smooth: true,

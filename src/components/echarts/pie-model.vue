@@ -27,7 +27,7 @@ export default {
 		initChart() {
 			// 基于准备好的dom，初始化echarts实例
 			this.modelPieChart = echarts.init(document.getElementById("modelPieChart" + this.index));
-			const title = { value: 2966, type: "模型总数" };
+			const title = { value: this.data.reduce((acc, cur) => acc + cur.counts, 0), type: "模型总数" };
 			const _this = this;
 			let option = {
 				title: {

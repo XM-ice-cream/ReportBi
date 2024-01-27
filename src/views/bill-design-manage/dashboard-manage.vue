@@ -365,8 +365,8 @@ export default {
 		},
 		//新增用户收藏
 		addCollectList(data) {
-			const { reportCode, reportName } = data;
-			const obj = { type: "Dashboard", collect: reportCode, name: reportName };
+			const { dashboardName } = data;
+			const obj = { type: "Dashboard", name: dashboardName };
 			addCollectReq(obj).then((res) => {
 				if (res.code == 200) {
 					this.getCollectList();

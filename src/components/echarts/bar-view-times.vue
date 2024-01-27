@@ -27,24 +27,9 @@ export default {
 		initChart() {
 			// 基于准备好的dom，初始化echarts实例
 			this.viewTimesBarChart = echarts.init(document.getElementById("viewTimesBarChart" + this.index));
-			var salvProName = [
-				"安徽省",
-				"河南河南省河南省河南省河南省河南省河南省河南省省",
-				"浙江省",
-				"湖北省",
-				"贵州省",
-				"江西省",
-				"江苏省",
-				"四川省",
-				"云南省",
-				"湖南省",
-			];
-
-			var salvProValue = [181, 154, 144, 135, 117, 74, 72, 67, 55];
-
 			let option = {
 				grid: {
-					bottom: 0,
+					bottom: 1,
 					top: 10,
 					left: 0,
 					rigth: 0,
@@ -52,7 +37,7 @@ export default {
 				xAxis: {
 					type: "category",
 					show: false,
-					data: salvProName,
+					data: this.data.map((item) => item.dateStr),
 				},
 				yAxis: [
 					{
@@ -64,7 +49,7 @@ export default {
 					{
 						// name: '值',
 						type: "bar",
-						data: salvProValue,
+						data: this.data.map((item) => item.clickCount),
 						barWidth: 8,
 						itemStyle: {
 							normal: {
