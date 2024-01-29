@@ -55,7 +55,7 @@
 				<p style="page-break-after: always"></p>
 			</div>
 		</div>
-		<Modal draggable v-model="modalFlag" width="800" title="导出PDF" :styles="{ top: '20px' }">
+		<!-- <Modal draggable v-model="modalFlag" width="800" title="导出PDF" :styles="{ top: '20px' }">
 			<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent>
 				<FormItem label="文件名称" prop="pdfName">
 					<Input v-model="req.pdfName" :placeholder="$t('pleaseEnter') + '文件名称'" />
@@ -63,9 +63,9 @@
 			</Form>
 			<div slot="footer" style="text-align: right">
 				<Button @click="modalFlag = false">{{ $t("cancel") }}</Button>
-				<PrintButtonCom id="temp-img" title="导出PDF" :pdfName="req.pdfName" :modalFlag.sync="modalFlag"></PrintButtonCom>
 			</div>
-		</Modal>
+		</Modal> -->
+		<PrintButtonCom ref="downloadRef" id="temp-img" title="导出PDF" :pdfName="req.pdfName" :modalFlag.sync="modalFlag"></PrintButtonCom>
 	</div>
 </template>
 <script>
@@ -170,7 +170,11 @@ export default {
 						this.imgArr.push({ canvas: canvasImg, title });
 						if (i + 1 === this.$refs.componentRef.length) {
 							this.$Spin.hide(); //隐藏loading
-							this.modalFlag = true; //显示弹框
+							// this.modalFlag = true; //显示弹框
+              //手动触发导出PDF
+							const buttonElement = this.$refs.downloadRef.$el;
+							const clickEvent = new MouseEvent("click");
+							buttonElement.dispatchEvent(clickEvent);
 						}
 					});
 				}
@@ -198,7 +202,11 @@ export default {
 						this.imgArr.push({ canvas: canvasImg, title });
 						if (i === pageTotalTemp) {
 							this.$Spin.hide(); //隐藏loading
-							this.modalFlag = true; //显示弹框
+							// this.modalFlag = true; //显示弹框
+              //手动触发导出PDF
+              const buttonElement = this.$refs.downloadRef.$el;
+							const clickEvent = new MouseEvent("click");
+							buttonElement.dispatchEvent(clickEvent);
 						}
 					});
 				}

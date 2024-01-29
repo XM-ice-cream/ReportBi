@@ -57,13 +57,13 @@ export default {
 					console.log("执行了打印");
 				},
 				closeCallback(vue) {
-					console.log("关闭了打印工具");
-					vue.$parent.$parent.modalFlag = false;
-					document.title = window.localStorage.getItem("documentTitle");
+					// console.log("关闭了打印工具");
+					// vue.$parent.$parent.modalFlag = false;
+					// document.title = window.localStorage.getItem("documentTitle");
 					// window.localStorage.setItem("documentTitle", this.$parent.submitData.workBookName);
 				},
 				clickMounted(vue) {
-					document.title = this.pdfName;
+					// document.title = this.pdfName;
 					console.log("点击了打印按钮", vue, this.id, this.pdfName);
 
 					// vue.printContent.popTitle = "123"; // 动态设置页眉
