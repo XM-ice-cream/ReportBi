@@ -37,8 +37,11 @@ export default {
 				preview: false, // 是否启动预览模式，默认是false（开启预览模式，可以先预览后打印）
 				previewTitle: "打印", // 打印预览的标题（开启预览模式后出现）,
 				previewPrintBtnLabel: "", // 打印预览的标题的下方按钮文本，点击可进入打印（开启预览模式后出现）
-				zIndex: 200003, // 预览的窗口的z-index，默认是 20002（此值要高一些，这涉及到预览模式是否显示在最上面）
+				zIndex: "", // 预览的窗口的z-index，默认是 20002（此值要高一些，这涉及到预览模式是否显示在最上面）
 				extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>',
+				url: "",
+				standard: "HTML5",
+				extraCss: "",
 				previewBeforeOpenCallback() {
 					console.log("正在加载预览窗口");
 				},
@@ -63,10 +66,8 @@ export default {
 					document.title = this.pdfName;
 					console.log("点击了打印按钮", vue, this.id, this.pdfName);
 
-					// vue.printContent.popTitle = vue.tableHead; // 动态设置页眉
+					// vue.printContent.popTitle = "123"; // 动态设置页眉
 				},
-				// url: "",
-				standard: "",
 			},
 		};
 	},
@@ -83,31 +84,6 @@ export default {
 		background-color: #ffffff;
 		height: auto;
 		margin: 0px;
-	}
-	body {
-		margin: 10mm 15mm 10mm 15mm;
-		border: solid 1px #ffffff; /* margin: 10mm 15mm 10mm 15mm; */
-		height: auto;
-	}
-	::-webkit-scrollbar {
-		display: none; /* 隐藏滚动条 */
-	}
-	#temp-img {
-		display: block;
-		height: auto;
-		overflow: hidden;
-	}
-	/*打印内容的class*/
-	.print-container {
-		transform: scale(0.6);
-	}
-	/*无需打印内容的class*/
-	.noPrint {
-		display: none;
-	}
-	/* 自动分页*/
-	.page-break {
-		page-break-after: always;
 	}
 }
 </style>

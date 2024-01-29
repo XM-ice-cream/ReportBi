@@ -49,11 +49,11 @@
 			</div>
 		</div>
 		<div id="temp-img">
-			<template v-for="item in imgArr">
+			<div v-for="item in imgArr" style="heigth: auto; position: relative">
 				<div class="img-title">{{ item.title }}</div>
-				<img :src="item.canvas" style="margin-top: 0" />
+				<img :src="item.canvas" style="margin-top: 40px" />
 				<p style="page-break-after: always"></p>
-			</template>
+			</div>
 		</div>
 		<Modal draggable v-model="modalFlag" width="800" title="导出PDF" :styles="{ top: '20px' }">
 			<Form ref="searchReq" :model="req" :label-width="80" @submit.native.prevent>
@@ -1271,5 +1271,9 @@ export default {
 	font-weight: bold;
 	height: 40px;
 	line-height: 40px;
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translate(-50%, 0);
 }
 </style>
