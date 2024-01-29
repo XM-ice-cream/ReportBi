@@ -46,9 +46,9 @@
 						<div class="sub-title">访问次数</div>
 						<div class="title">{{ data.addCount }}</div>
 						<div class="sub-title">
-							较上月 {{ data.addCountPreRt }}
+							较{{ getCurrArea }} {{ data.addCountPreRt }}
 							<Icon type="ios-undo" v-if="data.addCountPreRt > 0" />
-							<Icon type="md-share-alt" v-else />
+							<Icon type="md-share-alt" v-if="data.addCountPreRt < 0" />
 						</div>
 					</div>
 					<div class="model-line">
@@ -61,10 +61,10 @@
 					<div class="box-title">
 						<span>已收藏BI模板</span>
 						<span>/ Collect BI Templates</span>
-						<span>查看更多 > </span>
+						<span @click="previewMore('BI')">查看更多 > </span>
 					</div>
 					<div class="box">
-						<div class="box-cell" v-for="item in data.biModelList.concat(data.dashboardModelList)" @click="preview(item)">
+						<div class="box-cell" v-for="item in data.biModelList.concat(data.dashboardModelList)" @click="preview('BI', item)">
 							<img src="../../../assets/images/home/bi.png" />
 							<div class="collect">
 								<span>{{ item.name }}</span>
@@ -77,10 +77,10 @@
 					<div class="box-title">
 						<span>已收藏Report模板</span>
 						<span>/ Collect Report Templates</span>
-						<span>查看更多 > </span>
+						<span @click="previewMore('Report')">查看更多 > </span>
 					</div>
 					<div class="box">
-						<div class="box-cell" v-for="item in data.reportModelList" @click="preview(item)">
+						<div class="box-cell" v-for="item in data.reportModelList" @click="preview('Report', item)">
 							<img src="../../../assets/images/home/report.png" />
 							<div class="collect">
 								<span>{{ item.name }}</span>
@@ -127,7 +127,7 @@
 					</div>
 					<!-- 访问次数折线图 -->
 					<div class="box">
-						<LineRecord index="0" ref="lineRecordChartRef" v-if="isShow" :data="data.lineRecordData" />
+						<LineRecord index="0" ref="lineRecordChartRef" :data="data.lineRecordData" />
 					</div>
 				</div>
 				<div class="bottom-right">
@@ -190,6 +190,16 @@ export default {
 			clickList: [],
 		};
 	},
+	computed: {
+		getCurrArea() {
+			let obj = {
+				day: "昨日",
+				week: "上周",
+				month: "上月",
+			};
+			return obj[this.req.dateType];
+		},
+	},
 	mounted() {
 		this.$Message.destroy();
 		this.pageLoad();
@@ -201,18 +211,19 @@ export default {
 			this.getNum();
 			this.getTopFive();
 			this.getTopChartRecord("");
-			this.getModelRecord();
 
 			this.data.biModelList = await this.getCollectList("BI");
-			this.data.dashboardModelList = await this.getCollectList("Dashboard");
-			console.log(this.data.biModelList, this.data.dashboardModelList);
+			const dashboardList = await this.getCollectList("Dashboard");
+			this.data.biModelList = this.data.biModelList.concat(dashboardList);
 			this.data.reportModelList = await this.getCollectList("Report");
 			this.datasetList = await this.getTopChartRecordTop("dataset");
 			this.workbookList = await this.getTopChartRecordTop("workbook");
 			this.clickList = await this.getTopChartRecordTop("");
 			await this.$nextTick(() => {
 				this.isShow = true;
+				this.data = JSON.parse(JSON.stringify(this.data));
 			});
+			await this.getModelRecord();
 		},
 		//获取汇总数量
 		getNum() {
@@ -252,7 +263,7 @@ export default {
 					const data = res?.result || [];
 					this.data.lineRecordData = data;
 					this.$nextTick(() => {
-						this.$refs.lineRecordChartRef.initChart();
+						this.$refs?.lineRecordChartRef.initChart();
 					});
 				}
 			});
@@ -267,7 +278,7 @@ export default {
 				if (res.code === 200) {
 					this.data.modelRecordData = res?.result || [];
 					this.$nextTick(() => {
-						this.$refs.pieModelRef.initChart();
+						this.$refs?.pieModelRef.initChart();
 					});
 				}
 			});
@@ -296,10 +307,17 @@ export default {
 			});
 			return result;
 		},
+		//查看更多
+		previewMore(type) {
+			if (type === "BI") {
+				this.$router.push({ name: "preview-bi" });
+			} else {
+				this.$router.push({ name: "preview-excel" });
+			}
+		},
 		//跳转页面
-		preview(data) {
+		preview(type, data) {
 			const { collect, name } = data;
-			const type = this.req.type;
 			let params = type == "BI" ? { id: collect } : { reportCode: collect, reportName: name };
 			let skipName = `${type}Preview`;
 			const href = this.skipUrl(skipName, { ...params });
@@ -566,7 +584,7 @@ export default {
 					align-items: center;
 					margin-bottom: 8px;
 					padding-bottom: 8px;
-
+					cursor: pointer;
 					img {
 						vertical-align: middle;
 					}

@@ -51,6 +51,10 @@ export default {
 						},
 					},
 				},
+				grid: {
+					height: "100%",
+					width: "100%",
+				},
 				color: ["#33c29c", "#57b57e", "#9ea5c2", "#fb992a", "#f4c02c", "#38b1d3", "#57b1f2", "#9873fe"],
 				tooltip: {
 					trigger: "item",
